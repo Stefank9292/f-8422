@@ -18,6 +18,30 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     });
   };
 
+  const handleDownload = async (videoUrl: string) => {
+    try {
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `video-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        description: "Download started",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        variant: "destructive",
+        description: "Failed to download video",
+      });
+    }
+  };
+
   const formatNumber = (num: number) => {
     return num?.toLocaleString() || '0';
   };
@@ -77,7 +101,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
                   <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
                     <ExternalLink className="w-4 h-4" />
                   </Button>
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" onClick={() => handleDownload(post.videoUrl)}>
                     <Download className="w-4 h-4" />
                   </Button>
                 </div>
