@@ -125,53 +125,49 @@ export function AppSidebar() {
             </button>
           </div>
 
-          <SidebarGroupContent className="flex flex-col h-[calc(100vh-4rem)]">
+          <SidebarGroupContent>
             <SidebarMenu>
               {/* Tools Section */}
-              <div className="flex-1">
-                <SidebarSection
-                  title="TOOLS"
-                  items={toolsMenuItems}
-                  onNavigate={navigate}
-                  currentPath={location.pathname}
-                />
+              <SidebarSection
+                title="TOOLS"
+                items={toolsMenuItems}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
 
-                {/* History Section */}
-                <SidebarSection
-                  title="HISTORY"
-                  items={historyMenuItems}
-                  onNavigate={navigate}
-                  currentPath={location.pathname}
-                />
-              </div>
+              {/* History Section */}
+              <SidebarSection
+                title="HISTORY"
+                items={historyMenuItems}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
 
-              {/* Settings Section - Now at the bottom */}
-              <div className="mt-auto">
-                <SidebarMenuItem>
-                  <div className="h-px bg-sidebar-border mx-2 my-4" />
-                </SidebarMenuItem>
+              {/* Secondary Menu Section with separator */}
+              <SidebarMenuItem>
+                <div className="h-px bg-sidebar-border mx-2 my-4" />
+              </SidebarMenuItem>
 
-                {/* Settings Section */}
-                <SidebarSection
-                  title="SETTINGS"
-                  items={secondaryMenuItems}
-                  subscriptionStatus={subscriptionStatus}
-                  onNavigate={navigate}
-                  currentPath={location.pathname}
-                />
+              {/* Settings Section */}
+              <SidebarSection
+                title="SETTINGS"
+                items={secondaryMenuItems}
+                subscriptionStatus={subscriptionStatus}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
 
-                {/* User Profile */}
-                <SidebarMenuItem>
-                  <UserProfile email={session?.user?.email} />
-                </SidebarMenuItem>
+              {/* User Profile */}
+              <SidebarMenuItem>
+                <UserProfile email={session?.user?.email} />
+              </SidebarMenuItem>
 
-                {/* Crafted with love by VyralSearch */}
-                <SidebarMenuItem>
-                  <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                    Crafted with ❤️ by VyralSearch
-                  </div>
-                </SidebarMenuItem>
-              </div>
+              {/* Crafted with love by VyralSearch */}
+              <SidebarMenuItem>
+                <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                  Crafted with ❤️ by VyralSearch
+                </div>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
