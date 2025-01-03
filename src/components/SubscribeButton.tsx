@@ -80,7 +80,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed && planId !== 'free') {
-      return `Subscribe to ${planName}`;
+      return `Upgrade to ${planName}`;
     }
 
     if (planId === 'free') {
@@ -98,6 +98,11 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
     // If user has Ultra plan (viewing Premium button)
     if (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" && planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
       return "Downgrade to Premium";
+    }
+
+    // If user has Premium plan (viewing Ultra button)
+    if (subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && planId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+      return "Upgrade to Ultra";
     }
 
     return `Upgrade to ${planName}`;

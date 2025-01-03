@@ -89,6 +89,7 @@ const SubscribePage = () => {
         )}
 
         <div className="grid md:grid-cols-3 gap-6">
+          {/* Free Plan */}
           <Card className="p-6 space-y-4">
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold">Free Plan</h2>
@@ -106,6 +107,7 @@ const SubscribePage = () => {
             </div>
           </Card>
 
+          {/* Premium Plan */}
           <Card className="p-6 space-y-4">
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold">Premium Plan</h2>
@@ -123,12 +125,15 @@ const SubscribePage = () => {
             </div>
           </Card>
 
-          <Card className="p-6 space-y-4 border-2 border-primary">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <h2 className="text-2xl font-semibold">Ultra Plan</h2>
-                <span className="bg-primary text-primary-foreground text-sm px-2 py-1 rounded">Best Value</span>
-              </div>
+          {/* Ultra Plan - Most Popular */}
+          <Card className="p-6 space-y-4 relative border-2 border-primary ring-2 ring-primary/20 shadow-lg">
+            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+              <Badge variant="default" className="bg-primary text-primary-foreground px-3 py-1">
+                Most Popular
+              </Badge>
+            </div>
+            <div className="space-y-2 pt-2">
+              <h2 className="text-2xl font-semibold">Ultra Plan</h2>
               <p className="text-muted-foreground">For power users</p>
             </div>
             <ul className="space-y-2">
