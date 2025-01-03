@@ -100,10 +100,10 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
   });
 
   const getSortIcon = (key: string) => {
-    if (sortConfig.key === key) {
-      return <ArrowUpDown className={`h-4 w-4 ${sortConfig.direction ? 'text-primary' : 'text-muted-foreground'}`} />;
+    if (sortConfig.key === key && sortConfig.direction !== null) {
+      return <ArrowUpDown className="h-4 w-4 text-primary" />;
     }
-    return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
+    return null;
   };
 
   return (
