@@ -125,7 +125,7 @@ export async function fetchInstagramPosts(
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    // Prepare request body according to Apify API specifications
+    // Prepare request body with reduced memory requirements
     const requestBody: Record<string, any> = {
       "addParentData": false,
       "directUrls": [instagramUrl],
@@ -135,7 +135,8 @@ export async function fetchInstagramPosts(
       "resultsLimit": numberOfVideos,
       "resultsType": "posts",
       "searchLimit": 1,
-      "searchType": "user"
+      "searchType": "user",
+      "memoryMbytes": 512 // Reduce memory requirement to avoid quota issues
     };
 
     // Only add postsUntil if a date is provided
@@ -160,6 +161,12 @@ export async function fetchInstagramPosts(
     if (!response.ok) {
       const errorBody = await response.text();
       console.error('API Error Response:', errorBody);
+      
+      // Check if it's a quota/billing error
+      if (response.status === 402) {
+        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+      }
+      
       throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
     }
 
