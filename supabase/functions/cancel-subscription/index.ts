@@ -41,12 +41,9 @@ serve(async (req) => {
       throw new Error('No customer found')
     }
 
-    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
-
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
-      price: price_id,
       limit: 1
     })
 
@@ -54,10 +51,13 @@ serve(async (req) => {
       throw new Error('No active subscription found')
     }
 
-    // Cancel the subscription at period end
-    await stripe.subscriptions.update(subscriptions.data[0].id, {
-      cancel_at_period_end: true
-    })
+    // Cancel the subscription immediately instead of at period end
+    await stripe.subscriptions.cancel(subscriptions.data[0].id, {
+      invoice_now: true,
+      prorate: true
+    });
+
+    console.log('Subscription cancelled immediately')
 
     return new Response(
       JSON.stringify({ success: true }),

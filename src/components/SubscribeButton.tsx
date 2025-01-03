@@ -34,7 +34,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
         
         toast({
           title: "Plan Updated",
-          description: "You have been successfully downgraded to the Free plan.",
+          description: "Your subscription has been cancelled and you have been moved to the Free plan immediately.",
         });
       } 
       // Handle downgrade to Premium from Ultra
