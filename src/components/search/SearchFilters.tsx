@@ -18,6 +18,7 @@ interface SearchFiltersProps {
   onReset: () => void;
   totalResults: number;
   filteredResults: number;
+  currentPosts: any[]; // Add this prop to receive the filtered posts
 }
 
 export const SearchFilters = ({ 
@@ -25,8 +26,52 @@ export const SearchFilters = ({
   onFilterChange, 
   onReset,
   totalResults,
-  filteredResults
+  filteredResults,
+  currentPosts
 }: SearchFiltersProps) => {
+  const handleExportCSV = () => {
+    // Convert posts data to CSV format
+    const headers = [
+      'Username',
+      'Caption',
+      'Date',
+      'Plays',
+      'Views',
+      'Likes',
+      'Comments',
+      'Duration',
+      'Engagement',
+      'URL'
+    ].join(',');
+
+    const rows = currentPosts.map(post => [
+      `@${post.ownerUsername}`,
+      `"${post.caption.replace(/"/g, '""')}"`, // Escape quotes in caption
+      post.date,
+      post.playsCount,
+      post.viewsCount,
+      post.likesCount,
+      post.commentsCount,
+      post.duration || '0:00',
+      post.engagement,
+      post.url
+    ].join(','));
+
+    const csvContent = [headers, ...rows].join('\n');
+    
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `tiktok-search-results-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-4">
       {/* Filter Header */}
@@ -39,7 +84,7 @@ export const SearchFilters = ({
           <span className="text-sm text-gray-600">
             Showing {filteredResults} of {totalResults} results
           </span>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleExportCSV}>
             <Download className="w-4 h-4 mr-2" />
             Export CSV
           </Button>

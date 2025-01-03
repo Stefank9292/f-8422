@@ -125,6 +125,7 @@ const Index = () => {
             onReset={handleFilterReset}
             totalResults={posts.length}
             filteredResults={filteredPosts.length}
+            currentPosts={filteredPosts}
           />
           <SearchResults posts={filteredPosts} />
         </div>
