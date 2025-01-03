@@ -1,4 +1,4 @@
-import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, PanelLeftClose } from "lucide-react";
+import { MagnifyingGlass, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, PanelLeftClose } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,9 +19,9 @@ import {
 
 const menuItems = [
   {
-    title: "Home",
+    title: "VyralSearch",
     url: "/",
-    icon: Home,
+    icon: MagnifyingGlass,
   },
 ];
 
