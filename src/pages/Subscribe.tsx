@@ -142,7 +142,7 @@ const SubscribePage = () => {
               <h2 className="text-2xl font-semibold">Premium Plan</h2>
               <p className="text-muted-foreground">Perfect for casual users</p>
               <div className="text-2xl font-bold">
-                ${isAnnual ? '19.99' : '24.99'}/mo
+                ${isAnnual ? '23.97' : '29.97'}/mo
                 {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
               </div>
             </div>
@@ -172,7 +172,7 @@ const SubscribePage = () => {
               <h2 className="text-2xl font-semibold">Ultra Plan</h2>
               <p className="text-muted-foreground">For power users</p>
               <div className="text-2xl font-bold">
-                ${isAnnual ? '39.99' : '49.99'}/mo
+                ${isAnnual ? '27.97' : '34.97'}/mo
                 {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
               </div>
             </div>
