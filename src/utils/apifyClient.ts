@@ -27,7 +27,7 @@ function isInstagramPost(obj: unknown): boolean {
   try {
     const likesCount = Number(post.likesCount) || 0;
     const commentsCount = Number(post.commentsCount) || 0;
-    const viewsCount = Number(post.viewsCount) || 0;
+    const viewsCount = Number(post.videoPlayCount) || 0;
     
     // Check if the object has all required properties with correct types
     const hasRequiredProps = 
@@ -66,7 +66,7 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
   try {
     const likesCount = Number(post.likesCount) || 0;
     const commentsCount = Number(post.commentsCount) || 0;
-    const viewsCount = Number(post.viewsCount) || 0;
+    const videoPlayCount = Number(post.videoPlayCount) || 0;
     
     const transformedPost: InstagramPost = {
       url: typeof post.url === 'string' ? post.url : 
@@ -74,10 +74,10 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
       caption: typeof post.caption === 'string' ? post.caption : '',
       likesCount,
       commentsCount,
-      viewsCount,
-      playsCount: Number(post.videoPlayCount) || 0,
+      viewsCount: videoPlayCount, // Use videoPlayCount for viewsCount
+      playsCount: videoPlayCount,
       duration: typeof post.videoDuration === 'string' ? post.videoDuration : '0:00',
-      engagement: `${((likesCount + commentsCount) / (viewsCount || 1) * 100).toFixed(2)}%`,
+      engagement: `${((likesCount + commentsCount) / (videoPlayCount || 1) * 100).toFixed(2)}%`,
       date: typeof post.timestamp === 'string' ? new Date(post.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
       type: typeof post.type === 'string' ? post.type : 'Post',
       timestamp: typeof post.timestamp === 'string' ? post.timestamp : new Date().toISOString(),
