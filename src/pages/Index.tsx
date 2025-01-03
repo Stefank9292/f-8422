@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { fetchInstagramPosts } from "@/utils/apifyClient";
@@ -8,10 +8,11 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
+import { Loader2 } from "lucide-react";
 
 const Index = () => {
   const [username, setUsername] = useState("");
-  const [searchTrigger, setSearchTrigger] = useState(0); // Add trigger for manual search
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -27,9 +28,9 @@ const Index = () => {
   const { toast } = useToast();
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger], // Add searchTrigger to queryKey
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: Boolean(username && searchTrigger), // Only run when searchTrigger changes and username exists
+    enabled: Boolean(username && searchTrigger),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -46,7 +47,7 @@ const Index = () => {
       return;
     }
 
-    setSearchTrigger(prev => prev + 1); // Increment trigger to force new search
+    setSearchTrigger(prev => prev + 1);
   };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
@@ -96,7 +97,14 @@ const Index = () => {
           disabled={isLoading}
           className="w-full"
         >
-          {isLoading ? "Searching..." : "Search"}
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              This can take up to a minute...
+            </>
+          ) : (
+            "Search"
+          )}
         </Button>
 
         <SearchSettings
