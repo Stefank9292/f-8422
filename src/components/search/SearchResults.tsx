@@ -18,6 +18,10 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     });
   };
 
+  const formatNumber = (num: number) => {
+    return num?.toLocaleString() || '0';
+  };
+
   return (
     <TooltipProvider>
       <Table>
@@ -27,7 +31,6 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableHead>Caption</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Views</TableHead>
-            <TableHead>Video Views</TableHead>
             <TableHead>Video Plays</TableHead>
             <TableHead>Likes</TableHead>
             <TableHead>Comments</TableHead>
@@ -37,52 +40,48 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {posts.map((post, index) => {
-            console.log('Post data:', post); // Add this to debug the data
-            return (
-              <TableRow key={index}>
-                <TableCell>@{post.ownerUsername}</TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="flex items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="truncate cursor-help">{post.caption}</span>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-sm">
-                        <p className="break-words">{post.caption}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6"
-                      onClick={() => handleCopyCaption(post.caption)}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell title={post.timestamp}>{post.date}</TableCell>
-                <TableCell>{post.viewCount?.toLocaleString() || '0'}</TableCell>
-                <TableCell>{post.videoViewCount?.toLocaleString() || '0'}</TableCell>
-                <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
-                <TableCell>{post.likesCount?.toLocaleString() || '0'}</TableCell>
-                <TableCell>{post.commentsCount?.toLocaleString() || '0'}</TableCell>
-                <TableCell>{post.videoDuration || '0:00'}</TableCell>
-                <TableCell>{post.engagement}</TableCell>
-                <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
-                      <ExternalLink className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {posts.map((post, index) => (
+            <TableRow key={index}>
+              <TableCell>@{post.ownerUsername}</TableCell>
+              <TableCell className="max-w-xs">
+                <div className="flex items-center gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="truncate cursor-help">{post.caption}</span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">
+                      <p className="break-words">{post.caption}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => handleCopyCaption(post.caption)}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+              </TableCell>
+              <TableCell title={post.timestamp}>{post.date}</TableCell>
+              <TableCell>{formatNumber(post.viewsCount)}</TableCell>
+              <TableCell>{formatNumber(post.playsCount)}</TableCell>
+              <TableCell>{formatNumber(post.likesCount)}</TableCell>
+              <TableCell>{formatNumber(post.commentsCount)}</TableCell>
+              <TableCell>{post.duration || '0:00'}</TableCell>
+              <TableCell>{post.engagement}</TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon">
+                    <Download className="w-4 h-4" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
     </TooltipProvider>
