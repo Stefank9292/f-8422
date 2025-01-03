@@ -104,8 +104,6 @@ export async function fetchInstagramPosts(
 ): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
-    console.log('Number of videos requested:', numberOfVideos);
-    console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
     
     // Clean up username and handle URL input
     let cleanUsername = username.trim();
@@ -144,7 +142,7 @@ export async function fetchInstagramPosts(
     // Only add postsUntil if a date is provided
     if (postsNewerThan instanceof Date) {
       requestBody.postsUntil = postsNewerThan.toISOString();
-      console.log('Including posts until:', postsNewerThan.toISOString());
+      console.log('Including posts until:', postsNewerThan);
     }
 
     // Make the API request to Apify
