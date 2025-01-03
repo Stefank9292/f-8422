@@ -69,6 +69,13 @@ export function AppSidebar() {
     navigate("/auth");
   };
 
+  const getSubscriptionButtonText = () => {
+    if (subscriptionStatus?.subscribed) {
+      return "Manage Subscription";
+    }
+    return "Upgrade to Pro";
+  };
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -108,7 +115,7 @@ export function AppSidebar() {
                   isActive={location.pathname === "/subscribe"}
                 >
                   <CreditCard className="h-4 w-4" />
-                  <span>{subscriptionStatus?.subscribed ? "Subscribe" : "Upgrade to Pro"}</span>
+                  <span>{getSubscriptionButtonText()}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
