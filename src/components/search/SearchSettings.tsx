@@ -1,7 +1,10 @@
-import { Settings, HelpCircle, Minus, Plus, Calendar } from "lucide-react";
+import { Settings, HelpCircle, Minus, Plus, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 interface SearchSettingsProps {
   isSettingsOpen: boolean;
@@ -16,6 +19,12 @@ export const SearchSettings = ({
   numberOfVideos,
   setNumberOfVideos,
 }: SearchSettingsProps) => {
+  // Calculate the date 90 days ago
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  const [date, setDate] = React.useState<Date | undefined>(undefined);
+
   return (
     <Collapsible
       open={isSettingsOpen}
@@ -61,14 +70,31 @@ export const SearchSettings = ({
             <label className="text-sm font-medium">Posts newer than</label>
             <HelpCircle className="w-4 h-4 text-gray-400" />
           </div>
-          <div className="relative">
-            <Input
-              type="text"
-              placeholder="tt.mm.jjjj"
-              className="pl-10"
-            />
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="dd.mm.yyyy"
+                  value={date ? format(date, 'dd.MM.yyyy') : ''}
+                  className="pl-10"
+                  readOnly
+                />
+                <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                disabled={(date) => {
+                  return date > new Date() || date < ninetyDaysAgo;
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
           <p className="text-sm text-gray-500">Limited to posts from the last 90 days</p>
         </div>
       </CollapsibleContent>
