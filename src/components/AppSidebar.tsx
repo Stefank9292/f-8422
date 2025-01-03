@@ -1,4 +1,4 @@
-import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, ChevronLeft } from "lucide-react";
+import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, PanelLeftClose } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -100,13 +100,17 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          {/* Collapse Button */}
-          <SidebarMenuItem>
-            <SidebarMenuButton onClick={toggleSidebar} className="justify-between">
-              <span>Navigation</span>
-              <ChevronLeft className="h-4 w-4" />
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {/* Navigation Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
+            <span className="text-sm font-medium">Navigation</span>
+            <button 
+              onClick={toggleSidebar}
+              className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+              <span className="sr-only">Toggle Sidebar</span>
+            </button>
+          </div>
 
           <SidebarGroupContent>
             <SidebarMenu>
