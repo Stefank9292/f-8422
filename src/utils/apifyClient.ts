@@ -23,24 +23,31 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
   }
   
   const post = obj as Record<string, unknown>;
-  return (
-    typeof post.url === 'string' &&
-    typeof post.caption === 'string' &&
-    typeof post.likesCount === 'number' &&
-    typeof post.commentsCount === 'number' &&
-    typeof post.viewsCount === 'number' &&
-    typeof post.playsCount === 'number' &&
-    typeof post.duration === 'string' &&
-    typeof post.engagement === 'string' &&
-    typeof post.date === 'string' &&
-    typeof post.type === 'string' &&
-    typeof post.timestamp === 'string' &&
-    Array.isArray(post.hashtags) &&
-    Array.isArray(post.mentions) &&
-    typeof post.ownerUsername === 'string' &&
-    typeof post.ownerId === 'string' &&
-    (post.locationName === undefined || typeof post.locationName === 'string')
-  );
+  
+  // Transform and validate the data from Apify's format to our format
+  try {
+    return {
+      url: post.url || post.shortCode && `https://www.instagram.com/p/${post.shortCode}`,
+      caption: post.caption || '',
+      likesCount: post.likesCount || 0,
+      commentsCount: post.commentsCount || 0,
+      viewsCount: post.viewsCount || 0,
+      playsCount: post.videoPlayCount || 0,
+      duration: post.videoDuration || '0:00',
+      engagement: ((post.likesCount || 0) + (post.commentsCount || 0)) / (post.viewsCount || 1) * 100 + '%',
+      date: new Date(post.timestamp || Date.now()).toLocaleDateString(),
+      type: post.type || 'Post',
+      timestamp: post.timestamp || new Date().toISOString(),
+      hashtags: Array.isArray(post.hashtags) ? post.hashtags : [],
+      mentions: Array.isArray(post.mentions) ? post.mentions : [],
+      ownerUsername: post.ownerUsername || '',
+      ownerId: post.ownerId || '',
+      locationName: post.locationName || undefined
+    } as InstagramPost;
+  } catch (error) {
+    console.error('Error transforming post data:', error);
+    return false;
+  }
 }
 
 export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
@@ -82,9 +89,9 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         "isUserReelFeedURL": false,
         "isUserTaggedFeedURL": false,
         "resultsLimit": 5,
-        "resultsType": "stories",
+        "resultsType": "posts",
         "searchLimit": 1,
-        "searchType": "hashtag"
+        "searchType": "user"
       })
     });
 
@@ -95,8 +102,8 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     const data = await response.json();
     console.log('Raw response from Apify:', data);
 
-    // Validate and transform the data
-    const validPosts = Array.isArray(data) ? data.filter(isInstagramPost) : [];
+    // Transform and validate the data
+    const validPosts = Array.isArray(data) ? data.map(post => isInstagramPost(post)).filter(Boolean) : [];
     console.log('Valid posts:', validPosts);
 
     return validPosts;
