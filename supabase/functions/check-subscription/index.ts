@@ -8,23 +8,23 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
+    // Get the user from the JWT token
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    const { data: { user } } = await supabaseClient.auth.getUser(token)
 
-    if (!email) {
+    if (!user?.email) {
       throw new Error('No email found')
     }
 
@@ -32,14 +32,21 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
+    console.log('Checking subscription for email:', user.email)
+
+    // Get customer by email
     const customers = await stripe.customers.list({
-      email: email,
+      email: user.email,
       limit: 1
     })
 
     if (customers.data.length === 0) {
+      console.log('No customer found')
       return new Response(
-        JSON.stringify({ subscribed: false, canceled: false }),
+        JSON.stringify({ 
+          subscribed: false,
+          priceId: null
+        }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -47,22 +54,37 @@ serve(async (req) => {
       )
     }
 
-    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
-
+    // Get active subscriptions for the customer
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
-      price: price_id,
       limit: 1
     })
 
+    if (subscriptions.data.length === 0) {
+      console.log('No active subscription found')
+      return new Response(
+        JSON.stringify({ 
+          subscribed: false,
+          priceId: null
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      )
+    }
+
+    // Get the price ID from the subscription
     const subscription = subscriptions.data[0]
-    const isCanceled = subscription?.cancel_at_period_end ?? false
+    const priceId = subscription.items.data[0].price.id
+
+    console.log('Active subscription found with price ID:', priceId)
 
     return new Response(
       JSON.stringify({ 
-        subscribed: subscriptions.data.length > 0,
-        canceled: isCanceled
+        subscribed: true,
+        priceId: priceId,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
