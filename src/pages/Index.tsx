@@ -52,19 +52,19 @@ const Index = () => {
   });
 
   const getClickLimit = () => {
-    if (!subscriptionStatus?.subscribed) return 0;
-    return subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 20 : 10;
+    if (!subscriptionStatus) return 3; // Default to free plan limit
+    return subscriptionStatus.maxClicks || 3; // Use maxClicks from API or default to 3
   };
 
   const handleClick = () => {
     const clickLimit = getClickLimit();
-    if (subscriptionStatus?.subscribed && clickCount < clickLimit) {
+    if (clickCount < clickLimit) {
       setClickCount(prev => prev + 1);
       toast({
         title: "Crown clicked!",
         description: `You have ${clickLimit - clickCount - 1} clicks remaining.`,
       });
-    } else if (subscriptionStatus?.subscribed && clickCount >= clickLimit) {
+    } else {
       toast({
         title: "Click limit reached",
         description: `You have reached the maximum number of clicks (${clickLimit}).`,
@@ -99,12 +99,12 @@ const Index = () => {
           </div>
         ) : (
           <div className="p-4 bg-yellow-100 rounded">
-            <p>You are not subscribed</p>
+            <p>You are on the Free plan</p>
             <button
               onClick={() => navigate('/subscribe')}
               className="mt-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded"
             >
-              Subscribe now
+              Upgrade now
             </button>
           </div>
         )}
