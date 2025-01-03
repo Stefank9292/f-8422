@@ -47,8 +47,7 @@ serve(async (req) => {
       )
     }
 
-    // Replace with your actual price ID from Stripe
-    const price_id = "YOUR_PRICE_ID"
+    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
 
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,

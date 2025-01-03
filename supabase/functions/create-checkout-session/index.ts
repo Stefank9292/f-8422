@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -19,7 +18,6 @@ serve(async (req) => {
   )
 
   try {
-    // Get the session or user object
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
     const { data } = await supabaseClient.auth.getUser(token)
@@ -39,8 +37,7 @@ serve(async (req) => {
       limit: 1
     })
 
-    // Replace with your actual price ID from Stripe
-    const price_id = "YOUR_PRICE_ID"
+    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
 
     let customer_id = undefined
     if (customers.data.length > 0) {
