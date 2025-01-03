@@ -125,15 +125,15 @@ export async function fetchInstagramPosts(
 
     // Prepare request body according to Apify API specifications
     const requestBody: Record<string, any> = {
+      "addParentData": false,
       "directUrls": [instagramUrl],
-      "resultsType": "posts",
+      "enhanceUserSearchWithFacebookPage": false,
+      "isUserReelFeedURL": false,
+      "isUserTaggedFeedURL": false,
       "resultsLimit": numberOfVideos,
-      "searchType": "user",
+      "resultsType": "stories",
       "searchLimit": 1,
-      "extendOutputFunction": `async ({ data, item, page, customData }) => {
-        return item;
-      }`,
-      "customData": {}
+      "searchType": "hashtag"
     };
 
     // Only add postsUntil if a date is provided
