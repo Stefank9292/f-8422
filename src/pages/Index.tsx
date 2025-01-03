@@ -56,6 +56,9 @@ const Index = () => {
   const { data: userClicks, refetch: refetchClicks } = useQuery({
     queryKey: ['user-clicks'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) throw new Error('No authenticated session found');
+
       const now = new Date();
       const { data, error } = await supabase
         .from('user_clicks')
@@ -78,6 +81,7 @@ const Index = () => {
         const { data: newPeriod, error: insertError } = await supabase
           .from('user_clicks')
           .insert({
+            user_id: session.user.id,
             click_count: 0,
             period_start: periodStart.toISOString(),
             period_end: periodEnd.toISOString()
