@@ -53,7 +53,7 @@ export const ExportCSV = ({ currentPosts }: ExportCSVProps) => {
     const url = URL.createObjectURL(blob);
     
     link.setAttribute('href', url);
-    link.setAttribute('download', `tiktok-search-results-${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `vyralsearch-results-${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
