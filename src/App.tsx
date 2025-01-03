@@ -16,7 +16,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <SidebarProvider>
+        <SidebarProvider defaultOpen>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <main className="flex-1 overflow-y-auto">
