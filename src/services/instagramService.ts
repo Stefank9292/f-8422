@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { ScrapeOptions, InstagramData } from '@/types/instagram';
+import type { ScrapeOptions, InstagramData, ApifyResponse } from '@/types/instagram';
 
 const API_TOKEN = 'apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1';
 const ACTOR_TASK = 'stefankaralic92~instagram-scraper-task';
