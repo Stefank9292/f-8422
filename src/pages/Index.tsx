@@ -155,7 +155,7 @@ const Index = () => {
           <p>Your current limit is: {getClickLimit()} clicks</p>
           {userClicks && (
             <p className="text-sm text-gray-600">
-              Period ends: {new Date(userClicks.period_end).toLocaleDateString()}
+              Clicks refill: {new Date(userClicks.period_end).toLocaleDateString()}
             </p>
           )}
           
