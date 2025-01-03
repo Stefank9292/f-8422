@@ -12,23 +12,21 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    const { data: { user } } = await supabaseClient.auth.getUser(token)
 
-    if (!email) {
+    if (!user?.email) {
       throw new Error('No email found')
     }
 
-    const { priceId } = await req.json();
+    const { priceId } = await req.json()
     if (!priceId) {
       throw new Error('No price ID provided')
     }
@@ -37,25 +35,32 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Looking up customer with email:', email)
+    // Get customer by email
     const customers = await stripe.customers.list({
-      email: email,
+      email: user.email,
       limit: 1
     })
 
-    let customer_id = undefined
-    if (customers.data.length > 0) {
+    let customer_id
+    if (customers.data.length === 0) {
+      // Create new customer if none exists
+      const customer = await stripe.customers.create({
+        email: user.email,
+      })
+      customer_id = customer.id
+    } else {
       customer_id = customers.data[0].id
-      // check if already subscribed
+
+      // Check for existing subscriptions
       const subscriptions = await stripe.subscriptions.list({
-        customer: customers.data[0].id,
+        customer: customer_id,
         status: 'active',
         limit: 1
       })
 
       if (subscriptions.data.length > 0) {
-        const currentSubscription = subscriptions.data[0];
-        const currentPriceId = currentSubscription.items.data[0].price.id;
+        const currentSubscription = subscriptions.data[0]
+        const currentPriceId = currentSubscription.items.data[0].price.id
 
         // If trying to subscribe to the same plan, return error
         if (currentPriceId === priceId) {
@@ -68,42 +73,25 @@ serve(async (req) => {
           )
         }
 
-        // Create a checkout session for upgrade/downgrade
-        console.log('Creating checkout session for plan change...')
-        const session = await stripe.checkout.sessions.create({
-          customer: customer_id,
-          mode: 'subscription',
-          line_items: [{ price: priceId, quantity: 1 }],
-          success_url: `${req.headers.get('origin')}/`,
-          cancel_url: `${req.headers.get('origin')}/`
-        })
-
-        return new Response(
-          JSON.stringify({ url: session.url }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 200,
-          }
-        )
+        // If upgrading to Ultra plan, cancel the current subscription immediately
+        if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+          console.log('Canceling existing subscription for upgrade to Ultra')
+          await stripe.subscriptions.cancel(currentSubscription.id, {
+            prorate: true
+          })
+        }
       }
     }
 
-    console.log('Creating payment session for new subscription...')
+    console.log('Creating checkout session...')
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
-      customer_email: customer_id ? undefined : email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
       mode: 'subscription',
+      line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${req.headers.get('origin')}/`,
-      cancel_url: `${req.headers.get('origin')}/`,
+      cancel_url: `${req.headers.get('origin')}/`
     })
 
-    console.log('Payment session created:', session.id)
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -112,7 +100,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating payment session:', error)
+    console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
