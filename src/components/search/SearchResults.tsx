@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, ExternalLink, Copy } from "lucide-react";
+import { Download, ExternalLink, Copy, User, PenLine, Clock, Play, Eye, Heart, MessageSquare, Timer, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
@@ -104,28 +104,77 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Username</TableHead>
-            <TableHead>Caption</TableHead>
+            <TableHead>
+              <Tooltip>
+                <TooltipTrigger>
+                  <User className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Username</TooltipContent>
+              </Tooltip>
+            </TableHead>
+            <TableHead>
+              <Tooltip>
+                <TooltipTrigger>
+                  <PenLine className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Caption</TooltipContent>
+              </Tooltip>
+            </TableHead>
             <TableHead onClick={() => handleSort('date')} className="cursor-pointer hover:bg-muted/50">
-              Date
+              <Tooltip>
+                <TooltipTrigger>
+                  <Clock className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Date</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('playsCount')} className="cursor-pointer hover:bg-muted/50">
-              Views
+              <Tooltip>
+                <TooltipTrigger>
+                  <Play className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Views</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('viewsCount')} className="cursor-pointer hover:bg-muted/50">
-              Plays
+              <Tooltip>
+                <TooltipTrigger>
+                  <Eye className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Plays</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('likesCount')} className="cursor-pointer hover:bg-muted/50">
-              Likes
+              <Tooltip>
+                <TooltipTrigger>
+                  <Heart className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Likes</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('commentsCount')} className="cursor-pointer hover:bg-muted/50">
-              Comments
+              <Tooltip>
+                <TooltipTrigger>
+                  <MessageSquare className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Comments</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('duration')} className="cursor-pointer hover:bg-muted/50">
-              Duration
+              <Tooltip>
+                <TooltipTrigger>
+                  <Timer className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Duration</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead onClick={() => handleSort('engagement')} className="cursor-pointer hover:bg-muted/50">
-              Engagement
+              <Tooltip>
+                <TooltipTrigger>
+                  <Zap className="h-4 w-4" />
+                </TooltipTrigger>
+                <TooltipContent>Engagement</TooltipContent>
+              </Tooltip>
             </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
