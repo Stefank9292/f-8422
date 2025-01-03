@@ -42,14 +42,20 @@ export const fetchInstagramPosts = async (username: string): Promise<InstagramPo
         const run = await client.actor("shu8hvrXbJbY3Eb9W").call(input);
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
         
-        // Type assertion with runtime validation using the type guard
-        const posts = items.filter(isInstagramPost);
+        // Type assertion and validation of the API response
+        const validPosts = items.filter((item): item is InstagramPost => {
+            if (!isInstagramPost(item)) {
+                console.warn('Invalid post data structure:', item);
+                return false;
+            }
+            return true;
+        });
         
-        if (posts.length === 0) {
+        if (validPosts.length === 0) {
             console.warn('No valid Instagram posts found in the response');
         }
         
-        return posts;
+        return validPosts;
     } catch (error) {
         console.error('Error fetching Instagram posts:', error);
         throw error;
