@@ -37,6 +37,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
+    console.log('Looking up customer with email:', email)
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -53,11 +54,42 @@ serve(async (req) => {
       })
 
       if (subscriptions.data.length > 0) {
-        throw new Error("Customer already has an active subscription")
+        const currentSubscription = subscriptions.data[0];
+        const currentPriceId = currentSubscription.items.data[0].price.id;
+
+        // If trying to subscribe to the same plan, return error
+        if (currentPriceId === priceId) {
+          return new Response(
+            JSON.stringify({ error: "You are already subscribed to this plan" }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 400,
+            }
+          )
+        }
+
+        // Create a checkout session for upgrade/downgrade
+        console.log('Creating checkout session for plan change...')
+        const session = await stripe.checkout.sessions.create({
+          customer: customer_id,
+          mode: 'subscription',
+          line_items: [{ price: priceId, quantity: 1 }],
+          success_url: `${req.headers.get('origin')}/`,
+          cancel_url: `${req.headers.get('origin')}/`,
+          subscription_behavior: 'create_new_subscription_and_cancel_existing',
+        })
+
+        return new Response(
+          JSON.stringify({ url: session.url }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          }
+        )
       }
     }
 
-    console.log('Creating payment session...')
+    console.log('Creating payment session for new subscription...')
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       customer_email: customer_id ? undefined : email,
