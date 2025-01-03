@@ -325,6 +325,7 @@ const Index = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Type</TableHead>
                 <TableHead>Username</TableHead>
                 <TableHead>Caption</TableHead>
                 <TableHead>Date</TableHead>
@@ -334,24 +335,47 @@ const Index = () => {
                 <TableHead>Comments</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Engagement</TableHead>
+                <TableHead>Location</TableHead>
+                <TableHead>Hashtags</TableHead>
+                <TableHead>Mentions</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredPosts.map((post, index) => (
                 <TableRow key={index}>
-                  <TableCell>@{username}</TableCell>
+                  <TableCell>{post.type}</TableCell>
+                  <TableCell>@{post.ownerUsername}</TableCell>
                   <TableCell className="max-w-xs truncate">{post.caption}</TableCell>
-                  <TableCell>{post.date}</TableCell>
+                  <TableCell title={post.timestamp}>{post.date}</TableCell>
                   <TableCell>{post.viewsCount.toLocaleString()}</TableCell>
                   <TableCell>{post.playsCount.toLocaleString()}</TableCell>
                   <TableCell>{post.likesCount.toLocaleString()}</TableCell>
                   <TableCell>{post.commentsCount.toLocaleString()}</TableCell>
                   <TableCell>{post.duration}</TableCell>
                   <TableCell>{post.engagement}</TableCell>
+                  <TableCell>{post.locationName || '-'}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {post.hashtags.map((tag, i) => (
+                        <span key={i} className="text-xs bg-muted px-1 rounded">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {post.mentions.map((mention, i) => (
+                        <span key={i} className="text-xs text-blue-500">
+                          {mention}
+                        </span>
+                      ))}
+                    </div>
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
                         <ExternalLink className="w-4 h-4" />
                       </Button>
                       <Button variant="ghost" size="icon">
