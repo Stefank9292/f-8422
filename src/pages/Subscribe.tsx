@@ -6,6 +6,7 @@ import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton"
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Check, X } from "lucide-react";
 
 const SubscribePage = () => {
   const { data: session } = useQuery({
@@ -36,6 +37,17 @@ const SubscribePage = () => {
       ? `${planName} (Cancels at end of period)` 
       : `${planName}`;
   };
+
+  const FeatureItem = ({ included, text }: { included: boolean; text: string }) => (
+    <li className="flex items-center gap-2">
+      {included ? (
+        <Check className="h-5 w-5 text-green-500" />
+      ) : (
+        <X className="h-5 w-5 text-red-500" />
+      )}
+      <span className={!included ? "text-muted-foreground" : ""}>{text}</span>
+    </li>
+  );
 
   return (
     <div className="min-h-screen p-4">
@@ -83,14 +95,11 @@ const SubscribePage = () => {
               <p className="text-muted-foreground">Get started for free</p>
             </div>
             <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Click crown up to 3 times</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Basic features included</span>
-              </li>
+              <FeatureItem included={true} text="3 Total Searches" />
+              <FeatureItem included={true} text="Maximum 5 Results per Search" />
+              <FeatureItem included={false} text="Bulk Search" />
+              <FeatureItem included={false} text="Contact Support" />
+              <FeatureItem included={false} text="Early Access to new Features" />
             </ul>
             <div className="pt-4">
               <SubscribeButton planId="free" planName="Free" />
@@ -103,14 +112,11 @@ const SubscribePage = () => {
               <p className="text-muted-foreground">Perfect for casual users</p>
             </div>
             <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Click crown up to 10 times</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Basic features included</span>
-              </li>
+              <FeatureItem included={true} text="25 Total Searches" />
+              <FeatureItem included={true} text="Maximum 20 Results per Search" />
+              <FeatureItem included={true} text="Bulk Search" />
+              <FeatureItem included={true} text="Contact Support" />
+              <FeatureItem included={false} text="Early Access to new Features" />
             </ul>
             <div className="pt-4">
               <SubscribeButton planId="price_1QdBd2DoPDXfOSZFnG8aWuIq" planName="Premium" />
@@ -126,18 +132,11 @@ const SubscribePage = () => {
               <p className="text-muted-foreground">For power users</p>
             </div>
             <ul className="space-y-2">
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Click crown up to 20 times</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>All Premium features included</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Priority support</span>
-              </li>
+              <FeatureItem included={true} text="Unlimited Searches" />
+              <FeatureItem included={true} text="Maximum 50 Results per Search" />
+              <FeatureItem included={true} text="Bulk Search" />
+              <FeatureItem included={true} text="Contact Support" />
+              <FeatureItem included={true} text="Early Access to new Features" />
             </ul>
             <div className="pt-4">
               <SubscribeButton planId="price_1QdC54DoPDXfOSZFXHBO4yB3" planName="Ultra" />
@@ -148,20 +147,5 @@ const SubscribePage = () => {
     </div>
   );
 };
-
-const CheckIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
 
 export default SubscribePage;
