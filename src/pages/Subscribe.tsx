@@ -96,6 +96,7 @@ const SubscribePage = () => {
           </div>
         </div>
 
+        {/* Subscription Management Card */}
         {subscriptionStatus?.subscribed && (
           <Card className="p-6 space-y-4">
             <h2 className="text-2xl font-semibold">Subscription Management</h2>
@@ -142,8 +143,14 @@ const SubscribePage = () => {
               <h2 className="text-2xl font-semibold">Premium Plan</h2>
               <p className="text-muted-foreground">Perfect for casual users</p>
               <div className="text-2xl font-bold">
-                ${isAnnual ? '23.97' : '29.97'}/mo
-                {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
+                {isAnnual ? (
+                  <>
+                    $287.64/year
+                    <span className="text-sm text-muted-foreground ml-2">($23.97/mo)</span>
+                  </>
+                ) : (
+                  '$29.97/mo'
+                )}
               </div>
             </div>
             <ul className="space-y-2">
@@ -172,8 +179,14 @@ const SubscribePage = () => {
               <h2 className="text-2xl font-semibold">Ultra Plan</h2>
               <p className="text-muted-foreground">For power users</p>
               <div className="text-2xl font-bold">
-                ${isAnnual ? '27.97' : '34.97'}/mo
-                {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
+                {isAnnual ? (
+                  <>
+                    $335.64/year
+                    <span className="text-sm text-muted-foreground ml-2">($27.97/mo)</span>
+                  </>
+                ) : (
+                  '$34.97/mo'
+                )}
               </div>
             </div>
             <ul className="space-y-2">
