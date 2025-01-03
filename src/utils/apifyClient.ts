@@ -95,7 +95,11 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
   }
 }
 
-export async function fetchInstagramPosts(username: string, numberOfVideos: number = 3): Promise<InstagramPost[]> {
+export async function fetchInstagramPosts(
+  username: string, 
+  numberOfVideos: number = 3,
+  postsNewerThan?: string
+): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
     
@@ -119,6 +123,24 @@ export async function fetchInstagramPosts(username: string, numberOfVideos: numb
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
+    // Prepare request body
+    const requestBody: Record<string, any> = {
+      "addParentData": false,
+      "directUrls": [instagramUrl],
+      "enhanceUserSearchWithFacebookPage": false,
+      "isUserReelFeedURL": false,
+      "isUserTaggedFeedURL": false,
+      "resultsLimit": numberOfVideos,
+      "resultsType": "posts",
+      "searchLimit": 1,
+      "searchType": "user"
+    };
+
+    // Add postsNewerThan if provided
+    if (postsNewerThan) {
+      requestBody.onlyPostsNewerThan = postsNewerThan;
+    }
+
     // Make the API request to Apify
     const apiEndpoint = `https://api.apify.com/v2/actor-tasks/stefankaralic92~instagram-scraper-task/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
     
@@ -127,17 +149,7 @@ export async function fetchInstagramPosts(username: string, numberOfVideos: numb
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        "addParentData": false,
-        "directUrls": [instagramUrl],
-        "enhanceUserSearchWithFacebookPage": false,
-        "isUserReelFeedURL": false,
-        "isUserTaggedFeedURL": false,
-        "resultsLimit": numberOfVideos,
-        "resultsType": "posts",
-        "searchLimit": 1,
-        "searchType": "user"
-      })
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {

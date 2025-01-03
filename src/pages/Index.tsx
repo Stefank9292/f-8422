@@ -52,7 +52,11 @@ const Index = () => {
     setIsLoading(true);
     try {
       console.log('Starting Apify API request for username:', username);
-      const fetchedPosts = await fetchInstagramPosts(username, numberOfVideos);
+      const fetchedPosts = await fetchInstagramPosts(
+        username, 
+        numberOfVideos,
+        filters.postsNewerThan // Pass the postsNewerThan filter
+      );
       setPosts(fetchedPosts);
       toast({
         title: "Success",
