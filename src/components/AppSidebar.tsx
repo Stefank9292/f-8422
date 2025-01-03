@@ -1,4 +1,4 @@
-import { Home, CreditCard, LogOut, User } from "lucide-react";
+import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, Settings } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,27 @@ const menuItems = [
     title: "Home",
     url: "/",
     icon: Home,
+  },
+];
+
+const secondaryMenuItems = [
+  {
+    title: "Dark Mode",
+    icon: Moon,
+    onClick: () => {
+      // Toggle dark mode functionality can be added here
+      document.documentElement.classList.toggle('dark');
+    },
+  },
+  {
+    title: "Help Center",
+    icon: HelpCircle,
+    url: "https://docs.lovable.dev/",
+  },
+  {
+    title: "FAQs",
+    icon: MessageCircle,
+    url: "https://docs.lovable.dev/faqs",
   },
 ];
 
@@ -127,11 +148,30 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               )}
 
+              {/* Secondary Menu Items */}
+              {secondaryMenuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    onClick={item.onClick || (item.url ? () => window.open(item.url, '_blank') : undefined)}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+
               <SidebarMenuItem>
                 <SidebarMenuButton onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
-                  <span>Log out</span>
+                  <span>Sign Out</span>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {/* Crafted with love by VyralSearch */}
+              <SidebarMenuItem>
+                <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                  Crafted with ❤️ by VyralSearch
+                </div>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
