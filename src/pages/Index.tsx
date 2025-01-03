@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import { fetchInstagramPosts } from "@/utils/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchBar } from "@/components/search/SearchBar";
@@ -10,11 +11,9 @@ import { SearchResults } from "@/components/search/SearchResults";
 
 const Index = () => {
   const [username, setUsername] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [posts, setPosts] = useState<any[]>([]);
   const [filters, setFilters] = useState({
     minViews: "",
     minPlays: "",
@@ -26,6 +25,16 @@ const Index = () => {
   });
   const { toast } = useToast();
 
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
+    enabled: Boolean(username),
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
+    retry: 2,
+    refetchOnWindowFocus: false,
+  });
+
   const handleSearch = async () => {
     if (!username) {
       toast({
@@ -36,29 +45,8 @@ const Index = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      console.log('Starting Apify API request for username:', username);
-      const fetchedPosts = await fetchInstagramPosts(
-        username, 
-        numberOfVideos,
-        selectedDate
-      );
-      setPosts(fetchedPosts);
-      toast({
-        title: "Success",
-        description: `Found ${fetchedPosts.length} posts for @${username}`,
-      });
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch Instagram posts",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    // This will trigger the query
+    setUsername(username);
   };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
