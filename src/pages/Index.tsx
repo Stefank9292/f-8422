@@ -4,10 +4,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { useState } from "react";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [clickCount, setClickCount] = useState(0);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -25,6 +27,22 @@ const Index = () => {
       description: "You have been successfully logged out.",
     });
     navigate("/auth");
+  };
+
+  const handleCrownClick = () => {
+    if (subscriptionStatus?.subscribed && clickCount < 10) {
+      setClickCount(prev => prev + 1);
+      toast({
+        title: "Crown clicked!",
+        description: `You have ${9 - clickCount} clicks remaining.`,
+      });
+    } else if (subscriptionStatus?.subscribed && clickCount >= 10) {
+      toast({
+        title: "Click limit reached",
+        description: "You have reached the maximum number of clicks (10).",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -51,11 +69,19 @@ const Index = () => {
               <p className="text-xl text-gray-600 mb-6">
                 Thank you for being a premium member!
               </p>
-              <img 
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxPqum0Pg64e3XHpP323coM5r2JN1ThM06wQ&s" 
-                alt="Premium content"
-                className="mx-auto rounded-lg shadow-lg"
-              />
+              <div className="relative inline-block">
+                <img 
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxPqum0Pg64e3XHpP323coM5r2JN1ThM06wQ&s" 
+                  alt="Premium content"
+                  className={`mx-auto rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${clickCount >= 10 ? 'opacity-50' : ''}`}
+                  onClick={handleCrownClick}
+                />
+                {clickCount > 0 && (
+                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                    {clickCount}
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-xl text-gray-600">
