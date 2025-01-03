@@ -9,7 +9,7 @@ const Index = () => {
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
 
-  const { data: subscriptionStatus, error: subscriptionError } = useQuery({
+  const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -22,13 +22,15 @@ const Index = () => {
       return data;
     },
     retry: false,
-    onError: (error) => {
-      console.error('Subscription check error:', error);
-      toast({
-        title: "Error checking subscription",
-        description: "Please try again later",
-        variant: "destructive"
-      });
+    meta: {
+      onError: (error: Error) => {
+        console.error('Subscription check error:', error);
+        toast({
+          title: "Error checking subscription",
+          description: "Please try again later",
+          variant: "destructive"
+        });
+      }
     }
   });
 
