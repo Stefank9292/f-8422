@@ -3,7 +3,11 @@ interface InstagramPost {
   caption: string;
   likesCount: number;
   commentsCount: number;
-  [key: string]: unknown; // Allow additional properties
+  viewsCount: number;
+  playsCount: number;
+  duration: string;
+  engagement: string;
+  date: string;
 }
 
 // Type guard function to check if an object is an InstagramPost
@@ -17,7 +21,12 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
     typeof post.url === 'string' &&
     typeof post.caption === 'string' &&
     typeof post.likesCount === 'number' &&
-    typeof post.commentsCount === 'number'
+    typeof post.commentsCount === 'number' &&
+    typeof post.viewsCount === 'number' &&
+    typeof post.playsCount === 'number' &&
+    typeof post.duration === 'string' &&
+    typeof post.engagement === 'string' &&
+    typeof post.date === 'string'
   );
 }
 
@@ -25,19 +34,40 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
   try {
     console.log('Fetching Instagram posts for:', username);
 
-    // Using a mock response for development - replace with actual API call
+    // Mock response for development
     const mockPosts = [
       {
         url: `https://www.instagram.com/${username}/p/mock1`,
-        caption: 'Test post 1',
-        likesCount: 100,
-        commentsCount: 10
+        caption: '15 years later, we are Still underestimating the huge...',
+        likesCount: 8025,
+        commentsCount: 157,
+        viewsCount: 82668,
+        playsCount: 311799,
+        duration: '0:45',
+        engagement: '9.90%',
+        date: '3.1.2025'
       },
       {
         url: `https://www.instagram.com/${username}/p/mock2`,
-        caption: 'Test post 2',
-        likesCount: 200,
-        commentsCount: 20
+        caption: 'On this first day of the year can you pls send this to...',
+        likesCount: 23656,
+        commentsCount: 665,
+        viewsCount: 242523,
+        playsCount: 741145,
+        duration: '0:31',
+        engagement: '10.03%',
+        date: '1.1.2025'
+      },
+      {
+        url: `https://www.instagram.com/${username}/p/mock3`,
+        caption: 'Beyond ready to give more than ever .... Happy new...',
+        likesCount: 14585,
+        commentsCount: 290,
+        viewsCount: 119635,
+        playsCount: 529882,
+        duration: '0:15',
+        engagement: '12.43%',
+        date: '1.1.2025'
       }
     ];
 
