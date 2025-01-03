@@ -1,20 +1,20 @@
-import { Search, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, PanelLeftClose, History, BarChart2, Star } from "lucide-react";
+import { Search, CreditCard, LogOut, Moon, HelpCircle, MessageCircle, PanelLeftClose, History, BarChart2, Star } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuButton,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { UserProfile } from "./sidebar/UserProfile";
+import { SidebarSection } from "./sidebar/SidebarSection";
 
 const toolsMenuItems = [
   {
@@ -126,76 +126,38 @@ export function AppSidebar() {
             <SidebarMenu>
               {/* User Profile Section */}
               <SidebarMenuItem>
-                <div className="flex items-center gap-3 px-2 py-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>
-                      <User className="h-4 w-4" />
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex flex-col items-start">
-                    <span className="text-sm text-sidebar-foreground truncate">
-                      {session?.user?.email}
-                    </span>
-                  </div>
-                </div>
+                <UserProfile email={session?.user?.email} />
               </SidebarMenuItem>
 
               {/* Tools Section */}
-              <SidebarMenuItem>
-                <div className="px-2 pt-4 pb-2">
-                  <span className="text-xs font-semibold text-muted-foreground">TOOLS</span>
-                </div>
-              </SidebarMenuItem>
-              {toolsMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    onClick={() => navigate(item.url)}
-                    isActive={location.pathname === item.url}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarSection
+                title="TOOLS"
+                items={toolsMenuItems}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
 
               {/* History Section */}
+              <SidebarSection
+                title="HISTORY"
+                items={historyMenuItems}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
+
+              {/* Secondary Menu Section with separator */}
               <SidebarMenuItem>
-                <div className="px-2 pt-4 pb-2">
-                  <span className="text-xs font-semibold text-muted-foreground">HISTORY</span>
-                </div>
+                <div className="h-px bg-sidebar-border mx-2 my-4" />
               </SidebarMenuItem>
-              {historyMenuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    onClick={() => navigate(item.url)}
-                    isActive={location.pathname === item.url}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
 
               {/* Secondary Menu Items */}
-              {secondaryMenuItems.map((item) => {
-                // Skip rendering if showWhen condition is defined and returns false
-                if (item.showWhen && !item.showWhen(subscriptionStatus)) {
-                  return null;
-                }
-
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      onClick={item.onClick || (item.url ? () => navigate(item.url) : undefined)}
-                      isActive={item.url ? location.pathname === item.url : false}
-                      className={item.className}
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+              <SidebarSection
+                title="SETTINGS"
+                items={secondaryMenuItems}
+                subscriptionStatus={subscriptionStatus}
+                onNavigate={navigate}
+                currentPath={location.pathname}
+              />
 
               {/* Sign Out Button */}
               <SidebarMenuItem>
