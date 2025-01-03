@@ -1,5 +1,8 @@
-import { Home, CreditCard } from "lucide-react";
+import { Home, CreditCard, Ban } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import {
   Sidebar,
   SidebarContent,
@@ -28,6 +31,15 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) throw error;
+      return data;
+    },
+  });
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -46,6 +58,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {subscriptionStatus?.subscribed && (
+                <SidebarMenuItem>
+                  <CancelSubscriptionButton 
+                    isCanceled={subscriptionStatus?.canceled}
+                    className="w-full justify-start gap-2 px-2"
+                  >
+                    <Ban className="h-4 w-4" />
+                    <span>Cancel Subscription</span>
+                  </CancelSubscriptionButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

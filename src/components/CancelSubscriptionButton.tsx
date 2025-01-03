@@ -15,7 +15,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const CancelSubscriptionButton = ({ isCanceled = false }: { isCanceled?: boolean }) => {
+export const CancelSubscriptionButton = ({ 
+  isCanceled = false, 
+  children,
+  className 
+}: { 
+  isCanceled?: boolean;
+  children?: React.ReactNode;
+  className?: string;
+}) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -51,9 +59,9 @@ export const CancelSubscriptionButton = ({ isCanceled = false }: { isCanceled?: 
       <Button 
         variant="outline" 
         disabled 
-        className="w-full sm:w-auto"
+        className={className}
       >
-        Canceled
+        {children || "Canceled"}
       </Button>
     );
   }
@@ -62,11 +70,11 @@ export const CancelSubscriptionButton = ({ isCanceled = false }: { isCanceled?: 
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button 
-          variant="destructive"
+          variant="ghost"
           disabled={loading}
-          className="w-full sm:w-auto"
+          className={className}
         >
-          Cancel Subscription
+          {children || "Cancel Subscription"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
