@@ -1,15 +1,22 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, ExternalLink, Copy } from "lucide-react";
+import { Download, ExternalLink, Copy, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface SearchResultsProps {
   posts: any[];
 }
 
+type SortConfig = {
+  key: string;
+  direction: 'asc' | 'desc' | null;
+};
+
 export const SearchResults = ({ posts }: SearchResultsProps) => {
   const { toast } = useToast();
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -50,6 +57,55 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
   };
 
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' | null = 'asc';
+    
+    if (sortConfig.key === key) {
+      if (sortConfig.direction === 'asc') {
+        direction = 'desc';
+      } else if (sortConfig.direction === 'desc') {
+        direction = null;
+      }
+    }
+    
+    setSortConfig({ key, direction });
+  };
+
+  const sortedPosts = [...posts].sort((a, b) => {
+    if (sortConfig.direction === null) return 0;
+    
+    let aValue = a[sortConfig.key];
+    let bValue = b[sortConfig.key];
+    
+    // Handle numeric values
+    if (typeof aValue === 'number' && typeof bValue === 'number') {
+      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
+    }
+    
+    // Handle date strings
+    if (sortConfig.key === 'date') {
+      return sortConfig.direction === 'asc' 
+        ? new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+        : new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+    }
+    
+    // Handle other string values
+    if (typeof aValue === 'string' && typeof bValue === 'string') {
+      return sortConfig.direction === 'asc' 
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+    
+    return 0;
+  });
+
+  const getSortIcon = (key: string) => {
+    if (sortConfig.key === key) {
+      return <ArrowUpDown className={`h-4 w-4 ${sortConfig.direction ? 'text-primary' : 'text-muted-foreground'}`} />;
+    }
+    return <ArrowUpDown className="h-4 w-4 text-muted-foreground" />;
+  };
+
   return (
     <TooltipProvider>
       <Table>
@@ -57,18 +113,32 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
           <TableRow>
             <TableHead>Username</TableHead>
             <TableHead>Caption</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Views</TableHead>
-            <TableHead>Plays</TableHead>
-            <TableHead>Likes</TableHead>
-            <TableHead>Comments</TableHead>
-            <TableHead>Duration</TableHead>
-            <TableHead>Engagement</TableHead>
+            <TableHead onClick={() => handleSort('date')} className="cursor-pointer hover:bg-muted/50">
+              Date {getSortIcon('date')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('playsCount')} className="cursor-pointer hover:bg-muted/50">
+              Views {getSortIcon('playsCount')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('viewsCount')} className="cursor-pointer hover:bg-muted/50">
+              Plays {getSortIcon('viewsCount')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('likesCount')} className="cursor-pointer hover:bg-muted/50">
+              Likes {getSortIcon('likesCount')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('commentsCount')} className="cursor-pointer hover:bg-muted/50">
+              Comments {getSortIcon('commentsCount')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('duration')} className="cursor-pointer hover:bg-muted/50">
+              Duration {getSortIcon('duration')}
+            </TableHead>
+            <TableHead onClick={() => handleSort('engagement')} className="cursor-pointer hover:bg-muted/50">
+              Engagement {getSortIcon('engagement')}
+            </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {posts.map((post, index) => (
+          {sortedPosts.map((post, index) => (
             <TableRow key={index}>
               <TableCell>@{post.ownerUsername}</TableCell>
               <TableCell className="max-w-xs">
