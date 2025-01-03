@@ -1,6 +1,7 @@
-import { Instagram, TiktokIcon, Search, List, Settings } from "lucide-react";
+import { Instagram, Search, List, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 const Index = () => {
   return (
@@ -25,7 +26,7 @@ const Index = () => {
             href="#"
             className="flex items-center space-x-2 text-gray-600 hover:text-gray-900"
           >
-            <TiktokIcon className="w-5 h-5" />
+            <TikTokIcon className="w-5 h-5" />
             <span className="text-gray-400">TikTok Coming Soon</span>
           </a>
         </div>
