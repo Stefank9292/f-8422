@@ -14,7 +14,7 @@ interface InstagramPost {
   mentions: string[];
   ownerUsername: string;
   ownerId: string;
-  locationName?: string; // Keep this optional in the interface
+  locationName?: string;
 }
 
 function isInstagramPost(obj: unknown): obj is InstagramPost {
@@ -39,7 +39,7 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
     Array.isArray(post.mentions) &&
     typeof post.ownerUsername === 'string' &&
     typeof post.ownerId === 'string' &&
-    (post.locationName === undefined || typeof post.locationName === 'string') // Updated type check for optional locationName
+    (post.locationName === undefined || typeof post.locationName === 'string')
   );
 }
 
@@ -54,8 +54,8 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     const instagramUrl = `https://www.instagram.com/${cleanUsername}`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    // Mock response for development - using the constructed URL and expanded data structure
-    const mockPosts = [
+    // Mock response for development
+    const mockPosts: InstagramPost[] = [
       {
         url: `${instagramUrl}/p/mock1`,
         caption: '15 years later, we are Still underestimating the huge...',
@@ -117,13 +117,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     console.log('Raw items:', mockPosts);
 
     // Validate and transform the data
-    const validPosts = mockPosts.filter((item): item is InstagramPost => {
-      if (!isInstagramPost(item)) {
-        console.warn('Invalid post data structure:', item);
-        return false;
-      }
-      return true;
-    });
+    const validPosts = mockPosts.filter(isInstagramPost);
 
     console.log('Valid posts:', validPosts);
     return validPosts;
