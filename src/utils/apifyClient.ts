@@ -17,7 +17,7 @@ interface InstagramPost {
   locationName?: string;
 }
 
-function isInstagramPost(obj: unknown): obj is InstagramPost {
+function isInstagramPost(obj: unknown): boolean {
   if (!obj || typeof obj !== 'object') {
     return false;
   }
@@ -77,7 +77,7 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
       viewsCount,
       playsCount: Number(post.videoPlayCount) || 0,
       duration: typeof post.videoDuration === 'string' ? post.videoDuration : '0:00',
-      engagement: `${((likesCount + commentsCount) / (viewsCount || 1)) * 100}%`,
+      engagement: `${((likesCount + commentsCount) / (viewsCount || 1) * 100).toFixed(2)}%`,
       date: typeof post.timestamp === 'string' ? new Date(post.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
       type: typeof post.type === 'string' ? post.type : 'Post',
       timestamp: typeof post.timestamp === 'string' ? post.timestamp : new Date().toISOString(),
@@ -95,7 +95,7 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
   }
 }
 
-export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
+export async function fetchInstagramPosts(username: string, numberOfVideos: number = 3): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
     
@@ -133,7 +133,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         "enhanceUserSearchWithFacebookPage": false,
         "isUserReelFeedURL": false,
         "isUserTaggedFeedURL": false,
-        "resultsLimit": 5,
+        "resultsLimit": numberOfVideos,
         "resultsType": "posts",
         "searchLimit": 1,
         "searchType": "user"
