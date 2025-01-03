@@ -14,13 +14,26 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.access_token,
   });
 
   const handleSubscribe = async () => {
@@ -29,7 +42,11 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
       
       // Handle downgrade to free plan
       if (planId === 'free') {
-        const { error } = await supabase.functions.invoke('cancel-subscription');
+        const { error } = await supabase.functions.invoke('cancel-subscription', {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`
+          }
+        });
         if (error) throw error;
         
         toast({
@@ -40,7 +57,10 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
       // Handle downgrade to Premium from Ultra
       else if (planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
         const { error } = await supabase.functions.invoke('update-subscription', {
-          body: { priceId: planId }
+          body: { priceId: planId },
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`
+          }
         });
         
         if (error) throw error;
@@ -53,7 +73,10 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
       // Handle upgrades through checkout
       else {
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-          body: { priceId: planId }
+          body: { priceId: planId },
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`
+          }
         });
         
         if (error) throw error;

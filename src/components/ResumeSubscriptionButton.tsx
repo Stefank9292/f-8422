@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface ResumeSubscriptionButtonProps {
   children?: React.ReactNode;
@@ -14,10 +14,22 @@ export const ResumeSubscriptionButton = ({ children, className }: ResumeSubscrip
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   const handleResume = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.functions.invoke('resume-subscription');
+      const { error } = await supabase.functions.invoke('resume-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
       
       if (error) throw error;
       

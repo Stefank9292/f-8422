@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const CancelSubscriptionButton = ({ 
   isCanceled = false, 
@@ -28,10 +28,22 @@ export const CancelSubscriptionButton = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   const handleCancel = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.functions.invoke('cancel-subscription');
+      const { error } = await supabase.functions.invoke('cancel-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
       
       if (error) throw error;
       
