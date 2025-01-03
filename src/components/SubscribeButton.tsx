@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface SubscribeButtonProps {
   planId: string;
@@ -11,6 +12,15 @@ interface SubscribeButtonProps {
 export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const handleSubscribe = async () => {
     try {
@@ -36,13 +46,27 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
     }
   };
 
+  const getButtonText = () => {
+    if (!subscriptionStatus?.subscribed) {
+      return `Subscribe to ${planName}`;
+    }
+
+    const isCurrentPlan = subscriptionStatus.priceId === planId;
+    if (isCurrentPlan) {
+      return "Current Plan";
+    }
+
+    return `Upgrade to ${planName}`;
+  };
+
   return (
     <Button 
       onClick={handleSubscribe} 
-      disabled={loading}
+      disabled={loading || (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId)}
       className="w-full"
+      variant={subscriptionStatus?.priceId === planId ? "secondary" : "default"}
     >
-      {loading ? "Loading..." : `Subscribe to ${planName}`}
+      {loading ? "Loading..." : getButtonText()}
     </Button>
   );
 };
