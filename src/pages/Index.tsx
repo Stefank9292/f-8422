@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 
 const Index = () => {
   const { toast } = useToast();
@@ -31,10 +32,12 @@ const Index = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            {!subscriptionStatus?.subscribed && (
+            {!subscriptionStatus?.subscribed ? (
               <Button variant="default" onClick={() => navigate("/subscribe")}>
                 Upgrade to Premium
               </Button>
+            ) : (
+              <CancelSubscriptionButton />
             )}
           </div>
           <Button variant="outline" onClick={handleLogout}>
