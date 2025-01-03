@@ -24,11 +24,6 @@ const menuItems = [
     url: "/",
     icon: Home,
   },
-  {
-    title: "Subscribe",
-    url: "/subscribe",
-    icon: CreditCard,
-  },
 ];
 
 export function AppSidebar() {
@@ -106,6 +101,17 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={() => navigate("/subscribe")}
+                  isActive={location.pathname === "/subscribe"}
+                >
+                  <CreditCard className="h-4 w-4" />
+                  <span>{subscriptionStatus?.subscribed ? "Subscribe" : "Upgrade to Pro"}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
               {subscriptionStatus?.subscribed && (
                 <>
                   <SidebarMenuItem>
