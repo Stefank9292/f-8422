@@ -83,9 +83,13 @@ serve(async (req) => {
       }
     }
 
-    // Get the origin from the request headers
-    const origin = req.headers.get('origin') || 'http://localhost:5173'
-    
+    // Get the origin from the request headers and ensure it's properly formatted
+    const origin = req.headers.get('origin')
+    if (!origin) {
+      throw new Error('No origin header found')
+    }
+
+    // Create the checkout session with properly formatted URLs
     console.log('Creating checkout session with return URL:', origin)
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
