@@ -15,13 +15,10 @@ export interface InstagramData {
   likesCount: number;
   timestamp: string;
   videoUrl?: string;
-  videoPlayCount?: number;
   videoViewCount?: number;
   videoDuration?: number;
   displayUrl?: string;
   ownerUsername: string;
 }
 
-export interface ApifyResponse {
-  data: InstagramData[];
-}
+export interface ApifyResponse extends Array<InstagramData> {}

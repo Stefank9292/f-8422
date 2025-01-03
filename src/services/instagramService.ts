@@ -7,25 +7,25 @@ const ACTOR_ID = 'apify/instagram-scraper';
 const api = axios.create({
   baseURL: 'https://api.apify.com/v2/acts',
   timeout: 60000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 // Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error);
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          console.error('Invalid API token');
           throw new Error('Invalid API token');
         case 404:
-          console.error('Instagram profile not found');
           throw new Error('Instagram profile not found');
         case 429:
-          console.error('Rate limit exceeded');
           throw new Error('Too many requests, please try again later');
         default:
-          console.error('API Error:', error.response.data);
           throw new Error('Failed to fetch Instagram data');
       }
     }
@@ -38,25 +38,35 @@ export async function scrapeInstagramProfile(
   limit: number = 3,
   onlyPostsNewerThan?: Date
 ): Promise<InstagramData[]> {
-  const payload = {
-    username,
-    resultsLimit: limit,
-    maxPosts: limit,
-    mediaType: ['VIDEO'],
-    expandVideo: true,
-    includeVideoMetadata: true,
-    ...(onlyPostsNewerThan && { postsUntil: onlyPostsNewerThan.toISOString() }),
-  };
-
   try {
-    console.log('Fetching Instagram posts for:', username);
+    console.log('Starting Apify API request for username:', username);
+    
+    const payload = {
+      username,
+      resultsLimit: limit,
+      maxPosts: limit,
+      mediaType: ['VIDEO'],
+      expandVideo: true,
+      includeVideoMetadata: true,
+      ...(onlyPostsNewerThan && { postsUntil: onlyPostsNewerThan.toISOString() }),
+    };
+
+    console.log('Apify API payload:', payload);
+
     const response = await api.post<ApifyResponse>(
-      `/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`,
-      payload
+      `/${ACTOR_ID}/run-sync-get-dataset-items`,
+      payload,
+      {
+        params: {
+          token: API_TOKEN
+        }
+      }
     );
-    return response.data.data;
+
+    console.log('Apify API response:', response.data);
+    return response.data;
   } catch (error) {
-    console.error('Error fetching Instagram posts:', error);
+    console.error('Error in scrapeInstagramProfile:', error);
     throw error;
   }
 }
@@ -80,15 +90,15 @@ export async function scrapeInstagramUrls({
     ...(onlyPostsNewerThan && { postsUntil: onlyPostsNewerThan.toISOString() }),
   };
 
-  try {
-    console.log('Fetching Instagram posts for URLs:', urls);
-    const response = await api.post<ApifyResponse>(
-      `/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`,
-      payload
-    );
-    return response.data.data;
-  } catch (error) {
-    console.error('Error fetching Instagram posts:', error);
-    throw error;
-  }
+  const response = await api.post<ApifyResponse>(
+    `/${ACTOR_ID}/run-sync-get-dataset-items`,
+    payload,
+    {
+      params: {
+        token: API_TOKEN
+      }
+    }
+  );
+
+  return response.data;
 }

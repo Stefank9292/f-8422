@@ -30,6 +30,6 @@ export async function fetchInstagramPosts(
     url: post.url || `https://www.instagram.com/p/${post.shortCode}`,
     date: new Date(post.timestamp).toLocaleDateString(),
     duration: post.videoDuration ? `${Math.floor(post.videoDuration / 60)}:${(post.videoDuration % 60).toString().padStart(2, '0')}` : '0:00',
-    engagement: `${((post.likesCount + post.commentsCount) / (post.videoViewCount || post.videoPlayCount || 1)).toFixed(2)}%`
+    engagement: `${((post.likesCount + post.commentsCount) / (post.videoViewCount || 1)).toFixed(2)}%`
   }));
 }
