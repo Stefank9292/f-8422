@@ -73,9 +73,9 @@ serve(async (req) => {
           )
         }
 
-        // If upgrading to Ultra plan, cancel the current subscription immediately
-        if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
-          console.log('Canceling existing subscription for upgrade to Ultra')
+        // Cancel current subscription immediately for both upgrade to Ultra and downgrade to Premium
+        if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" || priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+          console.log(`Canceling existing subscription for ${priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 'upgrade to Ultra' : 'downgrade to Premium'}`)
           await stripe.subscriptions.cancel(currentSubscription.id, {
             prorate: true
           })
@@ -103,7 +103,7 @@ serve(async (req) => {
     console.error('Error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       }
