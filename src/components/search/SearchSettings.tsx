@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Settings, HelpCircle, Minus, Plus, Calendar as CalendarIcon } from "lucide-react";
+import { Settings, HelpCircle, Minus, Plus, Calendar as CalendarIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -25,6 +25,14 @@ export const SearchSettings = ({
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
   const [date, setDate] = React.useState<Date | undefined>(undefined);
+
+  const handleTodayClick = () => {
+    setDate(new Date());
+  };
+
+  const handleResetClick = () => {
+    setDate(undefined);
+  };
 
   return (
     <Collapsible
@@ -82,9 +90,39 @@ export const SearchSettings = ({
                   readOnly
                 />
                 <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                {date && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                    onClick={handleResetClick}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-3 border-b border-border">
+                <div className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleTodayClick}
+                    className="text-sm"
+                  >
+                    Today
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleResetClick}
+                    className="text-sm"
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </div>
               <Calendar
                 mode="single"
                 selected={date}
