@@ -12,13 +12,25 @@ const Index = () => {
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Session error:', error);
+        throw new Error('Authentication error');
+      }
+      
       if (!session?.user?.email) {
+        console.error('No authenticated session found');
+        navigate('/auth');
         throw new Error('No authenticated session found');
       }
       
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      if (error) throw error;
+      const { data, error: functionError } = await supabase.functions.invoke('check-subscription');
+      if (functionError) {
+        console.error('Function error:', functionError);
+        throw functionError;
+      }
+      
       return data;
     },
     retry: false,

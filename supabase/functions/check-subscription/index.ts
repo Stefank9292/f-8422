@@ -21,11 +21,27 @@ serve(async (req) => {
 
     // Get the user from the JWT token
     const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user } } = await supabaseClient.auth.getUser(token)
+    if (!authHeader) {
+      console.error('No authorization header found');
+      throw new Error('Not authenticated');
+    }
 
-    if (!user?.email) {
-      throw new Error('No email found')
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+
+    if (userError) {
+      console.error('Error getting user:', userError);
+      throw userError;
+    }
+
+    if (!user) {
+      console.error('No user found');
+      throw new Error('Not authenticated');
+    }
+
+    if (!user.email) {
+      console.error('No email found for user:', user.id);
+      throw new Error('No email found');
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -41,7 +57,7 @@ serve(async (req) => {
     })
 
     if (customers.data.length === 0) {
-      console.log('No customer found')
+      console.log('No customer found for email:', user.email)
       return new Response(
         JSON.stringify({ 
           subscribed: false,
@@ -63,7 +79,7 @@ serve(async (req) => {
     })
 
     if (subscriptions.data.length === 0) {
-      console.log('No active subscription found')
+      console.log('No active subscription found for customer:', customers.data[0].id)
       return new Response(
         JSON.stringify({ 
           subscribed: false,
