@@ -29,14 +29,13 @@ const secondaryMenuItems = [
     title: "Dark Mode",
     icon: Moon,
     onClick: () => {
-      // Toggle dark mode functionality can be added here
       document.documentElement.classList.toggle('dark');
     },
   },
   {
     title: "Help Center",
     icon: HelpCircle,
-    url: "https://docs.lovable.dev/",
+    url: "/help",
   },
   {
     title: "FAQs",

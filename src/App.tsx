@@ -1,65 +1,67 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import Index from "./pages/Index";
-import AuthPage from "./pages/Auth";
-import SubscribePage from "./pages/Subscribe";
-import ProtectedRoute from "./components/ProtectedRoute";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Index from "@/pages/Index";
+import Auth from "@/pages/Auth";
+import Subscribe from "@/pages/Subscribe";
+import FAQ from "@/pages/FAQ";
+import HelpCenter from "@/pages/HelpCenter";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
+const queryClient = new QueryClient();
 
-const AppContent = () => {
-  const location = useLocation();
-  const isAuthPage = location.pathname === '/auth';
-
+function App() {
   return (
-    <div className="flex min-h-screen w-full">
-      {!isAuthPage && <AppSidebar />}
-      <main className={`flex-1 p-4 ${isAuthPage ? 'w-full' : ''}`}>
-        {!isAuthPage && <SidebarTrigger className="mb-4" />}
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <Routes>
-                  <Route path="/subscribe" element={<SubscribePage />} />
-                  <Route path="/" element={<Index />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-    </div>
-  );
-};
-
-const App = () => (
-  <BrowserRouter>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+      <Router>
         <SidebarProvider>
-          <AppContent />
-          <Toaster />
-          <Sonner />
+          <div className="min-h-screen flex w-full">
+            <AppSidebar />
+            <main className="flex-1 overflow-y-auto">
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/subscribe"
+                  element={
+                    <ProtectedRoute>
+                      <Subscribe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/faq"
+                  element={
+                    <ProtectedRoute>
+                      <FAQ />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/help"
+                  element={
+                    <ProtectedRoute>
+                      <HelpCenter />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </main>
+          </div>
         </SidebarProvider>
-      </TooltipProvider>
+        <Toaster />
+      </Router>
     </QueryClientProvider>
-  </BrowserRouter>
-);
+  );
+}
 
 export default App;
