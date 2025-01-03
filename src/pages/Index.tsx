@@ -1,13 +1,26 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { fetchInstagramPosts } from "@/utils/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Filter, Download } from "lucide-react";
+import { 
+  Filter, 
+  Download,
+  Calendar,
+  HelpCircle,
+  Eye,
+  Play,
+  Heart,
+  MessageCircle,
+  Clock,
+  Zap,
+  ExternalLink
+} from "lucide-react";
 
 const Index = () => {
   const [username, setUsername] = useState("");
