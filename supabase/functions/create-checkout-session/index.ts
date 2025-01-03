@@ -75,10 +75,7 @@ serve(async (req) => {
           mode: 'subscription',
           line_items: [{ price: priceId, quantity: 1 }],
           success_url: `${req.headers.get('origin')}/`,
-          cancel_url: `${req.headers.get('origin')}/`,
-          subscription_data: {
-            cancel_at_period_end: false
-          }
+          cancel_url: `${req.headers.get('origin')}/`
         })
 
         return new Response(
