@@ -51,11 +51,11 @@ export async function scrapeInstagramProfile(
 
   try {
     console.log('Fetching Instagram posts for:', username);
-    const response = await api.post<ApifyResponse>(
+    const response = await api.post<{ data: InstagramData[] }>(
       `/${ACTOR_TASK}/run-sync-get-dataset-items?token=${API_TOKEN}`,
       payload
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
     throw error;
@@ -83,11 +83,11 @@ export async function scrapeInstagramUrls({
 
   try {
     console.log('Fetching Instagram posts for URLs:', urls);
-    const response = await api.post<ApifyResponse>(
+    const response = await api.post<{ data: InstagramData[] }>(
       `/${ACTOR_TASK}/run-sync-get-dataset-items?token=${API_TOKEN}`,
       payload
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
     throw error;
