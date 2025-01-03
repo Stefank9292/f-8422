@@ -131,9 +131,9 @@ export async function fetchInstagramPosts(
       "isUserReelFeedURL": false,
       "isUserTaggedFeedURL": false,
       "resultsLimit": numberOfVideos,
-      "resultsType": "stories",
+      "resultsType": "posts",
       "searchLimit": 1,
-      "searchType": "hashtag"
+      "searchType": "user"
     };
 
     // Only add postsUntil if a date is provided
@@ -145,6 +145,8 @@ export async function fetchInstagramPosts(
     // Make the API request to Apify
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
     
+    console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
+    
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
@@ -154,7 +156,9 @@ export async function fetchInstagramPosts(
     });
 
     if (!response.ok) {
-      throw new Error(`Apify API request failed: ${response.statusText}`);
+      const errorBody = await response.text();
+      console.error('API Error Response:', errorBody);
+      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
     }
 
     const data = await response.json();
