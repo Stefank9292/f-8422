@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { SubscribeButton } from "@/components/SubscribeButton";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
@@ -29,11 +30,26 @@ const SubscribePage = () => {
     enabled: !!session?.access_token,
   });
 
+  const getPlanBadgeText = () => {
+    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
+    return subscriptionStatus?.canceled 
+      ? `${planName} (Cancels at end of period)` 
+      : `${planName}`;
+  };
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-8 pt-8">
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold">Choose Your Plan</h1>
+          {subscriptionStatus?.subscribed && (
+            <div className="flex justify-center items-center gap-2">
+              <span className="text-lg text-muted-foreground">Current Plan:</span>
+              <Badge variant="secondary" className="text-base px-3 py-1">
+                {getPlanBadgeText()}
+              </Badge>
+            </div>
+          )}
           <p className="text-xl text-muted-foreground">
             Select the plan that best fits your needs
           </p>

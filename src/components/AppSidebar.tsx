@@ -2,7 +2,6 @@ import { Search, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, Pane
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -73,13 +72,6 @@ export function AppSidebar() {
     enabled: !!session?.access_token,
   });
 
-  const getPlanBadgeText = () => {
-    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
-    return subscriptionStatus?.canceled 
-      ? `${planName} (Cancels at end of period)` 
-      : `${planName}`;
-  };
-
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({
@@ -126,11 +118,6 @@ export function AppSidebar() {
                     <span className="text-sm text-sidebar-foreground truncate">
                       {session?.user?.email}
                     </span>
-                    {subscriptionStatus?.subscribed && (
-                      <Badge variant="secondary" className="text-xs px-1 py-0">
-                        {getPlanBadgeText()}
-                      </Badge>
-                    )}
                   </div>
                 </div>
               </SidebarMenuItem>
