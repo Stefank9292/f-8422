@@ -70,6 +70,7 @@ export function AppSidebar() {
       title: "Manage Subscription",
       icon: CreditCard,
       url: "/subscribe",
+      showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
     },
     {
       title: "Upgrade to Pro",
