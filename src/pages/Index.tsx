@@ -67,8 +67,8 @@ const Index = () => {
   };
 
   const filteredPosts = posts.filter(post => {
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) return false;
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) return false;
+    if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
+    if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
     if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
     if (filters.minDuration && post.duration < filters.minDuration) return false;
