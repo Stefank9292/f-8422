@@ -28,6 +28,11 @@ serve(async (req) => {
       throw new Error('No email found')
     }
 
+    const { priceId } = await req.json();
+    if (!priceId) {
+      throw new Error('No price ID provided')
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
@@ -37,16 +42,13 @@ serve(async (req) => {
       limit: 1
     })
 
-    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
-
     let customer_id = undefined
     if (customers.data.length > 0) {
       customer_id = customers.data[0].id
-      // check if already subscribed to this price
+      // check if already subscribed
       const subscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
         status: 'active',
-        price: price_id,
         limit: 1
       })
 
@@ -61,7 +63,7 @@ serve(async (req) => {
       customer_email: customer_id ? undefined : email,
       line_items: [
         {
-          price: price_id,
+          price: priceId,
           quantity: 1,
         },
       ],

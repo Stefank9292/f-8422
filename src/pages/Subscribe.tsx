@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { SubscribeButton } from "@/components/SubscribeButton";
 
 const SubscribePage = () => {
@@ -5,34 +7,59 @@ const SubscribePage = () => {
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-8 pt-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Upgrade to Premium</h1>
+          <h1 className="text-4xl font-bold">Choose Your Plan</h1>
           <p className="text-xl text-muted-foreground">
-            Get access to all premium features and content
+            Select the plan that best fits your needs
           </p>
         </div>
 
-        <div className="bg-card border rounded-lg p-8 space-y-6">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Premium Plan Features</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="p-6 space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Premium Plan</h2>
+              <p className="text-muted-foreground">Perfect for casual users</p>
+            </div>
             <ul className="space-y-2">
               <li className="flex items-center gap-2">
                 <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Feature 1</span>
+                <span>Click crown up to 10 times</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Feature 2</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckIcon className="h-5 w-5 text-green-500" />
-                <span>Feature 3</span>
+                <span>Basic features included</span>
               </li>
             </ul>
-          </div>
-          
-          <div className="pt-4">
-            <SubscribeButton />
-          </div>
+            <div className="pt-4">
+              <SubscribeButton planId="price_1QdBd2DoPDXfOSZFnG8aWuIq" planName="Premium" />
+            </div>
+          </Card>
+
+          <Card className="p-6 space-y-4 border-2 border-primary">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-semibold">Ultra Plan</h2>
+                <span className="bg-primary text-primary-foreground text-sm px-2 py-1 rounded">Best Value</span>
+              </div>
+              <p className="text-muted-foreground">For power users</p>
+            </div>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <CheckIcon className="h-5 w-5 text-green-500" />
+                <span>Click crown up to 20 times</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckIcon className="h-5 w-5 text-green-500" />
+                <span>All Premium features included</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckIcon className="h-5 w-5 text-green-500" />
+                <span>Priority support</span>
+              </li>
+            </ul>
+            <div className="pt-4">
+              <SubscribeButton planId="price_1QdC54DoPDXfOSZFXHBO4yB3" planName="Ultra" />
+            </div>
+          </Card>
         </div>
       </div>
     </div>

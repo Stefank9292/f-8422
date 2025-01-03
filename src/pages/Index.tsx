@@ -22,6 +22,11 @@ const Index = () => {
     },
   });
 
+  const getClickLimit = () => {
+    if (!subscriptionStatus?.subscribed) return 0;
+    return subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 20 : 10;
+  };
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({
@@ -32,19 +37,27 @@ const Index = () => {
   };
 
   const handleCrownClick = () => {
-    if (subscriptionStatus?.subscribed && clickCount < 10) {
+    const clickLimit = getClickLimit();
+    if (subscriptionStatus?.subscribed && clickCount < clickLimit) {
       setClickCount(prev => prev + 1);
       toast({
         title: "Crown clicked!",
-        description: `You have ${9 - clickCount} clicks remaining.`,
+        description: `You have ${clickLimit - clickCount - 1} clicks remaining.`,
       });
-    } else if (subscriptionStatus?.subscribed && clickCount >= 10) {
+    } else if (subscriptionStatus?.subscribed && clickCount >= clickLimit) {
       toast({
         title: "Click limit reached",
-        description: "You have reached the maximum number of clicks (10).",
+        description: `You have reached the maximum number of clicks (${clickLimit}).`,
         variant: "destructive"
       });
     }
+  };
+
+  const getPlanBadgeText = () => {
+    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
+    return subscriptionStatus?.canceled 
+      ? `${planName} (Cancels at end of period)` 
+      : `${planName} Active`;
   };
 
   return (
@@ -54,7 +67,7 @@ const Index = () => {
           <div className="flex items-center gap-4">
             {!subscriptionStatus?.subscribed ? (
               <Button variant="default" onClick={() => navigate("/subscribe")}>
-                Upgrade to Premium
+                Upgrade to Premium or Ultra
               </Button>
             ) : (
               <>
@@ -64,7 +77,7 @@ const Index = () => {
                   <CancelSubscriptionButton isCanceled={subscriptionStatus?.canceled} />
                 )}
                 <Badge variant="secondary" className="text-sm">
-                  {subscriptionStatus?.canceled ? 'Premium (Cancels at end of period)' : 'Premium Active'}
+                  {getPlanBadgeText()}
                 </Badge>
               </>
             )}
@@ -78,13 +91,13 @@ const Index = () => {
           {subscriptionStatus?.subscribed ? (
             <div className="space-y-4">
               <p className="text-xl text-gray-600 mb-6">
-                Thank you for being a premium member!
+                Thank you for being a {subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium"} member!
               </p>
               <div className="relative inline-block">
                 <img 
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxPqum0Pg64e3XHpP323coM5r2JN1ThM06wQ&s" 
                   alt="Premium content"
-                  className={`mx-auto rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${clickCount >= 10 ? 'opacity-50' : ''}`}
+                  className={`mx-auto rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${clickCount >= getClickLimit() ? 'opacity-50' : ''}`}
                   onClick={handleCrownClick}
                 />
                 {clickCount > 0 && (

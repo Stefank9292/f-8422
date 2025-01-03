@@ -3,14 +3,21 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export const SubscribeButton = () => {
+interface SubscribeButtonProps {
+  planId: string;
+  planName: string;
+}
+
+export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSubscribe = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-checkout-session');
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { priceId: planId }
+      });
       
       if (error) throw error;
       
@@ -33,9 +40,9 @@ export const SubscribeButton = () => {
     <Button 
       onClick={handleSubscribe} 
       disabled={loading}
-      className="w-full sm:w-auto"
+      className="w-full"
     >
-      {loading ? "Loading..." : "Subscribe Now"}
+      {loading ? "Loading..." : `Subscribe to ${planName}`}
     </Button>
   );
 };
