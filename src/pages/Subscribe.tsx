@@ -13,7 +13,27 @@ const SubscribePage = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
+          <Card className="p-6 space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold">Free Plan</h2>
+              <p className="text-muted-foreground">Get started for free</p>
+            </div>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-2">
+                <CheckIcon className="h-5 w-5 text-green-500" />
+                <span>Click crown up to 3 times</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckIcon className="h-5 w-5 text-green-500" />
+                <span>Basic features included</span>
+              </li>
+            </ul>
+            <div className="pt-4">
+              <SubscribeButton planId="free" planName="Free" />
+            </div>
+          </Card>
+
           <Card className="p-6 space-y-4">
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold">Premium Plan</h2>

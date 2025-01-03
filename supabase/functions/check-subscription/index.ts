@@ -10,38 +10,23 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
+  const supabaseClient = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+  )
+
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    )
-
-    // Get the user from the JWT token
+    // Get the session or user object
     const authHeader = req.headers.get('Authorization')!
-    if (!authHeader) {
-      console.error('No authorization header found');
-      throw new Error('Not authenticated');
-    }
-
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    const { data } = await supabaseClient.auth.getUser(token)
+    const user = data.user
 
-    if (userError) {
-      console.error('Error getting user:', userError);
-      throw userError;
-    }
-
-    if (!user) {
-      console.error('No user found');
-      throw new Error('Not authenticated');
-    }
-
-    if (!user.email) {
-      console.error('No email found for user:', user.id);
-      throw new Error('No email found');
+    if (!user?.email) {
+      throw new Error('No email found')
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
@@ -62,7 +47,8 @@ serve(async (req) => {
         JSON.stringify({ 
           subscribed: false,
           priceId: null,
-          canceled: false
+          canceled: false,
+          maxClicks: 3 // Free plan max clicks
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -84,7 +70,8 @@ serve(async (req) => {
         JSON.stringify({ 
           subscribed: false,
           priceId: null,
-          canceled: false
+          canceled: false,
+          maxClicks: 3 // Free plan max clicks
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -98,13 +85,22 @@ serve(async (req) => {
     const priceId = subscription.items.data[0].price.id
     const canceled = subscription.cancel_at_period_end
 
-    console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled)
+    // Determine max clicks based on the plan
+    let maxClicks = 3; // Default free plan
+    if (priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+      maxClicks = 10; // Premium plan
+    } else if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+      maxClicks = 20; // Ultra plan
+    }
+
+    console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled, 'maxClicks:', maxClicks)
 
     return new Response(
       JSON.stringify({ 
         subscribed: true,
         priceId: priceId,
-        canceled: canceled
+        canceled: canceled,
+        maxClicks: maxClicks
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
