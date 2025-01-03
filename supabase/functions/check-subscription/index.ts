@@ -45,7 +45,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           subscribed: false,
-          priceId: null
+          priceId: null,
+          canceled: false
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -66,7 +67,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           subscribed: false,
-          priceId: null
+          priceId: null,
+          canceled: false
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -78,13 +80,15 @@ serve(async (req) => {
     // Get the price ID from the subscription
     const subscription = subscriptions.data[0]
     const priceId = subscription.items.data[0].price.id
+    const canceled = subscription.cancel_at_period_end
 
-    console.log('Active subscription found with price ID:', priceId)
+    console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled)
 
     return new Response(
       JSON.stringify({ 
         subscribed: true,
         priceId: priceId,
+        canceled: canceled
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
