@@ -22,6 +22,10 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     return num?.toLocaleString() || '0';
   };
 
+  const truncateCaption = (caption: string) => {
+    return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
+  };
+
   return (
     <TooltipProvider>
       <Table>
@@ -46,7 +50,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
                 <div className="flex items-center gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="truncate cursor-help">{post.caption}</span>
+                      <span className="truncate cursor-help">{truncateCaption(post.caption)}</span>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm">
                       <p className="break-words">{post.caption}</p>
