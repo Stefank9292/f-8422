@@ -2,13 +2,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
 
+  // Fetch subscription status and click limit
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -51,23 +52,84 @@ const Index = () => {
     }
   });
 
+  // Fetch user's current click count
+  const { data: userClicks, refetch: refetchClicks } = useQuery({
+    queryKey: ['user-clicks'],
+    queryFn: async () => {
+      const now = new Date();
+      const { data, error } = await supabase
+        .from('user_clicks')
+        .select('*')
+        .lte('period_start', now)
+        .gte('period_end', now)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error('Error fetching clicks:', error);
+        throw error;
+      }
+
+      // If no current period exists, create one
+      if (!data) {
+        const periodStart = new Date();
+        const periodEnd = new Date();
+        periodEnd.setMonth(periodEnd.getMonth() + 1); // One month period
+
+        const { data: newPeriod, error: insertError } = await supabase
+          .from('user_clicks')
+          .insert({
+            click_count: 0,
+            period_start: periodStart.toISOString(),
+            period_end: periodEnd.toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        return newPeriod;
+      }
+
+      return data;
+    }
+  });
+
   const getClickLimit = () => {
     if (!subscriptionStatus) return 3; // Default to free plan limit
-    return subscriptionStatus.maxClicks || 3; // Use maxClicks from API or default to 3
+    return subscriptionStatus.maxClicks || 3;
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
     const clickLimit = getClickLimit();
-    if (clickCount < clickLimit) {
-      setClickCount(prev => prev + 1);
-      toast({
-        title: "Crown clicked!",
-        description: `You have ${clickLimit - clickCount - 1} clicks remaining.`,
-      });
+    const currentCount = userClicks?.click_count || 0;
+
+    if (currentCount < clickLimit) {
+      try {
+        const newCount = currentCount + 1;
+        const { error } = await supabase
+          .from('user_clicks')
+          .update({ click_count: newCount })
+          .eq('id', userClicks?.id);
+
+        if (error) throw error;
+
+        await refetchClicks();
+        
+        toast({
+          title: "Crown clicked!",
+          description: `You have ${clickLimit - newCount} clicks remaining.`,
+        });
+      } catch (error) {
+        console.error('Error updating click count:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update click count",
+          variant: "destructive"
+        });
+      }
     } else {
       toast({
         title: "Click limit reached",
-        description: `You have reached the maximum number of clicks (${clickLimit}).`,
+        description: `You have reached the maximum number of clicks (${clickLimit}) for this period.`,
         variant: "destructive"
       });
     }
@@ -79,8 +141,13 @@ const Index = () => {
         <h1 className="text-2xl font-bold">Welcome to the App</h1>
         
         <div className="space-y-2">
-          <p>You have clicked {clickCount} times</p>
+          <p>You have used {userClicks?.click_count || 0} clicks this period</p>
           <p>Your current limit is: {getClickLimit()} clicks</p>
+          {userClicks && (
+            <p className="text-sm text-gray-600">
+              Period ends: {new Date(userClicks.period_end).toLocaleDateString()}
+            </p>
+          )}
           
           <button
             onClick={handleClick}
