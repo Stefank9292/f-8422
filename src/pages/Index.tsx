@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const Index = () => {
   const { toast } = useToast();
@@ -63,11 +63,12 @@ const Index = () => {
       const { data, error } = await supabase
         .from('user_clicks')
         .select('*')
-        .lte('period_start', now)
-        .gte('period_end', now)
-        .single();
+        .eq('user_id', session.user.id)
+        .lte('period_start', now.toISOString())
+        .gte('period_end', now.toISOString())
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      if (error) {
         console.error('Error fetching clicks:', error);
         throw error;
       }
@@ -108,11 +109,16 @@ const Index = () => {
 
     if (currentCount < clickLimit) {
       try {
+        if (!userClicks?.id) {
+          await refetchClicks();
+          return;
+        }
+
         const newCount = currentCount + 1;
         const { error } = await supabase
           .from('user_clicks')
           .update({ click_count: newCount })
-          .eq('id', userClicks?.id);
+          .eq('id', userClicks.id);
 
         if (error) throw error;
 
