@@ -39,7 +39,7 @@ export const PostTableHeader = ({ onSort }: TableHeaderProps) => {
             <TooltipTrigger>
               <Eye className="h-4 w-4 mx-auto text-green-500" />
             </TooltipTrigger>
-            <TooltipContent>Plays</TooltipContent>
+            <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('viewsCount')} className="cursor-pointer hover:bg-muted/50 text-center">
@@ -47,7 +47,7 @@ export const PostTableHeader = ({ onSort }: TableHeaderProps) => {
             <TooltipTrigger>
               <Play className="h-4 w-4 mx-auto text-blue-500" />
             </TooltipTrigger>
-            <TooltipContent>Views</TooltipContent>
+            <TooltipContent>Plays</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('likesCount')} className="cursor-pointer hover:bg-muted/50 text-center">
