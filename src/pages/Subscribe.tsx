@@ -1,14 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { SubscribeButton } from "@/components/SubscribeButton";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Check, X } from "lucide-react";
+import { useState } from "react";
 
 const SubscribePage = () => {
+  const [isAnnual, setIsAnnual] = useState(false);
+
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -49,6 +53,18 @@ const SubscribePage = () => {
     </li>
   );
 
+  // Price IDs for different billing periods
+  const priceIds = {
+    premium: {
+      monthly: "price_1QdBd2DoPDXfOSZFnG8aWuIq",
+      annual: "price_1QdBd2DoPDXfOSZFnG8aWuIq_yearly"
+    },
+    ultra: {
+      monthly: "price_1QdC54DoPDXfOSZFXHBO4yB3",
+      annual: "price_1QdC54DoPDXfOSZFXHBO4yB3_yearly"
+    }
+  };
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-8 pt-8">
@@ -65,6 +81,19 @@ const SubscribePage = () => {
           <p className="text-xl text-muted-foreground">
             Select the plan that best fits your needs
           </p>
+          
+          {/* Billing Period Toggle */}
+          <div className="flex items-center justify-center gap-4 pt-4">
+            <span className={!isAnnual ? "font-semibold" : "text-muted-foreground"}>Monthly</span>
+            <Switch
+              checked={isAnnual}
+              onCheckedChange={setIsAnnual}
+            />
+            <div className="flex items-center gap-2">
+              <span className={isAnnual ? "font-semibold" : "text-muted-foreground"}>Annual</span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">Save 20%</Badge>
+            </div>
+          </div>
         </div>
 
         {subscriptionStatus?.subscribed && (
@@ -112,6 +141,10 @@ const SubscribePage = () => {
             <div className="space-y-2">
               <h2 className="text-2xl font-semibold">Premium Plan</h2>
               <p className="text-muted-foreground">Perfect for casual users</p>
+              <div className="text-2xl font-bold">
+                ${isAnnual ? '19.99' : '24.99'}/mo
+                {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
+              </div>
             </div>
             <ul className="space-y-2">
               <FeatureItem included={true} text="25 Total Searches" />
@@ -121,7 +154,10 @@ const SubscribePage = () => {
               <FeatureItem included={false} text="Early Access to new Features" />
             </ul>
             <div className="pt-4">
-              <SubscribeButton planId="price_1QdBd2DoPDXfOSZFnG8aWuIq" planName="Premium" />
+              <SubscribeButton 
+                planId={isAnnual ? priceIds.premium.annual : priceIds.premium.monthly} 
+                planName="Premium" 
+              />
             </div>
           </Card>
 
@@ -135,6 +171,10 @@ const SubscribePage = () => {
             <div className="space-y-2 pt-2">
               <h2 className="text-2xl font-semibold">Ultra Plan</h2>
               <p className="text-muted-foreground">For power users</p>
+              <div className="text-2xl font-bold">
+                ${isAnnual ? '39.99' : '49.99'}/mo
+                {isAnnual && <span className="text-sm text-muted-foreground ml-2">billed annually</span>}
+              </div>
             </div>
             <ul className="space-y-2">
               <FeatureItem included={true} text="Unlimited Searches" />
@@ -144,7 +184,10 @@ const SubscribePage = () => {
               <FeatureItem included={true} text="Early Access to new Features" />
             </ul>
             <div className="pt-4">
-              <SubscribeButton planId="price_1QdC54DoPDXfOSZFXHBO4yB3" planName="Ultra" />
+              <SubscribeButton 
+                planId={isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly} 
+                planName="Ultra" 
+              />
             </div>
           </Card>
         </div>
