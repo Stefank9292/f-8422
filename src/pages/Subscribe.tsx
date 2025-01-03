@@ -1,8 +1,34 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { SubscribeButton } from "@/components/SubscribeButton";
+import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const SubscribePage = () => {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-4xl mx-auto space-y-8 pt-8">
@@ -12,6 +38,27 @@ const SubscribePage = () => {
             Select the plan that best fits your needs
           </p>
         </div>
+
+        {subscriptionStatus?.subscribed && (
+          <Card className="p-6 space-y-4">
+            <h2 className="text-2xl font-semibold">Subscription Management</h2>
+            <p className="text-muted-foreground">Manage your current subscription</p>
+            <div className="flex gap-4">
+              {subscriptionStatus.canceled ? (
+                <ResumeSubscriptionButton className="w-full">
+                  Resume Subscription
+                </ResumeSubscriptionButton>
+              ) : (
+                <CancelSubscriptionButton 
+                  isCanceled={subscriptionStatus?.canceled}
+                  className="w-full"
+                >
+                  Cancel Subscription
+                </CancelSubscriptionButton>
+              )}
+            </div>
+          </Card>
+        )}
 
         <div className="grid md:grid-cols-3 gap-6">
           <Card className="p-6 space-y-4">
