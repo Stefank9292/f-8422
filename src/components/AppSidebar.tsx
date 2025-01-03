@@ -37,50 +37,6 @@ const historyMenuItems = [
   },
 ];
 
-const secondaryMenuItems = [
-  {
-    title: "Manage Subscription",
-    icon: CreditCard,
-    url: "/subscribe",
-  },
-  {
-    title: "Upgrade to Pro",
-    icon: Star,
-    url: "/subscribe",
-    className: "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400",
-    showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
-  },
-  {
-    title: "Dark Mode",
-    icon: Moon,
-    onClick: () => {
-      document.documentElement.classList.toggle('dark');
-    },
-  },
-  {
-    title: "Help Center",
-    icon: HelpCircle,
-    url: "/help",
-  },
-  {
-    title: "FAQs",
-    icon: MessageCircle,
-    url: "/faq",
-  },
-  {
-    title: "Sign Out",
-    icon: LogOut,
-    onClick: async () => {
-      await supabase.auth.signOut();
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
-      navigate("/auth");
-    },
-  },
-];
-
 export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -108,6 +64,50 @@ export function AppSidebar() {
     },
     enabled: !!session?.access_token,
   });
+
+  const secondaryMenuItems = [
+    {
+      title: "Manage Subscription",
+      icon: CreditCard,
+      url: "/subscribe",
+    },
+    {
+      title: "Upgrade to Pro",
+      icon: Star,
+      url: "/subscribe",
+      className: "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400",
+      showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
+    },
+    {
+      title: "Dark Mode",
+      icon: Moon,
+      onClick: () => {
+        document.documentElement.classList.toggle('dark');
+      },
+    },
+    {
+      title: "Help Center",
+      icon: HelpCircle,
+      url: "/help",
+    },
+    {
+      title: "FAQs",
+      icon: MessageCircle,
+      url: "/faq",
+    },
+    {
+      title: "Sign Out",
+      icon: LogOut,
+      onClick: async () => {
+        await supabase.auth.signOut();
+        toast({
+          title: "Logged out",
+          description: "You have been successfully logged out.",
+        });
+        navigate("/auth");
+      },
+    },
+  ];
 
   return (
     <Sidebar>
