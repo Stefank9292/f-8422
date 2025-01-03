@@ -10,53 +10,60 @@ import AuthPage from "./pages/Auth";
 import SubscribePage from "./pages/Subscribe";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const AppContent = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {!isAuthPage && <AppSidebar />}
-        <main className={`flex-1 p-4 ${isAuthPage ? 'w-full' : ''}`}>
-          {!isAuthPage && <SidebarTrigger className="mb-4" />}
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route
-              path="/subscribe"
-              element={
-                <ProtectedRoute>
-                  <SubscribePage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
-    </SidebarProvider>
+    <div className="flex min-h-screen w-full">
+      {!isAuthPage && <AppSidebar />}
+      <main className={`flex-1 p-4 ${isAuthPage ? 'w-full' : ''}`}>
+        {!isAuthPage && <SidebarTrigger className="mb-4" />}
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/subscribe"
+            element={
+              <ProtectedRoute>
+                <SubscribePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Index />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </main>
+    </div>
   );
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <SidebarProvider>
+          <AppContent />
+          <Toaster />
+          <Sonner />
+        </SidebarProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
 );
 
 export default App;
