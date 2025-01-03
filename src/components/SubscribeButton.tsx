@@ -56,6 +56,11 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
       return "Current Plan";
     }
 
+    // If user has Ultra plan (viewing Premium button)
+    if (subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" && planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+      return "Downgrade to Premium";
+    }
+
     return `Upgrade to ${planName}`;
   };
 
