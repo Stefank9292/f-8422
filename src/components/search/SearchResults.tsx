@@ -91,7 +91,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
                 </div>
               </TableCell>
               <TableCell title={post.timestamp}>{post.date}</TableCell>
-              <TableCell>{formatNumber(post.videoViewCount || post.viewsCount)}</TableCell>
+              <TableCell>{formatNumber(post.playsCount)}</TableCell>
               <TableCell>{formatNumber(post.playsCount)}</TableCell>
               <TableCell>{formatNumber(post.likesCount)}</TableCell>
               <TableCell>{formatNumber(post.commentsCount)}</TableCell>
