@@ -10,7 +10,6 @@ interface InstagramPost {
   date: string;
 }
 
-// Type guard function to check if an object is an InstagramPost
 function isInstagramPost(obj: unknown): obj is InstagramPost {
   if (!obj || typeof obj !== 'object') {
     return false;
@@ -33,11 +32,18 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
 export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
+    
+    // Clean up username (remove @ if present and any spaces)
+    const cleanUsername = username.replace('@', '').trim();
+    
+    // Construct proper Instagram URL
+    const instagramUrl = `https://www.instagram.com/${cleanUsername}`;
+    console.log('Using Instagram URL:', instagramUrl);
 
-    // Mock response for development
+    // Mock response for development - using the constructed URL
     const mockPosts = [
       {
-        url: `https://www.instagram.com/${username}/p/mock1`,
+        url: `${instagramUrl}/p/mock1`,
         caption: '15 years later, we are Still underestimating the huge...',
         likesCount: 8025,
         commentsCount: 157,
@@ -48,7 +54,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         date: '3.1.2025'
       },
       {
-        url: `https://www.instagram.com/${username}/p/mock2`,
+        url: `${instagramUrl}/p/mock2`,
         caption: 'On this first day of the year can you pls send this to...',
         likesCount: 23656,
         commentsCount: 665,
@@ -59,7 +65,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         date: '1.1.2025'
       },
       {
-        url: `https://www.instagram.com/${username}/p/mock3`,
+        url: `${instagramUrl}/p/mock3`,
         caption: 'Beyond ready to give more than ever .... Happy new...',
         likesCount: 14585,
         commentsCount: 290,
