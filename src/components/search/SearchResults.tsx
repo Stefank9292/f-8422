@@ -29,8 +29,8 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableCell>@{post.ownerUsername}</TableCell>
             <TableCell className="max-w-xs truncate">{post.caption}</TableCell>
             <TableCell title={post.timestamp}>{post.date}</TableCell>
-            <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
             <TableCell>{post.videoViewCount?.toLocaleString() || '0'}</TableCell>
+            <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
             <TableCell>{post.likesCount.toLocaleString()}</TableCell>
             <TableCell>{post.commentsCount.toLocaleString()}</TableCell>
             <TableCell>{post.duration}</TableCell>
