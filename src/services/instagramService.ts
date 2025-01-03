@@ -1,11 +1,11 @@
 import axios from 'axios';
 import type { ScrapeOptions, InstagramData, ApifyResponse } from '@/types/instagram';
 
-const API_TOKEN = 'apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1';
-const ACTOR_TASK = 'stefankaralic92~instagram-scraper-task';
+const API_TOKEN = 'apify_api_k2bgBKJMfSfH16VAzFrgbeDAbUKpkO3Kl3TI';
+const ACTOR_ID = 'apify/instagram-scraper';
 
 const api = axios.create({
-  baseURL: 'https://api.apify.com/v2/actor-tasks',
+  baseURL: 'https://api.apify.com/v2/acts',
   timeout: 60000,
 });
 
@@ -40,19 +40,18 @@ export async function scrapeInstagramProfile(
 ): Promise<InstagramData[]> {
   const payload = {
     username,
-    maxPosts: limit,
     resultsLimit: limit,
-    mediaTypes: ['VIDEO'],
+    maxPosts: limit,
+    mediaType: ['VIDEO'],
     expandVideo: true,
     includeVideoMetadata: true,
-    directUrls: [`https://www.instagram.com/${username}`],
     ...(onlyPostsNewerThan && { postsUntil: onlyPostsNewerThan.toISOString() }),
   };
 
   try {
     console.log('Fetching Instagram posts for:', username);
-    const response = await api.post<{ data: InstagramData[] }>(
-      `/${ACTOR_TASK}/run-sync-get-dataset-items?token=${API_TOKEN}`,
+    const response = await api.post<ApifyResponse>(
+      `/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`,
       payload
     );
     return response.data.data;
@@ -73,9 +72,9 @@ export async function scrapeInstagramUrls({
 
   const payload = {
     directUrls: urls,
-    maxPosts: limit,
     resultsLimit: limit,
-    mediaTypes: ['VIDEO'],
+    maxPosts: limit,
+    mediaType: ['VIDEO'],
     expandVideo: true,
     includeVideoMetadata: true,
     ...(onlyPostsNewerThan && { postsUntil: onlyPostsNewerThan.toISOString() }),
@@ -83,8 +82,8 @@ export async function scrapeInstagramUrls({
 
   try {
     console.log('Fetching Instagram posts for URLs:', urls);
-    const response = await api.post<{ data: InstagramData[] }>(
-      `/${ACTOR_TASK}/run-sync-get-dataset-items?token=${API_TOKEN}`,
+    const response = await api.post<ApifyResponse>(
+      `/${ACTOR_ID}/run-sync-get-dataset-items?token=${API_TOKEN}`,
       payload
     );
     return response.data.data;
