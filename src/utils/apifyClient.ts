@@ -46,6 +46,19 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
 // Apify actor configuration
 const APIFY_ACTOR_ID = 'stefankaralic92/instagram-scraper-task';
 
+// Apify actor input configuration
+interface ApifyActorInput {
+  addParentData: boolean;
+  directUrls: string[];
+  enhanceUserSearchWithFacebookPage: boolean;
+  isUserReelFeedURL: boolean;
+  isUserTaggedFeedURL: boolean;
+  resultsLimit: number;
+  resultsType: string;
+  searchLimit: number;
+  searchType: string;
+}
+
 export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
@@ -70,6 +83,21 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
     console.log('Using Apify Actor:', APIFY_ACTOR_ID);
+
+    // Construct actor input
+    const actorInput: ApifyActorInput = {
+      addParentData: false,
+      directUrls: [instagramUrl],
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: 5,
+      resultsType: "stories",
+      searchLimit: 1,
+      searchType: "hashtag"
+    };
+
+    console.log('Actor input:', actorInput);
 
     // Mock response for development
     const mockPosts: InstagramPost[] = [
