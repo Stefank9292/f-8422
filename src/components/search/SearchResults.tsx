@@ -35,7 +35,6 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableHead>Likes</TableHead>
             <TableHead>Comments</TableHead>
             <TableHead>Duration</TableHead>
-            <TableHead>Engagement</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -69,7 +68,6 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
               <TableCell>{formatNumber(post.likesCount)}</TableCell>
               <TableCell>{formatNumber(post.commentsCount)}</TableCell>
               <TableCell>{post.duration || '0:00'}</TableCell>
-              <TableCell>{post.engagement}</TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
