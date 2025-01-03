@@ -8,14 +8,13 @@ interface InstagramPost {
   duration: string;
   engagement: string;
   date: string;
-  // Additional fields from Apify API
   type: string;
   timestamp: string;
   hashtags: string[];
   mentions: string[];
   ownerUsername: string;
   ownerId: string;
-  locationName?: string;
+  locationName?: string; // Keep this optional in the interface
 }
 
 function isInstagramPost(obj: unknown): obj is InstagramPost {
@@ -39,7 +38,8 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
     Array.isArray(post.hashtags) &&
     Array.isArray(post.mentions) &&
     typeof post.ownerUsername === 'string' &&
-    typeof post.ownerId === 'string'
+    typeof post.ownerId === 'string' &&
+    (post.locationName === undefined || typeof post.locationName === 'string') // Updated type check for optional locationName
   );
 }
 
