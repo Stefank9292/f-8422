@@ -43,6 +43,9 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
   );
 }
 
+// Apify actor configuration
+const APIFY_ACTOR_ID = 'stefankaralic92/instagram-scraper-task';
+
 export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
@@ -63,9 +66,10 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     // Remove @ if present
     cleanUsername = cleanUsername.replace('@', '');
     
-    // Construct proper Instagram URL
+    // Construct proper Instagram URL with trailing slash
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
+    console.log('Using Apify Actor:', APIFY_ACTOR_ID);
 
     // Mock response for development
     const mockPosts: InstagramPost[] = [
