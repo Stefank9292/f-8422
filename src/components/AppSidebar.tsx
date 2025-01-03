@@ -1,8 +1,9 @@
-import { Home, CreditCard, Ban } from "lucide-react";
+import { Home, CreditCard, Ban, RefreshCw } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import {
   Sidebar,
   SidebarContent,
@@ -59,15 +60,26 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
               {subscriptionStatus?.subscribed && (
-                <SidebarMenuItem>
-                  <CancelSubscriptionButton 
-                    isCanceled={subscriptionStatus?.canceled}
-                    className="w-full justify-start gap-2 px-2"
-                  >
-                    <Ban className="h-4 w-4" />
-                    <span>Cancel Subscription</span>
-                  </CancelSubscriptionButton>
-                </SidebarMenuItem>
+                <>
+                  {subscriptionStatus.canceled ? (
+                    <SidebarMenuItem>
+                      <ResumeSubscriptionButton className="w-full justify-start gap-2 px-2">
+                        <RefreshCw className="h-4 w-4" />
+                        <span>Resume Subscription</span>
+                      </ResumeSubscriptionButton>
+                    </SidebarMenuItem>
+                  ) : (
+                    <SidebarMenuItem>
+                      <CancelSubscriptionButton 
+                        isCanceled={subscriptionStatus?.canceled}
+                        className="w-full justify-start gap-2 px-2"
+                      >
+                        <Ban className="h-4 w-4" />
+                        <span>Cancel Subscription</span>
+                      </CancelSubscriptionButton>
+                    </SidebarMenuItem>
+                  )}
+                </>
               )}
             </SidebarMenu>
           </SidebarGroupContent>

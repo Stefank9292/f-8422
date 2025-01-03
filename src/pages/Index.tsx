@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
@@ -69,12 +68,9 @@ const Index = () => {
                 Upgrade to Premium or Ultra
               </Button>
             ) : (
-              <>
-                {subscriptionStatus?.canceled && <ResumeSubscriptionButton />}
-                <Badge variant="secondary" className="text-sm">
-                  {getPlanBadgeText()}
-                </Badge>
-              </>
+              <Badge variant="secondary" className="text-sm">
+                {getPlanBadgeText()}
+              </Badge>
             )}
           </div>
           <Button variant="outline" onClick={handleLogout}>
