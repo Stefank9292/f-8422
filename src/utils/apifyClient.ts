@@ -24,26 +24,32 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
   
   const post = obj as Record<string, unknown>;
   
-  // Transform and validate the data from Apify's format to our format
   try {
-    return {
-      url: post.url || post.shortCode && `https://www.instagram.com/p/${post.shortCode}`,
-      caption: post.caption || '',
-      likesCount: post.likesCount || 0,
-      commentsCount: post.commentsCount || 0,
-      viewsCount: post.viewsCount || 0,
-      playsCount: post.videoPlayCount || 0,
-      duration: post.videoDuration || '0:00',
-      engagement: ((post.likesCount || 0) + (post.commentsCount || 0)) / (post.viewsCount || 1) * 100 + '%',
-      date: new Date(post.timestamp || Date.now()).toLocaleDateString(),
-      type: post.type || 'Post',
-      timestamp: post.timestamp || new Date().toISOString(),
-      hashtags: Array.isArray(post.hashtags) ? post.hashtags : [],
-      mentions: Array.isArray(post.mentions) ? post.mentions : [],
-      ownerUsername: post.ownerUsername || '',
-      ownerId: post.ownerId || '',
-      locationName: post.locationName || undefined
-    } as InstagramPost;
+    const likesCount = Number(post.likesCount) || 0;
+    const commentsCount = Number(post.commentsCount) || 0;
+    const viewsCount = Number(post.viewsCount) || 0;
+    
+    const transformedPost: InstagramPost = {
+      url: typeof post.url === 'string' ? post.url : 
+           typeof post.shortCode === 'string' ? `https://www.instagram.com/p/${post.shortCode}` : '',
+      caption: typeof post.caption === 'string' ? post.caption : '',
+      likesCount,
+      commentsCount,
+      viewsCount,
+      playsCount: Number(post.videoPlayCount) || 0,
+      duration: typeof post.videoDuration === 'string' ? post.videoDuration : '0:00',
+      engagement: `${((likesCount + commentsCount) / (viewsCount || 1)) * 100}%`,
+      date: typeof post.timestamp === 'string' ? new Date(post.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
+      type: typeof post.type === 'string' ? post.type : 'Post',
+      timestamp: typeof post.timestamp === 'string' ? post.timestamp : new Date().toISOString(),
+      hashtags: Array.isArray(post.hashtags) ? post.hashtags.filter(tag => typeof tag === 'string') : [],
+      mentions: Array.isArray(post.mentions) ? post.mentions.filter(mention => typeof mention === 'string') : [],
+      ownerUsername: typeof post.ownerUsername === 'string' ? post.ownerUsername : '',
+      ownerId: typeof post.ownerId === 'string' ? post.ownerId : '',
+      locationName: typeof post.locationName === 'string' ? post.locationName : undefined
+    };
+
+    return transformedPost;
   } catch (error) {
     console.error('Error transforming post data:', error);
     return false;
@@ -103,7 +109,11 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
     console.log('Raw response from Apify:', data);
 
     // Transform and validate the data
-    const validPosts = Array.isArray(data) ? data.map(post => isInstagramPost(post)).filter(Boolean) : [];
+    const validPosts = Array.isArray(data) 
+      ? data.map(post => isInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== false)
+      : [];
+           
     console.log('Valid posts:', validPosts);
 
     return validPosts;
