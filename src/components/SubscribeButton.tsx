@@ -27,6 +27,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
     try {
       setLoading(true);
       
+      // Handle downgrade to free plan
       if (planId === 'free') {
         const { error } = await supabase.functions.invoke('cancel-subscription');
         if (error) throw error;
@@ -35,7 +36,22 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
           title: "Plan Updated",
           description: "You have been successfully downgraded to the Free plan.",
         });
-      } else {
+      } 
+      // Handle downgrade to Premium from Ultra
+      else if (planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+        const { error } = await supabase.functions.invoke('update-subscription', {
+          body: { priceId: planId }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Plan Updated",
+          description: "You have been successfully downgraded to the Premium plan.",
+        });
+      }
+      // Handle upgrades through checkout
+      else {
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
           body: { priceId: planId }
         });
