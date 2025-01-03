@@ -125,24 +125,22 @@ export async function fetchInstagramPosts(
 
     // Prepare request body
     const requestBody: Record<string, any> = {
-      "addParentData": false,
-      "directUrls": [instagramUrl],
-      "enhanceUserSearchWithFacebookPage": false,
-      "isUserReelFeedURL": false,
-      "isUserTaggedFeedURL": false,
+      "startUrls": [{ "url": instagramUrl }],
       "resultsLimit": numberOfVideos,
-      "resultsType": "posts",
-      "searchLimit": 1,
-      "searchType": "user"
+      "addUserInfo": false,
+      "expandOwners": false,
+      "proxy": {
+        "useApifyProxy": true
+      }
     };
 
     // Add postsNewerThan if provided
     if (postsNewerThan) {
-      requestBody.onlyPostsNewerThan = postsNewerThan;
+      requestBody.postsUntil = postsNewerThan;
     }
 
     // Make the API request to Apify
-    const apiEndpoint = `https://api.apify.com/v2/actor-tasks/stefankaralic92~instagram-scraper-task/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
+    const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
     
     const response = await fetch(apiEndpoint, {
       method: 'POST',
