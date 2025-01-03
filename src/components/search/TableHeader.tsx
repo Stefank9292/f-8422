@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, PenLine, Clock, Play, Eye, Heart, MessageSquare, Timer, Zap, Download, Chain } from "lucide-react";
+import { User, PenLine, Clock, Play, Eye, Heart, MessageSquare, Timer, Zap, Download, Link } from "lucide-react";
 
 interface TableHeaderProps {
   onSort: (key: string) => void;
@@ -85,7 +85,7 @@ export const PostTableHeader = ({ onSort }: TableHeaderProps) => {
         <TableHead className="text-center">
           <Tooltip>
             <TooltipTrigger>
-              <Chain className="h-4 w-4 mx-auto text-rose-400" />
+              <Link className="h-4 w-4 mx-auto text-rose-400" />
             </TooltipTrigger>
             <TooltipContent>Open URL</TooltipContent>
           </Tooltip>
