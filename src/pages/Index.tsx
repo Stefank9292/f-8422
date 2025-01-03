@@ -11,6 +11,7 @@ import { SearchResults } from "@/components/search/SearchResults";
 
 const Index = () => {
   const [username, setUsername] = useState("");
+  const [searchTrigger, setSearchTrigger] = useState(0); // Add trigger for manual search
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -26,11 +27,11 @@ const Index = () => {
   const { toast } = useToast();
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger], // Add searchTrigger to queryKey
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: Boolean(username),
-    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
-    gcTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
+    enabled: Boolean(username && searchTrigger), // Only run when searchTrigger changes and username exists
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
     retry: 2,
     refetchOnWindowFocus: false,
   });
@@ -45,8 +46,7 @@ const Index = () => {
       return;
     }
 
-    // This will trigger the query
-    setUsername(username);
+    setSearchTrigger(prev => prev + 1); // Increment trigger to force new search
   };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
@@ -109,7 +109,6 @@ const Index = () => {
         />
       </div>
 
-      {/* Results Section */}
       {posts.length > 0 && (
         <div className="w-full max-w-6xl space-y-4">
           <SearchFilters
