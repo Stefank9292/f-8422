@@ -24,6 +24,18 @@ export const AppSidebar = () => {
       label: "Home",
     },
     {
+      href: "/dashboard",
+      label: "Dashboard",
+    },
+    {
+      href: "/profile",
+      label: "Profile",
+    },
+    {
+      href: "/settings",
+      label: "Settings",
+    },
+    {
       href: "/subscribe",
       label: isSubscribed ? "Subscribe" : "Upgrade to Premium",
     },
