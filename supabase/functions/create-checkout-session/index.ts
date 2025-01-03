@@ -83,13 +83,16 @@ serve(async (req) => {
       }
     }
 
-    console.log('Creating checkout session...')
+    // Get the origin URL without any trailing colons
+    const origin = new URL(req.url).origin.replace(/:\/?$/, '')
+    
+    console.log('Creating checkout session with return URL:', origin)
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${req.headers.get('origin')}/`,
-      cancel_url: `${req.headers.get('origin')}/`
+      success_url: `${origin}/`,
+      cancel_url: `${origin}/`
     })
 
     return new Response(
