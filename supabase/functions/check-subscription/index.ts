@@ -15,17 +15,21 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '', // Use service role key
   )
 
   try {
-    // Get the session or user object
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
+      console.error('No authorization header provided')
       throw new Error('No authorization header')
     }
 
+    // Extract the JWT token
     const token = authHeader.replace('Bearer ', '')
+    
+    // Get user using the service role client
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
 
     if (userError) {
@@ -43,11 +47,11 @@ serve(async (req) => {
       throw new Error('No email found')
     }
 
+    console.log('Checking subscription for email:', user.email)
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
-
-    console.log('Checking subscription for email:', user.email)
 
     // Get customer by email
     const customers = await stripe.customers.list({
