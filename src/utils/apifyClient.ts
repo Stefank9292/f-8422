@@ -5,7 +5,7 @@ const client = new ApifyClient({
 });
 
 export interface InstagramPost {
-    url: string;
+    url: string;  // Making url required by removing the optional operator
     caption?: string;
     likesCount?: number;
     commentsCount?: number;
@@ -14,6 +14,16 @@ export interface InstagramPost {
     displayUrl?: string;
     mediaCount?: number;
     ownerUsername?: string;
+}
+
+// Type guard function to check if an object is an InstagramPost
+function isInstagramPost(obj: unknown): obj is InstagramPost {
+    return (
+        typeof obj === 'object' &&
+        obj !== null &&
+        'url' in obj &&
+        typeof (obj as any).url === 'string'
+    );
 }
 
 export const fetchInstagramPosts = async (username: string): Promise<InstagramPost[]> => {
@@ -32,13 +42,12 @@ export const fetchInstagramPosts = async (username: string): Promise<InstagramPo
         const run = await client.actor("shu8hvrXbJbY3Eb9W").call(input);
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
         
-        // Type assertion with runtime validation
-        const posts = items.map(item => {
-            if (typeof item === 'object' && item !== null && 'url' in item) {
-                return item as InstagramPost;
-            }
-            throw new Error('Invalid post data structure');
-        });
+        // Type assertion with runtime validation using the type guard
+        const posts = items.filter(isInstagramPost);
+        
+        if (posts.length === 0) {
+            console.warn('No valid Instagram posts found in the response');
+        }
         
         return posts;
     } catch (error) {
