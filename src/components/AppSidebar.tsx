@@ -1,4 +1,4 @@
-import { Home, CreditCard, Ban, RefreshCw, LogOut } from "lucide-react";
+import { Home, CreditCard, Ban, RefreshCw, LogOut, User } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,7 @@ import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton"
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
@@ -35,13 +36,26 @@ export function AppSidebar() {
   const location = useLocation();
   const { toast } = useToast();
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.access_token,
   });
 
   const getPlanBadgeText = () => {
@@ -67,6 +81,20 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
+              {/* User Profile Section */}
+              <SidebarMenuItem>
+                <div className="flex items-center gap-3 px-2 py-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback>
+                      <User className="h-4 w-4" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-sidebar-foreground truncate">
+                    {session?.user?.email}
+                  </span>
+                </div>
+              </SidebarMenuItem>
+
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
