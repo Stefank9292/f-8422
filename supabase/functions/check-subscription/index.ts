@@ -39,7 +39,7 @@ serve(async (req) => {
 
     if (customers.data.length === 0) {
       return new Response(
-        JSON.stringify({ subscribed: false }),
+        JSON.stringify({ subscribed: false, canceled: false }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
@@ -56,9 +56,13 @@ serve(async (req) => {
       limit: 1
     })
 
+    const subscription = subscriptions.data[0]
+    const isCanceled = subscription?.cancel_at_period_end ?? false
+
     return new Response(
       JSON.stringify({ 
         subscribed: subscriptions.data.length > 0,
+        canceled: isCanceled
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
