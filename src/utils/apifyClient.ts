@@ -99,7 +99,8 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
 
     console.log('Actor input:', actorInput);
 
-    // Mock response for development
+    // Here you would make the actual API call to Apify
+    // For now, we'll use mock data for development
     const mockPosts: InstagramPost[] = [
       {
         url: `${instagramUrl}p/mock1`,
