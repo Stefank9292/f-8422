@@ -11,7 +11,6 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Type</TableHead>
           <TableHead>Username</TableHead>
           <TableHead>Caption</TableHead>
           <TableHead>Date</TableHead>
@@ -27,12 +26,11 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
       <TableBody>
         {posts.map((post, index) => (
           <TableRow key={index}>
-            <TableCell>{post.type}</TableCell>
             <TableCell>@{post.ownerUsername}</TableCell>
             <TableCell className="max-w-xs truncate">{post.caption}</TableCell>
             <TableCell title={post.timestamp}>{post.date}</TableCell>
-            <TableCell>{post.viewsCount.toLocaleString()}</TableCell>
-            <TableCell>{post.playsCount.toLocaleString()}</TableCell>
+            <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
+            <TableCell>{post.videoViewCount?.toLocaleString() || '0'}</TableCell>
             <TableCell>{post.likesCount.toLocaleString()}</TableCell>
             <TableCell>{post.commentsCount.toLocaleString()}</TableCell>
             <TableCell>{post.duration}</TableCell>
