@@ -55,16 +55,6 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Viral Videos Search Input */}
-        <div className="relative">
-          <Input
-            type="text"
-            placeholder="Search Viral Videos"
-            className="pl-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        </div>
-
         {/* Settings Button */}
         <Button
           variant="ghost"
