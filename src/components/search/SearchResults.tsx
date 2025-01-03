@@ -27,7 +27,8 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableHead>Caption</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Views</TableHead>
-            <TableHead>Plays</TableHead>
+            <TableHead>Video Views</TableHead>
+            <TableHead>Video Plays</TableHead>
             <TableHead>Likes</TableHead>
             <TableHead>Comments</TableHead>
             <TableHead>Duration</TableHead>
@@ -62,6 +63,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
               <TableCell title={post.timestamp}>{post.date}</TableCell>
               <TableCell>{post.viewsCount?.toLocaleString() || '0'}</TableCell>
               <TableCell>{post.videoViewCount?.toLocaleString() || '0'}</TableCell>
+              <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
               <TableCell>{post.likesCount.toLocaleString()}</TableCell>
               <TableCell>{post.commentsCount.toLocaleString()}</TableCell>
               <TableCell>{post.videoDuration || '0:00'}</TableCell>
