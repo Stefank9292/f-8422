@@ -13,11 +13,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '', // Use service role key
-  )
-
   try {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization')
@@ -26,11 +21,16 @@ serve(async (req) => {
       throw new Error('No authorization header')
     }
 
-    // Extract the JWT token
-    const token = authHeader.replace('Bearer ', '')
-    
-    // Get user using the service role client
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+
+    // Get user from the JWT token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    )
 
     if (userError) {
       console.error('Error getting user:', userError)
