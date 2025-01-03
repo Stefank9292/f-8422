@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, ExternalLink, Copy, ArrowUpDown } from "lucide-react";
+import { Download, ExternalLink, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
@@ -99,13 +99,6 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     return 0;
   });
 
-  const getSortIcon = (key: string) => {
-    if (sortConfig.key === key && sortConfig.direction !== null) {
-      return <ArrowUpDown className="h-4 w-4 text-primary" />;
-    }
-    return null;
-  };
-
   return (
     <TooltipProvider>
       <Table>
@@ -114,25 +107,25 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableHead>Username</TableHead>
             <TableHead>Caption</TableHead>
             <TableHead onClick={() => handleSort('date')} className="cursor-pointer hover:bg-muted/50">
-              Date {getSortIcon('date')}
+              Date
             </TableHead>
             <TableHead onClick={() => handleSort('playsCount')} className="cursor-pointer hover:bg-muted/50">
-              Views {getSortIcon('playsCount')}
+              Views
             </TableHead>
             <TableHead onClick={() => handleSort('viewsCount')} className="cursor-pointer hover:bg-muted/50">
-              Plays {getSortIcon('viewsCount')}
+              Plays
             </TableHead>
             <TableHead onClick={() => handleSort('likesCount')} className="cursor-pointer hover:bg-muted/50">
-              Likes {getSortIcon('likesCount')}
+              Likes
             </TableHead>
             <TableHead onClick={() => handleSort('commentsCount')} className="cursor-pointer hover:bg-muted/50">
-              Comments {getSortIcon('commentsCount')}
+              Comments
             </TableHead>
             <TableHead onClick={() => handleSort('duration')} className="cursor-pointer hover:bg-muted/50">
-              Duration {getSortIcon('duration')}
+              Duration
             </TableHead>
             <TableHead onClick={() => handleSort('engagement')} className="cursor-pointer hover:bg-muted/50">
-              Engagement {getSortIcon('engagement')}
+              Engagement
             </TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
