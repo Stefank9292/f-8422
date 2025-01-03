@@ -11,7 +11,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>Thumbnail</TableHead>
+          <TableHead>Type</TableHead>
           <TableHead>Username</TableHead>
           <TableHead>Caption</TableHead>
           <TableHead>Date</TableHead>
@@ -27,15 +27,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
       <TableBody>
         {posts.map((post, index) => (
           <TableRow key={index}>
-            <TableCell>
-              {post.displayUrl && (
-                <img 
-                  src={post.displayUrl} 
-                  alt="Post thumbnail" 
-                  className="w-16 h-16 object-cover rounded-md"
-                />
-              )}
-            </TableCell>
+            <TableCell>{post.type}</TableCell>
             <TableCell>@{post.ownerUsername}</TableCell>
             <TableCell className="max-w-xs truncate">{post.caption}</TableCell>
             <TableCell title={post.timestamp}>{post.date}</TableCell>
