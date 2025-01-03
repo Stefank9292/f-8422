@@ -123,15 +123,17 @@ export async function fetchInstagramPosts(
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    // Prepare request body
+    // Prepare request body according to Apify API specifications
     const requestBody: Record<string, any> = {
-      "startUrls": [{ "url": instagramUrl }],
+      "directUrls": [instagramUrl],
+      "resultsType": "posts",
       "resultsLimit": numberOfVideos,
-      "addUserInfo": false,
-      "expandOwners": false,
-      "proxy": {
-        "useApifyProxy": true
-      }
+      "searchType": "user",
+      "searchLimit": 1,
+      "extendOutputFunction": `async ({ data, item, page, customData }) => {
+        return item;
+      }`,
+      "customData": {}
     };
 
     // Only add postsUntil if a date is provided
