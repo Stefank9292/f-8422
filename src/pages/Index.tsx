@@ -3,12 +3,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
+
+  // Add session check
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+      }
+    };
+    
+    checkSession();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate('/auth');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -17,6 +38,8 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
+    // Only run the query if we have a session
+    enabled: true,
   });
 
   const getClickLimit = () => {
