@@ -24,8 +24,13 @@ const Index = () => {
         navigate('/auth');
         throw new Error('No authenticated session found');
       }
-      
-      const { data, error: functionError } = await supabase.functions.invoke('check-subscription');
+
+      const { data, error: functionError } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
       if (functionError) {
         console.error('Function error:', functionError);
         throw functionError;
