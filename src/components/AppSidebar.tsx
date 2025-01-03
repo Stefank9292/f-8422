@@ -1,4 +1,4 @@
-import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, Settings } from "lucide-react";
+import { Home, CreditCard, LogOut, User, Moon, HelpCircle, MessageCircle, ChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 
 const menuItems = [
@@ -48,6 +49,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const { toggleSidebar } = useSidebar();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -98,7 +100,14 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          {/* Collapse Button */}
+          <SidebarMenuItem>
+            <SidebarMenuButton onClick={toggleSidebar} className="justify-between">
+              <span>Navigation</span>
+              <ChevronLeft className="h-4 w-4" />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+
           <SidebarGroupContent>
             <SidebarMenu>
               {/* User Profile Section */}
