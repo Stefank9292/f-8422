@@ -1,9 +1,3 @@
-import { ApifyClient } from 'apify-client';
-
-const client = new ApifyClient({
-  token: 'apify_api_token',
-});
-
 interface InstagramPost {
   url: string;
   // Add other properties that you expect from the Instagram post
@@ -24,20 +18,29 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
   try {
     console.log('Fetching Instagram posts for:', username);
 
-    // Start the actor and wait for it to finish
-    const run = await client.actor('apify/instagram-scraper').call({
-      username: username,
-      resultsLimit: 10,
-    });
+    // Using a mock response for development - replace with actual API call
+    const mockPosts = [
+      {
+        url: `https://www.instagram.com/${username}/p/mock1`,
+        caption: 'Test post 1',
+        likesCount: 100,
+        commentsCount: 10
+      },
+      {
+        url: `https://www.instagram.com/${username}/p/mock2`,
+        caption: 'Test post 2',
+        likesCount: 200,
+        commentsCount: 20
+      }
+    ];
 
-    console.log('Actor finished, fetching results...');
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Fetch the actor's output
-    const { items } = await client.dataset(run.defaultDatasetId).listItems();
-    console.log('Raw items from API:', items);
+    console.log('Raw items:', mockPosts);
 
     // Validate and transform the data
-    const validPosts = (items as unknown[]).filter((item): item is InstagramPost => {
+    const validPosts = mockPosts.filter((item): item is InstagramPost => {
       if (!isInstagramPost(item)) {
         console.warn('Invalid post data structure:', item);
         return false;
