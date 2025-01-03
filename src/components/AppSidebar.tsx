@@ -124,11 +124,6 @@ export function AppSidebar() {
 
           <SidebarGroupContent>
             <SidebarMenu>
-              {/* User Profile Section */}
-              <SidebarMenuItem>
-                <UserProfile email={session?.user?.email} />
-              </SidebarMenuItem>
-
               {/* Tools Section */}
               <SidebarSection
                 title="TOOLS"
@@ -150,7 +145,7 @@ export function AppSidebar() {
                 <div className="h-px bg-sidebar-border mx-2 my-4" />
               </SidebarMenuItem>
 
-              {/* Secondary Menu Items */}
+              {/* Settings Section */}
               <SidebarSection
                 title="SETTINGS"
                 items={secondaryMenuItems}
@@ -158,6 +153,11 @@ export function AppSidebar() {
                 onNavigate={navigate}
                 currentPath={location.pathname}
               />
+
+              {/* User Profile */}
+              <SidebarMenuItem>
+                <UserProfile email={session?.user?.email} />
+              </SidebarMenuItem>
 
               {/* Sign Out Button */}
               <SidebarMenuItem>
