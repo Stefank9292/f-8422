@@ -47,17 +47,30 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
   try {
     console.log('Fetching Instagram posts for:', username);
     
-    // Clean up username (remove @ if present and any spaces)
-    const cleanUsername = username.replace('@', '').trim();
+    // Clean up username and handle URL input
+    let cleanUsername = username.trim();
+    
+    // If the input is a URL, extract the username
+    if (cleanUsername.includes('instagram.com')) {
+      const urlParts = cleanUsername.split('/');
+      // Find the username part after instagram.com
+      const usernameIndex = urlParts.findIndex(part => part === 'instagram.com') + 1;
+      if (usernameIndex < urlParts.length) {
+        cleanUsername = urlParts[usernameIndex];
+      }
+    }
+    
+    // Remove @ if present
+    cleanUsername = cleanUsername.replace('@', '');
     
     // Construct proper Instagram URL
-    const instagramUrl = `https://www.instagram.com/${cleanUsername}`;
+    const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
     // Mock response for development
     const mockPosts: InstagramPost[] = [
       {
-        url: `${instagramUrl}/p/mock1`,
+        url: `${instagramUrl}p/mock1`,
         caption: '15 years later, we are Still underestimating the huge...',
         likesCount: 8025,
         commentsCount: 157,
@@ -75,7 +88,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         locationName: 'New York, NY'
       },
       {
-        url: `${instagramUrl}/p/mock2`,
+        url: `${instagramUrl}p/mock2`,
         caption: 'On this first day of the year can you pls send this to...',
         likesCount: 23656,
         commentsCount: 665,
@@ -93,7 +106,7 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         locationName: 'Los Angeles, CA'
       },
       {
-        url: `${instagramUrl}/p/mock3`,
+        url: `${instagramUrl}p/mock3`,
         caption: 'Beyond ready to give more than ever .... Happy new...',
         likesCount: 14585,
         commentsCount: 290,
@@ -110,9 +123,6 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
         ownerId: '12345'
       }
     ];
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
 
     console.log('Raw items:', mockPosts);
 
