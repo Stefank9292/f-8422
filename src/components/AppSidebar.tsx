@@ -75,7 +75,7 @@ export function AppSidebar() {
     const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
     return subscriptionStatus?.canceled 
       ? `${planName} (Cancels at end of period)` 
-      : `${planName} Active`;
+      : `${planName}`;
   };
 
   const handleLogout = async () => {
@@ -109,9 +109,16 @@ export function AppSidebar() {
                       <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm text-sidebar-foreground truncate">
-                    {session?.user?.email}
-                  </span>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm text-sidebar-foreground truncate">
+                      {session?.user?.email}
+                    </span>
+                    {subscriptionStatus?.subscribed && (
+                      <Badge variant="secondary" className="text-xs px-1 py-0">
+                        {getPlanBadgeText()}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </SidebarMenuItem>
 
@@ -136,16 +143,6 @@ export function AppSidebar() {
                   <span>{getSubscriptionButtonText()}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-
-              {subscriptionStatus?.subscribed && (
-                <SidebarMenuItem>
-                  <div className="px-2">
-                    <Badge variant="secondary" className="w-full justify-center text-sm">
-                      {getPlanBadgeText()}
-                    </Badge>
-                  </div>
-                </SidebarMenuItem>
-              )}
 
               {/* Secondary Menu Items */}
               {secondaryMenuItems.map((item) => (
