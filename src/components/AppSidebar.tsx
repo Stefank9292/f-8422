@@ -49,7 +49,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, state } = useSidebar();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -102,12 +102,12 @@ export function AppSidebar() {
         <SidebarGroup>
           {/* Navigation Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
-            <span className="text-sm font-medium">Navigation</span>
+            <span className={`text-sm font-medium ${state === 'collapsed' ? 'hidden' : ''}`}>Navigation</span>
             <button 
               onClick={toggleSidebar}
               className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
             >
-              <PanelLeftClose className="h-4 w-4" />
+              <PanelLeftClose className={`h-4 w-4 transition-transform ${state === 'collapsed' ? 'rotate-180' : ''}`} />
               <span className="sr-only">Toggle Sidebar</span>
             </button>
           </div>
