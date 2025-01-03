@@ -37,7 +37,7 @@ const Index = () => {
                 Upgrade to Premium
               </Button>
             ) : (
-              <CancelSubscriptionButton />
+              <CancelSubscriptionButton isCanceled={subscriptionStatus?.canceled} />
             )}
           </div>
           <Button variant="outline" onClick={handleLogout}>

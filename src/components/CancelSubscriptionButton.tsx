@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const CancelSubscriptionButton = () => {
+export const CancelSubscriptionButton = ({ isCanceled = false }: { isCanceled?: boolean }) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -45,6 +45,18 @@ export const CancelSubscriptionButton = () => {
       setLoading(false);
     }
   };
+
+  if (isCanceled) {
+    return (
+      <Button 
+        variant="outline" 
+        disabled 
+        className="w-full sm:w-auto"
+      >
+        Canceled
+      </Button>
+    );
+  }
 
   return (
     <AlertDialog>
