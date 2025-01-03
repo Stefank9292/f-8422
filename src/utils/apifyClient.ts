@@ -103,10 +103,9 @@ export async function fetchInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
-    console.log('=== Instagram Posts Fetch Request Details ===');
-    console.log('Username:', username);
+    console.log('Fetching Instagram posts for:', username);
     console.log('Number of videos requested:', numberOfVideos);
-    console.log('Posts newer than:', postsNewerThan ? postsNewerThan.toISOString() : 'No date filter');
+    console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
     
     // Clean up username and handle URL input
     let cleanUsername = username.trim();
@@ -148,10 +147,10 @@ export async function fetchInstagramPosts(
       console.log('Including posts until:', postsNewerThan.toISOString());
     }
 
-    console.log('Request body:', JSON.stringify(requestBody, null, 2));
-
     // Make the API request to Apify
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
+    
+    console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
     
     const response = await fetch(apiEndpoint, {
       method: 'POST',
@@ -174,7 +173,7 @@ export async function fetchInstagramPosts(
     }
 
     const data = await response.json();
-    console.log('Raw API Response:', data);
+    console.log('Raw response from Apify:', data);
 
     // Transform and validate the data
     const validPosts = Array.isArray(data) 
@@ -182,7 +181,7 @@ export async function fetchInstagramPosts(
            .filter((post): post is InstagramPost => post !== null)
       : [];
            
-    console.log('Transformed valid posts:', validPosts);
+    console.log('Valid posts:', validPosts);
 
     return validPosts;
   } catch (error) {
