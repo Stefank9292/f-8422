@@ -1,45 +1,35 @@
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const Index = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [clickCount, setClickCount] = useState(0);
 
-  // Add session check
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/auth');
-      }
-    };
-    
-    checkSession();
-
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!session) {
-        navigate('/auth');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  const { data: subscriptionStatus } = useQuery({
+  const { data: subscriptionStatus, error: subscriptionError } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.email) {
+        throw new Error('No authenticated session found');
+      }
+      
       const { data, error } = await supabase.functions.invoke('check-subscription');
       if (error) throw error;
       return data;
     },
-    // Only run the query if we have a session
-    enabled: true,
+    retry: false,
+    onError: (error) => {
+      console.error('Subscription check error:', error);
+      toast({
+        title: "Error checking subscription",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+    }
   });
 
   const getClickLimit = () => {
@@ -47,7 +37,7 @@ const Index = () => {
     return subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 20 : 10;
   };
 
-  const handleCrownClick = () => {
+  const handleClick = () => {
     const clickLimit = getClickLimit();
     if (subscriptionStatus?.subscribed && clickCount < clickLimit) {
       setClickCount(prev => prev + 1);
@@ -65,44 +55,40 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
-            {!subscriptionStatus?.subscribed && (
-              <Button variant="default" onClick={() => navigate("/subscribe")}>
-                Upgrade to Premium or Ultra
-              </Button>
+    <div className="container mx-auto p-4">
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold">Welcome to the App</h1>
+        
+        <div className="space-y-2">
+          <p>You have clicked {clickCount} times</p>
+          <p>Your current limit is: {getClickLimit()} clicks</p>
+          
+          <button
+            onClick={handleClick}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded"
+          >
+            Click me!
+          </button>
+        </div>
+
+        {subscriptionStatus?.subscribed ? (
+          <div className="p-4 bg-green-100 rounded">
+            <p>You are subscribed! 🎉</p>
+            {subscriptionStatus.canceled && (
+              <p className="text-yellow-600">Your subscription will end at the end of the current period</p>
             )}
           </div>
-        </div>
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to Your App</h1>
-          {subscriptionStatus?.subscribed ? (
-            <div className="space-y-4">
-              <p className="text-xl text-gray-600 mb-6">
-                Thank you for being a {subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium"} member!
-              </p>
-              <div className="relative inline-block">
-                <img 
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxPqum0Pg64e3XHpP323coM5r2JN1ThM06wQ&s" 
-                  alt="Premium content"
-                  className={`mx-auto rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105 ${clickCount >= getClickLimit() ? 'opacity-50' : ''}`}
-                  onClick={handleCrownClick}
-                />
-                {clickCount > 0 && (
-                  <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold">
-                    {clickCount}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <p className="text-xl text-gray-600">
-              Start building your amazing project here!
-            </p>
-          )}
-        </div>
+        ) : (
+          <div className="p-4 bg-yellow-100 rounded">
+            <p>You are not subscribed</p>
+            <button
+              onClick={() => navigate('/subscribe')}
+              className="mt-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded"
+            >
+              Subscribe now
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
