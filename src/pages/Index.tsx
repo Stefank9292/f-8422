@@ -4,7 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 
 const Index = () => {
   const { toast } = useToast();
@@ -51,26 +50,15 @@ const Index = () => {
     }
   };
 
-  const getPlanBadgeText = () => {
-    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
-    return subscriptionStatus?.canceled 
-      ? `${planName} (Cancels at end of period)` 
-      : `${planName} Active`;
-  };
-
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            {!subscriptionStatus?.subscribed ? (
+            {!subscriptionStatus?.subscribed && (
               <Button variant="default" onClick={() => navigate("/subscribe")}>
                 Upgrade to Premium or Ultra
               </Button>
-            ) : (
-              <Badge variant="secondary" className="text-sm">
-                {getPlanBadgeText()}
-              </Badge>
             )}
           </div>
           <Button variant="outline" onClick={handleLogout}>

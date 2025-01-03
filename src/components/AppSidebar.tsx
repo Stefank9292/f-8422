@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
+import { Badge } from "@/components/ui/badge";
 import {
   Sidebar,
   SidebarContent,
@@ -41,6 +42,13 @@ export function AppSidebar() {
     },
   });
 
+  const getPlanBadgeText = () => {
+    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
+    return subscriptionStatus?.canceled 
+      ? `${planName} (Cancels at end of period)` 
+      : `${planName} Active`;
+  };
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -61,6 +69,13 @@ export function AppSidebar() {
               ))}
               {subscriptionStatus?.subscribed && (
                 <>
+                  <SidebarMenuItem>
+                    <div className="px-2">
+                      <Badge variant="secondary" className="w-full justify-center text-sm">
+                        {getPlanBadgeText()}
+                      </Badge>
+                    </div>
+                  </SidebarMenuItem>
                   {subscriptionStatus.canceled ? (
                     <SidebarMenuItem>
                       <ResumeSubscriptionButton className="w-full justify-start gap-2 px-2">
