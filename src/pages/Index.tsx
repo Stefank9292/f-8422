@@ -4,6 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
@@ -57,7 +58,11 @@ const Index = () => {
               </Button>
             ) : (
               <>
-                <CancelSubscriptionButton isCanceled={subscriptionStatus?.canceled} />
+                {subscriptionStatus?.canceled ? (
+                  <ResumeSubscriptionButton />
+                ) : (
+                  <CancelSubscriptionButton isCanceled={subscriptionStatus?.canceled} />
+                )}
                 <Badge variant="secondary" className="text-sm">
                   {subscriptionStatus?.canceled ? 'Premium (Cancels at end of period)' : 'Premium Active'}
                 </Badge>
