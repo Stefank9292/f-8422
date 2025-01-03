@@ -43,11 +43,22 @@ const Index = () => {
         </div>
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Welcome to Your App</h1>
-          <p className="text-xl text-gray-600">
-            {subscriptionStatus?.subscribed 
-              ? "Thank you for being a premium member!"
-              : "Start building your amazing project here!"}
-          </p>
+          {subscriptionStatus?.subscribed ? (
+            <div className="space-y-4">
+              <p className="text-xl text-gray-600 mb-6">
+                Thank you for being a premium member!
+              </p>
+              <img 
+                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxPqum0Pg64e3XHpP323coM5r2JN1ThM06wQ&s" 
+                alt="Premium content"
+                className="mx-auto rounded-lg shadow-lg"
+              />
+            </div>
+          ) : (
+            <p className="text-xl text-gray-600">
+              Start building your amazing project here!
+            </p>
+          )}
         </div>
       </div>
     </div>
