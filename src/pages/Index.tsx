@@ -2,8 +2,44 @@ import { Instagram, Search, List, Settings } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { useState } from "react";
+import { fetchInstagramPosts } from "@/utils/apifyClient";
+import { useToast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const [username, setUsername] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
+  const handleSearch = async () => {
+    if (!username) {
+      toast({
+        title: "Error",
+        description: "Please enter an Instagram username",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const posts = await fetchInstagramPosts(username);
+      toast({
+        title: "Success",
+        description: `Found ${posts.length} posts for @${username}`,
+      });
+      console.log('Instagram posts:', posts);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch Instagram posts",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto flex flex-col items-center justify-center min-h-screen p-4 space-y-8">
       {/* Logo and Title Section */}
@@ -44,6 +80,9 @@ const Index = () => {
             type="text"
             placeholder="Enter Instagram username or profile URL"
             className="pl-10 pr-32"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Button
@@ -54,6 +93,15 @@ const Index = () => {
             <span>Bulk Search</span>
           </Button>
         </div>
+
+        {/* Search Button */}
+        <Button 
+          onClick={handleSearch} 
+          disabled={isLoading}
+          className="w-full"
+        >
+          {isLoading ? "Searching..." : "Search"}
+        </Button>
 
         {/* Settings Button */}
         <Button
