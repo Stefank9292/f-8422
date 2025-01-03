@@ -33,7 +33,7 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
             <TableCell>{post.videoPlayCount?.toLocaleString() || '0'}</TableCell>
             <TableCell>{post.likesCount.toLocaleString()}</TableCell>
             <TableCell>{post.commentsCount.toLocaleString()}</TableCell>
-            <TableCell>{post.duration}</TableCell>
+            <TableCell>{post.videoDuration || '0:00'}</TableCell>
             <TableCell>{post.engagement}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end gap-2">
