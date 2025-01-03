@@ -13,6 +13,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [posts, setPosts] = useState<any[]>([]);
   const [filters, setFilters] = useState({
     minViews: "",
@@ -41,7 +42,7 @@ const Index = () => {
       const fetchedPosts = await fetchInstagramPosts(
         username, 
         numberOfVideos,
-        filters.postsNewerThan
+        selectedDate
       );
       setPosts(fetchedPosts);
       toast({
@@ -115,6 +116,8 @@ const Index = () => {
           setIsSettingsOpen={setIsSettingsOpen}
           numberOfVideos={numberOfVideos}
           setNumberOfVideos={setNumberOfVideos}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
         />
       </div>
 

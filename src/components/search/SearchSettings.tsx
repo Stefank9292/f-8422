@@ -12,6 +12,8 @@ interface SearchSettingsProps {
   setIsSettingsOpen: (value: boolean) => void;
   numberOfVideos: number;
   setNumberOfVideos: (value: number) => void;
+  selectedDate: Date | undefined;
+  setSelectedDate: (date: Date | undefined) => void;
 }
 
 export const SearchSettings = ({
@@ -19,19 +21,19 @@ export const SearchSettings = ({
   setIsSettingsOpen,
   numberOfVideos,
   setNumberOfVideos,
+  selectedDate,
+  setSelectedDate,
 }: SearchSettingsProps) => {
   // Calculate the date 90 days ago
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
-
   const handleTodayClick = () => {
-    setDate(new Date());
+    setSelectedDate(new Date());
   };
 
   const handleResetClick = () => {
-    setDate(undefined);
+    setSelectedDate(undefined);
   };
 
   return (
@@ -85,12 +87,12 @@ export const SearchSettings = ({
                 <Input
                   type="text"
                   placeholder="dd.mm.yyyy"
-                  value={date ? format(date, 'dd.MM.yyyy') : ''}
+                  value={selectedDate ? format(selectedDate, 'dd.MM.yyyy') : ''}
                   className="pl-10"
                   readOnly
                 />
                 <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                {date && (
+                {selectedDate && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -125,8 +127,8 @@ export const SearchSettings = ({
               </div>
               <Calendar
                 mode="single"
-                selected={date}
-                onSelect={setDate}
+                selected={selectedDate}
+                onSelect={setSelectedDate}
                 disabled={(date) => {
                   return date > new Date() || date < ninetyDaysAgo;
                 }}

@@ -98,7 +98,7 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
 export async function fetchInstagramPosts(
   username: string, 
   numberOfVideos: number = 3,
-  postsNewerThan?: string
+  postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
     console.log('Fetching Instagram posts for:', username);
@@ -134,9 +134,10 @@ export async function fetchInstagramPosts(
       }
     };
 
-    // Add postsNewerThan if provided
-    if (postsNewerThan) {
-      requestBody.postsUntil = postsNewerThan;
+    // Only add postsUntil if a date is provided
+    if (postsNewerThan instanceof Date) {
+      requestBody.postsUntil = postsNewerThan.toISOString();
+      console.log('Including posts until:', postsNewerThan);
     }
 
     // Make the API request to Apify
