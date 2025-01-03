@@ -1,7 +1,9 @@
 interface InstagramPost {
   url: string;
-  // Add other properties that you expect from the Instagram post
-  [key: string]: unknown; // Allow other properties
+  caption: string;
+  likesCount: number;
+  commentsCount: number;
+  [key: string]: unknown; // Allow additional properties
 }
 
 // Type guard function to check if an object is an InstagramPost
@@ -11,7 +13,12 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
   }
   
   const post = obj as Record<string, unknown>;
-  return typeof post.url === 'string';
+  return (
+    typeof post.url === 'string' &&
+    typeof post.caption === 'string' &&
+    typeof post.likesCount === 'number' &&
+    typeof post.commentsCount === 'number'
+  );
 }
 
 export async function fetchInstagramPosts(username: string): Promise<InstagramPost[]> {
