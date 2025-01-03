@@ -151,7 +151,8 @@ export function AppSidebar() {
               {secondaryMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
-                    onClick={item.onClick || (item.url ? () => window.open(item.url, '_blank') : undefined)}
+                    onClick={item.onClick || (item.url ? () => navigate(item.url) : undefined)}
+                    isActive={item.url ? location.pathname === item.url : false}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.title}</span>
@@ -179,4 +180,3 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
-
