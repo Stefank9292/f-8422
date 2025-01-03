@@ -13,28 +13,19 @@ const Index = () => {
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (error) {
-        console.error('Session error:', error);
-        throw new Error('Authentication error');
-      }
-      
-      if (!session?.user?.email) {
+      if (!session) {
         console.error('No authenticated session found');
         navigate('/auth');
         throw new Error('No authenticated session found');
       }
 
-      const { data, error: functionError } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-
-      if (functionError) {
-        console.error('Function error:', functionError);
-        throw functionError;
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) {
+        console.error('Function error:', error);
+        throw error;
       }
       
       return data;
@@ -52,7 +43,6 @@ const Index = () => {
     }
   });
 
-  // Fetch user's current click count
   const { data: userClicks, refetch: refetchClicks } = useQuery({
     queryKey: ['user-clicks'],
     queryFn: async () => {
