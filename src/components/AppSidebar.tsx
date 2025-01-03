@@ -67,6 +67,18 @@ const secondaryMenuItems = [
     icon: MessageCircle,
     url: "/faq",
   },
+  {
+    title: "Sign Out",
+    icon: LogOut,
+    onClick: async () => {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate("/auth");
+    },
+  },
 ];
 
 export function AppSidebar() {
@@ -96,15 +108,6 @@ export function AppSidebar() {
     },
     enabled: !!session?.access_token,
   });
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate("/auth");
-  };
 
   return (
     <Sidebar>
@@ -157,14 +160,6 @@ export function AppSidebar() {
               {/* User Profile */}
               <SidebarMenuItem>
                 <UserProfile email={session?.user?.email} />
-              </SidebarMenuItem>
-
-              {/* Sign Out Button */}
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={handleLogout}>
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign Out</span>
-                </SidebarMenuButton>
               </SidebarMenuItem>
 
               {/* Crafted with love by VyralSearch */}
