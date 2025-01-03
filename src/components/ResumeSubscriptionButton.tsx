@@ -4,7 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
-export const ResumeSubscriptionButton = () => {
+interface ResumeSubscriptionButtonProps {
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export const ResumeSubscriptionButton = ({ children, className }: ResumeSubscriptionButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -39,10 +44,10 @@ export const ResumeSubscriptionButton = () => {
     <Button 
       onClick={handleResume} 
       disabled={loading}
-      variant="default"
-      className="w-full sm:w-auto"
+      variant="ghost"
+      className={className}
     >
-      {loading ? "Resuming..." : "Resume Subscription"}
+      {loading ? "Resuming..." : children || "Resume Subscription"}
     </Button>
   );
 };
