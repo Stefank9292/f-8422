@@ -17,12 +17,12 @@ export interface InstagramPost {
 }
 
 // Type guard function to check if an object is an InstagramPost
-function isInstagramPost(obj: unknown): obj is InstagramPost {
+function isInstagramPost(obj: any): obj is InstagramPost {
     return (
         typeof obj === 'object' &&
         obj !== null &&
         'url' in obj &&
-        typeof (obj as any).url === 'string'
+        typeof obj.url === 'string'
     );
 }
 
@@ -43,7 +43,7 @@ export const fetchInstagramPosts = async (username: string): Promise<InstagramPo
         const { items } = await client.dataset(run.defaultDatasetId).listItems();
         
         // Type assertion and validation of the API response
-        const validPosts = items.filter((item): item is InstagramPost => {
+        const validPosts = (items as any[]).filter((item): item is InstagramPost => {
             if (!isInstagramPost(item)) {
                 console.warn('Invalid post data structure:', item);
                 return false;
