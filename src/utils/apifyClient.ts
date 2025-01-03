@@ -29,6 +29,45 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
     const commentsCount = Number(post.commentsCount) || 0;
     const viewsCount = Number(post.viewsCount) || 0;
     
+    // Check if the object has all required properties with correct types
+    const hasRequiredProps = 
+      typeof (post.url === 'string' || post.shortCode === 'string') &&
+      typeof post.caption === 'string' &&
+      typeof likesCount === 'number' &&
+      typeof commentsCount === 'number' &&
+      typeof viewsCount === 'number' &&
+      typeof post.videoPlayCount === 'number' || post.videoPlayCount === undefined &&
+      typeof post.videoDuration === 'string' || post.videoDuration === undefined &&
+      typeof post.timestamp === 'string' || post.timestamp === undefined &&
+      typeof post.type === 'string' || post.type === undefined &&
+      Array.isArray(post.hashtags) &&
+      Array.isArray(post.mentions) &&
+      typeof post.ownerUsername === 'string' &&
+      typeof post.ownerId === 'string';
+
+    if (!hasRequiredProps) {
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error validating post data:', error);
+    return false;
+  }
+}
+
+function transformToInstagramPost(obj: unknown): InstagramPost | null {
+  if (!obj || typeof obj !== 'object') {
+    return null;
+  }
+  
+  const post = obj as Record<string, unknown>;
+  
+  try {
+    const likesCount = Number(post.likesCount) || 0;
+    const commentsCount = Number(post.commentsCount) || 0;
+    const viewsCount = Number(post.viewsCount) || 0;
+    
     const transformedPost: InstagramPost = {
       url: typeof post.url === 'string' ? post.url : 
            typeof post.shortCode === 'string' ? `https://www.instagram.com/p/${post.shortCode}` : '',
@@ -52,7 +91,7 @@ function isInstagramPost(obj: unknown): obj is InstagramPost {
     return transformedPost;
   } catch (error) {
     console.error('Error transforming post data:', error);
-    return false;
+    return null;
   }
 }
 
@@ -110,8 +149,8 @@ export async function fetchInstagramPosts(username: string): Promise<InstagramPo
 
     // Transform and validate the data
     const validPosts = Array.isArray(data) 
-      ? data.map(post => isInstagramPost(post))
-           .filter((post): post is InstagramPost => post !== false)
+      ? data.map(post => transformToInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== null)
       : [];
            
     console.log('Valid posts:', validPosts);
