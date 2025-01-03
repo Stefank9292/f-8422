@@ -12,19 +12,37 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
-    const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      console.error('No authorization header provided')
+      throw new Error('No authorization header')
+    }
 
-    if (!email) {
+    // Create Supabase client with service role key
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+
+    // Get user from the JWT token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    )
+
+    if (userError) {
+      console.error('Error getting user:', userError)
+      throw userError
+    }
+
+    if (!user) {
+      console.error('No user found')
+      throw new Error('No user found')
+    }
+
+    if (!user.email) {
+      console.error('No email found for user:', user.id)
       throw new Error('No email found')
     }
 
@@ -33,13 +51,15 @@ serve(async (req) => {
       throw new Error('No price ID provided')
     }
 
+    console.log('Updating subscription for user:', user.email, 'to price:', priceId)
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
     // Get customer by email
     const customers = await stripe.customers.list({
-      email: email,
+      email: user.email,
       limit: 1
     })
 
