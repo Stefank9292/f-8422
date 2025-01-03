@@ -27,7 +27,8 @@ function isInstagramPost(obj: unknown): boolean {
   try {
     const likesCount = Number(post.likesCount) || 0;
     const commentsCount = Number(post.commentsCount) || 0;
-    const viewsCount = Number(post.videoPlayCount) || 0;
+    const videoViewCount = Number(post.videoViewCount) || 0;
+    const videoPlayCount = Number(post.videoPlayCount) || 0;
     
     // Check if the object has all required properties with correct types
     const hasRequiredProps = 
@@ -35,8 +36,8 @@ function isInstagramPost(obj: unknown): boolean {
       typeof post.caption === 'string' &&
       typeof likesCount === 'number' &&
       typeof commentsCount === 'number' &&
-      typeof viewsCount === 'number' &&
-      typeof post.videoPlayCount === 'number' || post.videoPlayCount === undefined &&
+      typeof videoViewCount === 'number' &&
+      typeof videoPlayCount === 'number' &&
       typeof post.videoDuration === 'string' || post.videoDuration === undefined &&
       typeof post.timestamp === 'string' || post.timestamp === undefined &&
       typeof post.type === 'string' || post.type === undefined &&
@@ -66,6 +67,7 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
   try {
     const likesCount = Number(post.likesCount) || 0;
     const commentsCount = Number(post.commentsCount) || 0;
+    const videoViewCount = Number(post.videoViewCount) || 0;
     const videoPlayCount = Number(post.videoPlayCount) || 0;
     
     const transformedPost: InstagramPost = {
@@ -74,8 +76,8 @@ function transformToInstagramPost(obj: unknown): InstagramPost | null {
       caption: typeof post.caption === 'string' ? post.caption : '',
       likesCount,
       commentsCount,
-      viewsCount: videoPlayCount, // Use videoPlayCount for viewsCount
-      playsCount: videoPlayCount,
+      viewsCount: videoViewCount, // Use videoViewCount for views
+      playsCount: videoPlayCount, // Use videoPlayCount for plays
       duration: typeof post.videoDuration === 'string' ? post.videoDuration : '0:00',
       engagement: `${((likesCount + commentsCount) / (videoPlayCount || 1) * 100).toFixed(2)}%`,
       date: typeof post.timestamp === 'string' ? new Date(post.timestamp).toLocaleDateString() : new Date().toLocaleDateString(),
