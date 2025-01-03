@@ -40,7 +40,7 @@ const secondaryMenuItems = [
   {
     title: "FAQs",
     icon: MessageCircle,
-    url: "https://docs.lovable.dev/faqs",
+    url: "/faq",
   },
 ];
 
@@ -179,3 +179,4 @@ export function AppSidebar() {
     </Sidebar>
   );
 }
+
