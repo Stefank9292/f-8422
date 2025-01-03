@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -22,15 +21,6 @@ const Index = () => {
   const getClickLimit = () => {
     if (!subscriptionStatus?.subscribed) return 0;
     return subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 20 : 10;
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate("/auth");
   };
 
   const handleCrownClick = () => {
@@ -61,9 +51,6 @@ const Index = () => {
               </Button>
             )}
           </div>
-          <Button variant="outline" onClick={handleLogout}>
-            Log out
-          </Button>
         </div>
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Welcome to Your App</h1>

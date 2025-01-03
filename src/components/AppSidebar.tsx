@@ -1,10 +1,11 @@
-import { Home, CreditCard, Ban, RefreshCw } from "lucide-react";
+import { Home, CreditCard, Ban, RefreshCw, LogOut } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import {
   Sidebar,
   SidebarContent,
@@ -32,6 +33,7 @@ const menuItems = [
 export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { toast } = useToast();
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -47,6 +49,15 @@ export function AppSidebar() {
     return subscriptionStatus?.canceled 
       ? `${planName} (Cancels at end of period)` 
       : `${planName} Active`;
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/auth");
   };
 
   return (
@@ -96,6 +107,12 @@ export function AppSidebar() {
                   )}
                 </>
               )}
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={handleLogout}>
+                  <LogOut className="h-4 w-4" />
+                  <span>Log out</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
