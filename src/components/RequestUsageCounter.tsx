@@ -85,49 +85,42 @@ export const RequestUsageCounter = () => {
     };
   }, [session?.user.id, refetchRequestStats, toast]);
 
-  const maxRequests = subscriptionStatus?.maxClicks || 3;
+  const maxRequests = subscriptionStatus?.maxClicks || 25;
   const usedRequests = requestStats?.length || 0;
   const remainingRequests = Math.max(0, maxRequests - usedRequests);
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
     <Card className="bg-sidebar-accent p-4">
-      <div className="space-y-4">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-sidebar-foreground" />
-          <h3 className="text-sm font-semibold text-sidebar-foreground">Daily Usage</h3>
+          <Activity className="h-5 w-5 text-sidebar-foreground" />
+          <h3 className="text-base font-semibold text-sidebar-foreground">Request Usage</h3>
         </div>
 
         {/* Usage Stats */}
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {/* Used and Remaining */}
+          <div className="flex justify-between text-lg">
+            <span className="text-sidebar-foreground">
+              {usedRequests} used
+            </span>
+            <span className="text-sidebar-foreground">
+              {remainingRequests} remaining
+            </span>
+          </div>
+
           {/* Progress Bar */}
           <Progress 
             value={usagePercentage} 
-            className="h-3 bg-sidebar-accent/50"
+            className="h-2 bg-sidebar-accent/20"
           />
 
-          {/* Usage Numbers */}
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="space-y-1">
-              <span className="block text-sidebar-foreground/70">Used</span>
-              <span className="block font-semibold text-sidebar-foreground text-sm">
-                {usedRequests}
-              </span>
-            </div>
-            <div className="space-y-1 text-right">
-              <span className="block text-sidebar-foreground/70">Remaining</span>
-              <span className="block font-semibold text-sidebar-foreground text-sm">
-                {remainingRequests}
-              </span>
-            </div>
-          </div>
-
           {/* Total */}
-          <div className="pt-2 border-t border-sidebar-border/50">
-            <p className="text-xs text-sidebar-foreground/70 flex justify-between">
-              <span>Total Daily Limit</span>
-              <span className="font-medium text-sidebar-foreground">{maxRequests}</span>
+          <div className="pt-1">
+            <p className="text-sm text-sidebar-foreground/70">
+              Total requests: {maxRequests} per period
             </p>
           </div>
         </div>
