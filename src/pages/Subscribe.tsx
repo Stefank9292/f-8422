@@ -111,44 +111,43 @@ const SubscribePage = () => {
 
   return (
     <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-7xl mx-auto space-y-12 pt-8">
-        {/* Header Section */}
-        <div className="text-center space-y-6">
-          <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-8 pt-8">
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <p className="text-[13px] text-muted-foreground max-w-2xl mx-auto">
             {subtitle}
           </p>
           {subscriptionStatus?.subscribed && (
             <div className="flex justify-center mt-4">
               <CancelSubscriptionButton 
                 isCanceled={subscriptionStatus?.canceled} 
-                className="w-auto"
+                className="w-auto text-[11px] h-8 px-4"
               />
             </div>
           )}
         </div>
 
-        {/* Pricing Plans Section */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div className="flex items-center justify-center gap-4">
-            <span className={!isAnnual ? "font-semibold" : "text-muted-foreground"}>
+            <span className={`text-[11px] ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
               Monthly
             </span>
             <Switch
               checked={isAnnual}
               onCheckedChange={setIsAnnual}
+              className="scale-90"
             />
             <div className="flex items-center gap-2">
-              <span className={isAnnual ? "font-semibold" : "text-muted-foreground"}>
+              <span className={`text-[11px] ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
                 Annual
               </span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">
+              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800">
                 Save 20%
               </Badge>
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             {pricingPlans.map((plan, index) => (
               <PricingCard
                 key={index}

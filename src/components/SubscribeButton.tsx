@@ -139,7 +139,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
     <Button 
       onClick={handleSubscribe} 
       disabled={loading || isCurrentPlan}
-      className={`w-full ${isCurrentPlan ? "bg-secondary hover:bg-secondary/80" : "primary-gradient"}`}
+      className={`w-full text-[11px] h-8 ${isCurrentPlan ? "bg-secondary hover:bg-secondary/80" : "primary-gradient"}`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
       {loading ? "Loading..." : getButtonText()}

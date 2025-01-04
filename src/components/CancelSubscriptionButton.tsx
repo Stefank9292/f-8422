@@ -71,7 +71,7 @@ export const CancelSubscriptionButton = ({
       <Button 
         variant="outline" 
         disabled 
-        className={className}
+        className={`text-[11px] h-8 px-4 ${className}`}
       >
         {children || "Canceled"}
       </Button>
@@ -84,25 +84,25 @@ export const CancelSubscriptionButton = ({
         <Button 
           variant="ghost"
           disabled={loading}
-          className={className}
+          className={`text-[11px] h-8 px-4 ${className}`}
         >
           {children || "Cancel Subscription"}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-base">Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription className="text-[11px] text-muted-foreground">
             Your subscription will be cancelled at the end of the current billing period. 
             You will still have access to premium features until then.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
+          <AlertDialogCancel className="text-[11px] h-8">Keep Subscription</AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleCancel} 
             disabled={loading}
-            className="primary-gradient"
+            className="text-[11px] h-8 primary-gradient"
           >
             {loading ? "Cancelling..." : "Yes, Cancel Subscription"}
           </AlertDialogAction>
