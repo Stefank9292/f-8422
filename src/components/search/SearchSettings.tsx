@@ -5,6 +5,8 @@ import { Calendar as CalendarIcon, HelpCircle, ChevronDown, ChevronUp, Minus, Pl
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SearchSettingsProps {
   isSettingsOpen: boolean;
@@ -29,6 +31,31 @@ export const SearchSettings = ({
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.access_token) return null;
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getMaxVideos = () => {
+    if (!subscriptionStatus?.priceId) return 5; // Free plan
+    if (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") return 20; // Premium plan
+    if (subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") return 50; // Ultra plan
+    return 5; // Default to free plan
+  };
+
+  const maxVideos = getMaxVideos();
+
   return (
     <div className="w-full bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
       <button
@@ -51,7 +78,7 @@ export const SearchSettings = ({
         <div className="p-4 space-y-6 animate-in fade-in duration-200">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-base font-medium">Number of Videos</span>
+              <span className="text-base font-medium">Number of Videos (Max: {maxVideos})</span>
               <HelpCircle className="w-4 h-4 text-gray-400" />
             </div>
             <div className="flex items-center gap-4">
@@ -70,8 +97,8 @@ export const SearchSettings = ({
               <Button
                 variant="outline"
                 size="icon"
-                onClick={() => setNumberOfVideos(numberOfVideos + 1)}
-                disabled={disabled}
+                onClick={() => setNumberOfVideos(Math.min(maxVideos, numberOfVideos + 1))}
+                disabled={numberOfVideos >= maxVideos || disabled}
                 className="h-10 w-10"
               >
                 <Plus className="h-4 w-4" />

@@ -43,6 +43,34 @@ export const PricingCard = ({
   isAnnual,
   priceId,
 }: PricingCardProps) => {
+  const getFeatures = () => {
+    if (priceId === 'free') {
+      return [
+        { included: true, text: "3 Total Searches" },
+        { included: true, text: "Maximum 5 Results per Search" },
+        { included: false, text: "Bulk Search" },
+        { included: false, text: "Contact Support" },
+        { included: false, text: "Early Access to new Features" }
+      ];
+    } else if (priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+      return [
+        { included: true, text: "25 Total Searches" },
+        { included: true, text: "Maximum 20 Results per Search" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: false, text: "Early Access to new Features" }
+      ];
+    } else {
+      return [
+        { included: true, text: "Unlimited Searches" },
+        { included: true, text: "Maximum 50 Results per Search" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: true, text: "Early Access to new Features" }
+      ];
+    }
+  };
+
   return (
     <Card className={`p-6 space-y-4 relative ${isPopular ? 'border-2 border-primary ring-2 ring-primary/20 shadow-lg' : ''}`}>
       {isPopular && (
@@ -67,7 +95,7 @@ export const PricingCard = ({
         </div>
       </div>
       <ul className="space-y-2">
-        {features.map((feature, index) => (
+        {getFeatures().map((feature, index) => (
           <FeatureItem key={index} {...feature} />
         ))}
       </ul>
