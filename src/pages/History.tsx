@@ -39,7 +39,8 @@ export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
   const { state } = useSidebar();
 
-  const { data: searchHistory = [] } = useQuery<SearchHistoryItem[]>({
+  // Fetch search history with real-time updates
+  const { data: searchHistory = [], isLoading: isHistoryLoading } = useQuery<SearchHistoryItem[]>({
     queryKey: ['search-history'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -54,9 +55,11 @@ export default function HistoryPage() {
 
       return data;
     },
+    refetchInterval: 5000, // Refetch every 5 seconds to keep history up to date
   });
 
-  const { data: searchResult, isError } = useQuery<SearchResultData | null>({
+  // Fetch search results with real-time updates
+  const { data: searchResult, isError, isLoading: isResultsLoading } = useQuery<SearchResultData | null>({
     queryKey: ['search-result', selectedSearchId],
     queryFn: async () => {
       if (!selectedSearchId) return null;
@@ -95,7 +98,8 @@ export default function HistoryPage() {
 
       return transformedResults;
     },
-    enabled: !!selectedSearchId
+    enabled: !!selectedSearchId,
+    refetchInterval: 5000, // Refetch every 5 seconds to keep results up to date
   });
 
   return (
@@ -117,23 +121,28 @@ export default function HistoryPage() {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <Select value={selectedSearchId} onValueChange={setSelectedSearchId}>
-          <SelectTrigger className={cn("w-full", !selectedSearchId && "text-muted-foreground")}>
-            <SelectValue placeholder="Select a search to view results" />
-          </SelectTrigger>
-          <SelectContent>
-            {searchHistory.map((search) => (
-              <SelectItem key={search.id} value={search.id}>
-                <div className="flex justify-between items-center gap-4">
-                  <span>@{search.search_query}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {format(new Date(search.created_at), 'MMM d, yyyy')}
-                  </span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+        {isHistoryLoading ? (
+          <div className="text-sm text-muted-foreground">Loading search history...</div>
+        ) : (
+          <Select value={selectedSearchId} onValueChange={setSelectedSearchId}>
+            <SelectTrigger className={cn("w-full", !selectedSearchId && "text-muted-foreground")}>
+              <SelectValue placeholder="Select a search to view results" />
+            </SelectTrigger>
+            <SelectContent>
+              {searchHistory.map((search) => (
+                <SelectItem key={search.id} value={search.id}>
+                  <div className="flex justify-between items-center gap-4">
+                    <span>@{search.search_query}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {format(new Date(search.created_at), 'MMM d, yyyy')}
+                    </span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       {isError && (
@@ -145,13 +154,17 @@ export default function HistoryPage() {
         </Alert>
       )}
 
-      {selectedSearchId && !searchResult && !isError && (
+      {selectedSearchId && !searchResult && !isError && !isResultsLoading && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             No results found for this search.
           </AlertDescription>
         </Alert>
+      )}
+
+      {isResultsLoading && selectedSearchId && (
+        <div className="text-sm text-muted-foreground">Loading search results...</div>
       )}
 
       {searchResult && searchResult.results && (
