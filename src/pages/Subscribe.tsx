@@ -1,15 +1,14 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { SubscribeButton } from "@/components/SubscribeButton";
-import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
-import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
-import { RequestUsageCounter } from "@/components/RequestUsageCounter";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useState } from "react";
 import { PricingCard } from "@/components/pricing/PricingCard";
+import { RequestUsageCounter } from "@/components/RequestUsageCounter";
+import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -108,23 +107,62 @@ const SubscribePage = () => {
   ];
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-4xl mx-auto space-y-8 pt-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Choose Your Plan</h1>
-          {subscriptionStatus?.subscribed && (
-            <div className="flex justify-center items-center gap-2">
-              <span className="text-lg text-muted-foreground">Current Plan:</span>
-              <Badge variant="secondary" className="text-base px-3 py-1">
-                {getPlanBadgeText()}
-              </Badge>
-            </div>
-          )}
-          <p className="text-xl text-muted-foreground">
-            Select the plan that best fits your needs
+    <div className="min-h-screen p-4 bg-background">
+      <div className="max-w-7xl mx-auto space-y-12 pt-8">
+        {/* Header Section */}
+        <div className="text-center space-y-6">
+          <h1 className="text-4xl font-bold tracking-tight">Choose Your Plan</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Select the plan that best fits your needs and manage your subscription
           </p>
-          
-          <div className="flex items-center justify-center gap-4 pt-4">
+        </div>
+
+        {/* Current Plan & Usage Section */}
+        {session && (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Request Usage Card */}
+            <Card className="p-6 space-y-4 md:col-span-2 lg:col-span-2">
+              <div className="space-y-2">
+                <h2 className="text-2xl font-semibold">Usage Overview</h2>
+                {subscriptionStatus?.subscribed && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Current Plan:</span>
+                    <Badge variant="secondary" className="text-base px-3 py-1">
+                      {getPlanBadgeText()}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+              <RequestUsageCounter />
+            </Card>
+
+            {/* Subscription Management Card */}
+            {subscriptionStatus?.subscribed && (
+              <Card className="p-6 space-y-4">
+                <h2 className="text-2xl font-semibold">Subscription Management</h2>
+                <p className="text-muted-foreground">Manage your current subscription</p>
+                <div className="flex gap-4">
+                  {subscriptionStatus.canceled ? (
+                    <ResumeSubscriptionButton className="w-full">
+                      Resume Subscription
+                    </ResumeSubscriptionButton>
+                  ) : (
+                    <CancelSubscriptionButton 
+                      isCanceled={subscriptionStatus?.canceled}
+                      className="w-full"
+                    >
+                      Cancel Subscription
+                    </CancelSubscriptionButton>
+                  )}
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* Pricing Plans Section */}
+        <div className="space-y-8">
+          <div className="flex items-center justify-center gap-4">
             <span className={!isAnnual ? "font-semibold" : "text-muted-foreground"}>Monthly</span>
             <Switch
               checked={isAnnual}
@@ -135,43 +173,16 @@ const SubscribePage = () => {
               <Badge variant="secondary" className="bg-green-100 text-green-800">Save 20%</Badge>
             </div>
           </div>
-        </div>
 
-        {/* Request Usage Counter */}
-        {session && (
-          <RequestUsageCounter />
-        )}
-
-        {/* Subscription Management Card */}
-        {subscriptionStatus?.subscribed && (
-          <Card className="p-6 space-y-4">
-            <h2 className="text-2xl font-semibold">Subscription Management</h2>
-            <p className="text-muted-foreground">Manage your current subscription</p>
-            <div className="flex gap-4">
-              {subscriptionStatus.canceled ? (
-                <ResumeSubscriptionButton className="w-full">
-                  Resume Subscription
-                </ResumeSubscriptionButton>
-              ) : (
-                <CancelSubscriptionButton 
-                  isCanceled={subscriptionStatus?.canceled}
-                  className="w-full"
-                >
-                  Cancel Subscription
-                </CancelSubscriptionButton>
-              )}
-            </div>
-          </Card>
-        )}
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {pricingPlans.map((plan, index) => (
-            <PricingCard
-              key={index}
-              {...plan}
-              isAnnual={isAnnual}
-            />
-          ))}
+          <div className="grid md:grid-cols-3 gap-6">
+            {pricingPlans.map((plan, index) => (
+              <PricingCard
+                key={index}
+                {...plan}
+                isAnnual={isAnnual}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>
