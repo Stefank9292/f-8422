@@ -54,7 +54,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
           description: "Your subscription has been cancelled and you have been moved to the Free plan immediately.",
         });
       } 
-      // Handle downgrade to Premium from Ultra
+      // Handle downgrade to Creator Pro from Creator on Steroids
       else if (planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
         const { error } = await supabase.functions.invoke('update-subscription', {
           body: { priceId: planId },
@@ -67,7 +67,7 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
         
         toast({
           title: "Plan Updated",
-          description: "You have been successfully downgraded to the Premium plan.",
+          description: "You have been successfully downgraded to the Creator Pro plan.",
         });
       }
       // Handle upgrades through checkout
@@ -118,14 +118,14 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
       return "Current Plan";
     }
 
-    // If user has Ultra plan (viewing Premium button)
+    // If user has Creator on Steroids plan (viewing Creator Pro button)
     if (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" && planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
-      return "Downgrade to Premium";
+      return "Downgrade to Creator Pro";
     }
 
-    // If user has Premium plan (viewing Ultra button)
+    // If user has Creator Pro plan (viewing Creator on Steroids button)
     if (subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && planId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
-      return "Upgrade to Ultra";
+      return "Upgrade to Creator on Steroids";
     }
 
     return `Upgrade to ${planName}`;

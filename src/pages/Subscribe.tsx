@@ -92,8 +92,8 @@ const SubscribePage = () => {
       priceId: "free"
     },
     {
-      name: "Premium Plan",
-      description: "Perfect for casual users",
+      name: "Creator Pro",
+      description: "For Professional Creators",
       price: {
         monthly: "29.97",
         annual: { total: "287.64", perMonth: "23.97" }
@@ -108,8 +108,8 @@ const SubscribePage = () => {
       priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
     },
     {
-      name: "Ultra Plan",
-      description: "For power users",
+      name: "Creator on Steroids",
+      description: "For Viral Marketing Gods",
       price: {
         monthly: "34.97",
         annual: { total: "335.64", perMonth: "27.97" }
@@ -130,8 +130,8 @@ const SubscribePage = () => {
   const maxClicks = subscriptionStatus?.maxClicks || 3;
   const usedClicks = requestStats?.length || 0;
   const remainingClicks = Math.max(0, maxClicks - usedClicks);
-  const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : 
-                  subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" ? "Premium" : 
+  const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Creator on Steroids" : 
+                  subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" ? "Creator Pro" : 
                   "Free";
 
   return (
