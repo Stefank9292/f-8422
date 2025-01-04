@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
+import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -117,6 +118,14 @@ const SubscribePage = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             {subtitle}
           </p>
+          {subscriptionStatus?.subscribed && (
+            <div className="flex justify-center mt-4">
+              <CancelSubscriptionButton 
+                isCanceled={subscriptionStatus?.canceled} 
+                className="w-auto"
+              />
+            </div>
+          )}
         </div>
 
         {/* Pricing Plans Section */}
