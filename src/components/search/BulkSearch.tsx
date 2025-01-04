@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { SearchSettings } from "./SearchSettings";
+import { BulkSearchSettings } from "./BulkSearchSettings";
 import { Search, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -48,7 +48,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
     try {
       await onSearch(urlList, numberOfVideos, selectedDate);
-      onClose(); // Close the modal after successful search
+      onClose();
     } catch (error) {
       console.error('Search error:', error);
       toast({
@@ -81,7 +81,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             </p>
           </div>
 
-          <SearchSettings
+          <BulkSearchSettings
             isSettingsOpen={isSettingsOpen}
             setIsSettingsOpen={setIsSettingsOpen}
             numberOfVideos={numberOfVideos}
