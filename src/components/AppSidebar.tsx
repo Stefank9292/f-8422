@@ -36,7 +36,6 @@ export function AppSidebar() {
 
   const { data: subscriptionStatus } = useSubscription(session);
 
-  // Auto-collapse timer
   useEffect(() => {
     let collapseTimer: NodeJS.Timeout;
 
@@ -95,15 +94,9 @@ export function AppSidebar() {
 
                 <SidebarTools currentPath={location.pathname} />
               </SidebarMenu>
-
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <RequestUsageCounter />
-                </SidebarMenuItem>
-              </SidebarMenu>
             </div>
 
-            <div className="mt-auto">
+            <div className="mt-auto space-y-4">
               <SidebarMenu>
                 <SidebarMenuItem>
                   <div className="h-px bg-sidebar-border mx-2 my-4" />
@@ -113,6 +106,10 @@ export function AppSidebar() {
                   currentPath={location.pathname}
                   subscriptionStatus={subscriptionStatus}
                 />
+
+                <SidebarMenuItem>
+                  <RequestUsageCounter />
+                </SidebarMenuItem>
 
                 <SidebarMenuItem>
                   <SidebarFooter />

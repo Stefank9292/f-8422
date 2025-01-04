@@ -3,11 +3,13 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, User } from "lucide-react";
+import { Activity, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -85,46 +87,59 @@ export const RequestUsageCounter = () => {
     };
   }, [session?.user.id, refetchRequestStats, toast]);
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out.",
+    });
+    navigate("/auth");
+  };
+
   const maxRequests = subscriptionStatus?.maxClicks || 25;
   const usedRequests = requestStats?.length || 0;
   const remainingRequests = Math.max(0, maxRequests - usedRequests);
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
-    <div className="px-2 py-2 space-y-4">
-      {/* User Profile */}
-      <div className="flex items-center gap-2">
-        <Avatar className="h-8 w-8">
-          <AvatarFallback>
-            <User className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="text-xs text-sidebar-foreground/70 truncate">
-            {session?.user?.email}
-          </span>
-          <span className="text-[10px] text-sidebar-foreground/50">
-            {subscriptionStatus?.plan || 'Free'} Plan
-          </span>
+    <div className="px-2 py-2 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Avatar className="h-7 w-7">
+            <AvatarFallback>
+              <User className="h-3.5 w-3.5" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="text-[11px] text-sidebar-foreground/70 truncate">
+              {session?.user?.email}
+            </span>
+            <span className="text-[10px] text-sidebar-foreground/50">
+              {subscriptionStatus?.plan || 'Free'} Plan
+            </span>
+          </div>
         </div>
+        <button
+          onClick={handleSignOut}
+          className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-sidebar-accent/20 transition-colors"
+        >
+          <LogOut className="h-3.5 w-3.5 text-sidebar-foreground/70" />
+        </button>
       </div>
 
-      {/* Usage Stats */}
-      <div className="space-y-2">
-        {/* Header */}
-        <div className="flex items-center gap-1.5 text-xs text-sidebar-foreground/70">
-          <Activity className="h-3.5 w-3.5" />
+      <div className="space-y-1.5">
+        <div className="flex items-center gap-1.5 text-[10px] text-sidebar-foreground/70">
+          <Activity className="h-3 w-3" />
           <span>Daily Usage</span>
         </div>
 
-        {/* Progress and Stats */}
-        <div className="space-y-1.5">
+        <div className="space-y-1">
           <Progress 
             value={usagePercentage} 
-            className="h-1.5 bg-sidebar-accent/20"
+            className="h-1 bg-sidebar-accent/20"
           />
           
-          <div className="flex justify-between text-[10px] text-sidebar-foreground/60">
+          <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
             <span>{usedRequests}/{maxRequests}</span>
             <span>{remainingRequests} left</span>
           </div>
