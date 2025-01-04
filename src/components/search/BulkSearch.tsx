@@ -13,6 +13,8 @@ interface BulkSearchProps {
   isLoading?: boolean;
 }
 
+const MAX_URLS = 20;
+
 export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: BulkSearchProps) => {
   const [urls, setUrls] = useState<string>("");
   const [numberOfVideos, setNumberOfVideos] = useState(3);
@@ -30,6 +32,15 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
       toast({
         title: "Error",
         description: "Please enter at least one Instagram URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (urlList.length > MAX_URLS) {
+      toast({
+        title: "Error",
+        description: `Maximum ${MAX_URLS} URLs allowed. You entered ${urlList.length} URLs.`,
         variant: "destructive",
       });
       return;
@@ -57,15 +68,15 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-lg font-medium">Instagram URLs</label>
+            <label className="text-lg font-medium">Instagram URLs (max {MAX_URLS})</label>
             <Textarea
-              placeholder="Enter Instagram URLs (one per line)"
+              placeholder={`Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
               className="min-h-[200px] font-mono"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
             />
-            <p className="text-sm text-gray-500 text-right">
-              {urls.split('\n').filter(url => url.trim() !== "").length} URLs
+            <p className={`text-sm text-right ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-red-500' : 'text-gray-500'}`}>
+              {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
             </p>
           </div>
 
