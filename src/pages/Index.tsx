@@ -107,10 +107,10 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8 animate-in fade-in duration-200">
+    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 md:p-6 space-y-8 animate-in fade-in duration-200">
       <SearchHeader />
 
-      <p className="text-gray-600 dark:text-gray-300 text-lg text-center">
+      <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg text-center max-w-xl">
         Save time finding viral content for social media
       </p>
 
@@ -126,12 +126,12 @@ const Index = () => {
         <Button 
           onClick={handleSearch} 
           disabled={isLoading || isBulkSearching || isSearching}
-          className="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] hover:opacity-90 transition-all"
+          className="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] hover:opacity-90 transition-all text-base md:text-lg py-6"
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              This can take up to a minute...
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <span className="text-sm md:text-base">This can take up to a minute...</span>
             </>
           ) : (
             "Search"
@@ -150,7 +150,7 @@ const Index = () => {
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full max-w-6xl space-y-4">
+        <div className="w-full max-w-[90rem] space-y-6">
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -172,7 +172,7 @@ const Index = () => {
             }).length}
             currentPosts={displayPosts}
           />
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring overflow-hidden">
             <SearchResults posts={displayPosts} filters={filters} />
           </div>
         </div>
