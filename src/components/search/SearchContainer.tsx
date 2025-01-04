@@ -46,14 +46,14 @@ export const SearchContainer = ({
 
   return (
     <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-8 md:py-12 space-y-6 animate-in fade-in duration-300">
-      <div className="space-y-4 w-full max-w-2xl">
+      <div className="space-y-4 w-full max-w-xl">
         <SearchHeader />
-        <p className="text-[11px] text-muted-foreground text-center max-w-2xl mx-auto">
+        <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
           Save time finding viral content for social media
         </p>
       </div>
 
-      <div className="w-full max-w-2xl space-y-4">
+      <div className="w-full max-w-xl space-y-4">
         <SearchBar
           username={username}
           onSearch={handleSearch}
