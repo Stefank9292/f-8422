@@ -1,10 +1,16 @@
-import { Instagram } from "lucide-react";
+import { Copy, Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 export const SearchHeader = () => {
+  const copyDiscountCode = () => {
+    navigator.clipboard.writeText("VYRAL25");
+    toast.success("Discount code copied to clipboard!");
+  };
+
   return (
     <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
       <div className="relative inline-block">
@@ -21,8 +27,20 @@ export const SearchHeader = () => {
                 BETA
               </Badge>
             </TooltipTrigger>
-            <TooltipContent className="max-w-[200px]">
-              <p className="text-[11px]">You found a discount code – Gotta catch&apos;em all! Here is your 25% discount on Ultra plan for the first month! 🎉</p>
+            <TooltipContent className="max-w-[250px] p-4">
+              <div className="space-y-2">
+                <p className="text-[11px]">You found a discount code – Gotta catch&apos;em all! Here is your 25% discount on Ultra plan for the first month! 🎉</p>
+                <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-md">
+                  <code className="text-sm font-bold text-primary">VYRAL25</code>
+                  <button
+                    onClick={copyDiscountCode}
+                    className="p-1 hover:bg-primary/20 rounded-md transition-colors"
+                    aria-label="Copy discount code"
+                  >
+                    <Copy className="h-4 w-4 text-primary" />
+                  </button>
+                </div>
+              </div>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
