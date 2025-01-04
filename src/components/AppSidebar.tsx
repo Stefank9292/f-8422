@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useSubscription } from "@/hooks/use-subscription";
 import {
   Sidebar,
   SidebarContent,
@@ -43,32 +44,19 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { toggleSidebar, state } = useSidebar();
 
-  const { data: session, isLoading: isSessionLoading, isError: isSessionError } = useQuery({
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return data.session;
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session error:', error);
+        throw error;
+      }
+      return session;
     },
   });
 
-  const { data: subscriptionStatus, isError: isSubscriptionError } = useQuery({
-    queryKey: ['subscription-status', session?.access_token],
-    queryFn: async () => {
-      if (!session?.access_token) throw new Error('No access token available');
-      
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.access_token && !isSessionError,
-    retry: 3,
-  });
+  const { data: subscriptionStatus } = useSubscription(session);
 
   // Handle loading state
   if (isSessionLoading) {
@@ -76,7 +64,7 @@ export function AppSidebar() {
   }
 
   // If there's no session after loading, don't render the sidebar
-  if (!session || isSessionError) {
+  if (!session) {
     return null;
   }
 
