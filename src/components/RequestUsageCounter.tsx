@@ -89,10 +89,11 @@ export const RequestUsageCounter = () => {
     navigate("/auth");
   };
 
-  const maxRequests = subscriptionStatus?.maxClicks || 25;
+  const isUltraPlan = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3";
+  const maxRequests = isUltraPlan ? Infinity : (subscriptionStatus?.maxClicks || 25);
   const usedRequests = requestStats || 0;
-  const remainingRequests = Math.max(0, maxRequests - usedRequests);
-  const usagePercentage = (usedRequests / maxRequests) * 100;
+  const remainingRequests = isUltraPlan ? Infinity : Math.max(0, maxRequests - usedRequests);
+  const usagePercentage = isUltraPlan ? 0 : ((usedRequests / maxRequests) * 100);
 
   const getPlanName = () => {
     if (!subscriptionStatus?.subscribed) return 'Free';
@@ -134,15 +135,24 @@ export const RequestUsageCounter = () => {
         </div>
 
         <div className="space-y-1">
-          <Progress 
-            value={usagePercentage} 
-            className="h-1 bg-sidebar-accent/20"
-          />
-          
-          <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
-            <span>{usedRequests}/{maxRequests}</span>
-            <span>{remainingRequests} left</span>
-          </div>
+          {isUltraPlan ? (
+            <div className="text-[9px] text-sidebar-foreground/60 flex items-center gap-1">
+              <span>Unlimited Usage</span>
+              <span className="text-green-500">•</span>
+              <span>{usedRequests} requests today</span>
+            </div>
+          ) : (
+            <>
+              <Progress 
+                value={usagePercentage} 
+                className="h-1 bg-sidebar-accent/20"
+              />
+              <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
+                <span>{usedRequests}/{maxRequests}</span>
+                <span>{remainingRequests} left</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
