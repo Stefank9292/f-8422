@@ -49,8 +49,8 @@ const Index = () => {
         if (data && data.length > 0) {
           try {
             await saveSearchHistory(username, data);
-            // Invalidate recent searches query after successful search
-            queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+            // Invalidate both recent searches queries after successful search
+            await queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
           } catch (error) {
             toast({
               title: "Error",

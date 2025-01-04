@@ -8,7 +8,7 @@ interface RecentSearchesCompactProps {
 
 export const RecentSearchesCompact = ({ onSearchSelect }: RecentSearchesCompactProps) => {
   const { data: recentSearches = [] } = useQuery({
-    queryKey: ['recent-searches-compact'],
+    queryKey: ['recent-searches'],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
