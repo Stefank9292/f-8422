@@ -33,5 +33,4 @@ export interface ApifyRequestBody {
   expandVideo: boolean;
   includeVideoMetadata: boolean;
   onlyPostsNewerThan?: string;
-  productType?: string[];
 }

@@ -1,9 +1,9 @@
-import { InstagramPost } from './types';
-import { isInstagramPost, transformToInstagramPost } from './validation';
-import { trackInstagramRequest } from './requestTracker';
 import { supabase } from "@/integrations/supabase/client";
+import { InstagramPost, ApifyRequestBody } from "./types";
+import { isInstagramPost, transformToInstagramPost } from "./validation";
+import { trackInstagramRequest } from "./requestTracker";
 
-async function makeApifyRequest(requestBody: any): Promise<InstagramPost[]> {
+async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   const response = await fetch(
     `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`,
     {
@@ -63,21 +63,21 @@ export async function fetchInstagramPosts(
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    const requestBody = {
-      "addParentData": false,
-      "directUrls": [instagramUrl],
-      "enhanceUserSearchWithFacebookPage": false,
-      "isUserReelFeedURL": false,
-      "isUserTaggedFeedURL": false,
-      "resultsLimit": numberOfVideos,
-      "resultsType": "posts",
-      "searchLimit": 1,
-      "searchType": "user",
-      "memoryMbytes": 512,
-      "maxPosts": numberOfVideos,
-      "mediaTypes": ["VIDEO"],
-      "expandVideo": true,
-      "includeVideoMetadata": true
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: [instagramUrl],
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      memoryMbytes: 512,
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true
     };
 
     if (postsNewerThan instanceof Date) {
@@ -120,20 +120,20 @@ export async function fetchBulkInstagramPosts(
       return cleanUrl;
     });
 
-    const requestBody = {
-      "addParentData": false,
-      "directUrls": cleanUrls,
-      "enhanceUserSearchWithFacebookPage": false,
-      "isUserReelFeedURL": false,
-      "isUserTaggedFeedURL": false,
-      "resultsLimit": numberOfVideos,
-      "resultsType": "posts",
-      "searchLimit": 1,
-      "searchType": "user",
-      "maxPosts": numberOfVideos,
-      "mediaTypes": ["VIDEO"],
-      "expandVideo": true,
-      "includeVideoMetadata": true
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: cleanUrls,
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true
     };
 
     if (postsNewerThan instanceof Date) {
