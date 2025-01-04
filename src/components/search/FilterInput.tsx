@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { LucideIcon } from "lucide-react";
 
@@ -47,7 +48,16 @@ export const FilterInput = ({
         <div className="flex items-center gap-2">
           <Icon className="w-3.5 h-3.5 text-muted-foreground" />
           <label className="text-xs font-medium">{label}</label>
-          {helpText && <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />}
+          {helpText && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-[10px]">{helpText}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -85,7 +95,6 @@ export const FilterInput = ({
             />
           </PopoverContent>
         </Popover>
-        {helpText && <p className="text-[10px] text-muted-foreground">{helpText}</p>}
       </div>
     );
   }
@@ -95,7 +104,16 @@ export const FilterInput = ({
       <div className="flex items-center gap-2">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <label className="text-xs font-medium">{label}</label>
-        {helpText && <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />}
+        {helpText && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-[10px]">{helpText}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
       <Input
         type={type}
@@ -104,7 +122,6 @@ export const FilterInput = ({
         onChange={(e) => onChange(e.target.value)}
         className="h-8 text-xs"
       />
-      {helpText && <p className="text-[10px] text-muted-foreground">{helpText}</p>}
     </div>
   );
 };
