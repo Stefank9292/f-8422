@@ -17,6 +17,7 @@ const Index = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isBulkSearching, setIsBulkSearching] = useState(false);
+  const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
   const [filters, setFilters] = useState({
     minViews: "",
     minPlays: "",
@@ -31,7 +32,7 @@ const Index = () => {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: Boolean(username && searchTrigger),
+    enabled: Boolean(username && searchTrigger && !isBulkSearching),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     retry: 2,
@@ -47,7 +48,7 @@ const Index = () => {
       });
       return;
     }
-
+    setBulkSearchResults([]); // Clear bulk search results when using normal search
     setSearchTrigger(prev => prev + 1);
   };
 
@@ -55,11 +56,7 @@ const Index = () => {
     setIsBulkSearching(true);
     try {
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
-      setUsername(urls[0]); // Set the first URL as the current username
-      setNumberOfVideos(numVideos);
-      setSelectedDate(date);
-      // Update the posts data through a new search trigger
-      setSearchTrigger(prev => prev + 1);
+      setBulkSearchResults(results);
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
@@ -85,6 +82,9 @@ const Index = () => {
     });
   };
 
+  // Determine which posts to display based on whether we're showing bulk search results or normal search results
+  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
+
   return (
     <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8">
       <SearchHeader />
@@ -99,12 +99,12 @@ const Index = () => {
           onUsernameChange={setUsername}
           onSearch={handleSearch}
           onBulkSearch={handleBulkSearch}
-          isLoading={isBulkSearching}
+          isLoading={isBulkSearching || isLoading}
         />
 
         <Button 
           onClick={handleSearch} 
-          disabled={isLoading}
+          disabled={isLoading || isBulkSearching}
           className="w-full"
         >
           {isLoading ? (
@@ -127,14 +127,14 @@ const Index = () => {
         />
       </div>
 
-      {posts.length > 0 && (
+      {displayPosts.length > 0 && (
         <div className="w-full max-w-6xl space-y-4">
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
             onReset={handleFilterReset}
-            totalResults={posts.length}
-            filteredResults={posts.filter(post => {
+            totalResults={displayPosts.length}
+            filteredResults={displayPosts.filter(post => {
               if (filters.postsNewerThan) {
                 const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
                 const postDate = new Date(post.timestamp);
@@ -148,9 +148,9 @@ const Index = () => {
               if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
               return true;
             }).length}
-            currentPosts={posts}
+            currentPosts={displayPosts}
           />
-          <SearchResults posts={posts} filters={filters} />
+          <SearchResults posts={displayPosts} filters={filters} />
         </div>
       )}
     </div>
