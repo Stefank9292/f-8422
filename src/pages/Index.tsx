@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { fetchInstagramPosts } from "@/utils/apifyClient";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
@@ -54,13 +54,16 @@ const Index = () => {
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
     setIsBulkSearching(true);
     try {
-      // For now, we'll just use the first URL as an example
-      if (urls.length > 0) {
-        setUsername(urls[0]);
-        setNumberOfVideos(numVideos);
-        setSelectedDate(date);
-        setSearchTrigger(prev => prev + 1);
-      }
+      const results = await fetchBulkInstagramPosts(urls, numVideos, date);
+      setUsername(urls[0]); // Set the first URL as the current username
+      setNumberOfVideos(numVideos);
+      setSelectedDate(date);
+      // Update the posts data through a new search trigger
+      setSearchTrigger(prev => prev + 1);
+      return results;
+    } catch (error) {
+      console.error('Bulk search error:', error);
+      throw error;
     } finally {
       setIsBulkSearching(false);
     }

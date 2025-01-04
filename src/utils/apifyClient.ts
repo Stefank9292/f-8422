@@ -167,7 +167,6 @@ export async function fetchInstagramPosts(
       const errorBody = await response.text();
       console.error('API Error Response:', errorBody);
       
-      // Check if it's a quota/billing error
       if (response.status === 402) {
         throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
       }
@@ -178,7 +177,6 @@ export async function fetchInstagramPosts(
     const data = await response.json();
     console.log('Raw response from Apify:', data);
 
-    // Transform and validate the data
     const validPosts = Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
@@ -189,6 +187,87 @@ export async function fetchInstagramPosts(
     return validPosts;
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
+    throw error;
+  }
+}
+
+export async function fetchBulkInstagramPosts(
+  urls: string[],
+  numberOfVideos: number = 3,
+  postsNewerThan?: Date
+): Promise<InstagramPost[]> {
+  try {
+    console.log('Fetching bulk Instagram posts for URLs:', urls);
+    console.log('Number of videos per profile:', numberOfVideos);
+    console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
+
+    // Clean up URLs and ensure they're properly formatted
+    const cleanUrls = urls.map(url => {
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('https://')) {
+        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}/`;
+      }
+      return cleanUrl;
+    });
+
+    // Prepare request body for bulk search
+    const requestBody: Record<string, any> = {
+      "addParentData": false,
+      "directUrls": cleanUrls,
+      "enhanceUserSearchWithFacebookPage": false,
+      "isUserReelFeedURL": false,
+      "isUserTaggedFeedURL": false,
+      "resultsLimit": numberOfVideos,
+      "resultsType": "posts",
+      "searchLimit": 1,
+      "searchType": "user",
+      "maxPosts": numberOfVideos,
+      "mediaTypes": ["VIDEO"],
+      "expandVideo": true,
+      "includeVideoMetadata": true
+    };
+
+    // Add postsNewerThan if a date is provided
+    if (postsNewerThan instanceof Date) {
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
+    }
+
+    console.log('Making bulk request with body:', JSON.stringify(requestBody, null, 2));
+
+    const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
+
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('API Error Response:', errorBody);
+      
+      if (response.status === 402) {
+        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+      }
+      
+      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
+    }
+
+    const data = await response.json();
+    console.log('Raw response from Apify:', data);
+
+    const validPosts = Array.isArray(data) 
+      ? data.map(post => transformToInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== null)
+      : [];
+           
+    console.log('Valid posts:', validPosts);
+
+    return validPosts;
+  } catch (error) {
+    console.error('Error fetching bulk Instagram posts:', error);
     throw error;
   }
 }
