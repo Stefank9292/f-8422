@@ -20,6 +20,7 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
         .from('search_history')
         .select('search_query, created_at')
         .eq('user_id', session.user.id)
+        .eq('search_type', 'single')
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -33,10 +34,10 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
         return [];
       }
 
-      // Remove duplicates while preserving order
-      const uniqueSearches = data.filter((search, index, self) =>
-        index === self.findIndex((s) => s.search_query === search.search_query)
-      );
+      // Remove duplicates while preserving order (keep most recent)
+      const uniqueSearches = Array.from(
+        new Map(data.map(item => [item.search_query, item])).values()
+      ).slice(0, 5);
 
       return uniqueSearches;
     },
@@ -46,10 +47,6 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
   });
 
   if (!recentSearches || recentSearches.length === 0) return null;
-
-  const handleSearchSelect = (username: string) => {
-    onSearchSelect(username);
-  };
 
   return (
     <div className="w-full space-y-3">
@@ -61,7 +58,7 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
         {recentSearches.map((search, index) => (
           <button
             key={index}
-            onClick={() => handleSearchSelect(search.search_query)}
+            onClick={() => onSearchSelect(search.search_query)}
             className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
             <Instagram className="w-4 h-4" />
