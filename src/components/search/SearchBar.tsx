@@ -8,7 +8,7 @@ interface SearchBarProps {
   username: string;
   onUsernameChange: (value: string) => void;
   onSearch: () => void;
-  onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<void>;
+  onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<any>;
   isLoading?: boolean;
 }
 
