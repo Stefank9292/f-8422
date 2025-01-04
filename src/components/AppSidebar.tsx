@@ -43,18 +43,13 @@ export function AppSidebar() {
   const { toast } = useToast();
   const { toggleSidebar, state } = useSidebar();
 
-  const { data: session } = useQuery({
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
   });
-
-  // If there's no session, don't render the sidebar
-  if (!session) {
-    return null;
-  }
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -67,8 +62,18 @@ export function AppSidebar() {
       if (error) throw error;
       return data;
     },
-    enabled: !!session?.access_token,
+    enabled: !!session?.access_token, // Only run this query if we have a session
   });
+
+  // Handle loading state
+  if (isSessionLoading) {
+    return null;
+  }
+
+  // If there's no session after loading, don't render the sidebar
+  if (!session) {
+    return null;
+  }
 
   const secondaryMenuItems = [
     {
