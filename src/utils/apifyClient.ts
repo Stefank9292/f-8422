@@ -1,3 +1,5 @@
+import { supabase } from "@/integrations/supabase/client";
+
 interface InstagramPost {
   url: string;
   caption: string;
@@ -15,6 +17,43 @@ interface InstagramPost {
   ownerUsername: string;
   ownerId: string;
   locationName?: string;
+}
+
+async function updateUserClickCount() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user.id) return;
+
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  // First, try to get existing record for today
+  const { data: existingRecord } = await supabase
+    .from('user_clicks')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .gte('period_end', startOfDay.toISOString())
+    .lt('period_end', endOfDay.toISOString())
+    .single();
+
+  if (existingRecord) {
+    // Update existing record
+    await supabase
+      .from('user_clicks')
+      .update({ click_count: existingRecord.click_count + 1 })
+      .eq('id', existingRecord.id);
+  } else {
+    // Create new record
+    await supabase
+      .from('user_clicks')
+      .insert({
+        user_id: session.user.id,
+        click_count: 1,
+        period_start: startOfDay.toISOString(),
+        period_end: endOfDay.toISOString()
+      });
+  }
 }
 
 function isInstagramPost(obj: unknown): boolean {
@@ -110,24 +149,18 @@ export async function fetchInstagramPosts(
     // Clean up username and handle URL input
     let cleanUsername = username.trim();
     
-    // If the input is a URL, extract the username
     if (cleanUsername.includes('instagram.com')) {
       const urlParts = cleanUsername.split('/');
-      // Find the username part after instagram.com
       const usernameIndex = urlParts.findIndex(part => part === 'instagram.com') + 1;
       if (usernameIndex < urlParts.length) {
         cleanUsername = urlParts[usernameIndex];
       }
     }
     
-    // Remove @ if present
     cleanUsername = cleanUsername.replace('@', '');
-    
-    // Construct proper Instagram URL with trailing slash
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    // Prepare request body with updated parameters
     const requestBody: Record<string, any> = {
       "addParentData": false,
       "directUrls": [instagramUrl],
@@ -145,14 +178,12 @@ export async function fetchInstagramPosts(
       "includeVideoMetadata": true
     };
 
-    // Add postsUntil if a date is provided
     if (postsNewerThan instanceof Date) {
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
     console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
     
-    // Make the API request to Apify
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
     
     const response = await fetch(apiEndpoint, {
@@ -184,6 +215,11 @@ export async function fetchInstagramPosts(
            
     console.log('Valid posts:', validPosts);
 
+    // Only update click count if we got valid posts
+    if (validPosts.length > 0) {
+      await updateUserClickCount();
+    }
+
     return validPosts;
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
@@ -201,7 +237,6 @@ export async function fetchBulkInstagramPosts(
     console.log('Number of videos per profile:', numberOfVideos);
     console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
 
-    // Clean up URLs and ensure they're properly formatted
     const cleanUrls = urls.map(url => {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('https://')) {
@@ -210,7 +245,6 @@ export async function fetchBulkInstagramPosts(
       return cleanUrl;
     });
 
-    // Prepare request body for bulk search
     const requestBody: Record<string, any> = {
       "addParentData": false,
       "directUrls": cleanUrls,
@@ -227,7 +261,6 @@ export async function fetchBulkInstagramPosts(
       "includeVideoMetadata": true
     };
 
-    // Add postsNewerThan if a date is provided
     if (postsNewerThan instanceof Date) {
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
@@ -264,6 +297,11 @@ export async function fetchBulkInstagramPosts(
       : [];
            
     console.log('Valid posts:', validPosts);
+
+    // Only update click count if we got valid posts
+    if (validPosts.length > 0) {
+      await updateUserClickCount();
+    }
 
     return validPosts;
   } catch (error) {
