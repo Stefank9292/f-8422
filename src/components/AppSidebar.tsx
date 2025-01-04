@@ -90,6 +90,10 @@ export function AppSidebar() {
           <SidebarGroupContent className="flex flex-col h-full">
             <div>
               <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarNavigation />
+                </SidebarMenuItem>
+
                 <SidebarTools currentPath={location.pathname} />
               </SidebarMenu>
             </div>
@@ -109,10 +113,6 @@ export function AppSidebar() {
 
                 <SidebarMenuItem>
                   <UserProfile email={session?.user?.email} />
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarNavigation />
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
