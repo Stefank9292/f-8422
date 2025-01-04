@@ -61,22 +61,22 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Bulk Search</DialogTitle>
+          <DialogTitle className="text-xl font-semibold tracking-tight">Bulk Search</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           <div className="space-y-2">
-            <label className="text-lg font-medium">Instagram URLs (max {MAX_URLS})</label>
+            <label className="text-sm font-medium text-foreground">Instagram URLs (max {MAX_URLS})</label>
             <Textarea
               placeholder={`Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
-              className="min-h-[200px] font-mono"
+              className="min-h-[200px] font-mono text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
               disabled={isLoading}
             />
-            <p className={`text-sm text-right ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-red-500' : 'text-gray-500'}`}>
+            <p className={`text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
             </p>
           </div>
@@ -95,7 +95,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             <Button
               variant="outline"
               onClick={onClose}
-              className="gap-2"
+              className="gap-2 text-sm font-medium"
               disabled={isLoading}
             >
               <X className="w-4 h-4" />
@@ -103,7 +103,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             </Button>
             <Button
               onClick={handleSearch}
-              className="gap-2"
+              className="gap-2 text-sm font-medium instagram-gradient"
               disabled={isLoading}
             >
               {isLoading ? (

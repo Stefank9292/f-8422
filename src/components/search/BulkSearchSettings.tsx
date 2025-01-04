@@ -56,15 +56,15 @@ export const BulkSearchSettings = ({
   const maxVideos = getMaxVideos();
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-between px-6 py-4 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-xl"
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-accent/50 transition-colors rounded-lg"
         disabled={disabled}
       >
         <div className="flex items-center gap-2">
-          <Settings2 className="w-5 h-5" />
-          <span className="font-medium text-lg">Search Settings</span>
+          <Settings2 className="w-4 h-4" />
+          <span>Search Settings</span>
         </div>
         {isSettingsOpen ? (
           <ChevronUp className="w-4 h-4" />
@@ -74,24 +74,24 @@ export const BulkSearchSettings = ({
       </button>
 
       {isSettingsOpen && (
-        <div className="mt-4 p-6 space-y-8 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-800 animate-in fade-in duration-200">
-          <div className="space-y-6">
-            <div className="space-y-4">
+        <div className="mt-4 p-4 space-y-6 bg-accent/50 backdrop-blur-sm rounded-lg border border-input animate-in fade-in duration-200">
+          <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Number of Videos per Profile</span>
-                <HelpCircle className="w-4 h-4 text-gray-400" />
+                <span className="text-sm font-medium text-foreground">Number of Videos per Profile</span>
+                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
               </div>
-              <div className="flex items-center justify-end gap-3 bg-gray-50 dark:bg-gray-900 p-3 rounded-xl">
+              <div className="flex items-center justify-end gap-3 bg-background/50 p-2 rounded-lg">
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => setNumberOfVideos(Math.max(1, numberOfVideos - 1))}
                   disabled={numberOfVideos <= 1 || disabled}
-                  className="h-10 w-10 rounded-lg"
+                  className="h-8 w-8 rounded-md"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-3.5 w-3.5" />
                 </Button>
-                <span className="text-xl font-medium min-w-[2ch] text-center">
+                <span className="text-lg font-medium min-w-[2ch] text-center">
                   {numberOfVideos}
                 </span>
                 <Button
@@ -99,25 +99,25 @@ export const BulkSearchSettings = ({
                   size="icon"
                   onClick={() => setNumberOfVideos(Math.min(maxVideos, numberOfVideos + 1))}
                   disabled={numberOfVideos >= maxVideos || disabled}
-                  className="h-10 w-10 rounded-lg"
+                  className="h-8 w-8 rounded-md"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-3.5 w-3.5" />
                 </Button>
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-gray-500" />
-                <span className="text-lg font-medium text-gray-700 dark:text-gray-200">Posts newer than</span>
-                <HelpCircle className="w-4 h-4 text-gray-400" />
+                <CalendarIcon className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Posts newer than</span>
+                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
               </div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal py-6 text-lg rounded-xl",
+                      "w-full justify-start text-left font-normal py-4 text-sm rounded-lg",
                       !selectedDate && "text-muted-foreground"
                     )}
                     disabled={disabled}
@@ -137,7 +137,7 @@ export const BulkSearchSettings = ({
                   />
                 </PopoverContent>
               </Popover>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Limited to posts from the last 90 days
               </p>
             </div>
