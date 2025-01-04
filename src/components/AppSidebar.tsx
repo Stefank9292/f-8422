@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useSubscription } from "@/hooks/use-subscription";
+import { useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -37,7 +38,7 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { toggleSidebar, state } = useSidebar();
+  const { toggleSidebar, state, setOpen } = useSidebar();
 
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
@@ -52,6 +53,42 @@ export function AppSidebar() {
   });
 
   const { data: subscriptionStatus } = useSubscription(session);
+
+  // Auto-collapse timer
+  useEffect(() => {
+    let collapseTimer: NodeJS.Timeout;
+
+    const resetTimer = () => {
+      clearTimeout(collapseTimer);
+      if (state === 'expanded') {
+        collapseTimer = setTimeout(() => {
+          setOpen(false);
+        }, 10000); // 10 seconds
+      }
+    };
+
+    // Reset timer on mouse movement within sidebar
+    const handleMouseMove = () => {
+      resetTimer();
+    };
+
+    // Add event listener to sidebar element
+    const sidebarElement = document.querySelector('[data-sidebar="sidebar"]');
+    if (sidebarElement) {
+      sidebarElement.addEventListener('mousemove', handleMouseMove);
+    }
+
+    // Initial timer setup
+    resetTimer();
+
+    // Cleanup
+    return () => {
+      clearTimeout(collapseTimer);
+      if (sidebarElement) {
+        sidebarElement.removeEventListener('mousemove', handleMouseMove);
+      }
+    };
+  }, [state, setOpen]);
 
   // Handle loading state
   if (isSessionLoading) {
