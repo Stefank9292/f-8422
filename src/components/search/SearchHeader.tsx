@@ -17,7 +17,7 @@ export const SearchHeader = () => {
         </Badge>
       </div>
       <div className="mt-2">
-        <span className="px-6 py-2 text-lg md:text-xl text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
+        <span className="px-6 py-2.5 text-base font-medium text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
           Video Research on Steroids
         </span>
       </div>
