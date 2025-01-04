@@ -66,17 +66,6 @@ const Index = () => {
     });
   };
 
-  const filteredPosts = posts.filter(post => {
-    if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
-    if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
-    if (filters.minDuration && post.duration < filters.minDuration) return false;
-    if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
-    if (filters.postsNewerThan && new Date(post.date) < new Date(filters.postsNewerThan)) return false;
-    return true;
-  });
-
   return (
     <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8">
       <SearchHeader />
@@ -124,10 +113,23 @@ const Index = () => {
             onFilterChange={handleFilterChange}
             onReset={handleFilterReset}
             totalResults={posts.length}
-            filteredResults={filteredPosts.length}
-            currentPosts={filteredPosts}
+            filteredResults={posts.filter(post => {
+              if (filters.postsNewerThan) {
+                const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
+                const postDate = new Date(post.timestamp);
+                if (postDate < filterDate) return false;
+              }
+              if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
+              if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
+              if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
+              if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
+              if (filters.minDuration && post.duration < filters.minDuration) return false;
+              if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
+              return true;
+            }).length}
+            currentPosts={posts}
           />
-          <SearchResults posts={filteredPosts} />
+          <SearchResults posts={posts} filters={filters} />
         </div>
       )}
     </div>

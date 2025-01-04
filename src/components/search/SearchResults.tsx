@@ -7,6 +7,15 @@ import { PostTableRow } from "./TableRow";
 
 interface SearchResultsProps {
   posts: any[];
+  filters: {
+    postsNewerThan: string;
+    minViews: string;
+    minPlays: string;
+    minLikes: string;
+    minComments: string;
+    minDuration: string;
+    minEngagement: string;
+  };
 }
 
 type SortConfig = {
@@ -14,7 +23,7 @@ type SortConfig = {
   direction: 'asc' | 'desc' | null;
 };
 
-export const SearchResults = ({ posts }: SearchResultsProps) => {
+export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const { toast } = useToast();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
 
@@ -71,7 +80,26 @@ export const SearchResults = ({ posts }: SearchResultsProps) => {
     setSortConfig({ key, direction });
   };
 
-  const sortedPosts = [...posts].sort((a, b) => {
+  const filteredPosts = posts.filter(post => {
+    // Apply date filter
+    if (filters.postsNewerThan) {
+      const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
+      const postDate = new Date(post.timestamp);
+      if (postDate < filterDate) return false;
+    }
+
+    // Apply other filters
+    if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
+    if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
+    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
+    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
+    if (filters.minDuration && post.duration < filters.minDuration) return false;
+    if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
+
+    return true;
+  });
+
+  const sortedPosts = [...filteredPosts].sort((a, b) => {
     if (sortConfig.direction === null) return 0;
     
     let aValue = a[sortConfig.key];
