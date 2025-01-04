@@ -54,6 +54,35 @@ export type Database = {
         }
         Relationships: []
       }
+      search_results: {
+        Row: {
+          created_at: string
+          id: string
+          results: Json
+          search_history_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          results: Json
+          search_history_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          results?: Json
+          search_history_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_results_search_history_id_fkey"
+            columns: ["search_history_id"]
+            isOneToOne: false
+            referencedRelation: "search_history"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_requests: {
         Row: {
           created_at: string

@@ -1,4 +1,4 @@
-import { InstagramPost } from "./types";
+import { InstagramPost } from './types';
 
 export function isInstagramPost(obj: unknown): boolean {
   if (!obj || typeof obj !== 'object') {
@@ -13,7 +13,6 @@ export function isInstagramPost(obj: unknown): boolean {
     const videoViewCount = Number(post.videoViewCount) || 0;
     const videoPlayCount = Number(post.videoPlayCount) || 0;
     
-    // Check if the object has all required properties with correct types
     const hasRequiredProps = 
       typeof (post.url === 'string' || post.shortCode === 'string') &&
       typeof post.caption === 'string' &&
@@ -29,11 +28,7 @@ export function isInstagramPost(obj: unknown): boolean {
       typeof post.ownerUsername === 'string' &&
       typeof post.ownerId === 'string';
 
-    if (!hasRequiredProps) {
-      return false;
-    }
-
-    return true;
+    return hasRequiredProps;
   } catch (error) {
     console.error('Error validating post data:', error);
     return false;

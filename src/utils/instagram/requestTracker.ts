@@ -6,61 +6,46 @@ export async function trackInstagramRequest(userId: string) {
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  try {
-    const { error } = await supabase
-      .from('user_requests')
-      .insert({
-        user_id: userId,
-        request_type: 'instagram_search',
-        period_start: startOfDay.toISOString(),
-        period_end: endOfDay.toISOString()
-      });
-
-    if (error) {
-      console.error('Error tracking request:', error);
-      throw error;
-    }
-  } catch (error) {
-    console.error('Failed to track request:', error);
-    throw error;
-  }
+  await supabase
+    .from('user_requests')
+    .insert({
+      user_id: userId,
+      request_type: 'instagram_search',
+      period_start: startOfDay.toISOString(),
+      period_end: endOfDay.toISOString()
+    });
 }
 
 export async function checkRequestLimit(userId: string): Promise<boolean> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return false;
+
+  const { data } = await supabase.functions.invoke('check-subscription', {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
+
+  if (!data?.priceId) return true; // Free tier
+
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  try {
-    // Get current request count
-    const { data: requests, error: countError } = await supabase
-      .from('user_requests')
-      .select('*')
-      .eq('user_id', userId)
-      .gte('period_start', startOfDay.toISOString())
-      .lt('period_end', endOfDay.toISOString());
+  const { count } = await supabase
+    .from('user_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('request_type', 'instagram_search')
+    .gte('created_at', startOfDay.toISOString())
+    .lt('created_at', endOfDay.toISOString());
 
-    if (countError) throw countError;
+  // Define limits based on subscription tier
+  const limits: Record<string, number> = {
+    'price_1QdBd2DoPDXfOSZFnG8aWuIq': 100, // Premium
+    'price_1QdC54DoPDXfOSZFXHBO4yB3': 500  // Ultra
+  };
 
-    // Get user's subscription status
-    const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke(
-      'check-subscription',
-      {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
-        }
-      }
-    );
-
-    if (subscriptionError) throw subscriptionError;
-
-    const maxRequests = subscriptionData?.maxClicks || 3; // Default to free tier limit
-    const currentRequests = requests?.length || 0;
-
-    return currentRequests < maxRequests;
-  } catch (error) {
-    console.error('Error checking request limit:', error);
-    throw error;
-  }
+  return count !== null && count < (limits[data.priceId] || 10);
 }

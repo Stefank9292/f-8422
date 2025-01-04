@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/apifyClient";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
@@ -10,7 +10,6 @@ import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { RecentSearches } from "@/components/search/RecentSearches";
 import { Loader2, Search } from "lucide-react";
-import confetti from 'canvas-confetti';
 import { useSearchStore } from "../store/searchStore";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -35,23 +34,6 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const triggerConfetti = () => {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#1DA1F2', '#14171A', '#657786', '#AAB8C2'],
-      angle: 90,
-      startVelocity: 30,
-      gravity: 0.5,
-      drift: 0,
-      ticks: 200,
-      decay: 0.9,
-      scalar: 0.8,
-      zIndex: 100,
-    });
-  };
-
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
@@ -61,16 +43,51 @@ const Index = () => {
     retry: 2,
     refetchOnWindowFocus: false,
     meta: {
-      onSuccess: (data: any[]) => {
+      onSuccess: async (data: any[]) => {
         if (data && data.length > 0) {
-          triggerConfetti();
+          try {
+            // Store search history and results
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session?.user?.id) {
+              console.error('No authenticated user found');
+              return;
+            }
+
+            const { data: searchHistory, error: searchError } = await supabase
+              .from('search_history')
+              .insert({
+                search_query: username,
+                search_type: 'single',
+                user_id: session.user.id
+              })
+              .select()
+              .single();
+
+            if (searchError) {
+              console.error('Error saving search history:', searchError);
+              return;
+            }
+
+            const { error: resultsError } = await supabase
+              .from('search_results')
+              .insert({
+                search_history_id: searchHistory.id,
+                results: data
+              });
+
+            if (resultsError) {
+              console.error('Error saving search results:', resultsError);
+            }
+          } catch (error) {
+            console.error('Error storing search results:', error);
+          }
         }
-        setShouldSearch(false); // Reset the search trigger after successful search
+        setShouldSearch(false);
       }
     }
   });
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (isLoading || isBulkSearching) {
       return;
     }
@@ -84,37 +101,9 @@ const Index = () => {
       return;
     }
 
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user?.id) {
-        console.error('No authenticated user found');
-        return;
-      }
-
-      const { error: searchHistoryError } = await supabase
-        .from('search_history')
-        .insert({
-          search_query: username,
-          search_type: 'single',
-          user_id: session.user.id
-        });
-
-      if (searchHistoryError) {
-        console.error('Error saving search history:', searchHistoryError);
-      }
-
-      setBulkSearchResults([]);
-      setShouldSearch(true); // Trigger the search
-      await queryClient.invalidateQueries({ queryKey: ['instagram-posts', 'recent-searches'] });
-    } catch (error) {
-      console.error('Search error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to perform search",
-        variant: "destructive",
-      });
-    }
+    setBulkSearchResults([]);
+    setShouldSearch(true);
+    queryClient.invalidateQueries({ queryKey: ['instagram-posts', 'recent-searches'] });
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
@@ -127,9 +116,38 @@ const Index = () => {
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
-      if (results && results.length > 0) {
-        triggerConfetti();
+
+      // Store bulk search results
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id && results.length > 0) {
+        for (const url of urls) {
+          const { data: searchHistory } = await supabase
+            .from('search_history')
+            .insert({
+              search_query: url,
+              search_type: 'bulk',
+              user_id: session.user.id
+            })
+            .select()
+            .single();
+
+          if (searchHistory) {
+            const filteredResults = results.filter(result => 
+              result.ownerUsername === url.replace('@', '').replace('https://www.instagram.com/', '').replace('/', '')
+            );
+
+            if (filteredResults.length > 0) {
+              await supabase
+                .from('search_results')
+                .insert({
+                  search_history_id: searchHistory.id,
+                  results: filteredResults
+                });
+            }
+          }
+        }
       }
+
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
