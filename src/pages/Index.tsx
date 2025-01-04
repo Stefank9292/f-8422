@@ -35,6 +35,65 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Get current user session
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  // Get subscription status
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      if (!session?.access_token) return null;
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
+  // Get current day's request count
+  const { data: requestCount = 0 } = useQuery({
+    queryKey: ['request-count'],
+    queryFn: async () => {
+      if (!session?.user.id) return 0;
+      
+      const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setDate(endOfDay.getDate() + 1);
+
+      const { count } = await supabase
+        .from('user_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+        .eq('request_type', 'instagram_search')
+        .gte('created_at', startOfDay.toISOString())
+        .lt('created_at', endOfDay.toISOString());
+
+      return count || 0;
+    },
+    enabled: !!session?.user.id,
+  });
+
+  // Get max requests based on subscription
+  const getMaxRequests = () => {
+    if (!subscriptionStatus?.priceId) return 25; // Free tier
+    if (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") return 100; // Premium
+    if (subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") return 500; // Ultra
+    return 25; // Default to free tier
+  };
+
+  const hasReachedLimit = requestCount >= getMaxRequests();
+
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
@@ -49,7 +108,6 @@ const Index = () => {
         if (data && data.length > 0) {
           try {
             await saveSearchHistory(username, data);
-            // Invalidate both recent searches queries after successful search
             await queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
           } catch (error) {
             toast({
@@ -170,17 +228,23 @@ const Index = () => {
 
           <Button 
             onClick={handleSearch} 
-            disabled={isLoading || isBulkSearching || !username}
+            disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
             className={cn(
               "w-full material-button py-8 text-lg md:text-xl transition-all duration-300",
               username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl"
+              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl",
+              hasReachedLimit && "opacity-50 cursor-not-allowed"
             )}
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                 <span>This can take up to a minute...</span>
+              </>
+            ) : hasReachedLimit ? (
+              <>
+                <Search className="mr-3 h-6 w-6" />
+                Daily Limit Reached ({requestCount}/{getMaxRequests()})
               </>
             ) : (
               <>
