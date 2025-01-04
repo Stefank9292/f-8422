@@ -3,6 +3,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Settings2, HelpCircle } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -106,7 +107,14 @@ export const SearchSettings = ({
             <div className="flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
               <span className="text-[11px] font-medium">Posts newer than</span>
-              <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">Limited to posts from the last 90 days</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <Popover>
               <PopoverTrigger asChild>
@@ -133,9 +141,6 @@ export const SearchSettings = ({
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-[11px] text-gray-500">
-              Limited to posts from the last 90 days
-            </p>
           </div>
         </div>
       )}

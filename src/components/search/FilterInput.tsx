@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { LucideIcon } from "lucide-react";
 
@@ -24,7 +23,6 @@ export const FilterInput = ({
   value, 
   onChange, 
   placeholder, 
-  helpText,
   type = "text",
   isDatePicker = false
 }: FilterInputProps) => {
@@ -48,16 +46,6 @@ export const FilterInput = ({
         <div className="flex items-center gap-2">
           <Icon className="w-3.5 h-3.5 text-muted-foreground" />
           <label className="text-xs font-medium">{label}</label>
-          {helpText && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="text-[10px]">{helpText}</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -104,16 +92,6 @@ export const FilterInput = ({
       <div className="flex items-center gap-2">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <label className="text-xs font-medium">{label}</label>
-        {helpText && (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-[10px]">{helpText}</p>
-            </TooltipContent>
-          </Tooltip>
-        )}
       </div>
       <Input
         type={type}
