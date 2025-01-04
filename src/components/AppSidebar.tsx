@@ -18,6 +18,7 @@ import { SidebarHistory } from "./sidebar/SidebarHistory";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
+import { SubscriptionOverview } from "./subscription/SubscriptionOverview";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -88,7 +89,7 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent className="flex flex-col h-full">
-            <div>
+            <div className="space-y-6">
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarNavigation />
@@ -96,12 +97,28 @@ export function AppSidebar() {
 
                 <SidebarTools currentPath={location.pathname} />
               </SidebarMenu>
+
+              <SidebarMenu>
+                <SidebarHistory currentPath={location.pathname} />
+              </SidebarMenu>
+
+              {subscriptionStatus && (
+                <SidebarMenu>
+                  <SidebarMenuItem className="px-2">
+                    <SubscriptionOverview
+                      planName={subscriptionStatus.plan}
+                      usedClicks={subscriptionStatus.usedClicks}
+                      remainingClicks={subscriptionStatus.remainingClicks}
+                      maxClicks={subscriptionStatus.maxClicks}
+                      isCanceled={subscriptionStatus.isCanceled}
+                    />
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              )}
             </div>
 
             <div className="mt-auto">
               <SidebarMenu>
-                <SidebarHistory currentPath={location.pathname} />
-
                 <SidebarMenuItem>
                   <div className="h-px bg-sidebar-border mx-2 my-4" />
                 </SidebarMenuItem>
