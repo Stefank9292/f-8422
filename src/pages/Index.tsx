@@ -9,6 +9,7 @@ import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Loader2 } from "lucide-react";
+import confetti from 'canvas-confetti';
 
 const Index = () => {
   const [username, setUsername] = useState("");
@@ -31,15 +32,36 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Use staleTime: Infinity to keep the data fresh indefinitely until explicitly invalidated
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#1DA1F2', '#14171A', '#657786', '#AAB8C2'],
+      angle: 90,
+      startVelocity: 30,
+      gravity: 0.5,
+      drift: 0,
+      ticks: 200,
+      decay: 0.9,
+      scalar: 0.8,
+      zIndex: 100,
+    });
+  };
+
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
     enabled: Boolean(username && searchTrigger && !isBulkSearching),
-    staleTime: Infinity, // Keep the data fresh indefinitely
-    gcTime: Infinity, // Never garbage collect the data
+    staleTime: Infinity,
+    gcTime: Infinity,
     retry: 2,
     refetchOnWindowFocus: false,
+    onSuccess: (data) => {
+      if (data && data.length > 0) {
+        triggerConfetti();
+      }
+    },
   });
 
   const handleSearch = async () => {
@@ -58,8 +80,7 @@ const Index = () => {
 
     setIsSearching(true);
     try {
-      setBulkSearchResults([]); // Clear bulk search results when using normal search
-      // Invalidate the previous query cache before triggering a new search
+      setBulkSearchResults([]);
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       setSearchTrigger(prev => prev + 1);
     } finally {
@@ -74,10 +95,12 @@ const Index = () => {
 
     setIsBulkSearching(true);
     try {
-      // Clear the regular search results cache when doing a bulk search
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
+      if (results && results.length > 0) {
+        triggerConfetti();
+      }
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
@@ -103,7 +126,6 @@ const Index = () => {
     });
   };
 
-  // Determine which posts to display based on whether we're showing bulk search results or normal search results
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
