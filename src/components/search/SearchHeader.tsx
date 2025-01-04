@@ -6,15 +6,20 @@ export const SearchHeader = () => {
   return (
     <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
       <div className="relative inline-block">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
           VyralSearch
         </h1>
         <Badge 
           variant="secondary" 
-          className="absolute -top-2 -right-12 text-xs md:text-sm bg-gradient-to-r from-purple-600 to-orange-400 text-white border-none"
+          className="absolute -top-1 -right-16 text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-3 py-1 rounded-lg font-medium"
         >
           BETA
         </Badge>
+        <div className="mt-4">
+          <span className="px-6 py-2 text-lg md:text-xl text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
+            Video Research on Steroids
+          </span>
+        </div>
       </div>
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mt-6">
         <a
