@@ -13,8 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, InfoIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
@@ -61,7 +67,19 @@ export default function HistoryPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Search History</h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-2xl font-bold">Search History</h1>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="h-5 w-5 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Search history is automatically deleted after 7 days</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Select value={selectedSearchId} onValueChange={setSelectedSearchId}>
           <SelectTrigger className={cn("w-full", !selectedSearchId && "text-muted-foreground")}>
             <SelectValue placeholder="Select a search to view results" />
