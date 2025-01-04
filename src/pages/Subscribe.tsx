@@ -145,19 +145,6 @@ const SubscribePage = () => {
           </p>
         </div>
 
-        {/* Subscription Overview Section */}
-        {session && subscriptionStatus?.subscribed && (
-          <div className="max-w-3xl mx-auto">
-            <SubscriptionOverview
-              planName={planName}
-              usedClicks={usedClicks}
-              remainingClicks={remainingClicks}
-              maxClicks={maxClicks}
-              isCanceled={subscriptionStatus?.canceled}
-            />
-          </div>
-        )}
-
         {/* Pricing Plans Section */}
         <div className="space-y-8">
           <div className="flex items-center justify-center gap-4">
@@ -188,6 +175,19 @@ const SubscribePage = () => {
             ))}
           </div>
         </div>
+
+        {/* Subscription Overview Section */}
+        {session && subscriptionStatus?.subscribed && (
+          <div className="max-w-3xl mx-auto">
+            <SubscriptionOverview
+              planName={planName}
+              usedClicks={usedClicks}
+              remainingClicks={remainingClicks}
+              maxClicks={maxClicks}
+              isCanceled={subscriptionStatus?.canceled}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
