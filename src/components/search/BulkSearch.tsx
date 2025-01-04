@@ -37,6 +37,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
     try {
       await onSearch(urlList, numberOfVideos, selectedDate);
+      onClose(); // Close the modal after successful search
     } catch (error) {
       console.error('Search error:', error);
       toast({
