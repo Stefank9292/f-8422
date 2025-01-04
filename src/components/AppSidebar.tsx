@@ -87,32 +87,39 @@ export function AppSidebar() {
     <Sidebar className="z-30">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarTools currentPath={location.pathname} />
-              <SidebarHistory currentPath={location.pathname} />
+          <SidebarGroupContent className="flex flex-col h-full">
+            <div>
+              <SidebarMenu>
+                <SidebarTools currentPath={location.pathname} />
+              </SidebarMenu>
+            </div>
 
-              <SidebarMenuItem>
-                <div className="h-px bg-sidebar-border mx-2 my-4" />
-              </SidebarMenuItem>
+            <div className="mt-auto">
+              <SidebarMenu>
+                <SidebarHistory currentPath={location.pathname} />
 
-              <SidebarSettings 
-                currentPath={location.pathname}
-                subscriptionStatus={subscriptionStatus}
-              />
+                <SidebarMenuItem>
+                  <div className="h-px bg-sidebar-border mx-2 my-4" />
+                </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <UserProfile email={session?.user?.email} />
-              </SidebarMenuItem>
+                <SidebarSettings 
+                  currentPath={location.pathname}
+                  subscriptionStatus={subscriptionStatus}
+                />
 
-              <SidebarMenuItem>
-                <SidebarNavigation />
-              </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <UserProfile email={session?.user?.email} />
+                </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarFooter />
-              </SidebarMenuItem>
-            </SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarNavigation />
+                </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <SidebarFooter />
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
