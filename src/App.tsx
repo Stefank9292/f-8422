@@ -17,7 +17,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <SidebarProvider defaultOpen>
-          <div className="min-h-screen flex w-full">
+          <div className="min-h-screen flex w-full animate-in fade-in duration-200">
             <AppSidebar />
             <main className="flex-1 overflow-y-auto">
               <Routes>
