@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/sidebar";
 import { UserProfile } from "./sidebar/UserProfile";
 import { SidebarTools } from "./sidebar/SidebarTools";
-import { SidebarHistory } from "./sidebar/SidebarHistory";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
@@ -96,10 +95,6 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarTools currentPath={location.pathname} />
-              </SidebarMenu>
-
-              <SidebarMenu>
-                <SidebarHistory currentPath={location.pathname} />
               </SidebarMenu>
 
               {subscriptionStatus && (
