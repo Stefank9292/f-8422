@@ -31,6 +31,7 @@ export const SearchSettings = ({
   disabled = false,
   onSearchSelect
 }: SearchSettingsProps) => {
+  const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -58,6 +59,14 @@ export const SearchSettings = ({
   };
 
   const maxVideos = getMaxVideos();
+
+  const handleSliderChange = (value: number[]) => {
+    setLocalNumberOfVideos(value[0]);
+  };
+
+  const handleSliderPointerUp = () => {
+    setNumberOfVideos(localNumberOfVideos);
+  };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -88,12 +97,13 @@ export const SearchSettings = ({
                 <HelpCircle className="w-4 h-4 text-gray-400" />
               </div>
               <span className="text-sm font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                {numberOfVideos}
+                {localNumberOfVideos}
               </span>
             </div>
             <Slider
-              value={[numberOfVideos]}
-              onValueChange={(value) => setNumberOfVideos(value[0])}
+              value={[localNumberOfVideos]}
+              onValueChange={handleSliderChange}
+              onPointerUp={handleSliderPointerUp}
               min={1}
               max={maxVideos}
               step={1}
