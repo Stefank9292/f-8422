@@ -1,6 +1,8 @@
 import { Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const SearchHeader = () => {
   return (
@@ -9,12 +11,21 @@ export const SearchHeader = () => {
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
           VyralSearch
         </h1>
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-1 -right-12 text-[11px] bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-2 py-0.5 rounded-lg font-medium"
-        >
-          BETA
-        </Badge>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge 
+                variant="secondary" 
+                className="absolute -top-1 -right-12 text-[11px] bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-2 py-0.5 rounded-lg font-medium cursor-help"
+              >
+                BETA
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-[200px]">
+              <p className="text-[11px]">You found a discount code – Gotta catch&apos;em all! Here is your 25% discount on Ultra plan for the first month! 🎉</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
       <div className="mt-2">
         <span className="px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
