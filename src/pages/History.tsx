@@ -6,9 +6,22 @@ import { SearchResults } from "@/components/search/SearchResults";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { InstagramPost } from "@/types/instagram";
+import { SearchFilters } from "@/store/searchStore";
+
+interface SearchHistoryItem {
+  id: string;
+  search_query: string;
+  search_type: string;
+  created_at: string;
+}
+
+interface SearchResultData {
+  results: InstagramPost[];
+}
 
 const History = () => {
-  const [selectedHistory, setSelectedHistory] = useState<number | null>(null);
+  const [selectedHistory, setSelectedHistory] = useState<string | null>(null);
 
   const { data: searchHistory, isLoading: isHistoryLoading } = useQuery({
     queryKey: ['search-history'],
@@ -23,7 +36,7 @@ const History = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as SearchHistoryItem[];
     },
   });
 
@@ -39,10 +52,20 @@ const History = () => {
         .single();
 
       if (error) throw error;
-      return data.results;
+      return data as SearchResultData;
     },
     enabled: !!selectedHistory,
   });
+
+  const defaultFilters: SearchFilters = {
+    minViews: "",
+    minPlays: "",
+    minLikes: "",
+    minComments: "",
+    minDuration: "",
+    minEngagement: "",
+    postsNewerThan: ""
+  };
 
   return (
     <PageContainer>
@@ -92,7 +115,7 @@ const History = () => {
               </div>
             ) : searchResults ? (
               <div className="rounded-xl border border-border overflow-hidden">
-                <SearchResults posts={searchResults} filters={{}} />
+                <SearchResults posts={searchResults.results} filters={defaultFilters} />
               </div>
             ) : (
               <div className="text-center text-muted-foreground">
