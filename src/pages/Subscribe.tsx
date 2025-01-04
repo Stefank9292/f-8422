@@ -31,19 +31,18 @@ const SubscribePage = () => {
     enabled: !!session?.access_token,
   });
 
-  const { data: clickStats } = useQuery({
-    queryKey: ['click-stats'],
+  const { data: requestStats } = useQuery({
+    queryKey: ['request-stats'],
     queryFn: async () => {
       if (!session?.user.id) return null;
       
+      const now = new Date();
       const { data, error } = await supabase
-        .from('user_clicks')
-        .select('click_count')
+        .from('user_requests')
+        .select('*')
         .eq('user_id', session.user.id)
-        .gte('period_end', new Date().toISOString())
-        .order('period_end', { ascending: false })
-        .limit(1)
-        .single();
+        .gte('period_end', now.toISOString())
+        .order('period_end', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -129,7 +128,7 @@ const SubscribePage = () => {
 
   const { title, subtitle } = getPageTitle();
   const maxClicks = subscriptionStatus?.maxClicks || 3;
-  const usedClicks = clickStats?.click_count || 0;
+  const usedClicks = requestStats?.length || 0;
   const remainingClicks = Math.max(0, maxClicks - usedClicks);
   const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : 
                   subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" ? "Premium" : 

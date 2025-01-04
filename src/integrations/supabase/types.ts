@@ -54,30 +54,6 @@ export type Database = {
         }
         Relationships: []
       }
-      user_clicks: {
-        Row: {
-          click_count: number | null
-          id: string
-          period_end: string
-          period_start: string
-          user_id: string
-        }
-        Insert: {
-          click_count?: number | null
-          id?: string
-          period_end: string
-          period_start: string
-          user_id: string
-        }
-        Update: {
-          click_count?: number | null
-          id?: string
-          period_end?: string
-          period_start?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       user_requests: {
         Row: {
           created_at: string
