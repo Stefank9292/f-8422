@@ -111,11 +111,22 @@ export const RequestUsageCounter = () => {
             </span>
           </div>
 
-          {/* Progress Bar */}
-          <Progress 
-            value={usagePercentage} 
-            className="h-2 bg-sidebar-accent/20"
-          />
+          {/* Progress Bar Container */}
+          <div className="relative h-2 bg-sidebar-accent/20 rounded-full overflow-hidden">
+            {/* Current Position Indicator */}
+            <div 
+              className="absolute top-0 bottom-0 w-1 bg-primary transition-all duration-300"
+              style={{ 
+                left: `${usagePercentage}%`,
+                transform: 'translateX(-50%)'
+              }}
+            />
+            {/* Progress Bar */}
+            <Progress 
+              value={usagePercentage} 
+              className="h-full bg-transparent"
+            />
+          </div>
 
           {/* Total */}
           <div className="pt-1">
