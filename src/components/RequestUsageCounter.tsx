@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Activity } from "lucide-react";
 
@@ -91,62 +90,25 @@ export const RequestUsageCounter = () => {
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
-    <Card className="bg-sidebar-accent p-4">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-2">
-          <Activity className="h-5 w-5 text-sidebar-foreground" />
-          <h3 className="text-base font-semibold text-sidebar-foreground">Request Usage</h3>
-        </div>
+    <div className="px-2 py-2 space-y-2">
+      {/* Header */}
+      <div className="flex items-center gap-1.5 text-xs text-sidebar-foreground/70">
+        <Activity className="h-3.5 w-3.5" />
+        <span>Daily Usage</span>
+      </div>
 
-        {/* Usage Stats */}
-        <div className="space-y-4">
-          {/* Used and Remaining */}
-          <div className="flex justify-between text-lg">
-            <span className="text-sidebar-foreground">
-              {usedRequests} used
-            </span>
-            <span className="text-sidebar-foreground">
-              {remainingRequests} remaining
-            </span>
-          </div>
-
-          {/* Progress Bar Container */}
-          <div className="relative h-2 bg-sidebar-accent/20 rounded-full overflow-hidden">
-            {/* Current Position Indicator */}
-            <div 
-              className="absolute top-0 bottom-0 w-1 bg-primary transition-all duration-300"
-              style={{ 
-                left: `${usagePercentage}%`,
-                transform: 'translateX(-50%)'
-              }}
-            />
-            {/* Progress Bar */}
-            <Progress 
-              value={usagePercentage} 
-              className="h-full bg-transparent"
-            />
-          </div>
-
-          {/* Usage Percentage Indicator */}
-          <div className="text-center">
-            <span className={`text-sm font-medium ${
-              usagePercentage > 90 ? 'text-destructive' :
-              usagePercentage > 75 ? 'text-yellow-500' :
-              'text-green-500'
-            }`}>
-              {usagePercentage.toFixed(1)}% Used
-            </span>
-          </div>
-
-          {/* Total */}
-          <div className="pt-1">
-            <p className="text-sm text-sidebar-foreground/70">
-              Total requests: {maxRequests} per month
-            </p>
-          </div>
+      {/* Progress and Stats */}
+      <div className="space-y-1.5">
+        <Progress 
+          value={usagePercentage} 
+          className="h-1.5 bg-sidebar-accent/20"
+        />
+        
+        <div className="flex justify-between text-[10px] text-sidebar-foreground/60">
+          <span>{usedRequests}/{maxRequests}</span>
+          <span>{remainingRequests} left</span>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
