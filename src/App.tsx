@@ -10,7 +10,6 @@ import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
 import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
-import History from "@/pages/History";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,14 +64,6 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <HelpCenter />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/history"
-                  element={
-                    <ProtectedRoute>
-                      <History />
                     </ProtectedRoute>
                   }
                 />
