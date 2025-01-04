@@ -37,6 +37,7 @@ export const SearchBar = ({
       if (error) throw error;
       return data;
     },
+    enabled: false, // Only run when explicitly triggered
   });
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
