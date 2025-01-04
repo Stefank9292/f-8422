@@ -200,6 +200,7 @@ const Index = () => {
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
             disabled={isLoading || isBulkSearching}
+            onSearchSelect={setUsername}
           />
 
           <div className="flex justify-center w-full">
