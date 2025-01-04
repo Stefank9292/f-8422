@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { RequestUsageCounter } from "@/components/RequestUsageCounter";
-import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
-import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
+import { UsageOverview } from "@/components/subscription/UsageOverview";
+import { SubscriptionManagement } from "@/components/subscription/SubscriptionManagement";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -35,12 +32,25 @@ const SubscribePage = () => {
     enabled: !!session?.access_token,
   });
 
-  const getPlanBadgeText = () => {
-    const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : "Premium";
-    return subscriptionStatus?.canceled 
-      ? `${planName} (Cancels at end of period)` 
-      : `${planName}`;
-  };
+  const { data: clickStats } = useQuery({
+    queryKey: ['click-stats'],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      
+      const { data, error } = await supabase
+        .from('user_clicks')
+        .select('click_count')
+        .eq('user_id', session.user.id)
+        .gte('period_end', new Date().toISOString())
+        .order('period_end', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
+  });
 
   const getPageTitle = () => {
     if (!subscriptionStatus?.subscribed) {
@@ -119,6 +129,12 @@ const SubscribePage = () => {
   ];
 
   const { title, subtitle } = getPageTitle();
+  const maxClicks = subscriptionStatus?.maxClicks || 3;
+  const usedClicks = clickStats?.click_count || 0;
+  const remainingClicks = Math.max(0, maxClicks - usedClicks);
+  const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Ultra" : 
+                  subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" ? "Premium" : 
+                  "Free";
 
   return (
     <div className="min-h-screen p-4 bg-background">
@@ -132,59 +148,37 @@ const SubscribePage = () => {
         </div>
 
         {/* Current Plan & Usage Section */}
-        {session && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {/* Request Usage Card */}
-            <Card className="p-6 space-y-4 md:col-span-2 lg:col-span-2">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-semibold">Usage Overview</h2>
-                {subscriptionStatus?.subscribed && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Current Plan:</span>
-                    <Badge variant="secondary" className="text-base px-3 py-1">
-                      {getPlanBadgeText()}
-                    </Badge>
-                  </div>
-                )}
-              </div>
-              <RequestUsageCounter />
-            </Card>
-
-            {/* Subscription Management Card */}
-            {subscriptionStatus?.subscribed && (
-              <Card className="p-6 space-y-4">
-                <h2 className="text-2xl font-semibold">Subscription Management</h2>
-                <p className="text-muted-foreground">Manage your current subscription</p>
-                <div className="flex gap-4">
-                  {subscriptionStatus.canceled ? (
-                    <ResumeSubscriptionButton className="w-full">
-                      Resume Subscription
-                    </ResumeSubscriptionButton>
-                  ) : (
-                    <CancelSubscriptionButton 
-                      isCanceled={subscriptionStatus?.canceled}
-                      className="w-full"
-                    >
-                      Cancel Subscription
-                    </CancelSubscriptionButton>
-                  )}
-                </div>
-              </Card>
-            )}
+        {session && subscriptionStatus?.subscribed && (
+          <div className="grid gap-6 md:grid-cols-2">
+            <UsageOverview
+              planName={planName}
+              usedClicks={usedClicks}
+              remainingClicks={remainingClicks}
+              maxClicks={maxClicks}
+            />
+            <SubscriptionManagement 
+              isCanceled={subscriptionStatus?.canceled}
+            />
           </div>
         )}
 
         {/* Pricing Plans Section */}
         <div className="space-y-8">
           <div className="flex items-center justify-center gap-4">
-            <span className={!isAnnual ? "font-semibold" : "text-muted-foreground"}>Monthly</span>
+            <span className={!isAnnual ? "font-semibold" : "text-muted-foreground"}>
+              Monthly
+            </span>
             <Switch
               checked={isAnnual}
               onCheckedChange={setIsAnnual}
             />
             <div className="flex items-center gap-2">
-              <span className={isAnnual ? "font-semibold" : "text-muted-foreground"}>Annual</span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">Save 20%</Badge>
+              <span className={isAnnual ? "font-semibold" : "text-muted-foreground"}>
+                Annual
+              </span>
+              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                Save 20%
+              </Badge>
             </div>
           </div>
 
