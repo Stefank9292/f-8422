@@ -5,6 +5,7 @@ import { SearchResultItem, SupabaseSearchResult } from "@/types/instagram";
 import { transformSearchResults } from "@/utils/transformSearchResults";
 import { SearchResultDetails } from "@/components/history/SearchResultDetails";
 import { format } from "date-fns";
+import { useSidebar } from "@/components/ui/sidebar";
 import {
   Select,
   SelectContent,
@@ -24,6 +25,7 @@ import {
 
 export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
+  const { state } = useSidebar();
 
   const { data: searchHistory = [] } = useQuery({
     queryKey: ['search-history'],
@@ -65,7 +67,10 @@ export default function HistoryPage() {
   });
 
   return (
-    <div className="container mx-auto py-8 pl-16 space-y-8">
+    <div className={cn(
+      "container mx-auto py-8 space-y-8",
+      state === 'collapsed' ? "pl-16" : "pl-0"
+    )}>
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Search History</h1>
