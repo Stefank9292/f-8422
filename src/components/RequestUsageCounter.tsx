@@ -103,30 +103,33 @@ export const RequestUsageCounter = () => {
   };
 
   return (
-    <div className="px-2 py-2 space-y-3 flex flex-col items-center">
-      <div className="flex items-center justify-between w-full">
-        <div className="flex items-center gap-2">
-          <Avatar className="h-7 w-7">
-            <AvatarFallback>
-              <User className="h-3.5 w-3.5" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="text-[11px] text-sidebar-foreground/70 truncate">
-              {session?.user?.email}
-            </span>
-            <span className="text-[10px] text-sidebar-foreground/50">
-              {getPlanName()} Plan
-            </span>
-          </div>
+    <div className="px-2 py-2 space-y-4 flex flex-col items-center">
+      <div className="w-full flex flex-col items-center space-y-2">
+        <Avatar className="h-8 w-8">
+          <AvatarFallback>
+            <User className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+        
+        <div className="flex flex-col items-center space-y-1">
+          <span className="text-[11px] text-sidebar-foreground/70 text-center truncate max-w-[150px]">
+            {session?.user?.email}
+          </span>
+          <span className="text-[10px] text-sidebar-foreground/50">
+            {getPlanName()} Plan
+          </span>
         </div>
+
         <button
           onClick={handleSignOut}
-          className="h-7 w-7 rounded-full flex items-center justify-center hover:bg-sidebar-accent/20 transition-colors"
+          className="mt-1 px-2 py-1 rounded-full flex items-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
         >
-          <LogOut className="h-3.5 w-3.5 text-sidebar-foreground/70" />
+          <LogOut className="h-3 w-3" />
+          <span>Sign out</span>
         </button>
       </div>
+
+      <div className="w-full h-px bg-sidebar-border my-2" />
 
       <div className="space-y-1.5 w-full text-center">
         <div className="flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70">
