@@ -41,12 +41,16 @@ export const SubscriptionOverview = ({
         throw new Error("No email found");
       }
 
-      const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
+      // Using a single await to prevent multiple reads of the response stream
+      const response = await supabase.auth.resetPasswordForEmail(session.user.email, {
         redirectTo: `${window.location.origin}/auth/reset-password`,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/reset-password`
+        }
       });
 
-      if (error) {
-        throw error;
+      if (response.error) {
+        throw response.error;
       }
 
       toast({
