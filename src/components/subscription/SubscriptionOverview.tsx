@@ -36,22 +36,29 @@ export const SubscriptionOverview = ({
   });
 
   const handleResetPassword = async () => {
-    if (!session?.user?.email) return;
+    try {
+      if (!session?.user?.email) {
+        throw new Error("No email found");
+      }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to send reset password email. Please try again.",
-        variant: "destructive",
+      const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
+        redirectTo: `${window.location.origin}/auth/reset-password`,
       });
-    } else {
+
+      if (error) {
+        throw error;
+      }
+
       toast({
         title: "Success",
         description: "Password reset email has been sent. Please check your inbox.",
+      });
+    } catch (error: any) {
+      console.error('Reset password error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reset password email. Please try again.",
+        variant: "destructive",
       });
     }
   };
