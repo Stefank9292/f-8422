@@ -33,6 +33,7 @@ export const RequestUsageCounter = () => {
         .from('user_requests')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
+        .eq('request_type', 'instagram_search')
         .gte('created_at', startOfDay.toISOString())
         .lt('created_at', endOfDay.toISOString());
 
