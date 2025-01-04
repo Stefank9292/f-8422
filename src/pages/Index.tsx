@@ -50,6 +50,17 @@ const Index = () => {
     setSearchTrigger(prev => prev + 1);
   };
 
+  const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
+    // For now, we'll just use the first URL as an example
+    // You'll need to modify the fetchInstagramPosts function to handle multiple URLs
+    if (urls.length > 0) {
+      setUsername(urls[0]);
+      setNumberOfVideos(numVideos);
+      setSelectedDate(date);
+      setSearchTrigger(prev => prev + 1);
+    }
+  };
+
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
@@ -79,6 +90,7 @@ const Index = () => {
           username={username}
           onUsernameChange={setUsername}
           onSearch={handleSearch}
+          onBulkSearch={handleBulkSearch}
         />
 
         <Button 
