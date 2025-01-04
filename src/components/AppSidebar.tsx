@@ -17,6 +17,7 @@ import { SidebarTools } from "./sidebar/SidebarTools";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
+import { RequestUsageCounter } from "./RequestUsageCounter";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -94,6 +95,12 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarTools currentPath={location.pathname} />
+              </SidebarMenu>
+
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <RequestUsageCounter />
+                </SidebarMenuItem>
               </SidebarMenu>
             </div>
 
