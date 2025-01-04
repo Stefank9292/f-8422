@@ -46,7 +46,7 @@ export function AppSidebar() {
       if (state === 'expanded') {
         collapseTimer = setTimeout(() => {
           setOpen(false);
-        }, 10000); // 10 seconds
+        }, 20000); // 20 seconds
       }
     };
 
