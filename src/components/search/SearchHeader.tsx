@@ -24,18 +24,18 @@ export const SearchHeader = () => {
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 mt-6">
         <a
           href="#"
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow duration-200"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 group"
         >
           <Instagram className="w-5 h-5 text-[#E1306C]" />
-          <span className="text-sm md:text-base font-medium">Instagram</span>
+          <span className="text-base font-medium text-gray-800 dark:text-gray-200">Instagram</span>
         </a>
-        <a
-          href="#"
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed opacity-80"
+        <div
+          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
         >
           <TikTokIcon className="w-5 h-5 text-gray-400" />
-          <span className="text-sm md:text-base font-medium text-gray-400">TikTok Coming Soon</span>
-        </a>
+          <span className="text-base font-medium text-gray-400">TikTok</span>
+          <span className="text-sm text-gray-400 ml-1">Coming Soon</span>
+        </div>
       </div>
     </div>
   );
