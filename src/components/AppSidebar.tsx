@@ -51,6 +51,11 @@ export function AppSidebar() {
     },
   });
 
+  // If there's no session, don't render the sidebar
+  if (!session) {
+    return null;
+  }
+
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
