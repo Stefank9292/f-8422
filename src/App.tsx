@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { ResetPassword } from "@/components/auth/ResetPassword";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
@@ -33,6 +34,7 @@ function App() {
             <main className="flex-1 overflow-y-auto">
               <Routes>
                 <Route path="/auth" element={<Auth />} />
+                <Route path="/auth/reset-password" element={<ResetPassword />} />
                 <Route
                   path="/"
                   element={

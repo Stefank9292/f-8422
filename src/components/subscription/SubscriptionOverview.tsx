@@ -1,9 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Activity, CreditCard } from "lucide-react";
+import { Activity, CreditCard, User } from "lucide-react";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface SubscriptionOverviewProps {
   planName?: string;
@@ -21,10 +25,61 @@ export const SubscriptionOverview = ({
   isCanceled
 }: SubscriptionOverviewProps) => {
   const usagePercentage = (usedClicks / maxClicks) * 100;
+  const { toast } = useToast();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const handleResetPassword = async () => {
+    if (!session?.user?.email) return;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(session.user.email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send reset password email. Please try again.",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Success",
+        description: "Password reset email has been sent. Please check your inbox.",
+      });
+    }
+  };
 
   return (
     <Card className="max-w-2xl mx-auto">
       <div className="p-6 space-y-8">
+        {/* User Profile Section */}
+        <div className="flex items-center justify-between border-b pb-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <User className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">
+                {session?.user?.email}
+              </p>
+              <Button
+                variant="link"
+                className="h-auto p-0 text-sm"
+                onClick={handleResetPassword}
+              >
+                Reset Password
+              </Button>
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
