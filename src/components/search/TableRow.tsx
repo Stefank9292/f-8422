@@ -46,7 +46,6 @@ export const PostTableRow = ({
       <TableCell className="text-center text-blue-500">{formatNumber(post.viewsCount)}</TableCell>
       <TableCell className="text-center text-rose-500">{formatNumber(post.likesCount)}</TableCell>
       <TableCell className="text-center text-blue-400">{formatNumber(post.commentsCount)}</TableCell>
-      <TableCell className="text-center text-purple-500">{post.duration || '0:00'}</TableCell>
       <TableCell className="text-center text-orange-500">{post.engagement}</TableCell>
       <TableCell className="text-center">
         <Button variant="ghost" size="icon" onClick={() => window.open(post.url, '_blank')}>
