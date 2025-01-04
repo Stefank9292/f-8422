@@ -5,6 +5,21 @@ import { useState, useEffect, useRef } from "react";
 import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
 import confetti from 'canvas-confetti';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface SearchResultsProps {
   posts: any[];
@@ -29,15 +44,11 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
   const previousPostsRef = useRef<string>('');
   const hasTriggeredConfetti = useRef<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
-    // Convert current posts to string for comparison
     const currentPostsString = JSON.stringify(posts);
-
-    // Only trigger confetti if:
-    // 1. Posts have changed
-    // 2. Posts are not empty
-    // 3. Confetti hasn't been triggered for this set of posts yet
     if (
       posts.length > 0 && 
       currentPostsString !== previousPostsRef.current &&
@@ -57,14 +68,9 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
         scalar: 0.8,
         zIndex: 100,
       });
-
-      // Mark confetti as triggered for this set of posts
       hasTriggeredConfetti.current = true;
-      // Update the reference to current posts
       previousPostsRef.current = currentPostsString;
     }
-
-    // Reset the confetti trigger when posts change
     if (currentPostsString !== previousPostsRef.current) {
       hasTriggeredConfetti.current = false;
     }
@@ -124,14 +130,11 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   };
 
   const filteredPosts = posts.filter(post => {
-    // Apply date filter
     if (filters.postsNewerThan) {
       const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
       const postDate = new Date(post.timestamp);
       if (postDate < filterDate) return false;
     }
-
-    // Apply other filters
     if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
     if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
@@ -167,24 +170,97 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
     return 0;
   });
 
+  const totalPages = Math.ceil(sortedPosts.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPosts = sortedPosts.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+  };
+
   return (
     <TooltipProvider>
-      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-        <Table>
-          <PostTableHeader onSort={handleSort} />
-          <TableBody>
-            {sortedPosts.map((post, index) => (
-              <PostTableRow
-                key={index}
-                post={post}
-                onCopyCaption={handleCopyCaption}
-                onDownload={handleDownload}
-                formatNumber={formatNumber}
-                truncateCaption={truncateCaption}
-              />
-            ))}
-          </TableBody>
-        </Table>
+      <div className="space-y-4">
+        {sortedPosts.length > 25 && (
+          <div className="flex items-center justify-between px-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Show</span>
+              <Select
+                value={pageSize.toString()}
+                onValueChange={handlePageSizeChange}
+              >
+                <SelectTrigger className="w-[100px]">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground">per page</span>
+            </div>
+          </div>
+        )}
+        
+        <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+          <Table>
+            <PostTableHeader onSort={handleSort} />
+            <TableBody>
+              {currentPosts.map((post, index) => (
+                <PostTableRow
+                  key={index}
+                  post={post}
+                  onCopyCaption={handleCopyCaption}
+                  onDownload={handleDownload}
+                  formatNumber={formatNumber}
+                  truncateCaption={truncateCaption}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+
+        {sortedPosts.length > 25 && (
+          <div className="flex justify-center mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => handlePageChange(page)}
+                      isActive={currentPage === page}
+                      className="cursor-pointer"
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
     </TooltipProvider>
   );
