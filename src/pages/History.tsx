@@ -18,10 +18,23 @@ interface SearchHistoryItem {
   created_at: string;
 }
 
+interface InstagramPost {
+  ownerUsername: string;
+  caption: string;
+  date: string;
+  playsCount: number;
+  viewsCount: number;
+  likesCount: number;
+  commentsCount: number;
+  duration: string;
+  engagement: string;
+  url: string;
+}
+
 interface SearchResultItem {
   id: string;
   search_history_id: string;
-  results: any[];
+  results: InstagramPost[];
   created_at: string;
 }
 
@@ -74,7 +87,11 @@ export default function HistoryPage() {
         throw error;
       }
 
-      return data;
+      // Parse the JSON results into InstagramPost array
+      return {
+        ...data,
+        results: data.results as InstagramPost[]
+      };
     },
     enabled: !!selectedSearchId
   });
