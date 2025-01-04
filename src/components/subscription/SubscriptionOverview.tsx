@@ -46,7 +46,7 @@ export const SubscriptionOverview = ({
 
           {/* Total */}
           <p className="text-xs text-sidebar-foreground/70">
-            Total: {maxClicks} per period
+            Total: {maxClicks} per month
           </p>
         </div>
       </div>
