@@ -13,19 +13,31 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const getUpgradeText = () => {
+    if (!subscriptionStatus?.subscribed) {
+      return "Upgrade to Pro";
+    }
+    if (subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+      return "Upgrade to Ultra";
+    }
+    return "Manage Subscription";
+  };
+
+  const getUpgradeUrl = () => {
+    if (!subscriptionStatus?.subscribed || 
+        subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+      return "/pricing";
+    }
+    return "/subscribe";
+  };
+
   const secondaryMenuItems = [
     {
-      title: "Manage Subscription",
-      icon: CreditCard,
-      url: "/subscribe",
-      showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
-    },
-    {
-      title: "Upgrade to Pro",
-      icon: Star,
-      url: "/subscribe",
-      className: "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400",
-      showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
+      title: getUpgradeText(),
+      icon: subscriptionStatus?.subscribed ? CreditCard : Star,
+      url: getUpgradeUrl(),
+      className: !subscriptionStatus?.subscribed ? 
+        "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400" : undefined,
     },
     {
       title: "Help Center",
