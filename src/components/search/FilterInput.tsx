@@ -45,9 +45,9 @@ export const FilterInput = ({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-gray-500" />
-          <label className="text-sm font-medium">{label}</label>
-          {helpText && <HelpCircle className="w-4 h-4 text-gray-400" />}
+          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+          <label className="text-xs font-medium">{label}</label>
+          {helpText && <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />}
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -56,43 +56,23 @@ export const FilterInput = ({
                 type="text"
                 placeholder={placeholder}
                 value={value}
-                className="pl-10"
+                className="h-8 text-xs pl-8"
                 readOnly
               />
-              <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <CalendarIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
               {value && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6"
                   onClick={handleResetDate}
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-3.5 w-3.5" />
                 </Button>
               )}
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div className="p-3 border-b border-border">
-              <div className="flex justify-between">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDateSelect(new Date())}
-                  className="text-sm"
-                >
-                  Today
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleResetDate}
-                  className="text-sm"
-                >
-                  Reset
-                </Button>
-              </div>
-            </div>
             <Calendar
               mode="single"
               selected={value ? new Date(value.split('.').reverse().join('-')) : undefined}
@@ -101,10 +81,11 @@ export const FilterInput = ({
                 return date > new Date() || date < ninetyDaysAgo;
               }}
               initialFocus
+              className="rounded-md border"
             />
           </PopoverContent>
         </Popover>
-        {helpText && <p className="text-xs text-gray-500">{helpText}</p>}
+        {helpText && <p className="text-[10px] text-muted-foreground">{helpText}</p>}
       </div>
     );
   }
@@ -112,17 +93,18 @@ export const FilterInput = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <Icon className="w-4 h-4 text-gray-500" />
-        <label className="text-sm font-medium">{label}</label>
-        {helpText && <HelpCircle className="w-4 h-4 text-gray-400" />}
+        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
+        <label className="text-xs font-medium">{label}</label>
+        {helpText && <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />}
       </div>
       <Input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        className="h-8 text-xs"
       />
-      {helpText && <p className="text-xs text-gray-500">{helpText}</p>}
+      {helpText && <p className="text-[10px] text-muted-foreground">{helpText}</p>}
     </div>
   );
 };
