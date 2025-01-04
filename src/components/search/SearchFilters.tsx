@@ -44,8 +44,9 @@ export const SearchFilters = ({
           label="Posts newer than"
           value={filters.postsNewerThan}
           onChange={(value) => onFilterChange('postsNewerThan', value)}
-          placeholder="tt.mm.jjjj"
+          placeholder="dd.mm.yyyy"
           helpText="Limited to posts from the last 90 days"
+          isDatePicker={true}
         />
 
         <FilterInput
