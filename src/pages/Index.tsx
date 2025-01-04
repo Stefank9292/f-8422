@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -8,12 +8,10 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
-import { RecentSearches } from "@/components/search/RecentSearches";
 import { Loader2, Search } from "lucide-react";
 import { useSearchStore } from "../store/searchStore";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { saveSearchHistory } from "@/utils/searchHistory";
 
 const Index = () => {
   const {
@@ -104,19 +102,7 @@ const Index = () => {
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     meta: {
-      onSuccess: async (data: any[]) => {
-        if (data && data.length > 0) {
-          try {
-            await saveSearchHistory(username, data);
-            await queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
-          } catch (error) {
-            toast({
-              title: "Error",
-              description: "Failed to save search history",
-              variant: "destructive",
-            });
-          }
-        }
+      onSuccess: () => {
         setShouldSearch(false);
       },
       onError: (error: Error) => {
@@ -159,39 +145,6 @@ const Index = () => {
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id && results.length > 0) {
-        for (const url of urls) {
-          const { data: searchHistory } = await supabase
-            .from('search_history')
-            .insert({
-              search_query: url,
-              search_type: 'bulk',
-              user_id: session.user.id
-            })
-            .select()
-            .single();
-
-          if (searchHistory) {
-            const filteredResults = results.filter(result => 
-              result.ownerUsername === url.replace('@', '').replace('https://www.instagram.com/', '').replace('/', '')
-            );
-
-            if (filteredResults.length > 0) {
-              await supabase
-                .from('search_results')
-                .insert({
-                  search_history_id: searchHistory.id,
-                  results: JSON.parse(JSON.stringify(filteredResults))
-                });
-            }
-          }
-        }
-        // Invalidate recent searches query after successful bulk search
-        queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
-      }
-
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
@@ -255,22 +208,15 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="space-y-8">
-          <SearchSettings
-            isSettingsOpen={isSettingsOpen}
-            setIsSettingsOpen={setIsSettingsOpen}
-            numberOfVideos={numberOfVideos}
-            setNumberOfVideos={setNumberOfVideos}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            disabled={isLoading || isBulkSearching}
-            onSearchSelect={setUsername}
-          />
-
-          <div className="flex justify-center w-full">
-            <RecentSearches onSearchSelect={setUsername} />
-          </div>
-        </div>
+        <SearchSettings
+          isSettingsOpen={isSettingsOpen}
+          setIsSettingsOpen={setIsSettingsOpen}
+          numberOfVideos={numberOfVideos}
+          setNumberOfVideos={setNumberOfVideos}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          disabled={isLoading || isBulkSearching}
+        />
       </div>
 
       {displayPosts.length > 0 && (

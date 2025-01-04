@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Slider } from "@/components/ui/slider";
-import { RecentSearchesCompact } from "./RecentSearchesCompact";
 
 interface SearchSettingsProps {
   isSettingsOpen: boolean;
@@ -18,7 +17,6 @@ interface SearchSettingsProps {
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
   disabled?: boolean;
-  onSearchSelect?: (username: string) => void;
 }
 
 export const SearchSettings = ({
@@ -29,7 +27,6 @@ export const SearchSettings = ({
   selectedDate,
   setSelectedDate,
   disabled = false,
-  onSearchSelect
 }: SearchSettingsProps) => {
   const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
   const ninetyDaysAgo = new Date();
@@ -88,8 +85,6 @@ export const SearchSettings = ({
 
       {isSettingsOpen && (
         <div className="mt-3 p-4 space-y-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 animate-in fade-in duration-200">
-          {onSearchSelect && <RecentSearchesCompact onSearchSelect={onSearchSelect} />}
-          
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
