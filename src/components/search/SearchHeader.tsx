@@ -1,4 +1,4 @@
-import { Copy, Instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -30,16 +30,12 @@ export const SearchHeader = () => {
             <TooltipContent className="max-w-[250px] p-4">
               <div className="space-y-2">
                 <p className="text-[11px]">You found a discount code – Gotta catch&apos;em all! Here is your 25% discount on Ultra plan for the first month! 🎉</p>
-                <div className="flex items-center gap-2 p-2 bg-primary/10 rounded-md">
+                <button
+                  onClick={copyDiscountCode}
+                  className="w-full p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
+                >
                   <code className="text-sm font-bold text-primary">VYRAL25</code>
-                  <button
-                    onClick={copyDiscountCode}
-                    className="p-1 hover:bg-primary/20 rounded-md transition-colors"
-                    aria-label="Copy discount code"
-                  >
-                    <Copy className="h-4 w-4 text-primary" />
-                  </button>
-                </div>
+                </button>
               </div>
             </TooltipContent>
           </Tooltip>
