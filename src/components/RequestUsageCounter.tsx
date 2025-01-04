@@ -128,10 +128,21 @@ export const RequestUsageCounter = () => {
             />
           </div>
 
+          {/* Usage Percentage Indicator */}
+          <div className="text-center">
+            <span className={`text-sm font-medium ${
+              usagePercentage > 90 ? 'text-destructive' :
+              usagePercentage > 75 ? 'text-yellow-500' :
+              'text-green-500'
+            }`}>
+              {usagePercentage.toFixed(1)}% Used
+            </span>
+          </div>
+
           {/* Total */}
           <div className="pt-1">
             <p className="text-sm text-sidebar-foreground/70">
-              Total requests: {maxRequests} per period
+              Total requests: {maxRequests} per month
             </p>
           </div>
         </div>

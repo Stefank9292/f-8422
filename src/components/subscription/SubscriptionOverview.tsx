@@ -34,6 +34,17 @@ export const SubscriptionOverview = ({
             className="h-2.5 bg-sidebar-accent"
           />
 
+          {/* Usage Percentage */}
+          <div className="text-center">
+            <span className={`text-xs font-medium ${
+              usagePercentage > 90 ? 'text-destructive' :
+              usagePercentage > 75 ? 'text-yellow-500' :
+              'text-green-500'
+            }`}>
+              {usagePercentage.toFixed(1)}% Used
+            </span>
+          </div>
+
           {/* Numbers */}
           <div className="flex justify-between text-xs">
             <span className="text-sidebar-foreground">
