@@ -23,11 +23,6 @@ const toolsMenuItems = [
     url: "/",
     icon: Search,
   },
-  {
-    title: "Profile Analyzer",
-    url: "/analyzer",
-    icon: BarChart2,
-  },
 ];
 
 const historyMenuItems = [
