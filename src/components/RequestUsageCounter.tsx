@@ -69,14 +69,8 @@ export const RequestUsageCounter = () => {
           table: 'user_requests',
           filter: `user_id=eq.${session.user.id}`,
         },
-        async (payload) => {
-          console.log('User requests updated:', payload);
+        async () => {
           await refetchRequestStats();
-          
-          toast({
-            title: "Usage Updated",
-            description: "Your request usage has been updated.",
-          });
         }
       )
       .subscribe();
@@ -84,7 +78,7 @@ export const RequestUsageCounter = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session?.user.id, refetchRequestStats, toast]);
+  }, [session?.user.id, refetchRequestStats]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
