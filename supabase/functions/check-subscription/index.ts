@@ -18,6 +18,8 @@ serve(async (req) => {
   try {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
+    console.log('Auth header present:', !!authHeader);
+    
     if (!authHeader) {
       console.error('No authorization header provided');
       return new Response(
@@ -36,6 +38,9 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
+
+    console.log('User found:', !!user);
+    console.log('User error:', userError);
 
     if (userError || !user) {
       console.error('Error getting user:', userError);
