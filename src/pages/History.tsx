@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SearchResultItem, SupabaseSearchResult } from "@/types/instagram";
-import { transformSearchResults } from "@/utils/transformSearchResults";
 import { SearchResultDetails } from "@/components/history/SearchResultDetails";
 import { format } from "date-fns";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -22,17 +20,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { InstagramPost } from "@/types/instagram";
+
+interface SearchHistoryItem {
+  id: string;
+  search_query: string;
+  created_at: string;
+}
+
+interface SearchResultData {
+  id: string;
+  search_history_id: string;
+  results: InstagramPost[];
+  created_at: string;
+}
 
 export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
   const { state } = useSidebar();
 
-  const { data: searchHistory = [] } = useQuery({
+  const { data: searchHistory = [] } = useQuery<SearchHistoryItem[]>({
     queryKey: ['search-history'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('search_history')
-        .select('*')
+        .select('id, search_query, created_at')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -44,7 +56,7 @@ export default function HistoryPage() {
     },
   });
 
-  const { data: searchResult, isError } = useQuery({
+  const { data: searchResult, isError } = useQuery<SearchResultData | null>({
     queryKey: ['search-result', selectedSearchId],
     queryFn: async () => {
       if (!selectedSearchId) return null;
@@ -61,7 +73,27 @@ export default function HistoryPage() {
       }
 
       if (!data) return null;
-      return transformSearchResults(data as SupabaseSearchResult);
+
+      // Transform the results to ensure they match the InstagramPost type
+      const transformedResults = {
+        ...data,
+        results: Array.isArray(data.results) ? data.results.map((post: any) => ({
+          ownerUsername: post.ownerUsername || '',
+          caption: post.caption || '',
+          date: post.date || '',
+          playsCount: post.playsCount || 0,
+          viewsCount: post.viewsCount || 0,
+          likesCount: post.likesCount || 0,
+          commentsCount: post.commentsCount || 0,
+          duration: post.duration || '',
+          engagement: post.engagement || '',
+          url: post.url || '',
+          videoUrl: post.videoUrl,
+          timestamp: post.timestamp || '',
+        })) : [],
+      };
+
+      return transformedResults;
     },
     enabled: !!selectedSearchId
   });
@@ -122,7 +154,7 @@ export default function HistoryPage() {
         </Alert>
       )}
 
-      {searchResult && (
+      {searchResult && searchResult.results && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {searchResult.results.map((result, index) => (

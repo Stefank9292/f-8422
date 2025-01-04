@@ -12,11 +12,14 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('search_history')
-        .select('search_query')
+        .select('search_query, created_at')
         .order('created_at', { ascending: false })
         .limit(5);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching recent searches:', error);
+        throw error;
+      }
 
       // Remove duplicates while preserving order
       const uniqueSearches = data.filter((search, index, self) =>
@@ -27,7 +30,7 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
     },
   });
 
-  if (recentSearches.length === 0) return null;
+  if (!recentSearches || recentSearches.length === 0) return null;
 
   return (
     <div className="w-full space-y-3">
