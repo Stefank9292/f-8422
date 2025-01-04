@@ -103,8 +103,8 @@ export const RequestUsageCounter = () => {
   };
 
   return (
-    <div className="px-2 py-2 space-y-3">
-      <div className="flex items-center justify-between">
+    <div className="px-2 py-2 space-y-3 flex flex-col items-center">
+      <div className="flex items-center justify-between w-full">
         <div className="flex items-center gap-2">
           <Avatar className="h-7 w-7">
             <AvatarFallback>
@@ -128,15 +128,15 @@ export const RequestUsageCounter = () => {
         </button>
       </div>
 
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-1.5 text-[10px] text-sidebar-foreground/70">
+      <div className="space-y-1.5 w-full text-center">
+        <div className="flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70">
           <Activity className="h-3 w-3" />
           <span>Daily Usage</span>
         </div>
 
         <div className="space-y-1">
           {isUltraPlan ? (
-            <div className="text-[9px] text-sidebar-foreground/60 flex items-center gap-1">
+            <div className="text-[9px] text-sidebar-foreground/60 flex items-center justify-center gap-1">
               <span>Unlimited Usage</span>
               <span className="text-green-500">•</span>
               <span>{usedRequests} requests today</span>
