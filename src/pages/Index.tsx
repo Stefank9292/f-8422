@@ -1,12 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
-import { fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
+import { Button } from "@/components/ui/button";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
-import { SearchSection } from "@/components/search/SearchSection";
-import { SearchResultsSection } from "@/components/search/SearchResultsSection";
+import { SearchBar } from "@/components/search/SearchBar";
+import { SearchSettings } from "@/components/search/SearchSettings";
+import { SearchFilters } from "@/components/search/SearchFilters";
+import { SearchResults } from "@/components/search/SearchResults";
+import { RecentSearches } from "@/components/search/RecentSearches";
+import { Loader2, Search } from "lucide-react";
 import { useSearchStore } from "../store/searchStore";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+import { saveSearchHistory } from "@/utils/searchHistory";
 
 const Index = () => {
   const {
@@ -26,8 +33,9 @@ const Index = () => {
   const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
   const [shouldSearch, setShouldSearch] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Query for checking usage limits
+  // Add query for checking usage limits
   const { data: usageData } = useQuery({
     queryKey: ['request-stats'],
     queryFn: async () => {
@@ -51,7 +59,6 @@ const Index = () => {
     },
   });
 
-  // Query for subscription status
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
@@ -66,27 +73,6 @@ const Index = () => {
       if (error) throw error;
       return data;
     },
-  });
-
-  // Query for Instagram posts
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, shouldSearch],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) throw new Error('No authenticated user found');
-
-      // Track the request before making it
-      await supabase.from('user_requests').insert({
-        user_id: session.user.id,
-        request_type: 'instagram_search',
-        period_start: new Date(),
-        period_end: new Date(new Date().setDate(new Date().getDate() + 1))
-      });
-
-      return await fetchBulkInstagramPosts([username], numberOfVideos, selectedDate);
-    },
-    enabled: shouldSearch && Boolean(username),
-    retry: 1,
   });
 
   const maxRequests = subscriptionStatus?.maxClicks || 25;
@@ -116,16 +102,56 @@ const Index = () => {
     }
 
     try {
-      setIsBulkSearching(true);
+      await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id && results.length > 0) {
+        for (const url of urls) {
+          const { data: searchHistory } = await supabase
+            .from('search_history')
+            .insert({
+              search_query: url,
+              search_type: 'bulk',
+              user_id: session.user.id
+            })
+            .select()
+            .single();
+
+          if (searchHistory) {
+            const filteredResults = results.filter(result => 
+              result.ownerUsername === url.replace('@', '').replace('https://www.instagram.com/', '').replace('/', '')
+            );
+
+            if (filteredResults.length > 0) {
+              await supabase
+                .from('search_results')
+                .insert({
+                  search_history_id: searchHistory.id,
+                  results: JSON.parse(JSON.stringify(filteredResults))
+                });
+            }
+          }
+        }
+        // Invalidate recent searches query after successful bulk search
+        queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+      }
+
       return results;
+    } catch (error) {
+      console.error('Bulk search error:', error);
+      throw error;
     } finally {
       setIsBulkSearching(false);
     }
   };
 
-  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : (posts || []);
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters({ ...filters, [key]: value });
+  };
+
+  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
     <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-16 md:py-24 space-y-16 animate-in fade-in duration-300">
@@ -136,28 +162,91 @@ const Index = () => {
         </p>
       </div>
 
-      <SearchSection
-        username={username}
-        setUsername={setUsername}
-        handleSearch={handleSearch}
-        handleBulkSearch={handleBulkSearch}
-        isLoading={isLoading || isBulkSearching}
-        isSettingsOpen={isSettingsOpen}
-        setIsSettingsOpen={setIsSettingsOpen}
-        numberOfVideos={numberOfVideos}
-        setNumberOfVideos={setNumberOfVideos}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        hasReachedLimit={hasReachedLimit}
-      />
+      <div className="w-full max-w-2xl space-y-12">
+        <div className="space-y-6">
+          <SearchBar
+            username={username}
+            onUsernameChange={setUsername}
+            onSearch={handleSearch}
+            onBulkSearch={handleBulkSearch}
+            isLoading={isLoading || isBulkSearching}
+            disabled={hasReachedLimit}
+          />
+
+          <Button 
+            onClick={handleSearch} 
+            disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
+            className={cn(
+              "w-full material-button py-8 text-lg md:text-xl transition-all duration-300",
+              username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl",
+              hasReachedLimit && "opacity-50 cursor-not-allowed"
+            )}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                <span>This can take up to a minute...</span>
+              </>
+            ) : hasReachedLimit ? (
+              <>
+                <Search className="mr-3 h-6 w-6" />
+                Daily Limit Reached
+              </>
+            ) : (
+              <>
+                <Search className="mr-3 h-6 w-6" />
+                Search Viral Videos
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="space-y-8">
+          <SearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            disabled={isLoading || isBulkSearching}
+            onSearchSelect={setUsername}
+          />
+
+          <div className="flex justify-center w-full">
+            <RecentSearches onSearchSelect={setUsername} />
+          </div>
+        </div>
+      </div>
 
       {displayPosts.length > 0 && (
-        <SearchResultsSection
-          posts={displayPosts}
-          filters={filters}
-          onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-          onReset={resetFilters}
-        />
+        <div className="w-full max-w-[90rem] space-y-12">
+          <SearchFilters
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            onReset={resetFilters}
+            totalResults={displayPosts.length}
+            filteredResults={displayPosts.filter(post => {
+              if (filters.postsNewerThan) {
+                const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
+                const postDate = new Date(post.timestamp);
+                if (postDate < filterDate) return false;
+              }
+              if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
+              if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
+              if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
+              if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
+              if (filters.minDuration && post.duration < filters.minDuration) return false;
+              if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
+              return true;
+            }).length}
+            currentPosts={displayPosts}
+          />
+          <div className="material-card overflow-hidden animate-in fade-in duration-300">
+            <SearchResults posts={displayPosts} filters={filters} />
+          </div>
+        </div>
       )}
     </div>
   );
