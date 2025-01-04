@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface SearchFilters {
+export interface SearchFilters {
   minViews: string;
   minPlays: string;
   minLikes: string;

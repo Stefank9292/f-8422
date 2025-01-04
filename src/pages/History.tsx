@@ -49,10 +49,30 @@ const History = () => {
         .from('search_results')
         .select('*')
         .eq('search_history_id', selectedHistory)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      return data as SearchResultData;
+      if (!data) return null;
+
+      // Transform the JSON data to match InstagramPost type
+      const transformedResults = Array.isArray(data.results) 
+        ? data.results.map((result: any) => ({
+            ownerUsername: result.ownerUsername || '',
+            caption: result.caption || '',
+            date: result.date || '',
+            playsCount: Number(result.playsCount) || 0,
+            viewsCount: Number(result.viewsCount) || 0,
+            likesCount: Number(result.likesCount) || 0,
+            commentsCount: Number(result.commentsCount) || 0,
+            duration: result.duration || '',
+            engagement: result.engagement || '',
+            url: result.url || '',
+            videoUrl: result.videoUrl,
+            timestamp: result.timestamp
+          }))
+        : [];
+
+      return { results: transformedResults } as SearchResultData;
     },
     enabled: !!selectedHistory,
   });
