@@ -29,16 +29,14 @@ export const RequestUsageCounter = () => {
       const endOfDay = new Date(startOfDay);
       endOfDay.setDate(endOfDay.getDate() + 1);
 
-      const { data, error } = await supabase
+      const { count } = await supabase
         .from('user_requests')
-        .select('*')
+        .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
-        .gte('period_start', startOfDay.toISOString())
-        .lt('period_end', endOfDay.toISOString())
-        .order('created_at', { ascending: false });
+        .gte('created_at', startOfDay.toISOString())
+        .lt('created_at', endOfDay.toISOString());
 
-      if (error) throw error;
-      return data;
+      return count || 0;
     },
     enabled: !!session?.user.id,
   });
@@ -97,7 +95,7 @@ export const RequestUsageCounter = () => {
   };
 
   const maxRequests = subscriptionStatus?.maxClicks || 25;
-  const usedRequests = requestStats?.length || 0;
+  const usedRequests = requestStats || 0;
   const remainingRequests = Math.max(0, maxRequests - usedRequests);
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
