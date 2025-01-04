@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { SubscriptionOverview } from "@/components/subscription/SubscriptionOverview";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -29,25 +28,6 @@ const SubscribePage = () => {
       return data;
     },
     enabled: !!session?.access_token,
-  });
-
-  const { data: requestStats } = useQuery({
-    queryKey: ['request-stats'],
-    queryFn: async () => {
-      if (!session?.user.id) return null;
-      
-      const now = new Date();
-      const { data, error } = await supabase
-        .from('user_requests')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .gte('period_end', now.toISOString())
-        .order('period_end', { ascending: false });
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.user.id,
   });
 
   const getPageTitle = () => {
@@ -127,12 +107,6 @@ const SubscribePage = () => {
   ];
 
   const { title, subtitle } = getPageTitle();
-  const maxClicks = subscriptionStatus?.maxClicks || 3;
-  const usedClicks = requestStats?.length || 0;
-  const remainingClicks = Math.max(0, maxClicks - usedClicks);
-  const planName = subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? "Creator on Steroids" : 
-                  subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" ? "Creator Pro" : 
-                  "Free";
 
   return (
     <div className="min-h-screen p-4 bg-background">
@@ -175,19 +149,6 @@ const SubscribePage = () => {
             ))}
           </div>
         </div>
-
-        {/* Subscription Overview Section */}
-        {session && subscriptionStatus?.subscribed && (
-          <div className="max-w-3xl mx-auto">
-            <SubscriptionOverview
-              planName={planName}
-              usedClicks={usedClicks}
-              remainingClicks={remainingClicks}
-              maxClicks={maxClicks}
-              isCanceled={subscriptionStatus?.canceled}
-            />
-          </div>
-        )}
       </div>
     </div>
   );
