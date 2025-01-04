@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -41,12 +40,6 @@ const AuthPage = () => {
             Sign in to your account or create a new one
           </p>
         </div>
-        
-        <Alert className="bg-card border-2">
-          <AlertDescription>
-            For testing, use any email and password combination to create an account.
-          </AlertDescription>
-        </Alert>
         
         <div className="material-card p-6 space-y-6">
           <Auth
