@@ -30,6 +30,7 @@ const Index = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
+  const [shouldSearch, setShouldSearch] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -53,7 +54,7 @@ const Index = () => {
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: Boolean(username),
+    enabled: Boolean(username) && shouldSearch,
     staleTime: Infinity,
     gcTime: Infinity,
     retry: 2,
@@ -63,6 +64,7 @@ const Index = () => {
         if (data && data.length > 0) {
           triggerConfetti();
         }
+        setShouldSearch(false); // Reset the search trigger after successful search
       }
     }
   });
@@ -82,7 +84,6 @@ const Index = () => {
     }
 
     try {
-      // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session?.user?.id) {
@@ -90,7 +91,6 @@ const Index = () => {
         return;
       }
 
-      // Save search to history with user_id
       const { error: searchHistoryError } = await supabase
         .from('search_history')
         .insert({
@@ -104,6 +104,7 @@ const Index = () => {
       }
 
       setBulkSearchResults([]);
+      setShouldSearch(true); // Trigger the search
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts', 'recent-searches'] });
     } catch (error) {
       console.error('Search error:', error);
