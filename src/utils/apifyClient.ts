@@ -127,7 +127,7 @@ export async function fetchInstagramPosts(
     const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
     console.log('Using Instagram URL:', instagramUrl);
 
-    // Prepare request body with reduced memory requirements
+    // Prepare request body with updated parameters
     const requestBody: Record<string, any> = {
       "addParentData": false,
       "directUrls": [instagramUrl],
@@ -138,19 +138,22 @@ export async function fetchInstagramPosts(
       "resultsType": "posts",
       "searchLimit": 1,
       "searchType": "user",
-      "memoryMbytes": 512 // Reduce memory requirement to avoid quota issues
+      "memoryMbytes": 512,
+      "maxPosts": numberOfVideos,
+      "mediaTypes": ["VIDEO"],
+      "expandVideo": true,
+      "includeVideoMetadata": true
     };
 
-    // Only add postsUntil if a date is provided
+    // Add postsUntil if a date is provided
     if (postsNewerThan instanceof Date) {
-      requestBody.postsUntil = postsNewerThan.toISOString();
-      console.log('Including posts until:', postsNewerThan.toISOString());
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
+    console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
+    
     // Make the API request to Apify
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
-    
-    console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
     
     const response = await fetch(apiEndpoint, {
       method: 'POST',
