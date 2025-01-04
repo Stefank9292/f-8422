@@ -1,34 +1,30 @@
-import { useNavigate } from "react-router-dom";
-import { Home, History, Search } from "lucide-react";
-import { SidebarSection } from "./SidebarSection";
+import { PanelLeftClose } from "lucide-react";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export function SidebarNavigation() {
-  const navigate = useNavigate();
-
-  const navigationItems = [
-    {
-      title: "Home",
-      url: "/",
-      icon: Home,
-    },
-    {
-      title: "Search",
-      url: "/search",
-      icon: Search,
-    },
-    {
-      title: "History",
-      url: "/history",
-      icon: History,
-    },
-  ];
+  const { toggleSidebar, state } = useSidebar();
 
   return (
-    <SidebarSection
-      title="Navigation"
-      items={navigationItems}
-      onNavigate={navigate}
-      currentPath={location.pathname}
-    />
+    <>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
+        <span className={`text-sm font-medium ${state === 'collapsed' ? 'hidden' : ''}`}>Navigation</span>
+        <button 
+          onClick={toggleSidebar}
+          className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+        >
+          <PanelLeftClose className={`h-4 w-4 transition-transform ${state === 'collapsed' ? 'rotate-180' : ''}`} />
+          <span className="sr-only">Toggle Sidebar</span>
+        </button>
+      </div>
+      <button
+        onClick={toggleSidebar}
+        className={`fixed left-4 top-4 z-40 p-2 rounded-md bg-background shadow-md hover:bg-accent transition-opacity ${
+          state === 'collapsed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+      >
+        <PanelLeftClose className="h-4 w-4 rotate-180" />
+        <span className="sr-only">Open Sidebar</span>
+      </button>
+    </>
   );
 }
