@@ -29,12 +29,21 @@ interface InstagramPost {
   duration: string;
   engagement: string;
   url: string;
+  videoUrl?: string;
+  timestamp?: string;
 }
 
 interface SearchResultItem {
   id: string;
   search_history_id: string;
   results: InstagramPost[];
+  created_at: string;
+}
+
+interface SupabaseSearchResult {
+  id: string;
+  search_history_id: string;
+  results: unknown;
   created_at: string;
 }
 
@@ -87,10 +96,38 @@ export default function HistoryPage() {
         throw error;
       }
 
-      // Parse the JSON results into InstagramPost array
+      const supabaseResult = data as SupabaseSearchResult;
+      
+      // Validate and transform the results
+      const parsedResults = Array.isArray(supabaseResult.results) 
+        ? supabaseResult.results.map(result => {
+            // Ensure the result has all required fields
+            if (typeof result === 'object' && result !== null) {
+              const post = result as Record<string, unknown>;
+              return {
+                ownerUsername: String(post.ownerUsername || ''),
+                caption: String(post.caption || ''),
+                date: String(post.date || ''),
+                playsCount: Number(post.playsCount || 0),
+                viewsCount: Number(post.viewsCount || 0),
+                likesCount: Number(post.likesCount || 0),
+                commentsCount: Number(post.commentsCount || 0),
+                duration: String(post.duration || ''),
+                engagement: String(post.engagement || ''),
+                url: String(post.url || ''),
+                videoUrl: post.videoUrl ? String(post.videoUrl) : undefined,
+                timestamp: post.timestamp ? String(post.timestamp) : undefined,
+              } as InstagramPost;
+            }
+            return null;
+          }).filter((post): post is InstagramPost => post !== null)
+        : [];
+
       return {
-        ...data,
-        results: data.results as InstagramPost[]
+        id: supabaseResult.id,
+        search_history_id: supabaseResult.search_history_id,
+        created_at: supabaseResult.created_at,
+        results: parsedResults
       };
     },
     enabled: !!selectedSearchId
