@@ -12,7 +12,6 @@ interface SearchBarProps {
   onSearch: () => void;
   onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<any>;
   isLoading?: boolean;
-  disabled?: boolean;
 }
 
 export const SearchBar = ({ 
@@ -20,8 +19,7 @@ export const SearchBar = ({
   onUsernameChange, 
   onSearch,
   onBulkSearch,
-  isLoading,
-  disabled = false
+  isLoading 
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
@@ -29,7 +27,7 @@ export const SearchBar = ({
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const typingSpeed = 100;
+  const typingSpeed = 100; // milliseconds per character
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -98,7 +96,7 @@ export const SearchBar = ({
   }, [currentCharIndex, currentExampleIndex, examples, isTyping, username]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isLoading && !disabled) {
+    if (e.key === 'Enter' && !isLoading) {
       e.preventDefault();
       onSearch();
     }
@@ -113,16 +111,15 @@ export const SearchBar = ({
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder={disabled ? "Daily limit reached" : placeholder}
+          placeholder={placeholder}
           className="pl-14 pr-36 h-16 text-lg md:text-xl rounded-2xl border-2 
                    border-gray-200/80 dark:border-gray-800/80 
                    focus:border-primary shadow-sm
-                   placeholder:text-gray-400 dark:placeholder:text-gray-600
-                   disabled:opacity-50 disabled:cursor-not-allowed"
+                   placeholder:text-gray-400 dark:placeholder:text-gray-600"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isLoading || disabled}
+          disabled={isLoading}
         />
         <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
         {isBulkSearchEnabled && (
@@ -131,10 +128,9 @@ export const SearchBar = ({
             className="absolute right-3 top-1/2 transform -translate-y-1/2 
                      flex items-center gap-2 text-gray-600 hover:text-gray-900 
                      dark:text-gray-400 dark:hover:text-gray-200
-                     h-12 px-4 rounded-xl
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     h-12 px-4 rounded-xl"
             onClick={() => setIsBulkSearchOpen(true)}
-            disabled={isLoading || disabled}
+            disabled={isLoading}
           >
             <List className="w-5 h-5" />
             <span className="hidden md:inline font-medium">Bulk Search</span>

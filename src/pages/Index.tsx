@@ -35,51 +35,46 @@ const Index = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Add query for checking usage limits
-  const { data: usageData } = useQuery({
-    queryKey: ['request-stats'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) return null;
-      
-      const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endOfDay = new Date(startOfDay);
-      endOfDay.setDate(endOfDay.getDate() + 1);
-
-      const { count } = await supabase
-        .from('user_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', session.user.id)
-        .eq('request_type', 'instagram_search')
-        .gte('created_at', startOfDay.toISOString())
-        .lt('created_at', endOfDay.toISOString());
-
-      return count || 0;
-    },
-  });
-
-  const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
-    queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) return null;
-
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
+    enabled: Boolean(username) && shouldSearch,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: 2,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    meta: {
+      onSuccess: async (data: any[]) => {
+        if (data && data.length > 0) {
+          try {
+            await saveSearchHistory(username, data);
+            // Invalidate both recent searches queries after successful search
+            await queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: "Failed to save search history",
+              variant: "destructive",
+            });
+          }
         }
-      });
-      if (error) throw error;
-      return data;
-    },
+        setShouldSearch(false);
+      },
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to perform search",
+          variant: "destructive",
+        });
+        setShouldSearch(false);
+      }
+    }
   });
-
-  const maxRequests = subscriptionStatus?.maxClicks || 25;
-  const hasReachedLimit = usageData !== undefined && usageData >= maxRequests;
 
   const handleSearch = () => {
-    if (isLoading || isBulkSearching || hasReachedLimit) {
+    if (isLoading || isBulkSearching) {
       return;
     }
 
@@ -97,10 +92,11 @@ const Index = () => {
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
-    if (isLoading || isBulkSearching || hasReachedLimit) {
+    if (isLoading || isBulkSearching) {
       return;
     }
 
+    setIsBulkSearching(true);
     try {
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
@@ -170,28 +166,21 @@ const Index = () => {
             onSearch={handleSearch}
             onBulkSearch={handleBulkSearch}
             isLoading={isLoading || isBulkSearching}
-            disabled={hasReachedLimit}
           />
 
           <Button 
             onClick={handleSearch} 
-            disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
+            disabled={isLoading || isBulkSearching || !username}
             className={cn(
               "w-full material-button py-8 text-lg md:text-xl transition-all duration-300",
               username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl",
-              hasReachedLimit && "opacity-50 cursor-not-allowed"
+              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl"
             )}
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-3 h-6 w-6 animate-spin" />
                 <span>This can take up to a minute...</span>
-              </>
-            ) : hasReachedLimit ? (
-              <>
-                <Search className="mr-3 h-6 w-6" />
-                Daily Limit Reached
               </>
             ) : (
               <>
