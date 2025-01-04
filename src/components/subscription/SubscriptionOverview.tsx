@@ -23,51 +23,56 @@ export const SubscriptionOverview = ({
   const usagePercentage = (usedClicks / maxClicks) * 100;
 
   return (
-    <Card className="p-6 space-y-8">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <CreditCard className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-semibold">Subscription Overview</h2>
-        </div>
-        {planName && (
+    <Card className="max-w-2xl mx-auto">
+      <div className="p-6 space-y-8">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Current Plan:</span>
-            <Badge variant="secondary" className="text-base px-3 py-1">
-              {planName}
-            </Badge>
+            <CreditCard className="h-5 w-5 text-primary" />
+            <h2 className="text-2xl">Subscription Overview</h2>
           </div>
-        )}
-      </div>
-
-      <div className="space-y-6">
-        <Card className="p-6 space-y-4 bg-secondary/30">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Request Usage
-            </h3>
-          </div>
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span>{usedClicks} used</span>
-              <span>{remainingClicks} remaining</span>
+          {planName && (
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">Current Plan:</span>
+              <Badge variant="outline" className="text-base font-medium">
+                {planName}
+              </Badge>
             </div>
-            <Progress value={usagePercentage} className="h-2" />
-            <p className="text-sm text-muted-foreground">
-              Total requests: {maxClicks} per period
-            </p>
-          </div>
-        </Card>
+          )}
+        </div>
 
-        <div className="pt-2">
+        {/* Usage Stats */}
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Activity className="h-4 w-4" />
+              <h3 className="text-lg">Request Usage</h3>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>{usedClicks} used</span>
+                <span>{remainingClicks} remaining</span>
+              </div>
+              <Progress 
+                value={usagePercentage} 
+                className="h-2 bg-secondary"
+              />
+              <p className="text-sm text-muted-foreground">
+                Total requests: {maxClicks} per period
+              </p>
+            </div>
+          </div>
+
+          {/* Action Button */}
           {isCanceled ? (
-            <ResumeSubscriptionButton className="w-full">
+            <ResumeSubscriptionButton className="w-full bg-primary/5 hover:bg-primary/10">
               Resume Subscription
             </ResumeSubscriptionButton>
           ) : (
             <CancelSubscriptionButton 
               isCanceled={isCanceled}
-              className="w-full"
+              className="w-full bg-secondary/50 hover:bg-secondary/80"
             >
               Cancel Subscription
             </CancelSubscriptionButton>
