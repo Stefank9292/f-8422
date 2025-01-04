@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/apifyClient";
 import { SearchHeader } from "@/components/search/SearchHeader";
 import { SearchBar } from "@/components/search/SearchBar";
@@ -18,7 +18,7 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false); // New state to track any active search
+  const [isSearching, setIsSearching] = useState(false);
   const [filters, setFilters] = useState({
     minViews: "",
     minPlays: "",
@@ -29,19 +29,20 @@ const Index = () => {
     postsNewerThan: ""
   });
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
+  // Use staleTime: Infinity to keep the data fresh indefinitely until explicitly invalidated
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
     enabled: Boolean(username && searchTrigger && !isBulkSearching),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 10 * 60 * 1000,
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    gcTime: Infinity, // Never garbage collect the data
     retry: 2,
     refetchOnWindowFocus: false,
   });
 
   const handleSearch = async () => {
-    // Prevent multiple simultaneous searches
     if (isSearching || isLoading || isBulkSearching) {
       return;
     }
@@ -58,6 +59,8 @@ const Index = () => {
     setIsSearching(true);
     try {
       setBulkSearchResults([]); // Clear bulk search results when using normal search
+      // Invalidate the previous query cache before triggering a new search
+      await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       setSearchTrigger(prev => prev + 1);
     } finally {
       setIsSearching(false);
@@ -65,13 +68,14 @@ const Index = () => {
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
-    // Prevent multiple simultaneous searches
     if (isSearching || isLoading || isBulkSearching) {
       return;
     }
 
     setIsBulkSearching(true);
     try {
+      // Clear the regular search results cache when doing a bulk search
+      await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
       return results;
@@ -103,10 +107,10 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8">
+    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8 animate-in fade-in duration-200">
       <SearchHeader />
 
-      <p className="text-gray-600 text-lg text-center">
+      <p className="text-gray-600 dark:text-gray-300 text-lg text-center">
         Save time finding viral content for social media
       </p>
 
@@ -122,7 +126,7 @@ const Index = () => {
         <Button 
           onClick={handleSearch} 
           disabled={isLoading || isBulkSearching || isSearching}
-          className="w-full"
+          className="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] hover:opacity-90 transition-all"
         >
           {isLoading ? (
             <>
@@ -168,7 +172,9 @@ const Index = () => {
             }).length}
             currentPosts={displayPosts}
           />
-          <SearchResults posts={displayPosts} filters={filters} />
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring">
+            <SearchResults posts={displayPosts} filters={filters} />
+          </div>
         </div>
       )}
     </div>
