@@ -56,8 +56,7 @@ export const ResumeSubscriptionButton = ({ children, className }: ResumeSubscrip
     <Button 
       onClick={handleResume} 
       disabled={loading}
-      variant="ghost"
-      className={className}
+      className={`primary-gradient ${className}`}
     >
       {loading ? "Resuming..." : children || "Resume Subscription"}
     </Button>

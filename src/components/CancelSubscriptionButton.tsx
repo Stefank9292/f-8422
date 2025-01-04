@@ -99,7 +99,11 @@ export const CancelSubscriptionButton = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Keep Subscription</AlertDialogCancel>
-          <AlertDialogAction onClick={handleCancel} disabled={loading}>
+          <AlertDialogAction 
+            onClick={handleCancel} 
+            disabled={loading}
+            className="primary-gradient"
+          >
             {loading ? "Cancelling..." : "Yes, Cancel Subscription"}
           </AlertDialogAction>
         </AlertDialogFooter>

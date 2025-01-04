@@ -124,6 +124,10 @@
     @apply bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737];
   }
 
+  .primary-gradient {
+    @apply bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] hover:opacity-90;
+  }
+
   .card-hover {
     @apply hover:scale-[1.02] transition-all duration-300 ease-spring;
   }
@@ -151,8 +155,7 @@
   }
 
   .material-button-primary {
-    @apply material-button bg-primary text-primary-foreground 
-           hover:bg-primary/90;
+    @apply material-button primary-gradient text-primary-foreground;
   }
 
   .material-button-secondary {
