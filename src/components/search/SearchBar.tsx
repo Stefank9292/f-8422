@@ -21,6 +21,13 @@ export const SearchBar = ({
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !isLoading) {
+      e.preventDefault(); // Prevent form submission
+      onSearch();
+    }
+  };
+
   return (
     <>
       <div className="relative">
@@ -30,13 +37,15 @@ export const SearchBar = ({
           className="pl-10 pr-32"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && onSearch()}
+          onKeyDown={handleKeyDown}
+          disabled={isLoading}
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Button
           variant="ghost"
           className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-gray-600"
           onClick={() => setIsBulkSearchOpen(true)}
+          disabled={isLoading}
         >
           <List className="w-4 h-4" />
           <span>Bulk Search</span>

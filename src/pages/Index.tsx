@@ -18,6 +18,7 @@ const Index = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false); // New state to track any active search
   const [filters, setFilters] = useState({
     minViews: "",
     minPlays: "",
@@ -40,6 +41,11 @@ const Index = () => {
   });
 
   const handleSearch = async () => {
+    // Prevent multiple simultaneous searches
+    if (isSearching || isLoading || isBulkSearching) {
+      return;
+    }
+
     if (!username) {
       toast({
         title: "Error",
@@ -48,11 +54,22 @@ const Index = () => {
       });
       return;
     }
-    setBulkSearchResults([]); // Clear bulk search results when using normal search
-    setSearchTrigger(prev => prev + 1);
+
+    setIsSearching(true);
+    try {
+      setBulkSearchResults([]); // Clear bulk search results when using normal search
+      setSearchTrigger(prev => prev + 1);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
+    // Prevent multiple simultaneous searches
+    if (isSearching || isLoading || isBulkSearching) {
+      return;
+    }
+
     setIsBulkSearching(true);
     try {
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
@@ -99,12 +116,12 @@ const Index = () => {
           onUsernameChange={setUsername}
           onSearch={handleSearch}
           onBulkSearch={handleBulkSearch}
-          isLoading={isBulkSearching || isLoading}
+          isLoading={isLoading || isBulkSearching || isSearching}
         />
 
         <Button 
           onClick={handleSearch} 
-          disabled={isLoading || isBulkSearching}
+          disabled={isLoading || isBulkSearching || isSearching}
           className="w-full"
         >
           {isLoading ? (
@@ -124,7 +141,7 @@ const Index = () => {
           setNumberOfVideos={setNumberOfVideos}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching}
+          disabled={isLoading || isBulkSearching || isSearching}
         />
       </div>
 
