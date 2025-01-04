@@ -28,32 +28,15 @@ async function updateUserClickCount() {
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  // First, try to get existing record for today
-  const { data: existingRecord } = await supabase
+  // Insert a new request record for this search session
+  await supabase
     .from('user_requests')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .gte('period_end', startOfDay.toISOString())
-    .lt('period_end', endOfDay.toISOString())
-    .single();
-
-  if (existingRecord) {
-    // Update existing record
-    await supabase
-      .from('user_requests')
-      .update({ request_count: existingRecord.request_count + 1 })
-      .eq('id', existingRecord.id);
-  } else {
-    // Create new record
-    await supabase
-      .from('user_requests')
-      .insert({
-        user_id: session.user.id,
-        request_count: 1,
-        period_start: startOfDay.toISOString(),
-        period_end: endOfDay.toISOString()
-      });
-  }
+    .insert({
+      user_id: session.user.id,
+      request_type: 'instagram_search',
+      period_start: startOfDay.toISOString(),
+      period_end: endOfDay.toISOString()
+    });
 }
 
 function isInstagramPost(obj: unknown): boolean {
@@ -142,25 +125,14 @@ export async function fetchInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
+    // Track the request at the start
+    await updateUserClickCount();
+    
     console.log('Fetching Instagram posts for:', username);
     console.log('Number of videos requested:', numberOfVideos);
     console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
     
-    // Clean up username and handle URL input
-    let cleanUsername = username.trim();
-    
-    if (cleanUsername.includes('instagram.com')) {
-      const urlParts = cleanUsername.split('/');
-      const usernameIndex = urlParts.findIndex(part => part === 'instagram.com') + 1;
-      if (usernameIndex < urlParts.length) {
-        cleanUsername = urlParts[usernameIndex];
-      }
-    }
-    
-    cleanUsername = cleanUsername.replace('@', '');
-    const instagramUrl = `https://www.instagram.com/${cleanUsername}/`;
-    console.log('Using Instagram URL:', instagramUrl);
-
+    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}/`;
     const requestBody: Record<string, any> = {
       "addParentData": false,
       "directUrls": [instagramUrl],
@@ -182,8 +154,6 @@ export async function fetchInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    console.log('Making request with body:', JSON.stringify(requestBody, null, 2));
-    
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
     
     const response = await fetch(apiEndpoint, {
@@ -206,19 +176,12 @@ export async function fetchInstagramPosts(
     }
 
     const data = await response.json();
-    console.log('Raw response from Apify:', data);
-
     const validPosts = Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
       : [];
            
     console.log('Valid posts:', validPosts);
-
-    // Only track request if we got valid posts
-    if (validPosts.length > 0) {
-      await updateUserClickCount();
-    }
 
     return validPosts;
   } catch (error) {
@@ -233,6 +196,9 @@ export async function fetchBulkInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
+    // Track the request at the start - counts as one request regardless of number of URLs
+    await updateUserClickCount();
+    
     console.log('Fetching bulk Instagram posts for URLs:', urls);
     console.log('Number of videos per profile:', numberOfVideos);
     console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
@@ -265,8 +231,6 @@ export async function fetchBulkInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    console.log('Making bulk request with body:', JSON.stringify(requestBody, null, 2));
-
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
 
     const response = await fetch(apiEndpoint, {
@@ -289,19 +253,12 @@ export async function fetchBulkInstagramPosts(
     }
 
     const data = await response.json();
-    console.log('Raw response from Apify:', data);
-
     const validPosts = Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
       : [];
            
     console.log('Valid posts:', validPosts);
-
-    // Only track request if we got valid posts
-    if (validPosts.length > 0) {
-      await updateUserClickCount();
-    }
 
     return validPosts;
   } catch (error) {
