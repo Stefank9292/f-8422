@@ -1,9 +1,10 @@
 import { Table, TableBody } from "@/components/ui/table";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
+import confetti from 'canvas-confetti';
 
 interface SearchResultsProps {
   posts: any[];
@@ -26,6 +27,26 @@ type SortConfig = {
 export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const { toast } = useToast();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
+
+  useEffect(() => {
+    if (posts.length > 0) {
+      // Trigger confetti when results are displayed
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#1DA1F2', '#14171A', '#657786', '#AAB8C2'],
+        angle: 90,
+        startVelocity: 30,
+        gravity: 0.5,
+        drift: 0,
+        ticks: 200,
+        decay: 0.9,
+        scalar: 0.8,
+        zIndex: 100,
+      });
+    }
+  }, [posts]);
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
