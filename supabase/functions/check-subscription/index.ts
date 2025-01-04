@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from 'https://esm.sh/stripe@14.21.0';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -96,9 +95,9 @@ serve(async (req) => {
     // Determine max clicks based on the plan
     let maxClicks = 3; // Default free plan
     if (priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
-      maxClicks = 10; // Premium plan
+      maxClicks = 25; // Premium plan
     } else if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
-      maxClicks = 20; // Ultra plan
+      maxClicks = 50; // Ultra plan
     }
 
     console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled, 'maxClicks:', maxClicks);
