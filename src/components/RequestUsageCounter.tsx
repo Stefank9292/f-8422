@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Activity } from "lucide-react";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
@@ -57,7 +58,6 @@ export const RequestUsageCounter = () => {
   useEffect(() => {
     if (!session?.user.id) return;
 
-    // Subscribe to changes in the user_requests table
     const channel = supabase
       .channel('user-requests-changes')
       .on(
@@ -72,7 +72,6 @@ export const RequestUsageCounter = () => {
           console.log('User requests updated:', payload);
           await refetchRequestStats();
           
-          // Show a toast notification when usage is updated
           toast({
             title: "Usage Updated",
             description: "Your request usage has been updated.",
@@ -86,23 +85,52 @@ export const RequestUsageCounter = () => {
     };
   }, [session?.user.id, refetchRequestStats, toast]);
 
-  const maxRequests = subscriptionStatus?.maxClicks || 3; // Default to free tier
+  const maxRequests = subscriptionStatus?.maxClicks || 3;
   const usedRequests = requestStats?.length || 0;
   const remainingRequests = Math.max(0, maxRequests - usedRequests);
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
-    <Card className="p-6 space-y-4">
-      <h3 className="text-lg font-semibold">Request Usage</h3>
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm">
-          <span>{usedRequests} used</span>
-          <span>{remainingRequests} remaining</span>
+    <Card className="bg-sidebar-accent p-4">
+      <div className="space-y-4">
+        {/* Header */}
+        <div className="flex items-center gap-2">
+          <Activity className="h-4 w-4 text-sidebar-foreground" />
+          <h3 className="text-sm font-semibold text-sidebar-foreground">Daily Usage</h3>
         </div>
-        <Progress value={usagePercentage} className="h-2" />
-        <p className="text-sm text-muted-foreground">
-          Total requests: {maxRequests} per day
-        </p>
+
+        {/* Usage Stats */}
+        <div className="space-y-3">
+          {/* Progress Bar */}
+          <Progress 
+            value={usagePercentage} 
+            className="h-3 bg-sidebar-accent/50"
+          />
+
+          {/* Usage Numbers */}
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="space-y-1">
+              <span className="block text-sidebar-foreground/70">Used</span>
+              <span className="block font-semibold text-sidebar-foreground text-sm">
+                {usedRequests}
+              </span>
+            </div>
+            <div className="space-y-1 text-right">
+              <span className="block text-sidebar-foreground/70">Remaining</span>
+              <span className="block font-semibold text-sidebar-foreground text-sm">
+                {remainingRequests}
+              </span>
+            </div>
+          </div>
+
+          {/* Total */}
+          <div className="pt-2 border-t border-sidebar-border/50">
+            <p className="text-xs text-sidebar-foreground/70 flex justify-between">
+              <span>Total Daily Limit</span>
+              <span className="font-medium text-sidebar-foreground">{maxRequests}</span>
+            </p>
+          </div>
+        </div>
       </div>
     </Card>
   );
