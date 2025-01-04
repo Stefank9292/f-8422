@@ -1,7 +1,7 @@
 import { Table, TableBody } from "@/components/ui/table";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
 import confetti from 'canvas-confetti';
@@ -27,10 +27,14 @@ type SortConfig = {
 export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const { toast } = useToast();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
+  const previousPostsRef = useRef<string>('');
 
   useEffect(() => {
-    if (posts.length > 0) {
-      // Trigger confetti when results are displayed
+    // Convert current posts to string for comparison
+    const currentPostsString = JSON.stringify(posts);
+
+    // Only trigger confetti if posts have changed and are not empty
+    if (posts.length > 0 && currentPostsString !== previousPostsRef.current) {
       confetti({
         particleCount: 100,
         spread: 70,
@@ -45,6 +49,9 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
         scalar: 0.8,
         zIndex: 100,
       });
+
+      // Update the reference to current posts
+      previousPostsRef.current = currentPostsString;
     }
   }, [posts]);
 
