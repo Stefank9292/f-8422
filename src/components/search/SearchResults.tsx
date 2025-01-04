@@ -1,25 +1,9 @@
-import { Table, TableBody } from "@/components/ui/table";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect, useRef } from "react";
-import { PostTableHeader } from "./TableHeader";
-import { PostTableRow } from "./TableRow";
 import confetti from 'canvas-confetti';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { cn } from "@/lib/utils";
+import { TablePagination } from "./TablePagination";
+import { TableContent } from "./TableContent";
 
 interface SearchResultsProps {
   posts: any[];
@@ -186,82 +170,26 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   };
 
   return (
-    <TooltipProvider>
-      <div className="space-y-4">
-        {sortedPosts.length > 25 && (
-          <div className="flex items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Show</span>
-              <Select
-                value={pageSize.toString()}
-                onValueChange={handlePageSizeChange}
-              >
-                <SelectTrigger className="w-[100px]">
-                  <SelectValue placeholder="25" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                  <SelectItem value="100">100</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-muted-foreground">per page</span>
-            </div>
-          </div>
-        )}
-        
-        <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
-          <Table>
-            <PostTableHeader onSort={handleSort} />
-            <TableBody>
-              {currentPosts.map((post, index) => (
-                <PostTableRow
-                  key={index}
-                  post={post}
-                  onCopyCaption={handleCopyCaption}
-                  onDownload={handleDownload}
-                  formatNumber={formatNumber}
-                  truncateCaption={truncateCaption}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+    <div className="space-y-4">
+      <TableContent
+        currentPosts={currentPosts}
+        handleSort={handleSort}
+        handleCopyCaption={handleCopyCaption}
+        handleDownload={handleDownload}
+        formatNumber={formatNumber}
+        truncateCaption={truncateCaption}
+      />
 
-        {sortedPosts.length > 25 && (
-          <div className="flex justify-center mt-4">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                  />
-                </PaginationItem>
-                
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => handlePageChange(page)}
-                      isActive={currentPage === page}
-                      className="cursor-pointer"
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
-      </div>
-    </TooltipProvider>
+      {sortedPosts.length > 25 && (
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+          totalResults={sortedPosts.length}
+        />
+      )}
+    </div>
   );
 };
