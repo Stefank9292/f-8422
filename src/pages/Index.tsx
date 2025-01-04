@@ -148,7 +148,6 @@ const Index = () => {
     <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-12 animate-in fade-in duration-300">
       <div className="space-y-6">
         <SearchHeader />
-
         <p className="text-muted-foreground text-base md:text-lg text-center max-w-xl">
           Save time finding viral content for social media
         </p>
@@ -180,7 +179,7 @@ const Index = () => {
           </Button>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           <SearchSettings
             isSettingsOpen={isSettingsOpen}
             setIsSettingsOpen={setIsSettingsOpen}
@@ -191,7 +190,7 @@ const Index = () => {
             disabled={isLoading || isBulkSearching}
           />
 
-          <div className="flex justify-center w-full pt-2">
+          <div className="flex justify-center w-full">
             <RecentSearches onSearchSelect={setUsername} />
           </div>
         </div>

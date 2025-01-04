@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, HelpCircle, ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
+import { Calendar as CalendarIcon, Settings2, ChevronDown, ChevronUp, Minus, Plus } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -57,67 +57,60 @@ export const SearchSettings = ({
   const maxVideos = getMaxVideos();
 
   return (
-    <div className="w-full bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800">
+    <div className="w-full max-w-2xl mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-lg transition-colors"
+        className="w-full px-6 py-3 flex items-center justify-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors rounded-xl"
         disabled={disabled}
       >
-        <div className="flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-gray-500" />
-          <span className="font-medium">Search Settings</span>
-        </div>
+        <Settings2 className="w-5 h-5" />
+        <span className="font-medium">Search Settings</span>
         {isSettingsOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-4 h-4" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-4 h-4" />
         )}
       </button>
 
       {isSettingsOpen && (
-        <div className="p-4 space-y-6 animate-in fade-in duration-200">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base font-medium">Number of Videos (Max: {maxVideos})</span>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setNumberOfVideos(Math.max(1, numberOfVideos - 1))}
-                disabled={numberOfVideos <= 1 || disabled}
-                className="h-10 w-10"
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="text-2xl font-medium min-w-[2ch] text-center">
-                {numberOfVideos}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setNumberOfVideos(Math.min(maxVideos, numberOfVideos + 1))}
-                disabled={numberOfVideos >= maxVideos || disabled}
-                className="h-10 w-10"
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+        <div className="mt-4 p-6 space-y-6 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm rounded-xl border border-gray-200 dark:border-gray-800 animate-in fade-in duration-200">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Number of Videos (Max: {maxVideos})</span>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setNumberOfVideos(Math.max(1, numberOfVideos - 1))}
+                  disabled={numberOfVideos <= 1 || disabled}
+                  className="h-8 w-8"
+                >
+                  <Minus className="h-3 w-3" />
+                </Button>
+                <span className="text-lg font-medium min-w-[2ch] text-center">
+                  {numberOfVideos}
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setNumberOfVideos(Math.min(maxVideos, numberOfVideos + 1))}
+                  disabled={numberOfVideos >= maxVideos || disabled}
+                  className="h-8 w-8"
+                >
+                  <Plus className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-gray-500" />
-              <span className="text-base font-medium">Posts newer than</span>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
-            </div>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Posts newer than</span>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal text-sm",
                     !selectedDate && "text-muted-foreground"
                   )}
                   disabled={disabled}
@@ -138,7 +131,7 @@ export const SearchSettings = ({
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-sm text-gray-500">
+            <p className="text-xs text-gray-500">
               Limited to posts from the last 90 days
             </p>
           </div>
