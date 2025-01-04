@@ -1,26 +1,14 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SearchResultDetails } from "@/components/history/SearchResultDetails";
-import { format } from "date-fns";
 import { useSidebar } from "@/components/ui/sidebar";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { AlertCircle, InfoIcon } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { InstagramPost } from "@/types/instagram";
+import { HistoryHeader } from "@/components/history/HistoryHeader";
+import { SearchHistorySelect } from "@/components/history/SearchHistorySelect";
+import { SearchResultsGrid } from "@/components/history/SearchResultsGrid";
 
 interface SearchHistoryItem {
   id: string;
@@ -39,7 +27,6 @@ export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
   const { state } = useSidebar();
 
-  // Fetch search history with real-time updates
   const { data: searchHistory = [], isLoading: isHistoryLoading } = useQuery<SearchHistoryItem[]>({
     queryKey: ['search-history'],
     queryFn: async () => {
@@ -55,10 +42,9 @@ export default function HistoryPage() {
 
       return data;
     },
-    refetchInterval: 5000, // Refetch every 5 seconds to keep history up to date
+    refetchInterval: 5000,
   });
 
-  // Fetch search results with real-time updates
   const { data: searchResult, isError, isLoading: isResultsLoading } = useQuery<SearchResultData | null>({
     queryKey: ['search-result', selectedSearchId],
     queryFn: async () => {
@@ -77,7 +63,6 @@ export default function HistoryPage() {
 
       if (!data) return null;
 
-      // Transform the results to ensure they match the InstagramPost type
       const transformedResults = {
         ...data,
         results: Array.isArray(data.results) ? data.results.map((post: any) => ({
@@ -99,7 +84,7 @@ export default function HistoryPage() {
       return transformedResults;
     },
     enabled: !!selectedSearchId,
-    refetchInterval: 5000, // Refetch every 5 seconds to keep results up to date
+    refetchInterval: 5000,
   });
 
   return (
@@ -108,41 +93,13 @@ export default function HistoryPage() {
       state === 'collapsed' ? "pl-16" : "pl-6"
     )}>
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold">Search History</h1>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <InfoIcon className="h-5 w-5 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Search history is automatically deleted after 7 days</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-
-        {isHistoryLoading ? (
-          <div className="text-sm text-muted-foreground">Loading search history...</div>
-        ) : (
-          <Select value={selectedSearchId} onValueChange={setSelectedSearchId}>
-            <SelectTrigger className={cn("w-full", !selectedSearchId && "text-muted-foreground")}>
-              <SelectValue placeholder="Select a search to view results" />
-            </SelectTrigger>
-            <SelectContent>
-              {searchHistory.map((search) => (
-                <SelectItem key={search.id} value={search.id}>
-                  <div className="flex justify-between items-center gap-4">
-                    <span>@{search.search_query}</span>
-                    <span className="text-sm text-muted-foreground">
-                      {format(new Date(search.created_at), 'MMM d, yyyy')}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
+        <HistoryHeader />
+        <SearchHistorySelect
+          searchHistory={searchHistory}
+          selectedSearchId={selectedSearchId}
+          onSearchSelect={setSelectedSearchId}
+          isLoading={isHistoryLoading}
+        />
       </div>
 
       {isError && (
@@ -168,13 +125,7 @@ export default function HistoryPage() {
       )}
 
       {searchResult && searchResult.results && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {searchResult.results.map((result, index) => (
-              <SearchResultDetails key={index} result={result} />
-            ))}
-          </div>
-        </div>
+        <SearchResultsGrid results={searchResult.results} />
       )}
     </div>
   );
