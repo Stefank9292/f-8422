@@ -78,6 +78,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_requests: {
+        Row: {
+          created_at: string
+          id: string
+          period_end: string
+          period_start: string
+          request_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          period_end: string
+          period_start: string
+          request_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          period_end?: string
+          period_start?: string
+          request_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

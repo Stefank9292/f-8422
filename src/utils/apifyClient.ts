@@ -30,7 +30,7 @@ async function updateUserClickCount() {
 
   // First, try to get existing record for today
   const { data: existingRecord } = await supabase
-    .from('user_clicks')
+    .from('user_requests')
     .select('*')
     .eq('user_id', session.user.id)
     .gte('period_end', startOfDay.toISOString())
@@ -40,16 +40,16 @@ async function updateUserClickCount() {
   if (existingRecord) {
     // Update existing record
     await supabase
-      .from('user_clicks')
-      .update({ click_count: existingRecord.click_count + 1 })
+      .from('user_requests')
+      .update({ request_count: existingRecord.request_count + 1 })
       .eq('id', existingRecord.id);
   } else {
     // Create new record
     await supabase
-      .from('user_clicks')
+      .from('user_requests')
       .insert({
         user_id: session.user.id,
-        click_count: 1,
+        request_count: 1,
         period_start: startOfDay.toISOString(),
         period_end: endOfDay.toISOString()
       });
@@ -215,7 +215,7 @@ export async function fetchInstagramPosts(
            
     console.log('Valid posts:', validPosts);
 
-    // Only update click count if we got valid posts
+    // Only track request if we got valid posts
     if (validPosts.length > 0) {
       await updateUserClickCount();
     }
@@ -298,7 +298,7 @@ export async function fetchBulkInstagramPosts(
            
     console.log('Valid posts:', validPosts);
 
-    // Only update click count if we got valid posts
+    // Only track request if we got valid posts
     if (validPosts.length > 0) {
       await updateUserClickCount();
     }

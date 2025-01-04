@@ -16,19 +16,18 @@ export const RequestUsageCounter = () => {
     },
   });
 
-  const { data: clickStats, refetch: refetchClickStats } = useQuery({
-    queryKey: ['click-stats'],
+  const { data: requestStats, refetch: refetchRequestStats } = useQuery({
+    queryKey: ['request-stats'],
     queryFn: async () => {
       if (!session?.user.id) return null;
       
+      const now = new Date();
       const { data, error } = await supabase
-        .from('user_clicks')
-        .select('click_count')
+        .from('user_requests')
+        .select('*')
         .eq('user_id', session.user.id)
-        .gte('period_end', new Date().toISOString())
-        .order('period_end', { ascending: false })
-        .limit(1)
-        .single();
+        .gte('period_end', now.toISOString())
+        .order('period_end', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -53,20 +52,20 @@ export const RequestUsageCounter = () => {
   useEffect(() => {
     if (!session?.user.id) return;
 
-    // Subscribe to changes in the user_clicks table
+    // Subscribe to changes in the user_requests table
     const channel = supabase
-      .channel('user-clicks-changes')
+      .channel('user-requests-changes')
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'user_clicks',
+          table: 'user_requests',
           filter: `user_id=eq.${session.user.id}`,
         },
         async (payload) => {
-          console.log('User clicks updated:', payload);
-          await refetchClickStats();
+          console.log('User requests updated:', payload);
+          await refetchRequestStats();
           
           // Show a toast notification when usage is updated
           toast({
@@ -80,24 +79,24 @@ export const RequestUsageCounter = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [session?.user.id, refetchClickStats, toast]);
+  }, [session?.user.id, refetchRequestStats, toast]);
 
-  const maxClicks = subscriptionStatus?.maxClicks || 3; // Default to free tier
-  const usedClicks = clickStats?.click_count || 0;
-  const remainingClicks = Math.max(0, maxClicks - usedClicks);
-  const usagePercentage = (usedClicks / maxClicks) * 100;
+  const maxRequests = subscriptionStatus?.maxClicks || 3; // Default to free tier
+  const usedRequests = requestStats?.length || 0;
+  const remainingRequests = Math.max(0, maxRequests - usedRequests);
+  const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
     <Card className="p-6 space-y-4">
       <h3 className="text-lg font-semibold">Request Usage</h3>
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span>{usedClicks} used</span>
-          <span>{remainingClicks} remaining</span>
+          <span>{usedRequests} used</span>
+          <span>{remainingRequests} remaining</span>
         </div>
         <Progress value={usagePercentage} className="h-2" />
         <p className="text-sm text-muted-foreground">
-          Total requests: {maxClicks} per period
+          Total requests: {maxRequests} per period
         </p>
       </div>
     </Card>
