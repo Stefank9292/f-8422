@@ -1,19 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { History, Instagram } from "lucide-react";
-import { trackUserRequest } from "@/utils/requestTracker";
+import { useToast } from "@/hooks/use-toast";
 
 interface RecentSearchesProps {
   onSearchSelect: (username: string) => void;
 }
 
 export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
+  const { toast } = useToast();
+
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
-      // Track the request before fetching recent searches
-      await trackUserRequest();
-
       const { data, error } = await supabase
         .from('search_history')
         .select('search_query, created_at')
@@ -22,7 +21,12 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
 
       if (error) {
         console.error('Error fetching recent searches:', error);
-        throw error;
+        toast({
+          title: "Error",
+          description: "Failed to load recent searches",
+          variant: "destructive",
+        });
+        return [];
       }
 
       // Remove duplicates while preserving order
@@ -32,13 +36,21 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
 
       return uniqueSearches;
     },
+    meta: {
+      onError: (error: Error) => {
+        console.error('Query error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load recent searches",
+          variant: "destructive",
+        });
+      }
+    }
   });
 
   if (!recentSearches || recentSearches.length === 0) return null;
 
-  const handleSearchSelect = async (username: string) => {
-    // Track the request when a recent search is selected
-    await trackUserRequest();
+  const handleSearchSelect = (username: string) => {
     onSearchSelect(username);
   };
 

@@ -13,6 +13,7 @@ import { Loader2, Search } from "lucide-react";
 import { useSearchStore } from "../store/searchStore";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { saveSearchHistory } from "@/utils/searchHistory";
 
 const Index = () => {
   const {
@@ -47,44 +48,26 @@ const Index = () => {
       onSuccess: async (data: any[]) => {
         if (data && data.length > 0) {
           try {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (!session?.user?.id) {
-              console.error('No authenticated user found');
-              return;
-            }
-
-            const { data: searchHistory, error: searchError } = await supabase
-              .from('search_history')
-              .insert({
-                search_query: username,
-                search_type: 'single',
-                user_id: session.user.id
-              })
-              .select()
-              .single();
-
-            if (searchError) {
-              console.error('Error saving search history:', searchError);
-              return;
-            }
-
-            const { error: resultsError } = await supabase
-              .from('search_results')
-              .insert({
-                search_history_id: searchHistory.id,
-                results: JSON.parse(JSON.stringify(data))
-              });
-
-            if (resultsError) {
-              console.error('Error saving search results:', resultsError);
-            }
-
+            await saveSearchHistory(username, data);
             // Invalidate recent searches query after successful search
             queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
           } catch (error) {
-            console.error('Error storing search results:', error);
+            toast({
+              title: "Error",
+              description: "Failed to save search history",
+              variant: "destructive",
+            });
           }
         }
+        setShouldSearch(false);
+      },
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to perform search",
+          variant: "destructive",
+        });
         setShouldSearch(false);
       }
     }
