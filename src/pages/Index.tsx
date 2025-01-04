@@ -10,7 +10,7 @@ import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Loader2 } from "lucide-react";
 import confetti from 'canvas-confetti';
-import { useSearchStore } from "@/store/searchStore";
+import { useSearchStore } from "../store/searchStore";
 
 const Index = () => {
   const {
