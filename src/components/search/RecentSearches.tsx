@@ -13,9 +13,13 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return [];
+
       const { data, error } = await supabase
         .from('search_history')
         .select('search_query, created_at')
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -36,16 +40,9 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
 
       return uniqueSearches;
     },
-    meta: {
-      onError: (error: Error) => {
-        console.error('Query error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to load recent searches",
-          variant: "destructive",
-        });
-      }
-    }
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    staleTime: 0, // This ensures we always get fresh data
   });
 
   if (!recentSearches || recentSearches.length === 0) return null;
