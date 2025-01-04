@@ -3,23 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchSettings } from "./SearchSettings";
-import { Search, X } from "lucide-react";
+import { Search, X, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BulkSearchProps {
   isOpen: boolean;
   onClose: () => void;
-  onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => void;
+  onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<void>;
+  isLoading?: boolean;
 }
 
-export const BulkSearch = ({ isOpen, onClose, onSearch }: BulkSearchProps) => {
+export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: BulkSearchProps) => {
   const [urls, setUrls] = useState<string>("");
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     const urlList = urls
       .split('\n')
       .map(url => url.trim())
@@ -34,8 +35,16 @@ export const BulkSearch = ({ isOpen, onClose, onSearch }: BulkSearchProps) => {
       return;
     }
 
-    onSearch(urlList, numberOfVideos, selectedDate);
-    onClose();
+    try {
+      await onSearch(urlList, numberOfVideos, selectedDate);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to perform search",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -73,6 +82,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch }: BulkSearchProps) => {
               variant="outline"
               onClick={onClose}
               className="gap-2"
+              disabled={isLoading}
             >
               <X className="w-4 h-4" />
               Cancel
@@ -80,9 +90,19 @@ export const BulkSearch = ({ isOpen, onClose, onSearch }: BulkSearchProps) => {
             <Button
               onClick={handleSearch}
               className="gap-2"
+              disabled={isLoading}
             >
-              <Search className="w-4 h-4" />
-              Search Videos
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Searching...
+                </>
+              ) : (
+                <>
+                  <Search className="w-4 h-4" />
+                  Search Videos
+                </>
+              )}
             </Button>
           </div>
         </div>

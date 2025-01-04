@@ -16,6 +16,7 @@ const Index = () => {
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [filters, setFilters] = useState({
     minViews: "",
     minPlays: "",
@@ -51,13 +52,17 @@ const Index = () => {
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
-    // For now, we'll just use the first URL as an example
-    // You'll need to modify the fetchInstagramPosts function to handle multiple URLs
-    if (urls.length > 0) {
-      setUsername(urls[0]);
-      setNumberOfVideos(numVideos);
-      setSelectedDate(date);
-      setSearchTrigger(prev => prev + 1);
+    setIsBulkSearching(true);
+    try {
+      // For now, we'll just use the first URL as an example
+      if (urls.length > 0) {
+        setUsername(urls[0]);
+        setNumberOfVideos(numVideos);
+        setSelectedDate(date);
+        setSearchTrigger(prev => prev + 1);
+      }
+    } finally {
+      setIsBulkSearching(false);
     }
   };
 
@@ -91,6 +96,7 @@ const Index = () => {
           onUsernameChange={setUsername}
           onSearch={handleSearch}
           onBulkSearch={handleBulkSearch}
+          isLoading={isBulkSearching}
         />
 
         <Button 

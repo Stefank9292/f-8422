@@ -8,14 +8,16 @@ interface SearchBarProps {
   username: string;
   onUsernameChange: (value: string) => void;
   onSearch: () => void;
-  onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => void;
+  onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<void>;
+  isLoading?: boolean;
 }
 
 export const SearchBar = ({ 
   username, 
   onUsernameChange, 
   onSearch,
-  onBulkSearch 
+  onBulkSearch,
+  isLoading 
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
 
@@ -44,7 +46,8 @@ export const SearchBar = ({
       <BulkSearch
         isOpen={isBulkSearchOpen}
         onClose={() => setIsBulkSearchOpen(false)}
-        onSearch={onBulkSearch || (() => {})}
+        onSearch={onBulkSearch || (() => Promise.resolve())}
+        isLoading={isLoading}
       />
     </>
   );
