@@ -90,7 +90,24 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Improved typography */
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight;
+  }
+
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight;
+  }
+
+  p {
+    @apply leading-relaxed;
   }
 }
 
@@ -105,5 +122,46 @@
 
   .animate-spring {
     @apply transition-all duration-300 ease-spring;
+  }
+
+  /* Material Design inspired components */
+  .material-card {
+    @apply bg-card rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200;
+  }
+
+  .material-input {
+    @apply h-12 px-4 rounded-lg border-2 border-input bg-transparent focus:border-primary focus:ring-1 focus:ring-primary transition-colors;
+  }
+
+  .material-button {
+    @apply h-12 px-6 rounded-lg font-medium transition-all duration-200 
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
+           active:scale-95;
+  }
+
+  .material-button-primary {
+    @apply material-button bg-primary text-primary-foreground 
+           hover:bg-primary/90;
+  }
+
+  .material-button-secondary {
+    @apply material-button bg-secondary text-secondary-foreground
+           hover:bg-secondary/80;
+  }
+
+  /* Mobile-first container */
+  .responsive-container {
+    @apply w-full px-4 mx-auto sm:px-6 md:px-8 lg:px-12 max-w-7xl;
+  }
+
+  /* Responsive grid */
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
+
+  /* Touch-friendly spacing */
+  .touch-spacing {
+    @apply space-y-6 md:space-y-8;
   }
 }

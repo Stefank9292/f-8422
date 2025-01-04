@@ -61,23 +61,25 @@ const FAQ = () => {
   );
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-3xl mx-auto space-y-8 pt-8">
+    <div className="min-h-screen p-4 md:p-6 animate-in fade-in duration-300">
+      <div className="responsive-container space-y-8 pt-8">
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Frequently Asked Questions</h1>
-          <p className="text-xl text-muted-foreground">
+          <h1 className="bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+            Frequently Asked Questions
+          </h1>
+          <p className="text-lg md:text-xl text-muted-foreground">
             Find answers to common questions about VyralSearch
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="touch-spacing">
           <div className="relative">
             <Input
               type="text"
               placeholder="Search questions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10"
+              className="material-input pl-10 w-full"
             />
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +97,7 @@ const FAQ = () => {
             </svg>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 py-4">
             {categories.map((category) => (
               <button
                 key={category.id}
@@ -111,13 +113,21 @@ const FAQ = () => {
             ))}
           </div>
 
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full space-y-2">
             {filteredFaqs.map((faq, index) => (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-left">
-                  {faq.question}
+              <AccordionItem 
+                key={index} 
+                value={`item-${index}`}
+                className="material-card border-none px-4"
+              >
+                <AccordionTrigger className="text-left hover:no-underline py-4">
+                  <span className="text-base md:text-lg font-medium">
+                    {faq.question}
+                  </span>
                 </AccordionTrigger>
-                <AccordionContent>{faq.answer}</AccordionContent>
+                <AccordionContent className="text-muted-foreground">
+                  {faq.answer}
+                </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>

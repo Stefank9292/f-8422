@@ -3,7 +3,7 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AuthPage = () => {
@@ -31,18 +31,24 @@ const AuthPage = () => {
   }, [navigate, toast]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">
+      <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-bold">Welcome</h1>
-          <p className="text-muted-foreground">Sign in to your account or create a new one</p>
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
+            Welcome to VyralSearch
+          </h1>
+          <p className="text-muted-foreground">
+            Sign in to your account or create a new one
+          </p>
         </div>
-        <Alert>
+        
+        <Alert className="bg-card border-2">
           <AlertDescription>
             For testing, use any email and password combination to create an account.
           </AlertDescription>
         </Alert>
-        <div className="border rounded-lg p-6 bg-card">
+        
+        <div className="material-card p-6 space-y-6">
           <Auth
             supabaseClient={supabase}
             appearance={{
@@ -53,7 +59,21 @@ const AuthPage = () => {
                     brand: 'hsl(var(--primary))',
                     brandAccent: 'hsl(var(--primary))',
                   },
+                  borderWidths: {
+                    buttonBorderWidth: '2px',
+                    inputBorderWidth: '2px',
+                  },
+                  radii: {
+                    borderRadiusButton: '0.5rem',
+                    buttonBorderRadius: '0.5rem',
+                    inputBorderRadius: '0.5rem',
+                  },
                 },
+              },
+              className: {
+                button: 'material-button-primary w-full',
+                input: 'material-input',
+                label: 'text-sm font-medium text-foreground',
               },
             }}
             providers={[]}

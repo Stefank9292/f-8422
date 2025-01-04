@@ -107,10 +107,10 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 md:p-6 space-y-8 animate-in fade-in duration-200">
+    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-8 md:py-12 space-y-8 animate-in fade-in duration-300">
       <SearchHeader />
 
-      <p className="text-gray-600 dark:text-gray-300 text-base md:text-lg text-center max-w-xl">
+      <p className="text-muted-foreground text-base md:text-lg text-center max-w-xl">
         Save time finding viral content for social media
       </p>
 
@@ -126,7 +126,7 @@ const Index = () => {
         <Button 
           onClick={handleSearch} 
           disabled={isLoading || isBulkSearching || isSearching}
-          className="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] hover:opacity-90 transition-all text-base md:text-lg py-6"
+          className="w-full material-button-primary instagram-gradient py-6 text-base md:text-lg"
         >
           {isLoading ? (
             <>
@@ -172,7 +172,7 @@ const Index = () => {
             }).length}
             currentPosts={displayPosts}
           />
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring overflow-hidden">
+          <div className="material-card overflow-hidden animate-in fade-in duration-300">
             <SearchResults posts={displayPosts} filters={filters} />
           </div>
         </div>

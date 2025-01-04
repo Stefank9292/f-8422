@@ -112,7 +112,7 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar>
+      <Sidebar className="z-30">
         <SidebarContent>
           <SidebarGroup>
             {/* Navigation Header */}
