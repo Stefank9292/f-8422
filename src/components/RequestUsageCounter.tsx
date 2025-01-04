@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Activity } from "lucide-react";
+import { Activity, User } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
@@ -90,23 +91,43 @@ export const RequestUsageCounter = () => {
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
   return (
-    <div className="px-2 py-2 space-y-2">
-      {/* Header */}
-      <div className="flex items-center gap-1.5 text-xs text-sidebar-foreground/70">
-        <Activity className="h-3.5 w-3.5" />
-        <span>Daily Usage</span>
+    <div className="px-2 py-2 space-y-4">
+      {/* User Profile */}
+      <div className="flex items-center gap-2">
+        <Avatar className="h-8 w-8">
+          <AvatarFallback>
+            <User className="h-4 w-4" />
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <span className="text-xs text-sidebar-foreground/70 truncate">
+            {session?.user?.email}
+          </span>
+          <span className="text-[10px] text-sidebar-foreground/50">
+            {subscriptionStatus?.plan || 'Free'} Plan
+          </span>
+        </div>
       </div>
 
-      {/* Progress and Stats */}
-      <div className="space-y-1.5">
-        <Progress 
-          value={usagePercentage} 
-          className="h-1.5 bg-sidebar-accent/20"
-        />
-        
-        <div className="flex justify-between text-[10px] text-sidebar-foreground/60">
-          <span>{usedRequests}/{maxRequests}</span>
-          <span>{remainingRequests} left</span>
+      {/* Usage Stats */}
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center gap-1.5 text-xs text-sidebar-foreground/70">
+          <Activity className="h-3.5 w-3.5" />
+          <span>Daily Usage</span>
+        </div>
+
+        {/* Progress and Stats */}
+        <div className="space-y-1.5">
+          <Progress 
+            value={usagePercentage} 
+            className="h-1.5 bg-sidebar-accent/20"
+          />
+          
+          <div className="flex justify-between text-[10px] text-sidebar-foreground/60">
+            <span>{usedRequests}/{maxRequests}</span>
+            <span>{remainingRequests} left</span>
+          </div>
         </div>
       </div>
     </div>
