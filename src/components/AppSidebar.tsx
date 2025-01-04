@@ -87,23 +87,21 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent className="flex flex-col h-full">
-            <div className="space-y-8">
+            <div className="space-y-2">
               <SidebarMenu>
-                <SidebarMenuItem className="mb-6">
+                <SidebarMenuItem>
                   <SidebarNavigation />
                 </SidebarMenuItem>
 
-                <SidebarTools currentPath={location.pathname} />
+                <SidebarMenuItem>
+                  <SidebarTools currentPath={location.pathname} />
+                </SidebarMenuItem>
               </SidebarMenu>
             </div>
 
-            <div className="mt-auto space-y-6">
+            <div className="mt-auto space-y-2">
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <div className="h-px bg-sidebar-border mx-2 my-6" />
-                </SidebarMenuItem>
-
-                <SidebarMenuItem className="mb-4">
                   <SidebarSettings 
                     currentPath={location.pathname}
                     subscriptionStatus={subscriptionStatus}
@@ -111,10 +109,10 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <Separator className="my-6" />
+                  <Separator className="my-4" />
                 </SidebarMenuItem>
 
-                <SidebarMenuItem className="mb-4">
+                <SidebarMenuItem>
                   <RequestUsageCounter />
                 </SidebarMenuItem>
 
