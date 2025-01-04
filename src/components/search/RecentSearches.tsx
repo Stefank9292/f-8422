@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { History, Instagram } from "lucide-react";
+import { trackUserRequest } from "@/utils/requestTracker";
 
 interface RecentSearchesProps {
   onSearchSelect: (username: string) => void;
@@ -10,6 +11,9 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
+      // Track the request before fetching recent searches
+      await trackUserRequest();
+
       const { data, error } = await supabase
         .from('search_history')
         .select('search_query, created_at')
@@ -32,6 +36,12 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
 
   if (!recentSearches || recentSearches.length === 0) return null;
 
+  const handleSearchSelect = async (username: string) => {
+    // Track the request when a recent search is selected
+    await trackUserRequest();
+    onSearchSelect(username);
+  };
+
   return (
     <div className="w-full space-y-3">
       <div className="flex items-center gap-2 text-muted-foreground">
@@ -42,7 +52,7 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
         {recentSearches.map((search, index) => (
           <button
             key={index}
-            onClick={() => onSearchSelect(search.search_query)}
+            onClick={() => handleSearchSelect(search.search_query)}
             className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
             <Instagram className="w-4 h-4" />
