@@ -69,7 +69,7 @@ export default function HistoryPage() {
   return (
     <div className={cn(
       "container mx-auto py-8 space-y-8",
-      state === 'collapsed' ? "pl-16" : "pl-0"
+      state === 'collapsed' ? "pl-16" : "pl-6"
     )}>
       <div className="space-y-4">
         <div className="flex items-center gap-2">
