@@ -17,7 +17,13 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
         .limit(5);
 
       if (error) throw error;
-      return data;
+
+      // Remove duplicates while preserving order
+      const uniqueSearches = data.filter((search, index, self) =>
+        index === self.findIndex((s) => s.search_query === search.search_query)
+      );
+
+      return uniqueSearches;
     },
   });
 
