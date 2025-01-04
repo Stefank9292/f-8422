@@ -5,6 +5,7 @@ import { Switch } from "@/components/ui/switch";
 import { SubscribeButton } from "@/components/SubscribeButton";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { ResumeSubscriptionButton } from "@/components/ResumeSubscriptionButton";
+import { RequestUsageCounter } from "@/components/RequestUsageCounter";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -135,6 +136,11 @@ const SubscribePage = () => {
             </div>
           </div>
         </div>
+
+        {/* Request Usage Counter */}
+        {session && (
+          <RequestUsageCounter />
+        )}
 
         {/* Subscription Management Card */}
         {subscriptionStatus?.subscribed && (
