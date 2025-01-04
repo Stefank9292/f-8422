@@ -150,18 +150,6 @@ export function AppSidebar() {
       <Sidebar className="z-30">
         <SidebarContent>
           <SidebarGroup>
-            {/* Navigation Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
-              <span className={`text-sm font-medium ${state === 'collapsed' ? 'hidden' : ''}`}>Navigation</span>
-              <button 
-                onClick={toggleSidebar}
-                className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
-              >
-                <PanelLeftClose className={`h-4 w-4 transition-transform ${state === 'collapsed' ? 'rotate-180' : ''}`} />
-                <span className="sr-only">Toggle Sidebar</span>
-              </button>
-            </div>
-
             <SidebarGroupContent>
               <SidebarMenu>
                 {/* Tools Section */}
@@ -197,6 +185,20 @@ export function AppSidebar() {
                 {/* User Profile */}
                 <SidebarMenuItem>
                   <UserProfile email={session?.user?.email} />
+                </SidebarMenuItem>
+
+                {/* Navigation Header moved to bottom */}
+                <SidebarMenuItem>
+                  <div className="flex items-center justify-between px-4 py-3 border-t border-sidebar-border mt-auto">
+                    <span className={`text-sm font-medium ${state === 'collapsed' ? 'hidden' : ''}`}>Navigation</span>
+                    <button 
+                      onClick={toggleSidebar}
+                      className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+                    >
+                      <PanelLeftClose className={`h-4 w-4 transition-transform ${state === 'collapsed' ? 'rotate-180' : ''}`} />
+                      <span className="sr-only">Toggle Sidebar</span>
+                    </button>
+                  </div>
                 </SidebarMenuItem>
 
                 {/* Crafted with love by VyralSearch */}
