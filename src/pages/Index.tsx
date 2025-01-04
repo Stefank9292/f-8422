@@ -10,25 +10,24 @@ import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Loader2 } from "lucide-react";
 import confetti from 'canvas-confetti';
+import { useSearchStore } from "@/store/searchStore";
 
 const Index = () => {
-  const [username, setUsername] = useState("");
-  const [searchTrigger, setSearchTrigger] = useState(0);
-  const [numberOfVideos, setNumberOfVideos] = useState(3);
+  const {
+    username,
+    numberOfVideos,
+    selectedDate,
+    filters,
+    setUsername,
+    setNumberOfVideos,
+    setSelectedDate,
+    setFilters,
+    resetFilters
+  } = useSearchStore();
+  
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [filters, setFilters] = useState({
-    minViews: "",
-    minPlays: "",
-    minLikes: "",
-    minComments: "",
-    minDuration: "",
-    minEngagement: "",
-    postsNewerThan: ""
-  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -50,9 +49,9 @@ const Index = () => {
   };
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchTrigger],
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: Boolean(username && searchTrigger && !isBulkSearching),
+    enabled: Boolean(username),
     staleTime: Infinity,
     gcTime: Infinity,
     retry: 2,
@@ -67,7 +66,7 @@ const Index = () => {
   });
 
   const handleSearch = async () => {
-    if (isSearching || isLoading || isBulkSearching) {
+    if (isLoading || isBulkSearching) {
       return;
     }
 
@@ -80,18 +79,21 @@ const Index = () => {
       return;
     }
 
-    setIsSearching(true);
     try {
       setBulkSearchResults([]);
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
-      setSearchTrigger(prev => prev + 1);
-    } finally {
-      setIsSearching(false);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to perform search",
+        variant: "destructive",
+      });
     }
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
-    if (isSearching || isLoading || isBulkSearching) {
+    if (isLoading || isBulkSearching) {
       return;
     }
 
@@ -113,19 +115,7 @@ const Index = () => {
   };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleFilterReset = () => {
-    setFilters({
-      minViews: "",
-      minPlays: "",
-      minLikes: "",
-      minComments: "",
-      minDuration: "",
-      minEngagement: "",
-      postsNewerThan: ""
-    });
+    setFilters({ ...filters, [key]: value });
   };
 
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
@@ -144,12 +134,12 @@ const Index = () => {
           onUsernameChange={setUsername}
           onSearch={handleSearch}
           onBulkSearch={handleBulkSearch}
-          isLoading={isLoading || isBulkSearching || isSearching}
+          isLoading={isLoading || isBulkSearching}
         />
 
         <Button 
           onClick={handleSearch} 
-          disabled={isLoading || isBulkSearching || isSearching}
+          disabled={isLoading || isBulkSearching}
           className="w-full material-button-primary instagram-gradient py-6 text-base md:text-lg"
         >
           {isLoading ? (
@@ -169,7 +159,7 @@ const Index = () => {
           setNumberOfVideos={setNumberOfVideos}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching || isSearching}
+          disabled={isLoading || isBulkSearching}
         />
       </div>
 
@@ -178,7 +168,7 @@ const Index = () => {
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
-            onReset={handleFilterReset}
+            onReset={resetFilters}
             totalResults={displayPosts.length}
             filteredResults={displayPosts.filter(post => {
               if (filters.postsNewerThan) {
