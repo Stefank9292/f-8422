@@ -8,9 +8,11 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
+import { RecentSearches } from "@/components/search/RecentSearches";
 import { Loader2 } from "lucide-react";
 import confetti from 'canvas-confetti';
 import { useSearchStore } from "../store/searchStore";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const {
@@ -80,8 +82,22 @@ const Index = () => {
     }
 
     try {
+      // Save search to history
+      const { error: searchHistoryError } = await supabase
+        .from('search_history')
+        .insert([
+          { 
+            search_query: username,
+            search_type: 'single'
+          }
+        ]);
+
+      if (searchHistoryError) {
+        console.error('Error saving search history:', searchHistoryError);
+      }
+
       setBulkSearchResults([]);
-      await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
+      await queryClient.invalidateQueries({ queryKey: ['instagram-posts', 'recent-searches'] });
     } catch (error) {
       console.error('Search error:', error);
       toast({
@@ -151,6 +167,8 @@ const Index = () => {
             "Search"
           )}
         </Button>
+
+        <RecentSearches onSearchSelect={setUsername} />
 
         <SearchSettings
           isSettingsOpen={isSettingsOpen}
