@@ -95,7 +95,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             <Button
               variant="outline"
               onClick={onClose}
-              className="gap-2 text-sm font-medium"
+              className="h-10 px-6 text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20"
               disabled={isLoading}
             >
               <X className="w-4 h-4" />
@@ -103,7 +103,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             </Button>
             <Button
               onClick={handleSearch}
-              className="gap-2 text-sm font-medium instagram-gradient"
+              className="h-10 px-6 text-sm font-medium bg-[#9b87f5] hover:bg-[#9b87f5]/90 text-white"
               disabled={isLoading}
             >
               {isLoading ? (
