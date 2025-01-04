@@ -1,9 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 
 export const RequestUsageCounter = () => {
+  const { toast } = useToast();
+  
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -12,7 +16,7 @@ export const RequestUsageCounter = () => {
     },
   });
 
-  const { data: clickStats } = useQuery({
+  const { data: clickStats, refetch: refetchClickStats } = useQuery({
     queryKey: ['click-stats'],
     queryFn: async () => {
       if (!session?.user.id) return null;
@@ -45,6 +49,38 @@ export const RequestUsageCounter = () => {
     },
     enabled: !!session?.access_token,
   });
+
+  useEffect(() => {
+    if (!session?.user.id) return;
+
+    // Subscribe to changes in the user_clicks table
+    const channel = supabase
+      .channel('user-clicks-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_clicks',
+          filter: `user_id=eq.${session.user.id}`,
+        },
+        async (payload) => {
+          console.log('User clicks updated:', payload);
+          await refetchClickStats();
+          
+          // Show a toast notification when usage is updated
+          toast({
+            title: "Usage Updated",
+            description: "Your request usage has been updated.",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user.id, refetchClickStats, toast]);
 
   const maxClicks = subscriptionStatus?.maxClicks || 3; // Default to free tier
   const usedClicks = clickStats?.click_count || 0;
