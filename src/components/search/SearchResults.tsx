@@ -126,21 +126,23 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
 
   return (
     <TooltipProvider>
-      <Table>
-        <PostTableHeader onSort={handleSort} />
-        <TableBody>
-          {sortedPosts.map((post, index) => (
-            <PostTableRow
-              key={index}
-              post={post}
-              onCopyCaption={handleCopyCaption}
-              onDownload={handleDownload}
-              formatNumber={formatNumber}
-              truncateCaption={truncateCaption}
-            />
-          ))}
-        </TableBody>
-      </Table>
+      <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800">
+        <Table>
+          <PostTableHeader onSort={handleSort} />
+          <TableBody>
+            {sortedPosts.map((post, index) => (
+              <PostTableRow
+                key={index}
+                post={post}
+                onCopyCaption={handleCopyCaption}
+                onDownload={handleDownload}
+                formatNumber={formatNumber}
+                truncateCaption={truncateCaption}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </TooltipProvider>
   );
 };

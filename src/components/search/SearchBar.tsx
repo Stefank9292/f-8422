@@ -112,22 +112,28 @@ export const SearchBar = ({
         <Input
           type="text"
           placeholder={placeholder}
-          className="pl-12 pr-32 h-14 text-base md:text-lg rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-primary"
+          className="pl-14 pr-36 h-16 text-lg md:text-xl rounded-2xl border-2 
+                   border-gray-200/80 dark:border-gray-800/80 
+                   focus:border-primary shadow-sm
+                   placeholder:text-gray-400 dark:placeholder:text-gray-600"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
         {isBulkSearchEnabled && (
           <Button
             variant="ghost"
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 
+                     flex items-center gap-2 text-gray-600 hover:text-gray-900 
+                     dark:text-gray-400 dark:hover:text-gray-200
+                     h-12 px-4 rounded-xl"
             onClick={() => setIsBulkSearchOpen(true)}
             disabled={isLoading}
           >
-            <List className="w-4 h-4" />
-            <span className="hidden md:inline">Bulk Search</span>
+            <List className="w-5 h-5" />
+            <span className="hidden md:inline font-medium">Bulk Search</span>
           </Button>
         )}
       </div>

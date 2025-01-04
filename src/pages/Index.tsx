@@ -146,16 +146,16 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-12 animate-in fade-in duration-300">
-      <div className="space-y-6">
+    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-16 md:py-24 space-y-16 animate-in fade-in duration-300">
+      <div className="space-y-8">
         <SearchHeader />
-        <p className="text-muted-foreground text-base md:text-lg text-center max-w-xl">
+        <p className="text-muted-foreground text-lg md:text-xl text-center max-w-2xl mx-auto">
           Save time finding viral content for social media
         </p>
       </div>
 
-      <div className="w-full max-w-2xl space-y-8">
-        <div className="space-y-4">
+      <div className="w-full max-w-2xl space-y-12">
+        <div className="space-y-6">
           <SearchBar
             username={username}
             onUsernameChange={setUsername}
@@ -168,26 +168,26 @@ const Index = () => {
             onClick={handleSearch} 
             disabled={isLoading || isBulkSearching || !username}
             className={cn(
-              "w-full material-button py-6 text-base md:text-lg transition-all duration-300",
+              "w-full material-button py-8 text-lg md:text-xl transition-all duration-300",
               username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-              "text-white dark:text-gray-100"
+              "text-white dark:text-gray-100 shadow-lg hover:shadow-xl"
             )}
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                <span className="text-sm md:text-base">This can take up to a minute...</span>
+                <Loader2 className="mr-3 h-6 w-6 animate-spin" />
+                <span>This can take up to a minute...</span>
               </>
             ) : (
               <>
-                <Search className="mr-2 h-5 w-5" />
+                <Search className="mr-3 h-6 w-6" />
                 Search Viral Videos
               </>
             )}
           </Button>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <SearchSettings
             isSettingsOpen={isSettingsOpen}
             setIsSettingsOpen={setIsSettingsOpen}
@@ -205,7 +205,7 @@ const Index = () => {
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full max-w-[90rem] space-y-8">
+        <div className="w-full max-w-[90rem] space-y-12">
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
