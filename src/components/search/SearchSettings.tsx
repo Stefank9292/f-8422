@@ -69,29 +69,32 @@ export const SearchSettings = ({
     <div className="w-full max-w-2xl mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg border border-gray-200 dark:border-gray-700"
+        className="w-full flex items-center justify-between px-3 py-2 text-[11px] text-gray-700 dark:text-gray-200 
+                 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg 
+                 border border-gray-200/80 dark:border-gray-800/80"
         disabled={disabled}
       >
-        <div className="flex items-center gap-2">
-          <Settings2 className="w-4 h-4" />
+        <div className="flex items-center gap-1.5">
+          <Settings2 className="w-3.5 h-3.5" />
           <span className="font-medium">Search Settings</span>
         </div>
         {isSettingsOpen ? (
-          <ChevronUp className="w-4 h-4" />
+          <ChevronUp className="w-3.5 h-3.5" />
         ) : (
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-3.5 h-3.5" />
         )}
       </button>
 
       {isSettingsOpen && (
-        <div className="mt-3 p-4 space-y-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 animate-in fade-in duration-200">
-          <div className="space-y-4">
+        <div className="mt-2 p-3 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
+                      border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Number of Videos</span>
-                <HelpCircle className="w-4 h-4 text-gray-400" />
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-medium">Number of Videos</span>
+                <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
               </div>
-              <span className="text-sm font-medium bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+              <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                 {localNumberOfVideos}
               </span>
             </div>
@@ -107,18 +110,18 @@ export const SearchSettings = ({
             />
           </div>
 
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-gray-500" />
-              <span className="font-medium">Posts newer than</span>
-              <HelpCircle className="w-4 h-4 text-gray-400" />
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
+              <span className="text-[11px] font-medium">Posts newer than</span>
+              <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
             </div>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full h-8 justify-start text-[11px] font-normal",
                     !selectedDate && "text-muted-foreground"
                   )}
                   disabled={disabled}
@@ -138,7 +141,7 @@ export const SearchSettings = ({
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-xs text-gray-500">
+            <p className="text-[11px] text-gray-500">
               Limited to posts from the last 90 days
             </p>
           </div>
