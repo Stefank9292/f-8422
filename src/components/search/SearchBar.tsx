@@ -23,27 +23,27 @@ export const SearchBar = ({
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading) {
-      e.preventDefault(); // Prevent form submission
+      e.preventDefault();
       onSearch();
     }
   };
 
   return (
     <>
-      <div className="relative">
+      <div className="relative w-full max-w-2xl mx-auto">
         <Input
           type="text"
           placeholder="Enter Instagram username or profile URL"
-          className="pl-10 pr-32"
+          className="w-full pl-10 pr-32 h-12 rounded-xl border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <Button
           variant="ghost"
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-gray-600"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => setIsBulkSearchOpen(true)}
           disabled={isLoading}
         >

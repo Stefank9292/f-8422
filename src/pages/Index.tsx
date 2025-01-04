@@ -8,7 +8,7 @@ import { SearchBar } from "@/components/search/SearchBar";
 import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 
 const Index = () => {
   const [username, setUsername] = useState("");
@@ -107,14 +107,10 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen p-4 space-y-8 animate-in fade-in duration-200">
+    <div className="container mx-auto flex flex-col items-center justify-start min-h-screen py-12 px-4 space-y-12 animate-in fade-in duration-200">
       <SearchHeader />
 
-      <p className="text-gray-600 dark:text-gray-300 text-lg text-center">
-        Save time finding viral content for social media
-      </p>
-
-      <div className="w-full max-w-2xl space-y-4">
+      <div className="w-full space-y-6">
         <SearchBar
           username={username}
           onUsernameChange={setUsername}
@@ -126,17 +122,30 @@ const Index = () => {
         <Button 
           onClick={handleSearch} 
           disabled={isLoading || isBulkSearching || isSearching}
-          className="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] hover:opacity-90 transition-all"
+          className="w-full max-w-2xl mx-auto h-12 bg-gradient-to-r from-purple-600 to-pink-500 hover:opacity-90 transition-all rounded-xl"
         >
           {isLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              This can take up to a minute...
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Searching...
             </>
           ) : (
-            "Search"
+            <>
+              <Search className="mr-2 h-5 w-5" />
+              Search Viral Videos
+            </>
           )}
         </Button>
+
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          >
+            Search Settings
+          </Button>
+        </div>
 
         <SearchSettings
           isSettingsOpen={isSettingsOpen}
@@ -150,7 +159,7 @@ const Index = () => {
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full max-w-6xl space-y-4">
+        <div className="w-full max-w-6xl space-y-6">
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
@@ -172,7 +181,7 @@ const Index = () => {
             }).length}
             currentPosts={displayPosts}
           />
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:scale-[1.02] transition-all duration-300 ease-spring">
             <SearchResults posts={displayPosts} filters={filters} />
           </div>
         </div>
