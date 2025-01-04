@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Settings2, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Settings2, HelpCircle } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -69,20 +69,12 @@ export const SearchSettings = ({
     <div className="w-full max-w-2xl mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-between px-3 py-2 text-[11px] text-gray-700 dark:text-gray-200 
-                 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors rounded-lg 
-                 border border-gray-200/80 dark:border-gray-800/80"
+        className="w-full flex items-center justify-center gap-2 py-2 text-[11px] text-gray-700 dark:text-gray-200 
+                 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors rounded-lg"
         disabled={disabled}
       >
-        <div className="flex items-center gap-1.5">
-          <Settings2 className="w-3.5 h-3.5" />
-          <span className="font-medium">Search Settings</span>
-        </div>
-        {isSettingsOpen ? (
-          <ChevronUp className="w-3.5 h-3.5" />
-        ) : (
-          <ChevronDown className="w-3.5 h-3.5" />
-        )}
+        <Settings2 className="w-3.5 h-3.5" />
+        <span className="font-medium">Search Settings</span>
       </button>
 
       {isSettingsOpen && (
