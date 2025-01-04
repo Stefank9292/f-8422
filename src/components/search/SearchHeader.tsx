@@ -5,11 +5,14 @@ import { Badge } from "@/components/ui/badge";
 export const SearchHeader = () => {
   return (
     <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
-      <div className="space-y-2">
+      <div className="relative inline-block">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-orange-500 bg-clip-text text-transparent">
           VyralSearch
         </h1>
-        <Badge variant="secondary" className="text-xs md:text-sm bg-gradient-to-r from-purple-600 to-orange-400 text-white border-none">
+        <Badge 
+          variant="secondary" 
+          className="absolute -top-2 -right-12 text-xs md:text-sm bg-gradient-to-r from-purple-600 to-orange-400 text-white border-none"
+        >
           BETA
         </Badge>
       </div>
