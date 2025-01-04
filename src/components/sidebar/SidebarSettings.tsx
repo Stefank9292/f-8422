@@ -28,13 +28,6 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
     },
     {
-      title: "Dark Mode",
-      icon: Moon,
-      onClick: () => {
-        document.documentElement.classList.toggle('dark');
-      },
-    },
-    {
       title: "Help Center",
       icon: HelpCircle,
       url: "/help",
@@ -43,6 +36,13 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       title: "FAQs",
       icon: MessageCircle,
       url: "/faq",
+    },
+    {
+      title: "Dark Mode",
+      icon: Moon,
+      onClick: () => {
+        document.documentElement.classList.toggle('dark');
+      },
     },
     {
       title: "Sign Out",
