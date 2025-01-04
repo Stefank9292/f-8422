@@ -83,10 +83,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_subscription_tier: {
+        Args: {
+          user_id: string
+        }
+        Returns: Database["public"]["Enums"]["subscription_tier"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      subscription_tier: "free" | "premium" | "ultra"
     }
     CompositeTypes: {
       [_ in never]: never
