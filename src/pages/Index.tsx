@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -82,15 +82,22 @@ const Index = () => {
     }
 
     try {
-      // Save search to history
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user?.id) {
+        console.error('No authenticated user found');
+        return;
+      }
+
+      // Save search to history with user_id
       const { error: searchHistoryError } = await supabase
         .from('search_history')
-        .insert([
-          { 
-            search_query: username,
-            search_type: 'single'
-          }
-        ]);
+        .insert({
+          search_query: username,
+          search_type: 'single',
+          user_id: session.user.id
+        });
 
       if (searchHistoryError) {
         console.error('Error saving search history:', searchHistoryError);
