@@ -42,7 +42,19 @@ const SubscribePage = () => {
       : `${planName}`;
   };
 
-  // Price IDs for different billing periods
+  const getPageTitle = () => {
+    if (!subscriptionStatus?.subscribed) {
+      return {
+        title: "Choose Your Plan",
+        subtitle: "Select the plan that best fits your needs and manage your subscription"
+      };
+    }
+    return {
+      title: "Manage Subscription",
+      subtitle: "View your current plan details and manage your subscription settings"
+    };
+  };
+
   const priceIds = {
     premium: {
       monthly: "price_1QdBd2DoPDXfOSZFnG8aWuIq",
@@ -106,14 +118,16 @@ const SubscribePage = () => {
     }
   ];
 
+  const { title, subtitle } = getPageTitle();
+
   return (
     <div className="min-h-screen p-4 bg-background">
       <div className="max-w-7xl mx-auto space-y-12 pt-8">
         {/* Header Section */}
         <div className="text-center space-y-6">
-          <h1 className="text-4xl font-bold tracking-tight">Choose Your Plan</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{title}</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Select the plan that best fits your needs and manage your subscription
+            {subtitle}
           </p>
         </div>
 
