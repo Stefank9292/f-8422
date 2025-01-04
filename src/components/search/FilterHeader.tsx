@@ -11,18 +11,23 @@ interface FilterHeaderProps {
 
 export const FilterHeader = ({ totalResults, filteredResults, onReset, currentPosts }: FilterHeaderProps) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-3">
-      <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-medium">Filter Results</h2>
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 py-2.5 bg-card/50 rounded-lg border border-border/50">
+      <div className="flex items-center gap-1.5">
+        <Filter className="w-3.5 h-3.5 text-primary/70" />
+        <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="text-xs text-muted-foreground">
+      <div className="flex items-center gap-2">
+        <span className="text-[10px] text-muted-foreground/70">
           Showing {filteredResults} of {totalResults} results
         </span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <ExportCSV currentPosts={currentPosts} />
-          <Button variant="ghost" size="sm" onClick={onReset} className="text-xs">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onReset} 
+            className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50"
+          >
             Reset
           </Button>
         </div>
