@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { History } from "lucide-react";
+import { History, Instagram } from "lucide-react";
 
 interface RecentSearchesProps {
   onSearchSelect: (username: string) => void;
@@ -42,11 +42,7 @@ export const RecentSearches = ({ onSearchSelect }: RecentSearchesProps) => {
             onClick={() => onSearchSelect(search.search_query)}
             className="flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
           >
-            <img 
-              src="/lovable-uploads/8a8b904b-ed3c-4561-8289-a9ddd563e8e6.png" 
-              alt="Instagram" 
-              className="w-4 h-4"
-            />
+            <Instagram className="w-4 h-4" />
             <span className="text-sm">@{search.search_query}</span>
           </button>
         ))}
