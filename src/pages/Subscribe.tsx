@@ -4,8 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { UsageOverview } from "@/components/subscription/UsageOverview";
-import { SubscriptionManagement } from "@/components/subscription/SubscriptionManagement";
+import { SubscriptionOverview } from "@/components/subscription/SubscriptionOverview";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -147,16 +146,14 @@ const SubscribePage = () => {
           </p>
         </div>
 
-        {/* Current Plan & Usage Section */}
+        {/* Subscription Overview Section */}
         {session && subscriptionStatus?.subscribed && (
-          <div className="grid gap-6 md:grid-cols-2">
-            <UsageOverview
+          <div className="max-w-3xl mx-auto">
+            <SubscriptionOverview
               planName={planName}
               usedClicks={usedClicks}
               remainingClicks={remainingClicks}
               maxClicks={maxClicks}
-            />
-            <SubscriptionManagement 
               isCanceled={subscriptionStatus?.canceled}
             />
           </div>
