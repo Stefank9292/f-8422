@@ -1,7 +1,5 @@
-import { CreditCard, LogOut, Moon, HelpCircle, MessageCircle, Star } from "lucide-react";
+import { CreditCard, Moon, HelpCircle, MessageCircle, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { SidebarSection } from "./SidebarSection";
 
 interface SidebarSettingsProps {
@@ -11,7 +9,6 @@ interface SidebarSettingsProps {
 
 export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSettingsProps) {
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const secondaryMenuItems = [
     {
@@ -42,18 +39,6 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       icon: Moon,
       onClick: () => {
         document.documentElement.classList.toggle('dark');
-      },
-    },
-    {
-      title: "Sign Out",
-      icon: LogOut,
-      onClick: async () => {
-        await supabase.auth.signOut();
-        toast({
-          title: "Logged out",
-          description: "You have been successfully logged out.",
-        });
-        navigate("/auth");
       },
     },
   ];
