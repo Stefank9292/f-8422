@@ -17,13 +17,13 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
     {
       title: "Manage Subscription",
       icon: CreditCard,
-      url: "/subscribe",
+      url: "/pricing",
       showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
     },
     {
       title: "Upgrade to Pro",
       icon: Star,
-      url: "/subscribe",
+      url: "/pricing",
       className: "bg-orange-50 dark:bg-orange-950 text-orange-600 dark:text-orange-400",
       showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
     },
