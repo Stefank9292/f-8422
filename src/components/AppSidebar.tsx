@@ -12,7 +12,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { UserProfile } from "./sidebar/UserProfile";
 import { SidebarTools } from "./sidebar/SidebarTools";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
@@ -114,10 +113,6 @@ export function AppSidebar() {
                   currentPath={location.pathname}
                   subscriptionStatus={subscriptionStatus}
                 />
-
-                <SidebarMenuItem>
-                  <UserProfile email={session?.user?.email} />
-                </SidebarMenuItem>
 
                 <SidebarMenuItem>
                   <SidebarFooter />
