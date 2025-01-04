@@ -17,7 +17,6 @@ import { SidebarTools } from "./sidebar/SidebarTools";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
-import { SubscriptionOverview } from "./subscription/SubscriptionOverview";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -96,20 +95,6 @@ export function AppSidebar() {
 
                 <SidebarTools currentPath={location.pathname} />
               </SidebarMenu>
-
-              {subscriptionStatus && (
-                <SidebarMenu>
-                  <SidebarMenuItem className="px-2">
-                    <SubscriptionOverview
-                      planName={subscriptionStatus.plan}
-                      usedClicks={subscriptionStatus.usedClicks}
-                      remainingClicks={subscriptionStatus.remainingClicks}
-                      maxClicks={subscriptionStatus.maxClicks}
-                      isCanceled={subscriptionStatus.isCanceled}
-                    />
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              )}
             </div>
 
             <div className="mt-auto">
