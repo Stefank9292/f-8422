@@ -9,10 +9,11 @@ import { SearchSettings } from "@/components/search/SearchSettings";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { RecentSearches } from "@/components/search/RecentSearches";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import confetti from 'canvas-confetti';
 import { useSearchStore } from "../store/searchStore";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const {
@@ -165,8 +166,12 @@ const Index = () => {
 
           <Button 
             onClick={handleSearch} 
-            disabled={isLoading || isBulkSearching}
-            className="w-full material-button-primary instagram-gradient py-6 text-base md:text-lg"
+            disabled={isLoading || isBulkSearching || !username}
+            className={cn(
+              "w-full material-button py-6 text-base md:text-lg transition-all duration-300",
+              username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+              "text-white dark:text-gray-100"
+            )}
           >
             {isLoading ? (
               <>
@@ -174,7 +179,10 @@ const Index = () => {
                 <span className="text-sm md:text-base">This can take up to a minute...</span>
               </>
             ) : (
-              "Search"
+              <>
+                <Search className="mr-2 h-5 w-5" />
+                Search Viral Videos
+              </>
             )}
           </Button>
         </div>
