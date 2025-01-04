@@ -145,54 +145,60 @@ const Index = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return (
-    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-8 md:py-12 space-y-8 animate-in fade-in duration-300">
-      <SearchHeader />
+    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-12 animate-in fade-in duration-300">
+      <div className="space-y-6">
+        <SearchHeader />
 
-      <p className="text-muted-foreground text-base md:text-lg text-center max-w-xl">
-        Save time finding viral content for social media
-      </p>
+        <p className="text-muted-foreground text-base md:text-lg text-center max-w-xl">
+          Save time finding viral content for social media
+        </p>
+      </div>
 
-      <div className="w-full max-w-2xl space-y-4">
-        <SearchBar
-          username={username}
-          onUsernameChange={setUsername}
-          onSearch={handleSearch}
-          onBulkSearch={handleBulkSearch}
-          isLoading={isLoading || isBulkSearching}
-        />
+      <div className="w-full max-w-2xl space-y-8">
+        <div className="space-y-4">
+          <SearchBar
+            username={username}
+            onUsernameChange={setUsername}
+            onSearch={handleSearch}
+            onBulkSearch={handleBulkSearch}
+            isLoading={isLoading || isBulkSearching}
+          />
 
-        <Button 
-          onClick={handleSearch} 
-          disabled={isLoading || isBulkSearching}
-          className="w-full material-button-primary instagram-gradient py-6 text-base md:text-lg"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              <span className="text-sm md:text-base">This can take up to a minute...</span>
-            </>
-          ) : (
-            "Search"
-          )}
-        </Button>
+          <Button 
+            onClick={handleSearch} 
+            disabled={isLoading || isBulkSearching}
+            className="w-full material-button-primary instagram-gradient py-6 text-base md:text-lg"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span className="text-sm md:text-base">This can take up to a minute...</span>
+              </>
+            ) : (
+              "Search"
+            )}
+          </Button>
+        </div>
 
-        <SearchSettings
-          isSettingsOpen={isSettingsOpen}
-          setIsSettingsOpen={setIsSettingsOpen}
-          numberOfVideos={numberOfVideos}
-          setNumberOfVideos={setNumberOfVideos}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching}
-        />
+        <div className="space-y-8">
+          <SearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            disabled={isLoading || isBulkSearching}
+          />
 
-        <div className="flex justify-center w-full">
-          <RecentSearches onSearchSelect={setUsername} />
+          <div className="flex justify-center w-full pt-2">
+            <RecentSearches onSearchSelect={setUsername} />
+          </div>
         </div>
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full max-w-[90rem] space-y-6">
+        <div className="w-full max-w-[90rem] space-y-8">
           <SearchFilters
             filters={filters}
             onFilterChange={handleFilterChange}
