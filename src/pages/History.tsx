@@ -65,7 +65,7 @@ export default function HistoryPage() {
   });
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-8 pl-16 space-y-8">
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <h1 className="text-2xl font-bold">Search History</h1>
