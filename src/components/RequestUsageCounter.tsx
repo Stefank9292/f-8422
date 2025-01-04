@@ -101,6 +101,13 @@ export const RequestUsageCounter = () => {
   const remainingRequests = Math.max(0, maxRequests - usedRequests);
   const usagePercentage = (usedRequests / maxRequests) * 100;
 
+  const getPlanName = () => {
+    if (!subscriptionStatus?.subscribed) return 'Free';
+    if (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") return 'Creator Pro';
+    if (subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") return 'Creator on Steroids';
+    return 'Free';
+  };
+
   return (
     <div className="px-2 py-2 space-y-3">
       <div className="flex items-center justify-between">
@@ -115,7 +122,7 @@ export const RequestUsageCounter = () => {
               {session?.user?.email}
             </span>
             <span className="text-[10px] text-sidebar-foreground/50">
-              {subscriptionStatus?.plan || 'Free'} Plan
+              {getPlanName()} Plan
             </span>
           </div>
         </div>
