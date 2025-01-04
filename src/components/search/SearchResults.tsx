@@ -28,13 +28,21 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const { toast } = useToast();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
   const previousPostsRef = useRef<string>('');
+  const hasTriggeredConfetti = useRef<boolean>(false);
 
   useEffect(() => {
     // Convert current posts to string for comparison
     const currentPostsString = JSON.stringify(posts);
 
-    // Only trigger confetti if posts have changed and are not empty
-    if (posts.length > 0 && currentPostsString !== previousPostsRef.current) {
+    // Only trigger confetti if:
+    // 1. Posts have changed
+    // 2. Posts are not empty
+    // 3. Confetti hasn't been triggered for this set of posts yet
+    if (
+      posts.length > 0 && 
+      currentPostsString !== previousPostsRef.current &&
+      !hasTriggeredConfetti.current
+    ) {
       confetti({
         particleCount: 100,
         spread: 70,
@@ -50,8 +58,15 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
         zIndex: 100,
       });
 
+      // Mark confetti as triggered for this set of posts
+      hasTriggeredConfetti.current = true;
       // Update the reference to current posts
       previousPostsRef.current = currentPostsString;
+    }
+
+    // Reset the confetti trigger when posts change
+    if (currentPostsString !== previousPostsRef.current) {
+      hasTriggeredConfetti.current = false;
     }
   }, [posts]);
 
