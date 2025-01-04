@@ -13,6 +13,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function HistoryPage() {
   const [selectedSearchId, setSelectedSearchId] = useState<string>("");
@@ -34,20 +36,23 @@ export default function HistoryPage() {
     },
   });
 
-  const { data: searchResult } = useQuery({
+  const { data: searchResult, isError } = useQuery({
     queryKey: ['search-result', selectedSearchId],
     queryFn: async () => {
+      if (!selectedSearchId) return null;
+
       const { data, error } = await supabase
         .from('search_results')
         .select('*')
         .eq('search_history_id', selectedSearchId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching search result:', error);
         throw error;
       }
 
+      if (!data) return null;
       return transformSearchResults(data as SupabaseSearchResult);
     },
     enabled: !!selectedSearchId
@@ -75,6 +80,24 @@ export default function HistoryPage() {
           </SelectContent>
         </Select>
       </div>
+
+      {isError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load search results. Please try again later.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {selectedSearchId && !searchResult && !isError && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No results found for this search.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {searchResult && (
         <div className="space-y-6">
