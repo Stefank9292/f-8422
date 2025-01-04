@@ -176,8 +176,6 @@ const Index = () => {
           )}
         </Button>
 
-        <RecentSearches onSearchSelect={setUsername} />
-
         <SearchSettings
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
@@ -187,6 +185,10 @@ const Index = () => {
           setSelectedDate={setSelectedDate}
           disabled={isLoading || isBulkSearching}
         />
+
+        <div className="flex justify-center w-full">
+          <RecentSearches onSearchSelect={setUsername} />
+        </div>
       </div>
 
       {displayPosts.length > 0 && (
