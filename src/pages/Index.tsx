@@ -72,7 +72,7 @@ const Index = () => {
               .from('search_results')
               .insert({
                 search_history_id: searchHistory.id,
-                results: data
+                results: JSON.parse(JSON.stringify(data)) // Convert InstagramPost[] to Json
               });
 
             if (resultsError) {
@@ -141,7 +141,7 @@ const Index = () => {
                 .from('search_results')
                 .insert({
                   search_history_id: searchHistory.id,
-                  results: filteredResults
+                  results: JSON.parse(JSON.stringify(filteredResults)) // Convert InstagramPost[] to Json
                 });
             }
           }

@@ -8,6 +8,22 @@ import { useNavigate } from "react-router-dom";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Button } from "@/components/ui/button";
 import { useSearchStore } from "@/store/searchStore";
+import { cn } from "@/lib/utils";
+
+interface SearchHistoryItem {
+  id: string;
+  user_id: string;
+  search_query: string;
+  search_type: string;
+  created_at: string;
+}
+
+interface SearchResultItem {
+  id: string;
+  search_history_id: string;
+  results: any[];
+  created_at: string;
+}
 
 export default function HistoryPage() {
   const [searchFilter, setSearchFilter] = useState("");
@@ -16,7 +32,7 @@ export default function HistoryPage() {
   const navigate = useNavigate();
   const { setUsername } = useSearchStore();
 
-  const { data: recentSearches = [], isLoading: isLoadingSearches } = useQuery({
+  const { data: recentSearches = [], isLoading: isLoadingSearches } = useQuery<SearchHistoryItem[]>({
     queryKey: ['recent-searches'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,14 +54,14 @@ export default function HistoryPage() {
     },
   });
 
-  const { data: searchResults, isLoading: isLoadingResults } = useQuery({
+  const { data: searchResults, isLoading: isLoadingResults } = useQuery<SearchResultItem>({
     queryKey: ['search-results', selectedSearchId],
     queryFn: async () => {
       if (!selectedSearchId) return null;
 
       const { data, error } = await supabase
         .from('search_results')
-        .select('results')
+        .select('*')
         .eq('search_history_id', selectedSearchId)
         .single();
 
@@ -58,7 +74,7 @@ export default function HistoryPage() {
         throw error;
       }
 
-      return data.results;
+      return data;
     },
     enabled: !!selectedSearchId
   });
@@ -67,7 +83,7 @@ export default function HistoryPage() {
     search.search_query.toLowerCase().includes(searchFilter.toLowerCase())
   );
 
-  const handleSearchSelect = (search: any) => {
+  const handleSearchSelect = (search: SearchHistoryItem) => {
     setSelectedSearchId(search.id);
   };
 
@@ -161,7 +177,7 @@ export default function HistoryPage() {
             </div>
           ) : (
             <div className="material-card overflow-hidden animate-in fade-in duration-300">
-              <SearchResults posts={searchResults} filters={{
+              <SearchResults posts={searchResults.results} filters={{
                 postsNewerThan: '',
                 minViews: '',
                 minPlays: '',
