@@ -42,11 +42,11 @@ const Index = () => {
     gcTime: Infinity,
     retry: 2,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
     meta: {
       onSuccess: async (data: any[]) => {
         if (data && data.length > 0) {
           try {
-            // Store search history and results
             const { data: { session } } = await supabase.auth.getSession();
             if (!session?.user?.id) {
               console.error('No authenticated user found');
@@ -72,12 +72,15 @@ const Index = () => {
               .from('search_results')
               .insert({
                 search_history_id: searchHistory.id,
-                results: JSON.parse(JSON.stringify(data)) // Convert InstagramPost[] to Json
+                results: JSON.parse(JSON.stringify(data))
               });
 
             if (resultsError) {
               console.error('Error saving search results:', resultsError);
             }
+
+            // Invalidate recent searches query after successful search
+            queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
           } catch (error) {
             console.error('Error storing search results:', error);
           }
@@ -103,7 +106,6 @@ const Index = () => {
 
     setBulkSearchResults([]);
     setShouldSearch(true);
-    queryClient.invalidateQueries({ queryKey: ['instagram-posts', 'recent-searches'] });
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
@@ -117,7 +119,6 @@ const Index = () => {
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       setBulkSearchResults(results);
 
-      // Store bulk search results
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.id && results.length > 0) {
         for (const url of urls) {
@@ -141,11 +142,13 @@ const Index = () => {
                 .from('search_results')
                 .insert({
                   search_history_id: searchHistory.id,
-                  results: JSON.parse(JSON.stringify(filteredResults)) // Convert InstagramPost[] to Json
+                  results: JSON.parse(JSON.stringify(filteredResults))
                 });
             }
           }
         }
+        // Invalidate recent searches query after successful bulk search
+        queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
       }
 
       return results;
