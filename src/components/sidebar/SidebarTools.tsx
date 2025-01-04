@@ -1,27 +1,28 @@
-import { History, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SidebarSection } from "./SidebarSection";
 
-const toolsMenuItems = [
-  {
-    title: "Video Search",
-    url: "/",
-    icon: Search,
-  },
-  {
-    title: "Recent Searches",
-    url: "/history",
-    icon: History,
-  },
-];
+interface SidebarToolsProps {
+  currentPath: string;
+  subscriptionStatus?: any;
+}
 
-export function SidebarTools({ currentPath }: { currentPath: string }) {
+export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsProps) {
   const navigate = useNavigate();
-  
+
+  const items = [
+    {
+      title: "Search",
+      url: "/",
+      icon: Search,
+    },
+  ];
+
   return (
     <SidebarSection
-      title="TOOLS"
-      items={toolsMenuItems}
+      title="Tools"
+      items={items}
+      subscriptionStatus={subscriptionStatus}
       onNavigate={navigate}
       currentPath={currentPath}
     />
