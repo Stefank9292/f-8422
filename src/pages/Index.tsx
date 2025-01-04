@@ -57,11 +57,13 @@ const Index = () => {
     gcTime: Infinity,
     retry: 2,
     refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      if (data && data.length > 0) {
-        triggerConfetti();
+    meta: {
+      onSuccess: (data: any[]) => {
+        if (data && data.length > 0) {
+          triggerConfetti();
+        }
       }
-    },
+    }
   });
 
   const handleSearch = async () => {
