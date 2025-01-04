@@ -74,6 +74,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
               className="min-h-[200px] font-mono"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
+              disabled={isLoading}
             />
             <p className={`text-sm text-right ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-red-500' : 'text-gray-500'}`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
@@ -87,6 +88,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             setNumberOfVideos={setNumberOfVideos}
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
+            disabled={isLoading}
           />
 
           <div className="flex justify-end gap-3">

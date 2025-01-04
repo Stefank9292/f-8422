@@ -14,6 +14,7 @@ interface SearchSettingsProps {
   setNumberOfVideos: (value: number) => void;
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
+  disabled?: boolean;
 }
 
 export const SearchSettings = ({
@@ -23,6 +24,7 @@ export const SearchSettings = ({
   setNumberOfVideos,
   selectedDate,
   setSelectedDate,
+  disabled = false,
 }: SearchSettingsProps) => {
   // Calculate the date 90 days ago
   const ninetyDaysAgo = new Date();
@@ -39,13 +41,14 @@ export const SearchSettings = ({
   return (
     <Collapsible
       open={isSettingsOpen}
-      onOpenChange={setIsSettingsOpen}
+      onOpenChange={disabled ? undefined : setIsSettingsOpen}
       className="w-full space-y-2"
     >
       <CollapsibleTrigger asChild>
         <Button
           variant="ghost"
           className="flex items-center space-x-2 mx-auto text-gray-600"
+          disabled={disabled}
         >
           <Settings className="w-4 h-4" />
           <span>Search Settings</span>
@@ -62,6 +65,7 @@ export const SearchSettings = ({
               variant="outline"
               size="icon"
               onClick={() => setNumberOfVideos(Math.max(1, numberOfVideos - 1))}
+              disabled={disabled}
             >
               <Minus className="w-4 h-4" />
             </Button>
@@ -70,6 +74,7 @@ export const SearchSettings = ({
               variant="outline"
               size="icon"
               onClick={() => setNumberOfVideos(Math.min(10, numberOfVideos + 1))}
+              disabled={disabled}
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -90,9 +95,10 @@ export const SearchSettings = ({
                   value={selectedDate ? format(selectedDate, 'dd.MM.yyyy') : ''}
                   className="pl-10"
                   readOnly
+                  disabled={disabled}
                 />
                 <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                {selectedDate && (
+                {selectedDate && !disabled && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -112,6 +118,7 @@ export const SearchSettings = ({
                     size="sm"
                     onClick={handleTodayClick}
                     className="text-sm"
+                    disabled={disabled}
                   >
                     Today
                   </Button>
@@ -120,6 +127,7 @@ export const SearchSettings = ({
                     size="sm"
                     onClick={handleResetClick}
                     className="text-sm"
+                    disabled={disabled}
                   >
                     Reset
                   </Button>
@@ -128,9 +136,9 @@ export const SearchSettings = ({
               <Calendar
                 mode="single"
                 selected={selectedDate}
-                onSelect={setSelectedDate}
+                onSelect={disabled ? undefined : setSelectedDate}
                 disabled={(date) => {
-                  return date > new Date() || date < ninetyDaysAgo;
+                  return date > new Date() || date < ninetyDaysAgo || disabled;
                 }}
                 initialFocus
               />

@@ -124,6 +124,7 @@ const Index = () => {
           setNumberOfVideos={setNumberOfVideos}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          disabled={isLoading || isBulkSearching}
         />
       </div>
 
