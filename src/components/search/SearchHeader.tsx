@@ -29,7 +29,7 @@ export const SearchHeader = () => {
             </TooltipTrigger>
             <TooltipContent className="max-w-[250px] p-4">
               <div className="space-y-2">
-                <p className="text-[11px]">You found a discount code – Gotta catch&apos;em all! Here is your 25% discount on Ultra plan for the first month! 🎉</p>
+                <p className="text-[11px]">You've unlocked a discount code – Time to level up! 🎉 Enjoy 25% off the Ultra Plan for your first month! 🚀</p>
                 <button
                   onClick={copyDiscountCode}
                   className="w-full p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
