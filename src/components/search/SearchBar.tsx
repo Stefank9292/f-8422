@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,12 @@ export const SearchBar = ({
   isLoading 
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
+  const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
+  const examples = ["garyvee", "innermale", "stefankarolija"];
+  const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const typingSpeed = 100; // milliseconds per character
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -37,8 +43,57 @@ export const SearchBar = ({
       if (error) throw error;
       return data;
     },
-    enabled: false, // Only run when explicitly triggered
+    enabled: false,
   });
+
+  useEffect(() => {
+    let initialTimeout: NodeJS.Timeout;
+    let typingTimeout: NodeJS.Timeout;
+
+    const startTypingAnimation = () => {
+      setIsTyping(true);
+      setCurrentExampleIndex(0);
+      setCurrentCharIndex(0);
+    };
+
+    if (!username) {
+      // Show default placeholder for 3 seconds before starting animation
+      initialTimeout = setTimeout(() => {
+        startTypingAnimation();
+      }, 3000);
+    } else {
+      setIsTyping(false);
+      setPlaceholder("Enter Instagram username or profile URL");
+    }
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearTimeout(typingTimeout);
+    };
+  }, [username]);
+
+  useEffect(() => {
+    let typingTimeout: NodeJS.Timeout;
+
+    if (isTyping && !username) {
+      const currentExample = examples[currentExampleIndex];
+
+      if (currentCharIndex <= currentExample.length) {
+        typingTimeout = setTimeout(() => {
+          setPlaceholder(currentExample.substring(0, currentCharIndex));
+          setCurrentCharIndex(prev => prev + 1);
+        }, typingSpeed);
+      } else {
+        // Move to next example after a pause
+        typingTimeout = setTimeout(() => {
+          setCurrentCharIndex(0);
+          setCurrentExampleIndex((prev) => (prev + 1) % examples.length);
+        }, 1000);
+      }
+    }
+
+    return () => clearTimeout(typingTimeout);
+  }, [currentCharIndex, currentExampleIndex, examples, isTyping, username]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading) {
@@ -56,7 +111,7 @@ export const SearchBar = ({
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder="Enter Instagram username or profile URL"
+          placeholder={placeholder}
           className="pl-12 pr-32 h-14 text-base md:text-lg rounded-xl border-2 border-gray-200 dark:border-gray-700 focus:border-primary"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
