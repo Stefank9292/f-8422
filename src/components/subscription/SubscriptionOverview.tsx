@@ -18,37 +18,31 @@ export const SubscriptionOverview = ({
   const usagePercentage = (usedClicks / maxClicks) * 100;
 
   return (
-    <Card className="w-full bg-sidebar-accent p-4 space-y-4">
+    <Card className="w-full bg-sidebar p-4 space-y-4">
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center gap-2">
-          <Activity className="h-4 w-4 text-primary" />
-          <h4 className="text-sm font-medium text-foreground">Request Usage</h4>
+          <Activity className="h-4 w-4 text-muted-foreground" />
+          <h4 className="text-sm font-medium">Request Usage</h4>
         </div>
         
         {/* Usage Stats */}
         <div className="space-y-3">
           {/* Numbers */}
           <div className="flex justify-between text-sm">
-            <div className="flex flex-col">
-              <span className="font-semibold text-foreground">{usedClicks}</span>
-              <span className="text-xs text-muted-foreground">used</span>
-            </div>
-            <div className="flex flex-col items-end">
-              <span className="font-semibold text-foreground">{remainingClicks}</span>
-              <span className="text-xs text-muted-foreground">remaining</span>
-            </div>
+            <span className="font-medium">{usedClicks} used</span>
+            <span className="font-medium">{remainingClicks} remaining</span>
           </div>
 
           {/* Progress Bar */}
           <Progress 
             value={usagePercentage} 
-            className="h-3 bg-secondary"
+            className="h-2 bg-secondary"
           />
 
           {/* Total */}
-          <p className="text-xs text-muted-foreground text-center">
-            {maxClicks} total clicks per period
+          <p className="text-sm text-muted-foreground">
+            Total: {maxClicks} per period
           </p>
         </div>
       </div>
