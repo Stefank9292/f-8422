@@ -112,8 +112,7 @@ export const SearchBar = ({
         <Input
           type="text"
           placeholder={placeholder}
-          className="pl-14 pr-36 h-16 text-lg md:text-xl rounded-2xl border-2 
-                   border-gray-200/80 dark:border-gray-800/80 
+          className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
                    focus:border-primary shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
           value={username}
@@ -121,19 +120,19 @@ export const SearchBar = ({
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <Search className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400 w-6 h-6" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
         {isBulkSearchEnabled && (
           <Button
             variant="ghost"
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 
                      flex items-center gap-2 text-gray-600 hover:text-gray-900 
                      dark:text-gray-400 dark:hover:text-gray-200
-                     h-12 px-4 rounded-xl"
+                     h-7 px-3 rounded-lg"
             onClick={() => setIsBulkSearchOpen(true)}
             disabled={isLoading}
           >
-            <List className="w-5 h-5" />
-            <span className="hidden md:inline font-medium">Bulk Search</span>
+            <List className="w-3.5 h-3.5" />
+            <span className="hidden md:inline text-[11px] font-medium">Bulk Search</span>
           </Button>
         )}
       </div>

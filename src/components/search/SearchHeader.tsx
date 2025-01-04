@@ -4,37 +4,37 @@ import { Badge } from "@/components/ui/badge";
 
 export const SearchHeader = () => {
   return (
-    <div className="text-center space-y-6 w-full max-w-2xl mx-auto">
+    <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
       <div className="relative inline-block">
-        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
           VyralSearch
         </h1>
         <Badge 
           variant="secondary" 
-          className="absolute -top-1 -right-16 text-sm bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-3 py-1 rounded-lg font-medium"
+          className="absolute -top-1 -right-12 text-[11px] bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-2 py-0.5 rounded-lg font-medium"
         >
           BETA
         </Badge>
       </div>
       <div className="mt-2">
-        <span className="px-6 py-2.5 text-base font-medium text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
+        <span className="px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
           Video Research on Steroids
         </span>
       </div>
-      <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 mt-8">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 mt-6">
         <a
           href="#"
-          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
         >
-          <Instagram className="w-5 h-5 text-[#E1306C]" />
-          <span className="text-base font-medium text-gray-800 dark:text-gray-200">Instagram</span>
+          <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+          <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200">Instagram</span>
         </a>
         <div
-          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
         >
-          <TikTokIcon className="w-5 h-5 text-gray-400" />
-          <span className="text-base font-medium text-gray-400">TikTok</span>
-          <span className="text-sm text-gray-400 ml-1">Coming Soon</span>
+          <TikTokIcon className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-[11px] font-medium text-gray-400">TikTok</span>
+          <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
         </div>
       </div>
     </div>
