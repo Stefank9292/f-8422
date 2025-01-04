@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost, ApifyRequestBody } from "./types";
 import { isInstagramPost, transformToInstagramPost } from "./validation";
-import { trackInstagramRequest } from "./requestTracker";
+import { trackInstagramRequest, checkRequestLimit } from "./requestTracker";
 
 async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   const response = await fetch(
@@ -27,8 +27,6 @@ async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<Instagra
   }
 
   const data = await response.json();
-  console.log('Raw response from Apify:', data);
-
   return Array.isArray(data) 
     ? data.map(post => transformToInstagramPost(post))
          .filter((post): post is InstagramPost => post !== null)
@@ -41,15 +39,20 @@ export async function fetchInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
-    console.log('Fetching Instagram posts for:', username);
-    
-    // Get current user session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
     }
 
-    // Clean up username and handle URL input
+    // Check if user has reached their request limit
+    const canMakeRequest = await checkRequestLimit(session.user.id);
+    if (!canMakeRequest) {
+      throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+    }
+
+    // Track the request before making it
+    await trackInstagramRequest(session.user.id);
+
     let cleanUsername = username.trim();
     if (cleanUsername.includes('instagram.com')) {
       const urlParts = cleanUsername.split('/');
@@ -84,14 +87,7 @@ export async function fetchInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    const validPosts = await makeApifyRequest(requestBody);
-    
-    // Only track request if we got valid posts
-    if (validPosts.length > 0) {
-      await trackInstagramRequest(session.user.id);
-    }
-
-    return validPosts;
+    return await makeApifyRequest(requestBody);
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
     throw error;
@@ -104,13 +100,19 @@ export async function fetchBulkInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
-    console.log('Fetching bulk Instagram posts for URLs:', urls);
-    
-    // Get current user session
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
     }
+
+    // Check if user has reached their request limit
+    const canMakeRequest = await checkRequestLimit(session.user.id);
+    if (!canMakeRequest) {
+      throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+    }
+
+    // Track the request before making it (counts as one request regardless of number of URLs)
+    await trackInstagramRequest(session.user.id);
 
     const cleanUrls = urls.map(url => {
       let cleanUrl = url.trim();
@@ -140,14 +142,7 @@ export async function fetchBulkInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    const validPosts = await makeApifyRequest(requestBody);
-    
-    // Only track request if we got valid posts
-    if (validPosts.length > 0) {
-      await trackInstagramRequest(session.user.id);
-    }
-
-    return validPosts;
+    return await makeApifyRequest(requestBody);
   } catch (error) {
     console.error('Error fetching bulk Instagram posts:', error);
     throw error;

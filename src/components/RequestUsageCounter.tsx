@@ -22,12 +22,17 @@ export const RequestUsageCounter = () => {
       if (!session?.user.id) return null;
       
       const now = new Date();
+      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endOfDay = new Date(startOfDay);
+      endOfDay.setDate(endOfDay.getDate() + 1);
+
       const { data, error } = await supabase
         .from('user_requests')
         .select('*')
         .eq('user_id', session.user.id)
-        .gte('period_end', now.toISOString())
-        .order('period_end', { ascending: false });
+        .gte('period_start', startOfDay.toISOString())
+        .lt('period_end', endOfDay.toISOString())
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data;
@@ -96,7 +101,7 @@ export const RequestUsageCounter = () => {
         </div>
         <Progress value={usagePercentage} className="h-2" />
         <p className="text-sm text-muted-foreground">
-          Total requests: {maxRequests} per period
+          Total requests: {maxRequests} per day
         </p>
       </div>
     </Card>
