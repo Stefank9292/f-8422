@@ -24,7 +24,7 @@ export const SearchHeader = () => {
       <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 mt-8">
         <a
           href="#"
-          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-all duration-200 group"
+          className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
         >
           <Instagram className="w-5 h-5 text-[#E1306C]" />
           <span className="text-base font-medium text-gray-800 dark:text-gray-200">Instagram</span>
