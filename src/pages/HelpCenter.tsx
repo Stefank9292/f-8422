@@ -50,11 +50,11 @@ const HelpCenter = () => {
             <div className="w-full h-full bg-muted flex items-center justify-center">
               <div className="text-center space-y-2">
                 <h3 className="text-2xl font-semibold text-muted-foreground">Tutorial Video</h3>
-                <p className="text-sm text-muted-foreground/80">Coming Soon</p>
               </div>
             </div>
           </AspectRatio>
         </div>
+        <p className="text-sm text-muted-foreground text-center -mt-4">Coming Soon</p>
 
         <Accordion type="single" collapsible className="w-full space-y-2">
           <AccordionItem value="getting-started" className="border rounded-lg px-4">
