@@ -22,11 +22,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   });
 
   const { subscriptionStatus } = useSubscriptionLimits(session);
-  const isUltraPlan = subscriptionStatus === 'ultra';
+  const isSteroidsUser = subscriptionStatus === 'ultra';
 
   // Set up real-time listener for search history changes
   useEffect(() => {
-    if (!isUltraPlan) return;
+    if (!isSteroidsUser) return;
 
     const channel = supabase
       .channel('search-history-changes')
@@ -47,12 +47,12 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient, isUltraPlan]);
+  }, [queryClient, isSteroidsUser]);
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
-      if (!isUltraPlan) return [];
+      if (!isSteroidsUser) return [];
       
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
@@ -71,7 +71,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       return data || [];
     },
-    enabled: isUltraPlan,
+    enabled: isSteroidsUser,
   });
 
   const handleRemove = (id: string) => {
@@ -80,7 +80,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
 
-  if (!isUltraPlan) {
+  if (!isSteroidsUser) {
     return (
       <div className="w-full flex flex-col items-center space-y-4 mt-6">
         <div className="flex items-center gap-2">
@@ -88,7 +88,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
           <span className="text-[11px] text-muted-foreground font-medium">Recent Searches Locked</span>
         </div>
         <p className="text-[11px] text-muted-foreground text-center">
-          Recent searches are only available on the Ultra plan
+          Recent searches are only available on the Creator on Steroids plan
         </p>
       </div>
     );
