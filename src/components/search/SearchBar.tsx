@@ -113,7 +113,7 @@ export const SearchBar = ({
           type="text"
           placeholder={placeholder}
           className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
-                   focus:border-primary shadow-sm
+                   focus:border-[#0EA5E9] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}

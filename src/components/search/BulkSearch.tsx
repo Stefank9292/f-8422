@@ -103,7 +103,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             </Button>
             <Button
               onClick={handleSearch}
-              className="h-10 px-6 text-sm font-medium bg-[#9b87f5] hover:bg-[#9b87f5]/90 text-white"
+              className="h-10 px-6 text-sm font-medium bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white"
               disabled={isLoading}
             >
               {isLoading ? (
