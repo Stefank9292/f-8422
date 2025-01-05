@@ -143,9 +143,7 @@ export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButton
       className={`w-full text-[11px] h-8 ${
         isCurrentPlan 
           ? "bg-secondary hover:bg-secondary/80" 
-          : isPopular 
-            ? "primary-gradient"
-            : "bg-[#222226] hover:bg-[#222226]/90 text-white"
+          : "bg-[#222226] hover:bg-[#222226]/90 text-white"
       }`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
