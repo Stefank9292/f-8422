@@ -80,15 +80,6 @@ export const PricingCard = ({
           <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
             {name}
           </h2>
-          {isPopular && (
-            <Badge 
-              variant="outline"
-              className="instagram-gradient bg-clip-text text-transparent border px-1 py-0.5 text-[8px] font-medium animate-pulse 
-                        [background:linear-gradient(to_right,#D946EF,#FF3D77,#FF8A3D)_padding-box,linear-gradient(to_right,#D946EF,#FF3D77,#FF8A3D)_border-box] border-transparent"
-            >
-              Best
-            </Badge>
-          )}
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
         <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
