@@ -5,6 +5,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { LucideIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface FilterInputProps {
   icon: LucideIcon;
@@ -26,6 +28,8 @@ export const FilterInput = ({
   type = "text",
   isDatePicker = false
 }: FilterInputProps) => {
+  const isMobile = useIsMobile();
+  
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       onChange(format(date, 'dd.MM.yyyy'));
@@ -54,7 +58,10 @@ export const FilterInput = ({
                 type="text"
                 placeholder={placeholder}
                 value={value}
-                className="h-8 text-xs pl-8"
+                className={cn(
+                  "h-8 text-xs pl-8",
+                  isMobile && "bg-background"
+                )}
                 readOnly
               />
               <CalendarIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
@@ -98,7 +105,10 @@ export const FilterInput = ({
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 text-xs"
+        className={cn(
+          "h-8 text-xs",
+          isMobile && "bg-background"
+        )}
       />
     </div>
   );

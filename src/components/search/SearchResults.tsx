@@ -4,6 +4,7 @@ import confetti from 'canvas-confetti';
 import { cn } from "@/lib/utils";
 import { TablePagination } from "./TablePagination";
 import { TableContent } from "./TableContent";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SearchResultsProps {
   posts: any[];
@@ -30,6 +31,7 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const hasTriggeredConfetti = useRef<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const currentPostsString = JSON.stringify(posts);
@@ -170,15 +172,28 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      <TableContent
-        currentPosts={currentPosts}
-        handleSort={handleSort}
-        handleCopyCaption={handleCopyCaption}
-        handleDownload={handleDownload}
-        formatNumber={formatNumber}
-        truncateCaption={truncateCaption}
-      />
+    <div className={cn(
+      "space-y-4",
+      isMobile && "px-2"
+    )}>
+      <div className={cn(
+        "overflow-x-auto -mx-4 px-4",
+        isMobile && "pb-4"
+      )}>
+        <div className={cn(
+          "min-w-[800px]",
+          isMobile && "rounded-lg shadow-sm"
+        )}>
+          <TableContent
+            currentPosts={currentPosts}
+            handleSort={handleSort}
+            handleCopyCaption={handleCopyCaption}
+            handleDownload={handleDownload}
+            formatNumber={formatNumber}
+            truncateCaption={truncateCaption}
+          />
+        </div>
+      </div>
 
       {sortedPosts.length > 25 && (
         <TablePagination
