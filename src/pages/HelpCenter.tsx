@@ -1,6 +1,12 @@
 import { BookOpen, AlertCircle, CheckCircle, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 const HelpCenter = () => {
   return (
@@ -40,82 +46,106 @@ const HelpCenter = () => {
           {/* Getting Started */}
           <Card className="hover:bg-accent/5 transition-colors">
             <CardContent className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-lg bg-primary/10">
-                  <BookOpen className="h-6 w-6 text-primary" />
-                </div>
-                <h2 className="text-xl font-semibold">Getting Started</h2>
-              </div>
-              <div className="space-y-4 text-muted-foreground">
-                <p className="font-medium text-foreground">Welcome to VyralSearch</p>
-                <p>Get started with our platform in three simple steps:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Enter an Instagram username or profile URL</li>
-                  <li>Configure your search settings (optional)</li>
-                  <li>Click "Search Viral Videos" to start analyzing</li>
-                </ul>
-              </div>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="getting-started" className="border-none">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-primary/10">
+                        <BookOpen className="h-6 w-6 text-primary" />
+                      </div>
+                      <h2 className="text-xl font-semibold">Getting Started</h2>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 text-muted-foreground pt-4">
+                      <p className="font-medium text-foreground">Welcome to VyralSearch</p>
+                      <p>Get started with our platform in three simple steps:</p>
+                      <ul className="list-disc pl-6 space-y-2">
+                        <li>Enter an Instagram username or profile URL</li>
+                        <li>Configure your search settings (optional)</li>
+                        <li>Click "Search Viral Videos" to start analyzing</li>
+                      </ul>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
           </Card>
 
           {/* Known Issues */}
           <Card className="hover:bg-accent/5 transition-colors">
             <CardContent className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-lg bg-destructive/10">
-                  <AlertCircle className="h-6 w-6 text-destructive" />
-                </div>
-                <h2 className="text-xl font-semibold">Known Issues</h2>
-              </div>
-              <div className="space-y-4">
-                <p className="font-medium text-foreground">Current Limitations</p>
-                <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-                  <p className="text-muted-foreground">• Private Instagram accounts cannot be searched</p>
-                  <p className="text-muted-foreground">• Some videos may have limited metadata available</p>
-                  <p className="text-muted-foreground">• Historical data beyond 90 days may be incomplete</p>
-                </div>
-              </div>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="known-issues" className="border-none">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-destructive/10">
+                        <AlertCircle className="h-6 w-6 text-destructive" />
+                      </div>
+                      <h2 className="text-xl font-semibold">Known Issues</h2>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 pt-4">
+                      <p className="font-medium text-foreground">Current Limitations</p>
+                      <div className="bg-muted/30 rounded-lg p-4 space-y-2">
+                        <p className="text-muted-foreground">• Private Instagram accounts cannot be searched</p>
+                        <p className="text-muted-foreground">• Some videos may have limited metadata available</p>
+                        <p className="text-muted-foreground">• Historical data beyond 90 days may be incomplete</p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
           </Card>
 
           {/* Best Practices */}
           <Card className="hover:bg-accent/5 transition-colors">
             <CardContent className="p-8">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 rounded-lg bg-green-500/10">
-                  <CheckCircle className="h-6 w-6 text-green-500" />
-                </div>
-                <h2 className="text-xl font-semibold">Best Practices</h2>
-              </div>
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <div className="flex items-start gap-4">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">1</span>
-                    <div>
-                      <p className="font-medium text-foreground">Use Specific Searches</p>
-                      <p className="text-muted-foreground">Target specific content creators rather than broad hashtags or topics.</p>
+              <Accordion type="single" collapsible>
+                <AccordionItem value="best-practices" className="border-none">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-lg bg-green-500/10">
+                        <CheckCircle className="h-6 w-6 text-green-500" />
+                      </div>
+                      <h2 className="text-xl font-semibold">Best Practices</h2>
                     </div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-4">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">2</span>
-                    <div>
-                      <p className="font-medium text-foreground">Filter Results Effectively</p>
-                      <p className="text-muted-foreground">Use engagement rates and view counts to identify truly viral content.</p>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-6 pt-4">
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">1</span>
+                          <div>
+                            <p className="font-medium text-foreground">Use Specific Searches</p>
+                            <p className="text-muted-foreground">Target specific content creators rather than broad hashtags or topics.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">2</span>
+                          <div>
+                            <p className="font-medium text-foreground">Filter Results Effectively</p>
+                            <p className="text-muted-foreground">Use engagement rates and view counts to identify truly viral content.</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-4">
+                          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">3</span>
+                          <div>
+                            <p className="font-medium text-foreground">Regular Analysis</p>
+                            <p className="text-muted-foreground">Monitor successful accounts frequently to stay updated with trending content.</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-4">
-                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500 font-semibold">3</span>
-                    <div>
-                      <p className="font-medium text-foreground">Regular Analysis</p>
-                      <p className="text-muted-foreground">Monitor successful accounts frequently to stay updated with trending content.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </CardContent>
           </Card>
         </div>
