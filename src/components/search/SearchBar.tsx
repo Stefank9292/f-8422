@@ -27,7 +27,7 @@ export const SearchBar = ({
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
   const [currentCharIndex, setCurrentCharIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const typingSpeed = 100; // milliseconds per character
+  const typingSpeed = 100;
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -100,7 +100,6 @@ export const SearchBar = ({
     }
   };
 
-  // Updated condition to show bulk search for both Pro and Ultra plans
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
     subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
     subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV" || // Pro Annual
@@ -127,8 +126,8 @@ export const SearchBar = ({
           <Button
             variant="ghost"
             className="absolute right-2 top-1/2 transform -translate-y-1/2 
-                     flex items-center gap-2 text-gray-600 hover:text-gray-900 
-                     dark:text-gray-400 dark:hover:text-gray-200
+                     flex items-center gap-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100/80
+                     dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800/80
                      h-7 px-3 rounded-lg"
             onClick={() => setIsBulkSearchOpen(true)}
             disabled={isLoading}
