@@ -27,10 +27,11 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle views filter with proper type checking and validation
+    // Handle views filter (GREEN column - viewsCount)
     if (filters.minViews && filters.minViews !== "") {
       const minViews = parseInt(filters.minViews);
       if (!isNaN(minViews)) {
+        // Ensure we're using viewsCount (GREEN column)
         const postViews = typeof post.viewsCount === 'number' ? post.viewsCount : 0;
         if (postViews < minViews) {
           return false;
@@ -38,10 +39,11 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle plays filter with proper type checking and validation
+    // Handle plays filter (PINK column - playsCount)
     if (filters.minPlays && filters.minPlays !== "") {
       const minPlays = parseInt(filters.minPlays);
       if (!isNaN(minPlays)) {
+        // Ensure we're using playsCount (PINK column)
         const postPlays = typeof post.playsCount === 'number' ? post.playsCount : 0;
         if (postPlays < minPlays) {
           return false;
@@ -65,7 +67,7 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle engagement filter (remove % and convert to number)
+    // Handle engagement filter
     if (filters.minEngagement && filters.minEngagement !== "") {
       const minEngagement = parseFloat(filters.minEngagement);
       if (!isNaN(minEngagement) && post.engagement) {
