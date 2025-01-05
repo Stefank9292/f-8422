@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost, ApifyRequestBody } from "./types/InstagramTypes";
-import { makeApifyRequest } from "./services/apifyService";
-import { APIFY_CONFIG } from "./config/apifyConfig";
+import { makeApifyRequest, checkSubscriptionAndLimits } from "./services/apifyService";
+import { transformToInstagramPost } from "./transformers/postTransformer";
 
 async function trackInstagramRequest(userId: string) {
   const now = new Date();
@@ -31,6 +31,12 @@ export async function fetchInstagramPosts(
       throw new Error('No authenticated user found');
     }
 
+    const { canMakeRequest, maxRequestsPerDay } = await checkSubscriptionAndLimits(session.user.id);
+    
+    if (!canMakeRequest) {
+      throw new Error(`Daily request limit of ${maxRequestsPerDay} reached. Please upgrade your plan for more requests.`);
+    }
+
     await trackInstagramRequest(session.user.id);
 
     const requestBody: ApifyRequestBody = {
@@ -43,22 +49,24 @@ export async function fetchInstagramPosts(
       resultsType: "posts",
       searchLimit: 1,
       searchType: "user",
+      memoryMbytes: 512,
       maxPosts: numberOfVideos,
       mediaTypes: ["VIDEO"],
       expandVideo: true,
-      includeVideoMetadata: true,
-      ...APIFY_CONFIG
+      includeVideoMetadata: true
     };
 
     if (postsNewerThan) {
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    console.log('Making Apify request with optimized configuration');
+    console.log('Making Apify request with body:', requestBody);
     const data = await makeApifyRequest(requestBody);
+    console.log('Received response from Apify:', data);
     
     return Array.isArray(data) 
-      ? data.filter(post => post !== null)
+      ? data.map(post => transformToInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== null)
       : [];
   } catch (error) {
     console.error('Error fetching Instagram posts:', error);
@@ -76,6 +84,12 @@ export async function fetchBulkInstagramPosts(
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
+    }
+
+    const { canMakeRequest, maxRequestsPerDay } = await checkSubscriptionAndLimits(session.user.id);
+    
+    if (!canMakeRequest) {
+      throw new Error(`Daily request limit of ${maxRequestsPerDay} reached. Please upgrade your plan for more requests.`);
     }
 
     await trackInstagramRequest(session.user.id);
@@ -98,22 +112,24 @@ export async function fetchBulkInstagramPosts(
       resultsType: "posts",
       searchLimit: 1,
       searchType: "user",
+      memoryMbytes: 512,
       maxPosts: numberOfVideos,
       mediaTypes: ["VIDEO"],
       expandVideo: true,
-      includeVideoMetadata: true,
-      ...APIFY_CONFIG
+      includeVideoMetadata: true
     };
 
     if (postsNewerThan) {
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
-    console.log('Making bulk Apify request with optimized configuration');
+    console.log('Making bulk Apify request with body:', requestBody);
     const data = await makeApifyRequest(requestBody);
+    console.log('Received bulk response from Apify:', data);
     
     return Array.isArray(data) 
-      ? data.filter(post => post !== null)
+      ? data.map(post => transformToInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== null)
       : [];
   } catch (error) {
     console.error('Error fetching bulk Instagram posts:', error);

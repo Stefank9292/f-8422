@@ -1,12 +1,11 @@
-import { APIFY_ENDPOINTS, APIFY_API_KEY } from '../config/apifyConfig';
-import { ApifyRequestBody } from '../types/InstagramTypes';
+import { supabase } from "@/integrations/supabase/client";
+import { ApifyRequestBody } from "../types/InstagramTypes";
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody) {
   console.log('Making Apify request to endpoint');
-  const apiEndpoint = `${APIFY_ENDPOINTS.BASE_URL}/${APIFY_ENDPOINTS.INSTAGRAM_SCRAPER}?token=${APIFY_API_KEY}`;
+  const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
   
   try {
-    console.log('Sending optimized request to Apify:', { ...requestBody, token: '[REDACTED]' });
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
@@ -27,32 +26,70 @@ export async function makeApifyRequest(requestBody: ApifyRequestBody) {
     }
 
     const data = await response.json();
-    
-    // Validate the response data
-    if (!Array.isArray(data)) {
-      console.error('Invalid response format:', data);
-      throw new Error('Invalid response format from Apify API');
-    }
-
-    // Filter out any null or invalid entries
-    const validData = data.filter(item => 
-      item && 
-      typeof item === 'object' &&
-      item.ownerUsername &&
-      item.caption &&
-      (item.videoViewCount !== undefined || item.viewsCount !== undefined) &&
-      (item.videoPlayCount !== undefined || item.playsCount !== undefined)
-    );
-
-    if (validData.length === 0) {
-      console.warn('No valid posts found in the response');
-    } else {
-      console.log(`Successfully received ${validData.length} valid posts from Apify`);
-    }
-
-    return validData;
+    console.log('Successfully received data from Apify');
+    return data;
   } catch (error) {
     console.error('Error in makeApifyRequest:', error);
     throw error;
   }
+}
+
+export async function checkSubscriptionAndLimits(userId: string): Promise<{
+  canMakeRequest: boolean;
+  maxRequestsPerDay: number;
+  isSteroidsUser: boolean;
+}> {
+  console.log('Checking subscription and limits for user:', userId);
+  
+  // Get subscription status
+  const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke(
+    'check-subscription',
+    {
+      body: { userId }
+    }
+  );
+
+  if (subscriptionError) {
+    console.error('Error checking subscription:', subscriptionError);
+    throw new Error('Failed to check subscription status');
+  }
+
+  const isSteroidsUser = 
+    subscriptionData?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+    subscriptionData?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
+  const isProUser = 
+    subscriptionData?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+    subscriptionData?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+
+  // Get current day's request count
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  const { count } = await supabase
+    .from('user_requests')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('request_type', 'instagram_search')
+    .gte('created_at', startOfDay.toISOString())
+    .lt('created_at', endOfDay.toISOString());
+
+  const currentRequests = count || 0;
+  const maxRequestsPerDay = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
+  const canMakeRequest = currentRequests < maxRequestsPerDay;
+
+  console.log('Subscription check results:', {
+    currentRequests,
+    maxRequestsPerDay,
+    canMakeRequest,
+    isSteroidsUser
+  });
+
+  return {
+    canMakeRequest,
+    maxRequestsPerDay,
+    isSteroidsUser
+  };
 }

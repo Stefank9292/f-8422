@@ -37,28 +37,18 @@ export const useSearchState = () => {
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
       console.log('Fetching Instagram posts for:', username);
-      try {
-        const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
-        
-        if (!results || results.length === 0) {
-          toast({
-            title: "No Results Found",
-            description: "No videos found for this username. Try adjusting your search criteria.",
-            variant: "destructive",
-          });
-          return [];
-        }
-        
-        if (results.length > 0) {
-          await saveSearchHistory(username, results);
-          toast({
-            title: "Search Successful",
-            description: `Found ${results.length} videos`,
-          });
-        }
-        
-        return results;
-      } catch (error: any) {
+      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
+      
+      if (results.length > 0) {
+        await saveSearchHistory(username, results);
+      }
+      
+      return results;
+    },
+    enabled: shouldFetch && !!username && !isBulkSearching,
+    retry: false,
+    meta: {
+      onError: (error: Error) => {
         console.error('Search error:', error);
         toast({
           title: "Search Failed",
@@ -66,11 +56,8 @@ export const useSearchState = () => {
           variant: "destructive",
         });
         setShouldFetch(false);
-        throw error;
       }
     },
-    enabled: shouldFetch && !!username && !isBulkSearching,
-    retry: 1,
     gcTime: 0,
     staleTime: 0,
   });
