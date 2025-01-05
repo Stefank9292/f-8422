@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-import { Loader2, Trash2, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SearchHistoryItem } from "@/components/history/SearchHistoryItem";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const SearchHistory = () => {
   const { toast } = useToast();
@@ -35,7 +35,6 @@ const SearchHistory = () => {
           table: 'search_history'
         },
         () => {
-          // Invalidate and refetch when changes occur
           queryClient.invalidateQueries({ queryKey: ['search-history'] });
         }
       )
@@ -175,44 +174,13 @@ const SearchHistory = () => {
             No search history found
           </div>
         ) : (
-          searchHistory?.map((item: any) => (
-            <div
+          searchHistory?.map((item) => (
+            <SearchHistoryItem
               key={item.id}
-              className="p-4 rounded-lg border bg-card text-card-foreground"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">@{item.search_query}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {format(new Date(item.created_at), 'MMM d, yyyy HH:mm')}
-                    </span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {Array.isArray(item.search_results?.[0]?.results) 
-                      ? item.search_results[0]?.results.length 
-                      : 0} results found
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => window.open(`/search?q=${item.search_query}`, '_blank')}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(item.id)}
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+              item={item}
+              onDelete={handleDelete}
+              isDeleting={isDeleting}
+            />
           ))
         )}
       </div>
