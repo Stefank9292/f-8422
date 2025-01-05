@@ -132,6 +132,13 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
         return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
       }
       
+      if (sortKey === 'engagement') {
+        // Convert engagement percentage strings to numbers for comparison
+        const engagementA = parseFloat(a[sortKey].replace('%', ''));
+        const engagementB = parseFloat(b[sortKey].replace('%', ''));
+        return sortDirection === 'asc' ? engagementA - engagementB : engagementB - engagementA;
+      }
+      
       const valueA = a[sortKey];
       const valueB = b[sortKey];
       
