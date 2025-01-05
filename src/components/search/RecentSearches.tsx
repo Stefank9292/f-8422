@@ -48,24 +48,22 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         {recentSearches.map((search) => (
           <div
             key={search.id}
-            className="group flex items-center gap-2.5 bg-secondary/50 hover:bg-secondary/80 
-                     px-5 py-2.5 rounded-full transition-all duration-200 
-                     border border-border/50 hover:border-border/80"
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
           >
-            <Instagram className="h-3.5 w-3.5 text-primary" />
+            <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
             <button
               onClick={() => onSelect(search.search_query)}
-              className="text-sm text-foreground/80 hover:text-foreground font-medium"
+              className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
             >
               {search.search_query}
             </button>
             <Button
               variant="ghost"
               size="icon"
-              className="h-4 w-4 transition-colors"
+              className="h-4 w-4 p-0 hover:bg-transparent"
               onClick={() => handleRemove(search.id)}
             >
-              <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+              <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
               <span className="sr-only">Remove search</span>
             </Button>
           </div>
