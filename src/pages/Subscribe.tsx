@@ -111,10 +111,10 @@ const SubscribePage = () => {
 
   return (
     <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-6xl mx-auto space-y-8 pt-8">
-        <div className="text-center space-y-4">
+      <div className="max-w-3xl mx-auto space-y-8 pt-8">
+        <div className="space-y-4">
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-          <p className="text-[13px] text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-[13px] text-muted-foreground">
             {subtitle}
           </p>
           {subscriptionStatus?.subscribed && (
@@ -147,7 +147,7 @@ const SubscribePage = () => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto px-4">
+          <div className="grid md:grid-cols-3 gap-6">
             {pricingPlans.map((plan, index) => (
               <PricingCard
                 key={index}
