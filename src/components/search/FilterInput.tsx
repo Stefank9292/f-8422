@@ -39,12 +39,18 @@ export const FilterInput = ({
 
   const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Only allow positive numbers
-    if (type === "number" && value !== "") {
+    // Only allow positive numbers and empty string
+    if (type === "number") {
+      if (value === "") {
+        onChange("");
+        return;
+      }
       const num = parseInt(value);
-      if (num < 0) return;
+      if (isNaN(num) || num < 0) return;
+      onChange(num.toString());
+    } else {
+      onChange(value);
     }
-    onChange(value);
   };
 
   if (isDatePicker) {

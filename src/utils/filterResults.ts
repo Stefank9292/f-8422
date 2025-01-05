@@ -27,19 +27,32 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Apply numeric filters in the same order as the table columns
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) {
-      return false;
+    // Handle views filter - ensure proper numeric comparison
+    if (filters.minViews && filters.minViews !== "") {
+      const minViews = parseInt(filters.minViews);
+      const postViews = post.viewsCount || 0;
+      
+      if (isNaN(minViews) || postViews < minViews) {
+        return false;
+      }
     }
 
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) {
-      return false;
+    // Handle plays filter - ensure proper numeric comparison
+    if (filters.minPlays && filters.minPlays !== "") {
+      const minPlays = parseInt(filters.minPlays);
+      const postPlays = post.playsCount || 0;
+      
+      if (isNaN(minPlays) || postPlays < minPlays) {
+        return false;
+      }
     }
 
+    // Handle likes filter
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
       return false;
     }
 
+    // Handle comments filter
     if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
       return false;
     }
