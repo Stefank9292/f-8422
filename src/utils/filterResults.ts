@@ -7,7 +7,6 @@ export interface FilterState {
   minPlays: string;
   minLikes: string;
   minComments: string;
-  minDuration: string;
   minEngagement: string;
 }
 
@@ -43,17 +42,6 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
 
     if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
       return false;
-    }
-
-    // Handle duration filter
-    if (filters.minDuration && post.duration) {
-      // Split duration into minutes and seconds
-      const [minutes, seconds] = post.duration.split(':').map(Number);
-      const totalSeconds = (minutes * 60) + seconds;
-      
-      if (totalSeconds < parseInt(filters.minDuration)) {
-        return false;
-      }
     }
 
     // Handle engagement filter (remove % and convert to number)

@@ -5,7 +5,6 @@ interface SearchFilters {
   minPlays: string;
   minLikes: string;
   minComments: string;
-  minDuration: string;
   minEngagement: string;
   postsNewerThan: string;
 }
@@ -31,7 +30,6 @@ export const useSearchStore = create<SearchState>((set) => ({
     minPlays: "",
     minLikes: "",
     minComments: "",
-    minDuration: "",
     minEngagement: "",
     postsNewerThan: ""
   },
@@ -45,7 +43,6 @@ export const useSearchStore = create<SearchState>((set) => ({
       minPlays: "",
       minLikes: "",
       minComments: "",
-      minDuration: "",
       minEngagement: "",
       postsNewerThan: ""
     }

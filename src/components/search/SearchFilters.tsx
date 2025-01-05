@@ -1,4 +1,4 @@
-import { Calendar, Eye, Play, Heart, MessageCircle, Clock, Zap, ChevronDown, Filter, X } from "lucide-react";
+import { Calendar, Eye, Play, Heart, MessageCircle, Zap, ChevronDown, Filter, X } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -11,7 +11,6 @@ interface FiltersType {
   minPlays: string;
   minLikes: string;
   minComments: string;
-  minDuration: string;
   minEngagement: string;
   postsNewerThan: string;
 }
@@ -75,14 +74,6 @@ export const SearchFilters = ({
       value: filters.minComments,
       onChange: (value: string) => onFilterChange('minComments', value),
       placeholder: "e.g. 100",
-      type: "number"
-    },
-    {
-      icon: Clock,
-      label: "Minimum Duration (seconds)",
-      value: filters.minDuration,
-      onChange: (value: string) => onFilterChange('minDuration', value),
-      placeholder: "e.g. 30",
       type: "number"
     },
     {

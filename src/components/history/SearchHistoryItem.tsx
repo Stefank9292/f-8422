@@ -49,7 +49,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     minPlays: "",
     minLikes: "",
     minComments: "",
-    minDuration: "",
     minEngagement: "",
   });
 
@@ -65,7 +64,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       minPlays: "",
       minLikes: "",
       minComments: "",
-      minDuration: "",
       minEngagement: "",
     });
     setCurrentPage(1);
