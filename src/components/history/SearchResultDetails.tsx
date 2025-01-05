@@ -1,138 +1,147 @@
-import { useState } from "react";
-import { Instagram, ExternalLink, Download, Copy, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { InstagramPost } from "@/types/instagram";
-import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
+import { Instagram, Play, Eye, Heart, MessageCircle, Zap, Download, ExternalLink, Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SearchResultDetailsProps {
   result: InstagramPost;
 }
 
 export function SearchResultDetails({ result }: SearchResultDetailsProps) {
-  const [isCopied, setIsCopied] = useState(false);
   const { toast } = useToast();
 
-  const handleCopyCaption = async () => {
-    try {
-      await navigator.clipboard.writeText(result.caption || "");
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-      toast({
-        title: "Caption copied to clipboard",
-        duration: 2000,
-      });
-    } catch (err) {
-      toast({
-        title: "Failed to copy caption",
-        variant: "destructive",
-        duration: 2000,
-      });
-    }
+  const handleCopyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      description: "Caption copied to clipboard",
+    });
   };
 
-  const handleDownload = async (url: string) => {
+  const handleDownload = async (videoUrl: string) => {
     try {
-      const response = await fetch(url);
+      const response = await fetch(videoUrl);
       const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = `instagram-video-${Date.now()}.mp4`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `video-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
       toast({
-        title: "Download started",
-        duration: 2000,
+        description: "Download started",
       });
-    } catch (err) {
+    } catch (error) {
+      console.error('Download error:', error);
       toast({
-        title: "Failed to download video",
         variant: "destructive",
-        duration: 2000,
+        description: "Failed to download video",
       });
     }
   };
 
   return (
-    <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-all duration-200">
+    <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
       <div className="flex flex-col space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Instagram className="w-4 h-4 flex-shrink-0" />
             <a
               href={result.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium hover:underline truncate"
+              className="text-sm font-medium hover:underline truncate"
             >
               @{result.ownerUsername}
             </a>
+          </div>
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
               className="h-7 w-7 p-0"
-              onClick={() => window.open(result.url, "_blank")}
+              onClick={() => window.open(result.url, '_blank')}
             >
               <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
             </Button>
+            {result.videoUrl && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                onClick={() => handleDownload(result.videoUrl!)}
+              >
+                <Download className="h-3.5 w-3.5 text-blue-400" />
+              </Button>
+            )}
           </div>
-          {result.videoUrl && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 w-7 p-0"
-              onClick={() => handleDownload(result.videoUrl!)}
-            >
-              <Download className="h-3.5 w-3.5 text-blue-400" />
-            </Button>
-          )}
         </div>
         
         <div className="flex items-start gap-2">
-          <div className="aspect-square w-24 h-24 rounded-md overflow-hidden bg-muted flex-shrink-0">
-            <img
-              src={result.displayUrl}
-              alt="Post thumbnail"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="min-w-0 flex-1 space-y-2">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
-              <div>
-                <div className="text-muted-foreground">Likes</div>
-                <div className="font-medium">{result.likesCount}</div>
+          <p className="text-xs text-muted-foreground line-clamp-2 flex-1">{result.caption}</p>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 w-7 p-0 flex-shrink-0"
+            onClick={() => handleCopyCaption(result.caption)}
+          >
+            <Copy className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+        
+        <div className="grid grid-cols-3 gap-3 text-xs">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Play className="w-3.5 h-3.5 text-primary" />
+                <span>{result.playsCount.toLocaleString()}</span>
               </div>
-              <div>
-                <div className="text-muted-foreground">Comments</div>
-                <div className="font-medium">{result.commentsCount}</div>
+            </TooltipTrigger>
+            <TooltipContent>Plays</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Eye className="w-3.5 h-3.5 text-green-500" />
+                <span>{result.viewsCount.toLocaleString()}</span>
               </div>
-              <div>
-                <div className="text-muted-foreground">Plays</div>
-                <div className="font-medium">{result.playsCount || "N/A"}</div>
+            </TooltipTrigger>
+            <TooltipContent>Views</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Heart className="w-3.5 h-3.5 text-rose-500" />
+                <span>{result.likesCount.toLocaleString()}</span>
               </div>
-            </div>
-            {result.caption && (
-              <div className="flex items-start gap-2">
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {result.caption}
-                </p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 flex-shrink-0"
-                  onClick={handleCopyCaption}
-                >
-                  {isCopied ? (
-                    <Check className="h-3.5 w-3.5 text-green-500" />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" />
-                  )}
-                </Button>
+            </TooltipTrigger>
+            <TooltipContent>Likes</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <MessageCircle className="w-3.5 h-3.5 text-blue-500" />
+                <span>{result.commentsCount.toLocaleString()}</span>
               </div>
-            )}
-          </div>
+            </TooltipTrigger>
+            <TooltipContent>Comments</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5 text-yellow-500" />
+                <span>{result.engagement}%</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Engagement Rate</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>

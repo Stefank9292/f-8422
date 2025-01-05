@@ -22,13 +22,10 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const results = item.search_results?.[0]?.results || [];
 
   return (
-    <div className="animate-fade-in group">
-      <div className={cn(
-        "p-4 rounded-lg border bg-card text-card-foreground transition-all duration-200",
-        isExpanded ? "shadow-md bg-accent/30" : "hover:bg-accent/50"
-      )}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
+    <div className="animate-fade-in">
+      <div className="p-3 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <span className="font-medium truncate">@{item.search_query}</span>
             <span className="text-xs text-muted-foreground whitespace-nowrap">
               {format(new Date(item.created_at), 'MMM d, HH:mm')}
@@ -37,14 +34,14 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               ({results.length})
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
               className={cn(
-                "h-8 w-8 p-0 transition-all duration-200",
-                isExpanded ? "bg-accent hover:bg-accent/80" : "hover:bg-accent/50"
+                "h-8 w-8 p-0 transition-transform duration-200",
+                isExpanded && "bg-accent"
               )}
             >
               {isExpanded ? (
@@ -58,7 +55,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               size="sm"
               onClick={() => onDelete(item.id)}
               disabled={isDeleting}
-              className="h-8 w-8 p-0 hover:bg-destructive/10"
+              className="h-8 w-8 p-0"
             >
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
@@ -67,7 +64,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       </div>
       
       {isExpanded && results.length > 0 && (
-        <div className="pl-3 pt-3 space-y-3 animate-accordion-down">
+        <div className="pl-2 pt-2 space-y-2 animate-fade-in">
           {results.map((result, index) => (
             <SearchResultDetails key={index} result={result} />
           ))}
