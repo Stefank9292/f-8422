@@ -11,6 +11,7 @@ export interface InstagramPost {
   url: string;
   videoUrl?: string;
   timestamp?: string;
+  productType?: string;
 }
 
 export interface SearchResultItem {

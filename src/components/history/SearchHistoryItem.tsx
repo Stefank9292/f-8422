@@ -23,7 +23,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const { toast } = useToast();
   const allResults = item.search_results?.[0]?.results || [];
   // Filter for clips only
-  const results = allResults.filter(post => post.type?.toLowerCase() === 'clip');
+  const results = allResults.filter(post => post.productType?.toLowerCase() === 'clips');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState<FilterState>({
