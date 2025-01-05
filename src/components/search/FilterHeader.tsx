@@ -16,11 +16,11 @@ export const FilterHeader = ({ totalResults, filteredResults, onReset, currentPo
         <Filter className="w-3.5 h-3.5 text-primary/70" />
         <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] text-muted-foreground/70">
+      <div className="flex items-center gap-2 w-full sm:w-auto">
+        <span className="text-[10px] text-muted-foreground/70 hidden sm:inline">
           Showing {filteredResults} of {totalResults} results
         </span>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
           <ExportCSV currentPosts={currentPosts} />
           <Button 
             variant="ghost" 

@@ -27,49 +27,49 @@ export const MobilePostRow = ({
       onOpenChange={setIsOpen}
       className="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
     >
-      <CollapsibleTrigger className="flex w-full items-center justify-between p-4 hover:bg-muted/50">
-        <div className="flex flex-col items-start gap-1">
+      <CollapsibleTrigger className="flex w-full items-start justify-between p-4 hover:bg-muted/50">
+        <div className="flex flex-col items-start gap-2">
           <span className="text-sm font-medium">@{post.ownerUsername}</span>
-          <p className="text-xs text-muted-foreground line-clamp-2 text-left">{post.caption}</p>
-          <span className="text-xs text-muted-foreground">{post.date}</span>
+          <p className="text-xs text-muted-foreground line-clamp-3 text-left">{post.caption}</p>
+          <span className="text-[10px] text-muted-foreground">{post.date}</span>
         </div>
         <ChevronDown
           className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform duration-200",
+            "h-4 w-4 text-muted-foreground transition-transform duration-200 flex-shrink-0 mt-1",
             isOpen && "rotate-180"
           )}
         />
       </CollapsibleTrigger>
 
       <CollapsibleContent className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-green-500" />
-            <span className="text-sm font-medium text-green-500">
+            <Eye className="h-3.5 w-3.5 text-green-500" />
+            <span className="text-xs font-medium text-green-500">
               {formatNumber(post.playsCount)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Play className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-primary">
+            <Play className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-primary">
               {formatNumber(post.viewsCount)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Heart className="h-4 w-4 text-rose-500" />
-            <span className="text-sm font-medium text-rose-500">
+            <Heart className="h-3.5 w-3.5 text-rose-500" />
+            <span className="text-xs font-medium text-rose-500">
               {formatNumber(post.likesCount)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4 text-blue-400" />
-            <span className="text-sm font-medium text-blue-400">
+            <MessageSquare className="h-3.5 w-3.5 text-blue-400" />
+            <span className="text-xs font-medium text-blue-400">
               {formatNumber(post.commentsCount)}
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-orange-500" />
-            <span className="text-sm font-medium text-orange-500">
+          <div className="flex items-center gap-2 col-span-2">
+            <Zap className="h-3.5 w-3.5 text-orange-500" />
+            <span className="text-xs font-medium text-orange-500">
               {post.engagement}
             </span>
           </div>
@@ -79,28 +79,28 @@ export const MobilePostRow = ({
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 h-8 text-xs"
             onClick={() => window.open(post.url, '_blank')}
           >
-            <ExternalLink className="mr-2 h-4 w-4" />
+            <ExternalLink className="mr-2 h-3.5 w-3.5" />
             Open
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 h-8 text-xs"
             onClick={() => onDownload(post.videoUrl)}
           >
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="mr-2 h-3.5 w-3.5" />
             Download
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="flex-1"
+            className="flex-1 h-8 text-xs"
             onClick={() => onCopyCaption(post.caption)}
           >
-            <Copy className="mr-2 h-4 w-4" />
+            <Copy className="mr-2 h-3.5 w-3.5" />
             Copy
           </Button>
         </div>

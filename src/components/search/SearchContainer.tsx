@@ -45,15 +45,15 @@ export const SearchContainer = ({
   } = useSearchStore();
 
   return (
-    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-8 md:space-y-12 animate-in fade-in duration-300">
-      <div className="space-y-6 w-full max-w-md">
+    <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      <div className="space-y-4 sm:space-y-6 w-full max-w-md">
         <SearchHeader />
         <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
           Save time finding viral content for social media
         </p>
       </div>
 
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-md space-y-4 sm:space-y-6">
         <SearchBar
           username={username}
           onSearch={handleSearch}
@@ -102,7 +102,7 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full max-w-[90rem] space-y-8">
+        <div className="w-full max-w-[90rem] space-y-6 sm:space-y-8">
           <SearchFilters
             filters={filters}
             onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
