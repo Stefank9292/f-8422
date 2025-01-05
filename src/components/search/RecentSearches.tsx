@@ -1,15 +1,15 @@
 import { X, Instagram, History } from "lucide-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
 }
 
 export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
-  const queryClient = useQueryClient();
+  const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
@@ -28,39 +28,13 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     },
   });
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('search-history-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_history'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  const handleRemove = async (id: string) => {
-    const { data: session } = await supabase.auth.getSession();
-    if (!session?.session?.user?.id) return;
-
-    await supabase
-      .from('search_history')
-      .delete()
-      .eq('id', id)
-      .eq('user_id', session.session.user.id);
+  const handleRemove = (id: string, query: string) => {
+    setHiddenSearches(prev => [...prev, id]);
   };
 
-  if (recentSearches.length === 0) return null;
+  const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
+
+  if (visibleSearches.length === 0) return null;
 
   return (
     <div className="w-full flex flex-col items-center space-y-4 mt-6">
@@ -69,7 +43,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         <span className="text-[11px] text-muted-foreground font-medium">Recent Searches</span>
       </div>
       <div className="w-full flex flex-wrap justify-center gap-2.5">
-        {recentSearches.map((search) => (
+        {visibleSearches.map((search) => (
           <div
             key={search.id}
             className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
@@ -85,7 +59,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               variant="ghost"
               size="icon"
               className="h-1 w-1 p-0 hover:bg-transparent"
-              onClick={() => handleRemove(search.id)}
+              onClick={() => handleRemove(search.id, search.search_query)}
             >
               <X className="h-1 w-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
               <span className="sr-only">Remove search</span>
