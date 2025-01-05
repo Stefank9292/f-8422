@@ -6,13 +6,13 @@ export function SidebarNavigation() {
 
   return (
     <>
-      <div className="flex items-center justify-center px-4 py-3 border-b border-sidebar-border">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
         <span className={`text-sm font-medium transition-opacity duration-200 ${state === 'collapsed' ? 'opacity-0' : 'opacity-100'}`}>
           Navigation
         </span>
         <button 
           onClick={toggleSidebar}
-          className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors ml-auto"
+          className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
           aria-label={state === 'collapsed' ? 'Expand Sidebar' : 'Collapse Sidebar'}
         >
           <PanelLeftClose 
