@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { X, Instagram } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -39,31 +39,35 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   if (recentSearches.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-wrap gap-2 mt-3">
-      {recentSearches.map((search) => (
-        <div
-          key={search.id}
-          className="group flex items-center gap-1.5 bg-gray-100/80 dark:bg-gray-800/50 
-                   hover:bg-gray-200/80 dark:hover:bg-gray-700/50 
-                   px-3 py-1.5 rounded-full transition-colors"
-        >
-          <button
-            onClick={() => onSelect(search.search_query)}
-            className="text-[11px] text-gray-600 dark:text-gray-300 font-medium"
+    <div className="w-full flex flex-col items-center space-y-3 mt-4">
+      <h3 className="text-sm font-medium text-muted-foreground">Recent Searches</h3>
+      <div className="w-full flex flex-wrap justify-center gap-2">
+        {recentSearches.map((search) => (
+          <div
+            key={search.id}
+            className="group flex items-center gap-2 bg-secondary/50 hover:bg-secondary/80 
+                     px-4 py-2 rounded-full transition-all duration-200 
+                     border border-border/50 hover:border-border/80"
           >
-            {search.search_query}
-          </button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={() => handleRemove(search.id)}
-          >
-            <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300" />
-            <span className="sr-only">Remove search</span>
-          </Button>
-        </div>
-      ))}
+            <Instagram className="h-3.5 w-3.5 text-muted-foreground" />
+            <button
+              onClick={() => onSelect(search.search_query)}
+              className="text-xs text-foreground/80 hover:text-foreground font-medium"
+            >
+              {search.search_query}
+            </button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => handleRemove(search.id)}
+            >
+              <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+              <span className="sr-only">Remove search</span>
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
