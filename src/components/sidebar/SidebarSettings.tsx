@@ -40,7 +40,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       url: "/subscribe",
       showWhen: () => true, // Always show this button
       className: (isCreatorPro || isFreeUser) ? 
-        "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] text-white hover:from-[#FFE55C] hover:via-[#FFB52E] hover:to-[#FFA033] transition-all duration-300" 
+        "group relative" 
         : undefined
     },
     {
@@ -76,6 +76,8 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
           }
 
           const IconComponent = item.icon;
+          const isUpgradeButton = item.title.includes("Upgrade to Creator on Steroids");
+          
           const button = (
             <button
               key={item.title}
@@ -89,10 +91,16 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
             >
               <IconComponent 
                 className={`h-3.5 w-3.5 transition-transform duration-500 ease-spring
-                  ${(isCreatorPro || isFreeUser) && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
-                  ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
+                  ${isUpgradeButton ? 'animate-synchronized-pulse bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] [&>path]:fill-transparent [&>path]:stroke-white' : ''}
+                  ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`}
               />
-              <span className="text-left">{item.title}</span>
+              {isUpgradeButton ? (
+                <span className="bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] text-transparent bg-clip-text animate-synchronized-pulse">
+                  {item.title}
+                </span>
+              ) : (
+                <span className="text-left">{item.title}</span>
+              )}
               {item.lockIcon && <Lock className="h-3.5 w-3.5 ml-auto text-muted-foreground" />}
             </button>
           );
