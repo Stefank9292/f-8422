@@ -1,6 +1,6 @@
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
-import { Instagram, Play, Eye, Heart, MessageCircle, Clock, Zap, Download, ExternalLink, Copy } from "lucide-react";
+import { Instagram, Play, Eye, Heart, MessageCircle, Zap, Download, ExternalLink, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -131,16 +131,6 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
               </div>
             </TooltipTrigger>
             <TooltipContent>Comments</TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-orange-500" />
-                <span>{result.duration}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>Duration</TooltipContent>
           </Tooltip>
           
           <Tooltip>
