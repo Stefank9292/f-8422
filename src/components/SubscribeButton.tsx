@@ -146,8 +146,6 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (planId === 'free' && !subscriptionStatus?.subscribed) || 
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
-  const isFree = planId === 'free';
-
   return (
     <Button 
       onClick={handleSubscribe} 
@@ -155,11 +153,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       className={`w-full text-[11px] h-8 ${
         isCurrentPlan 
           ? "bg-secondary hover:bg-secondary/80" 
-          : isPopular
-            ? "bg-[#222226] hover:bg-[#222226]/90 text-white"
-            : isFree
-              ? "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white"
-              : "bg-[#222226] hover:bg-[#222226]/90 text-white"
+          : "bg-[#222226] hover:bg-[#222226]/90 text-white"
       }`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
