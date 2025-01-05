@@ -1,6 +1,5 @@
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
-import { format, isValid, parseISO } from "date-fns";
 import { Instagram, Play, Eye, Heart, MessageCircle, Clock, Zap, Download, ExternalLink, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -12,22 +11,6 @@ interface SearchResultDetailsProps {
 
 export function SearchResultDetails({ result }: SearchResultDetailsProps) {
   const { toast } = useToast();
-
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'No date available';
-    
-    try {
-      const date = parseISO(dateString);
-      if (!isValid(date)) {
-        console.error('Invalid date after parsing:', dateString);
-        return 'Invalid date';
-      }
-      return format(date, 'MMMM d, yyyy');
-    } catch (error) {
-      console.error('Error formatting date:', error, 'Date string:', dateString);
-      return 'Invalid date';
-    }
-  };
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -167,10 +150,6 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
             </TooltipTrigger>
             <TooltipContent>Engagement Rate</TooltipContent>
           </Tooltip>
-        </div>
-        
-        <div className="text-[10px] text-muted-foreground">
-          {formatDate(result.date)}
         </div>
       </div>
     </div>
