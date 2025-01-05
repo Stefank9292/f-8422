@@ -1,4 +1,54 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Define the FAQ items with categories
+const faqItems = [
+  {
+    category: "general",
+    question: "Do you need access to my Account?",
+    answer: "No, all features are available without the need of logging in your Instagram account."
+  },
+  {
+    category: "billing",
+    question: "What is your cancellation policy?",
+    answer: "Our goal is to make you happy. You can cancel at any time and won't be billed for subsequent months. No hard feelings."
+  },
+  {
+    category: "billing",
+    question: "What are my payment options?",
+    answer: "We accept all major credit cards."
+  },
+  {
+    category: "billing",
+    question: "What currency are your prices in?",
+    answer: "Our prices are in USD."
+  },
+  {
+    category: "billing",
+    question: "Can I change my plan?",
+    answer: "You can change your plan at any time!"
+  },
+  {
+    category: "features",
+    question: "Do you have a referral plan?",
+    answer: "We currently do not have a referral program, but plan to add one in the near future."
+  },
+  {
+    category: "technical",
+    question: "Can I use VyralSearch on my phone?",
+    answer: "Yes! Our platform supports all common devices with a web browser."
+  },
+  {
+    category: "technical",
+    question: "My search came up with no results. What happened?",
+    answer: "Although our software is incredibly awesome, it has its limits. We aren't able to search private accounts, so please make sure you are only searching public profiles."
+  },
+  {
+    category: "features",
+    question: "Do I need to give credit to the owner of content I'm reposting?",
+    answer: "Some accounts get away with doing this. We highly advise against it. Our platform will provide you with all the users tagged in the content. Sometimes there will be multiple users on that list. You can feel free to only tag the original poster in those cases."
+  }
+];
 
 const FAQ = () => {
   return (
@@ -11,88 +61,48 @@ const FAQ = () => {
           </p>
         </div>
 
-        <Accordion type="single" collapsible className="w-full space-y-2">
-          <AccordionItem value="item-1" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              Do you need access to my Account?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              No, all features are available without the need of logging in your Instagram account.
-            </AccordionContent>
-          </AccordionItem>
-          
-          <AccordionItem value="item-2" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              What is your cancellation policy?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              Our goal is to make you happy. You can cancel at any time and won't be billed for subsequent months. No hard feelings.
-            </AccordionContent>
-          </AccordionItem>
-          
-          <AccordionItem value="item-3" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              What are my payment options?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              We accept all major credit cards.
-            </AccordionContent>
-          </AccordionItem>
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="w-full justify-start gap-2 bg-transparent h-auto p-0 mb-8">
+            <TabsTrigger 
+              value="all" 
+              className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+            >
+              All Questions
+            </TabsTrigger>
+            {["general", "billing", "features", "technical"].map((category) => (
+              <TabsTrigger
+                key={category}
+                value={category}
+                className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
+              >
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
 
-          <AccordionItem value="item-4" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              What currency are your prices in?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              Our prices are in USD.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="item-5" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              Can I change my plan?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              You can change your plan at any time!
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="item-6" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              Do you have a referral plan?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              We currently do not have a referral program, but plan to add one in the near future.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="item-7" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              Can I use VyralSearch on my phone?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              Yes! Our platform supports all common devices with a web browser.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="item-8" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              My search came up with no results. What happened?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              Although our software is incredibly awesome, it has its limits. We aren't able to search private accounts, so please make sure you are only searching public profiles.
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="item-9" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              Do I need to give credit to the owner of content I'm reposting?
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              Some accounts get away with doing this. We highly advise against it. Our platform will provide you with all the users tagged in the content. Sometimes there will be multiple users on that list. You can feel free to only tag the original poster in those cases.
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+          {["all", "general", "billing", "features", "technical"].map((tab) => (
+            <TabsContent key={tab} value={tab} className="mt-0">
+              <Accordion type="single" collapsible className="w-full space-y-2">
+                {faqItems
+                  .filter((item) => tab === "all" || item.category === tab)
+                  .map((item, index) => (
+                    <AccordionItem 
+                      key={index} 
+                      value={`item-${index}`} 
+                      className="border rounded-lg px-4"
+                    >
+                      <AccordionTrigger className="text-[13px] font-medium">
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-[11px] text-muted-foreground">
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+              </Accordion>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );
