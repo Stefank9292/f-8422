@@ -12,9 +12,7 @@ interface SearchHistoryResult {
   id: string;
   search_query: string;
   created_at: string;
-  search_results: Array<{
-    results: Record<string, any>[];
-  }>;
+  search_results?: Array<{ results: InstagramPost[] }>;
 }
 
 const SearchHistory = () => {
@@ -24,9 +22,18 @@ const SearchHistory = () => {
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // First, get the session
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   useEffect(() => {
     const channel = supabase
-      .channel('search-history-changes')
+      .channel('search_history_changes')
       .on(
         'postgres_changes',
         {
@@ -48,63 +55,57 @@ const SearchHistory = () => {
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) throw new Error('No authenticated user');
+      if (!session?.user?.id) return null;
 
-      const { data, error } = await supabase
+      const { data: historyData, error: historyError } = await supabase
         .from('search_history')
         .select(`
-          *,
+          id,
+          search_query,
+          created_at,
           search_results (
             results
           )
         `)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
-      if (error) throw error;
+      if (historyError) {
+        console.error('Error fetching search history:', historyError);
+        throw historyError;
+      }
 
-      return (data as SearchHistoryResult[]).map(item => ({
-        id: item.id,
-        search_query: item.search_query,
-        created_at: item.created_at,
-        search_results: item.search_results?.map(sr => ({
-          results: sr.results.map(result => ({
-            ownerUsername: String(result.ownerUsername || ''),
-            caption: String(result.caption || ''),
-            date: String(result.date || ''),
-            playsCount: Number(result.playsCount || 0),
-            viewsCount: Number(result.viewsCount || 0),
-            likesCount: Number(result.likesCount || 0),
-            commentsCount: Number(result.commentsCount || 0),
-            duration: String(result.duration || ''),
-            engagement: String(result.engagement || ''),
-            url: String(result.url || ''),
-          } as InstagramPost))
-        }))
-      }));
+      return historyData as SearchHistoryResult[];
     },
+    enabled: !!session?.user?.id,
   });
 
   const handleDelete = async (id: string) => {
+    if (!session?.user?.id) return;
+
     try {
       setIsDeleting(true);
       const { error } = await supabase
         .from('search_history')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', session.user.id);
 
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      
       toast({
-        description: "Search history deleted successfully",
+        title: "Success",
+        description: "Search history item deleted successfully",
       });
     } catch (error) {
       console.error('Error deleting search history:', error);
       toast({
+        title: "Error",
+        description: "Failed to delete search history item",
         variant: "destructive",
-        description: "Failed to delete search history",
       });
     } finally {
       setIsDeleting(false);
@@ -112,11 +113,10 @@ const SearchHistory = () => {
   };
 
   const handleDeleteAll = async () => {
+    if (!session?.user?.id) return;
+
     try {
       setIsDeletingAll(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user.id) throw new Error('No authenticated user');
-
       const { error } = await supabase
         .from('search_history')
         .delete()
@@ -125,14 +125,17 @@ const SearchHistory = () => {
       if (error) throw error;
 
       queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      
       toast({
+        title: "Success",
         description: "All search history deleted successfully",
       });
     } catch (error) {
       console.error('Error deleting all search history:', error);
       toast({
-        variant: "destructive",
+        title: "Error",
         description: "Failed to delete all search history",
+        variant: "destructive",
       });
     } finally {
       setIsDeletingAll(false);
@@ -152,7 +155,7 @@ const SearchHistory = () => {
   }
 
   return (
-    <div className="container mx-auto py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
       <SearchHistoryHeader 
         onDeleteAll={handleDeleteAll}
         isDeletingAll={isDeletingAll}
