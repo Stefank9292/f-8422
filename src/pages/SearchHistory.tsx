@@ -5,11 +5,23 @@ import { format } from "date-fns";
 import { Loader2, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const SearchHistory = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
@@ -58,6 +70,34 @@ const SearchHistory = () => {
     }
   };
 
+  const handleDeleteAll = async () => {
+    try {
+      setIsDeletingAll(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user.id) throw new Error('No authenticated user');
+
+      const { error } = await supabase
+        .from('search_history')
+        .delete()
+        .eq('user_id', session.user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      toast({
+        description: "All search history deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting all search history:', error);
+      toast({
+        variant: "destructive",
+        description: "Failed to delete all search history",
+      });
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -68,11 +108,42 @@ const SearchHistory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Search History</h1>
-        <p className="text-sm text-muted-foreground">
-          Your last 10 searches are shown here
-        </p>
+      <div className="flex justify-between items-center">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold">Search History</h1>
+          <p className="text-sm text-muted-foreground">
+            Your last 10 searches are shown here
+          </p>
+        </div>
+        {searchHistory && searchHistory.length > 0 && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                disabled={isDeletingAll}
+                className="ml-4"
+              >
+                {isDeletingAll ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  "Delete All"
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete All Search History</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete all your search history.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAll}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
 
       <div className="space-y-4">
