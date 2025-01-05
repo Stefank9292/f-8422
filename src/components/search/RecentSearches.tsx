@@ -1,13 +1,16 @@
 import { X, Instagram, History } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
 }
 
 export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
+  const queryClient = useQueryClient();
+
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
@@ -24,6 +27,27 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
       return data || [];
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('search-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const handleRemove = async (id: string) => {
     const { data: session } = await supabase.auth.getSession();
