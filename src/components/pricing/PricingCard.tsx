@@ -79,7 +79,7 @@ export const PricingCard = ({
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <Badge 
             variant="default" 
-            className="bg-primary text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg animate-pulse"
+            className="bg-primary text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg"
           >
             Most Popular
           </Badge>
