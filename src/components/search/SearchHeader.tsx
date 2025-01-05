@@ -14,7 +14,7 @@ export const SearchHeader = () => {
   return (
     <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
       <div className="relative inline-block">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent">
           VyralSearch
         </h1>
         <TooltipProvider>
@@ -42,7 +42,7 @@ export const SearchHeader = () => {
         </TooltipProvider>
       </div>
       <div className="mt-2">
-        <span className="px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D]">
+        <span className="px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D]">
           Video Research on Steroids
         </span>
       </div>
