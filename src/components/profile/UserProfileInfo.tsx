@@ -1,5 +1,5 @@
 import { UserAvatar } from "./UserAvatar";
-import { Progress } from "@/components/ui/progress";
+import { CircleProgressAvatar } from "./CircleProgressAvatar";
 import { Link } from "react-router-dom";
 import { Infinity } from "lucide-react";
 
@@ -49,13 +49,13 @@ export const UserProfileInfo = ({
 
         {isUltraPlan ? (
           <div className="flex items-center gap-3">
-            <UserAvatar 
+            <CircleProgressAvatar 
+              progress={0}
               isSteroidsUser={isSteroidsUser} 
-              isProUser={isProUser} 
-              className="bg-muted border border-border"
+              isProUser={isProUser}
             >
               <Infinity className="h-4 w-4 text-foreground" />
-            </UserAvatar>
+            </CircleProgressAvatar>
             <div className="flex flex-col">
               <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                 Unlimited Usage
@@ -67,44 +67,17 @@ export const UserProfileInfo = ({
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <div className="relative w-8 h-8">
-              <div className="absolute inset-0 -m-0.5">
-                <svg className="w-[calc(100%+4px)] h-[calc(100%+4px)]" viewBox="0 0 120 120">
-                  <circle
-                    className="text-sidebar-accent/20"
-                    strokeWidth="8"
-                    stroke="currentColor"
-                    fill="none"
-                    r="54"
-                    cx="60"
-                    cy="60"
-                  />
-                  <circle
-                    className="text-primary"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    stroke="currentColor"
-                    fill="none"
-                    r="54"
-                    cx="60"
-                    cy="60"
-                    strokeDasharray={`${(1 - usagePercentage / 100) * 339.292} 339.292`}
-                    transform="rotate(-90 60 60)"
-                  />
-                </svg>
+            <CircleProgressAvatar 
+              progress={usagePercentage}
+              isSteroidsUser={isSteroidsUser} 
+              isProUser={isProUser}
+            >
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-[10px] font-medium text-foreground">
+                  {remainingRequests}
+                </span>
               </div>
-              <UserAvatar 
-                isSteroidsUser={isSteroidsUser} 
-                isProUser={isProUser}
-                className="bg-muted border border-border relative z-10"
-              >
-                <div className="flex flex-col items-center justify-center">
-                  <span className="text-[10px] font-medium text-foreground">
-                    {remainingRequests}
-                  </span>
-                </div>
-              </UserAvatar>
-            </div>
+            </CircleProgressAvatar>
             <div className="flex flex-col">
               <div className="space-y-2">
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
