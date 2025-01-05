@@ -7,9 +7,10 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 interface SubscribeButtonProps {
   planId: string;
   planName: string;
+  isPopular?: boolean;
 }
 
-export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
+export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -139,7 +140,13 @@ export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
     <Button 
       onClick={handleSubscribe} 
       disabled={loading || isCurrentPlan}
-      className={`w-full text-[11px] h-8 ${isCurrentPlan ? "bg-secondary hover:bg-secondary/80" : "primary-gradient"}`}
+      className={`w-full text-[11px] h-8 ${
+        isCurrentPlan 
+          ? "bg-secondary hover:bg-secondary/80" 
+          : isPopular 
+            ? "primary-gradient"
+            : "bg-[#222226] hover:bg-[#222226]/90 text-white"
+      }`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
       {loading ? "Loading..." : getButtonText()}

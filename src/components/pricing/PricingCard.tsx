@@ -105,7 +105,7 @@ export const PricingCard = ({
         ))}
       </ul>
       <div className="pt-6">
-        <SubscribeButton planId={priceId} planName={name} />
+        <SubscribeButton planId={priceId} planName={name} isPopular={isPopular} />
       </div>
     </Card>
   );
