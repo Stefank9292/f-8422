@@ -1,8 +1,6 @@
 import { Calendar, Eye, Play, Heart, MessageCircle, Clock, Zap } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 interface FiltersType {
   minViews: string;
@@ -31,10 +29,8 @@ export const SearchFilters = ({
   filteredResults,
   currentPosts
 }: SearchFiltersProps) => {
-  const isMobile = useIsMobile();
-
   return (
-    <div className="space-y-4 animate-in fade-in">
+    <div className="space-y-6 animate-in fade-in">
       <FilterHeader
         totalResults={totalResults}
         filteredResults={filteredResults}
@@ -42,10 +38,7 @@ export const SearchFilters = ({
         currentPosts={currentPosts}
       />
 
-      <div className={cn(
-        "grid gap-4 bg-card/50 p-4 rounded-lg",
-        isMobile ? "grid-cols-2" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-      )}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-card/50 p-6 rounded-lg">
         <FilterInput
           icon={Calendar}
           label="Posts newer than"

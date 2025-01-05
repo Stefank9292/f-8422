@@ -8,7 +8,6 @@ import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SearchContainerProps {
   username: string;
@@ -34,7 +33,6 @@ export const SearchContainer = ({
   displayPosts
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const isMobile = useIsMobile();
   const { 
     setUsername,
     numberOfVideos,
@@ -47,15 +45,15 @@ export const SearchContainer = ({
   } = useSearchStore();
 
   return (
-    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-6 md:py-12 space-y-6 md:space-y-8 animate-in fade-in duration-300">
-      <div className="space-y-4 w-full max-w-md">
+    <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-8 md:space-y-12 animate-in fade-in duration-300">
+      <div className="space-y-6 w-full max-w-md">
         <SearchHeader />
         <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
           Save time finding viral content for social media
         </p>
       </div>
 
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md space-y-6">
         <SearchBar
           username={username}
           onSearch={handleSearch}
@@ -104,10 +102,7 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div className={cn(
-          "w-full space-y-4",
-          isMobile ? "max-w-full px-0" : "max-w-[90rem]"
-        )}>
+        <div className="w-full max-w-[90rem] space-y-8">
           <SearchFilters
             filters={filters}
             onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}

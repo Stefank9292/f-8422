@@ -2,8 +2,6 @@ import { Table, TableBody } from "@/components/ui/table";
 import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 interface TableContentProps {
   currentPosts: any[];
@@ -22,14 +20,9 @@ export const TableContent = ({
   formatNumber,
   truncateCaption,
 }: TableContentProps) => {
-  const isMobile = useIsMobile();
-
   return (
     <TooltipProvider>
-      <div className={cn(
-        "rounded-xl overflow-hidden border border-border",
-        isMobile && "bg-card shadow-sm"
-      )}>
+      <div className="rounded-xl overflow-hidden border border-border">
         <Table>
           <PostTableHeader onSort={handleSort} />
           <TableBody>

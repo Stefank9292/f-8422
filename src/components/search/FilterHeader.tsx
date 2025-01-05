@@ -1,8 +1,6 @@
 import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ExportCSV } from "./ExportCSV";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 interface FilterHeaderProps {
   totalResults: number;
@@ -12,13 +10,8 @@ interface FilterHeaderProps {
 }
 
 export const FilterHeader = ({ totalResults, filteredResults, onReset, currentPosts }: FilterHeaderProps) => {
-  const isMobile = useIsMobile();
-
   return (
-    <div className={cn(
-      "flex items-center justify-between gap-3 px-3 py-2.5 bg-card/50 rounded-lg",
-      isMobile ? "flex-col" : "flex-row"
-    )}>
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 py-2.5 bg-card/50 rounded-lg">
       <div className="flex items-center gap-1.5">
         <Filter className="w-3.5 h-3.5 text-primary/70" />
         <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
