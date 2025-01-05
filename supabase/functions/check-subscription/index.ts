@@ -102,9 +102,9 @@ serve(async (req) => {
 
     // Determine max clicks based on the plan
     let maxClicks = 3; // Default free plan
-    if (priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
       maxClicks = 25; // Premium plan
-    } else if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+    } else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
       maxClicks = 50; // Ultra plan
     }
 
