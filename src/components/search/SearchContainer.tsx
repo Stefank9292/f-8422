@@ -46,7 +46,7 @@ export const SearchContainer = ({
   } = useSearchStore();
 
   const onSearchClick = () => {
-    if (!isLoading && !isBulkSearching && username && !hasReachedLimit) {
+    if (!isLoading && !isBulkSearching && username) {
       handleSearch();
     }
   };
@@ -71,23 +71,17 @@ export const SearchContainer = ({
 
         <Button 
           onClick={onSearchClick}
-          disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
+          disabled={isLoading || isBulkSearching || !username}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
             username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-            "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
-            hasReachedLimit && "opacity-50 cursor-not-allowed"
+            "text-white dark:text-gray-100 shadow-sm hover:shadow-md"
           )}
         >
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
               <span>This can take up to a minute...</span>
-            </>
-          ) : hasReachedLimit ? (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Monthly Limit Reached ({requestCount}/{maxRequests})
             </>
           ) : (
             <>
