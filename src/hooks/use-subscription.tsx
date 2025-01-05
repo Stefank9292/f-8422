@@ -7,7 +7,7 @@ export function useSubscription(session: Session | null) {
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
-        throw new Error('No access token available');
+        return null;
       }
 
       const { data, error } = await supabase.functions.invoke('check-subscription', {
