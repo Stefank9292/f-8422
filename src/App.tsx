@@ -8,6 +8,7 @@ import { ResetPassword } from "@/components/auth/ResetPassword";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
+import Success from "@/pages/Success";
 import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
 
@@ -48,6 +49,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Subscribe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/success"
+                  element={
+                    <ProtectedRoute>
+                      <Success />
                     </ProtectedRoute>
                   }
                 />
