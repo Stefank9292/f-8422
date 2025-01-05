@@ -7,10 +7,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 interface SubscribeButtonProps {
   planId: string;
   planName: string;
-  isPopular?: boolean;
 }
 
-export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButtonProps) => {
+export const SubscribeButton = ({ planId, planName }: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -136,22 +135,11 @@ export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButton
     (planId === 'free' && !subscriptionStatus?.subscribed) || 
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
-  const isDowngrade = 
-    (planId === 'free' && subscriptionStatus?.subscribed) ||
-    (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" && planId === "price_1QdBd2DoPDXfOSZFnG8aWuIq");
-
-  const getButtonStyle = () => {
-    if (isCurrentPlan) return "bg-secondary hover:bg-secondary/80";
-    if (isDowngrade) return "bg-muted hover:bg-muted/80 text-muted-foreground";
-    if (isPopular || planId === "price_1QdC54DoPDXfOSZFXHBO4yB3") return "primary-gradient";
-    return "bg-primary hover:bg-primary/90";
-  };
-
   return (
     <Button 
       onClick={handleSubscribe} 
       disabled={loading || isCurrentPlan}
-      className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
+      className={`w-full text-[11px] h-8 ${isCurrentPlan ? "bg-secondary hover:bg-secondary/80" : "primary-gradient"}`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
       {loading ? "Loading..." : getButtonText()}
