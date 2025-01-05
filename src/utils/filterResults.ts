@@ -27,25 +27,25 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle views filter (GREEN column - viewsCount)
-    if (filters.minViews && filters.minViews !== "") {
-      const minViews = parseInt(filters.minViews);
-      if (!isNaN(minViews)) {
-        // We use viewsCount for the GREEN column
-        const viewsCount = post.viewsCount;
-        if (typeof viewsCount !== 'number' || viewsCount < minViews) {
+    // Handle plays filter (GREEN column - playsCount)
+    if (filters.minPlays && filters.minPlays !== "") {
+      const minPlays = parseInt(filters.minPlays);
+      if (!isNaN(minPlays)) {
+        // We use playsCount for the GREEN column
+        const playsCount = post.viewsCount; // Changed to viewsCount as per request
+        if (typeof playsCount !== 'number' || playsCount < minPlays) {
           return false;
         }
       }
     }
 
-    // Handle plays filter (PINK column - playsCount)
-    if (filters.minPlays && filters.minPlays !== "") {
-      const minPlays = parseInt(filters.minPlays);
-      if (!isNaN(minPlays)) {
-        // We use playsCount for the PINK column
-        const playsCount = post.playsCount;
-        if (typeof playsCount !== 'number' || playsCount < minPlays) {
+    // Handle views filter (PINK column - viewsCount)
+    if (filters.minViews && filters.minViews !== "") {
+      const minViews = parseInt(filters.minViews);
+      if (!isNaN(minViews)) {
+        // We use viewsCount for the PINK column
+        const viewsCount = post.playsCount; // Changed to playsCount as per request
+        if (typeof viewsCount !== 'number' || viewsCount < minViews) {
           return false;
         }
       }
