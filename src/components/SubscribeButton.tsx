@@ -39,10 +39,47 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     enabled: !!session?.access_token,
   });
 
+  const resetSearchUsage = async (userId: string, fromPlan: string | null, toPlan: string) => {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    // Check current usage
+    const { count } = await supabase
+      .from('user_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('request_type', 'instagram_search')
+      .gte('created_at', startOfMonth.toISOString())
+      .lt('created_at', endOfMonth.toISOString());
+
+    const currentUsage = count || 0;
+
+    // Reset logic based on plan changes
+    const isFromUnlimited = fromPlan === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                           fromPlan === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+    const isToFreePlan = toPlan === 'free';
+    const shouldResetUsage = isFromUnlimited || (!isToFreePlan && currentUsage > 3);
+
+    if (shouldResetUsage) {
+      // Update last_reset_at for all user requests in this period
+      await supabase
+        .from('user_requests')
+        .update({ last_reset_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .gte('created_at', startOfMonth.toISOString())
+        .lt('created_at', endOfMonth.toISOString());
+    }
+  };
+
   const handleSubscribe = async () => {
     try {
       setLoading(true);
       
+      if (!session?.user.id) {
+        throw new Error('No authenticated user found');
+      }
+
       // Handle downgrade to free plan
       if (planId === 'free') {
         const { error } = await supabase.functions.invoke('cancel-subscription', {
@@ -52,13 +89,15 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
         });
         if (error) throw error;
         
+        // Don't reset usage when downgrading to free plan
         toast({
           title: "Plan Updated",
-          description: "Your subscription has been cancelled and you have been moved to the Free plan immediately.",
+          description: "Your subscription has been cancelled and you have been moved to the Free plan.",
         });
       } 
       // Handle downgrade to Creator Pro from Creator on Steroids
-      else if (planId === "price_1QdtwnGX13ZRG2XihcM36r3W" && subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
+      else if (planId === "price_1QdtwnGX13ZRG2XihcM36r3W" && 
+               subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
         const { error } = await supabase.functions.invoke('update-subscription', {
           body: { priceId: planId },
           headers: {
@@ -67,6 +106,9 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
         });
         
         if (error) throw error;
+        
+        // Reset usage when downgrading from unlimited plan
+        await resetSearchUsage(session.user.id, subscriptionStatus.priceId, planId);
         
         toast({
           title: "Plan Updated",

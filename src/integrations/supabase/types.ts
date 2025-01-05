@@ -87,6 +87,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          last_reset_at: string | null
           period_end: string
           period_start: string
           request_type: string
@@ -95,6 +96,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          last_reset_at?: string | null
           period_end: string
           period_start: string
           request_type: string
@@ -103,6 +105,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          last_reset_at?: string | null
           period_end?: string
           period_start?: string
           request_type?: string
