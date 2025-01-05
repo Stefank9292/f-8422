@@ -79,22 +79,47 @@ export const useSearchState = () => {
       if (!session?.user.id) return 0;
       
       const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endOfDay = new Date(startOfDay);
-      endOfDay.setDate(endOfDay.getDate() + 1);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
       const { count } = await supabase
         .from('user_requests')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
         .eq('request_type', 'instagram_search')
-        .gte('created_at', startOfDay.toISOString())
-        .lt('created_at', endOfDay.toISOString());
+        .gte('created_at', startOfMonth.toISOString())
+        .lt('created_at', endOfMonth.toISOString())
+        .or(`last_reset_at.is.null,last_reset_at.lt.${startOfMonth.toISOString()}`);
 
       return count || 0;
     },
     enabled: !!session?.user.id,
   });
+
+  // Listen for real-time updates on user_requests
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const channel = supabase
+      .channel('user-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_requests',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['request-count'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient]);
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
