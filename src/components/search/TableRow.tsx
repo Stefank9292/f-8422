@@ -24,17 +24,14 @@ export const PostTableRow = ({
       <TableRow className="hover:bg-muted/30 transition-colors md:hidden">
         <TableCell colSpan={10} className="p-4">
           <div className="flex flex-col space-y-4">
-            {/* Header: Username and Date */}
+            {/* Username */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground font-medium">
+              <span className="text-sm font-medium">
                 @{post.ownerUsername}
-              </span>
-              <span className="text-xs text-muted-foreground" title={post.timestamp}>
-                {post.date}
               </span>
             </div>
 
-            {/* Caption */}
+            {/* Caption with Copy Button */}
             <div className="flex items-center gap-2">
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -59,33 +56,33 @@ export const PostTableRow = ({
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
-                <Play className="h-4 w-4 text-green-500" />
-                <span className="text-sm font-medium text-green-500">{formatNumber(post.playsCount)}</span>
+                <Play className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">{formatNumber(post.playsCount)}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium text-primary">{formatNumber(post.viewsCount)}</span>
+                <Eye className="h-4 w-4 text-green-500" />
+                <span className="text-sm font-medium">{formatNumber(post.viewsCount)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Heart className="h-4 w-4 text-rose-500" />
-                <span className="text-sm font-medium text-rose-500">{formatNumber(post.likesCount)}</span>
+                <span className="text-sm font-medium">{formatNumber(post.likesCount)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-blue-400" />
-                <span className="text-sm font-medium text-blue-400">{formatNumber(post.commentsCount)}</span>
+                <span className="text-sm font-medium">{formatNumber(post.commentsCount)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-purple-500" />
-                <span className="text-sm font-medium text-purple-500">{post.duration}</span>
+                <span className="text-sm font-medium">{post.duration}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Zap className="h-4 w-4 text-orange-500" />
-                <span className="text-sm font-medium text-orange-500">{post.engagement}%</span>
+                <span className="text-sm font-medium">{post.engagement}%</span>
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-2">
+            {/* Action Button */}
+            <div className="flex justify-end">
               <Button
                 variant="outline"
                 size="sm"
@@ -94,15 +91,6 @@ export const PostTableRow = ({
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-2" />
                 Open
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-blue-400 border-blue-400/20 hover:bg-blue-400/10"
-                onClick={() => onDownload(post.videoUrl)}
-              >
-                <Download className="w-3.5 h-3.5 mr-2" />
-                Download
               </Button>
             </div>
           </div>
