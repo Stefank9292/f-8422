@@ -83,9 +83,9 @@ export const PricingCard = ({
           {isPopular && (
             <Badge 
               variant="default" 
-              className="bg-rose-400 text-primary-foreground px-1.5 py-0.5 text-[9px] font-medium"
+              className="bg-rose-400 text-primary-foreground px-1 py-0.5 text-[8px] font-medium"
             >
-              Most Popular
+              Best
             </Badge>
           )}
         </div>
