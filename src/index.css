@@ -46,25 +46,25 @@
 
   .dark {
     --background: 220 47% 15%;
-    --foreground: 0 0% 98%;
+    --foreground: 210 60% 85%;  /* Brighter navy blue */
 
     --card: 220 47% 15%;
-    --card-foreground: 0 0% 98%;
+    --card-foreground: 210 60% 85%;  /* Brighter navy blue */
 
     --popover: 220 47% 15%;
-    --popover-foreground: 0 0% 98%;
+    --popover-foreground: 210 60% 85%;  /* Brighter navy blue */
 
     --primary: 317 95% 57%;
     --primary-foreground: 355.7 100% 97.3%;
 
     --secondary: 220 47% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary-foreground: 210 60% 85%;  /* Brighter navy blue */
 
     --muted: 220 47% 20%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 210 40% 75%;  /* Slightly dimmer navy blue for muted text */
 
     --accent: 220 47% 20%;
-    --accent-foreground: 0 0% 98%;
+    --accent-foreground: 210 60% 85%;  /* Brighter navy blue */
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
@@ -74,11 +74,11 @@
     --ring: 220 47% 20%;
 
     --sidebar-background: 220 47% 15%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-foreground: 210 60% 85%;  /* Brighter navy blue */
     --sidebar-primary: 317 95% 57%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
     --sidebar-accent: 220 47% 20%;
-    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-accent-foreground: 210 60% 85%;  /* Brighter navy blue */
     --sidebar-border: 220 47% 20%;
     --sidebar-ring: 220 47% 20%;
   }
