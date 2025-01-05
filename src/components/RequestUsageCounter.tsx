@@ -111,6 +111,9 @@ export const RequestUsageCounter = () => {
     return 'Free';
   };
 
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
   return (
     <div className="px-2 py-2 space-y-4 flex flex-col items-center">
       <div className="w-full flex flex-col items-center space-y-2">
@@ -124,9 +127,16 @@ export const RequestUsageCounter = () => {
           <span className="text-[11px] text-sidebar-foreground/70 text-center truncate max-w-[150px]">
             {session?.user?.email}
           </span>
-          <span className="text-[10px] text-sidebar-foreground/50">
-            {getPlanName()} Plan
-          </span>
+          <div className="flex items-center gap-1">
+            <span className={`text-[10px] ${
+              isSteroidsUser 
+                ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-pulse font-medium'
+                : 'text-sidebar-foreground/50'
+            }`}>
+              {getPlanName()}
+            </span>
+            <span className="text-[10px] text-sidebar-foreground/50">Plan</span>
+          </div>
         </div>
 
         <button
