@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
 import { useNavigate } from "react-router-dom";
 
 const SubscribePage = () => {
@@ -144,14 +143,6 @@ const SubscribePage = () => {
           <p className="text-[13px] text-muted-foreground text-center">
             {subtitle}
           </p>
-          {subscriptionStatus?.subscribed && (
-            <div className="flex justify-center mt-4">
-              <CancelSubscriptionButton 
-                isCanceled={subscriptionStatus?.canceled} 
-                className="w-auto text-[11px] h-8 px-4"
-              />
-            </div>
-          )}
         </div>
 
         <div className="space-y-6">
