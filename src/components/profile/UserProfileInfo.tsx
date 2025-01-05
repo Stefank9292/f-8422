@@ -48,38 +48,35 @@ export const UserProfileInfo = ({
             <span className="text-[10px] text-sidebar-foreground/50">Plan</span>
           </div>
 
-          <div className="mt-4">
-            {isUltraPlan ? (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5">
-                  <CircleUserRound className="w-3.5 h-3.5 text-primary animate-pulse" />
-                  <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
-                    Unlimited Usage
-                  </span>
-                </div>
-                <span className="text-[10px] text-sidebar-foreground/60">
-                  {usedRequests} requests this month
+          {isUltraPlan ? (
+            <div className="flex flex-col mt-4">
+              <span className="text-[11px] text-sidebar-foreground/70">
+                <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+                  Unlimited Usage
                 </span>
+              </span>
+              <span className="text-[10px] text-sidebar-foreground/50">
+                {usedRequests} requests this month
+              </span>
+            </div>
+          ) : (
+            <div className="space-y-2 mt-4">
+              <span className="text-[11px] text-sidebar-foreground/70">Monthly Usage</span>
+              <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
+              <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
+                <span>{usedRequests}/{maxRequests} requests</span>
+                <span className="text-primary/70">{remainingRequests} left</span>
+                {hasReachedLimit && (
+                  <Link 
+                    to="/subscribe" 
+                    className="text-primary hover:text-primary/80 transition-colors"
+                  >
+                    Upgrade plan →
+                  </Link>
+                )}
               </div>
-            ) : (
-              <div className="space-y-2">
-                <span className="text-[11px] text-sidebar-foreground/70">Monthly Usage</span>
-                <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
-                <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
-                  <span>{usedRequests}/{maxRequests} requests</span>
-                  <span className="text-primary/70">{remainingRequests} left</span>
-                  {hasReachedLimit && (
-                    <Link 
-                      to="/subscribe" 
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Upgrade plan →
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
