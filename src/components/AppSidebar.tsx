@@ -35,23 +35,7 @@ export function AppSidebar() {
     },
   });
 
-  // Subscribe to auth state changes
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state changed:', _event, !!session);
-      if (!session) {
-        setOpen(false);
-      } else {
-        setOpen(true);
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [setOpen]);
-
-  // Set initial sidebar state based on session
+  // Always keep sidebar open when there's a session
   useEffect(() => {
     if (session) {
       setOpen(true);
