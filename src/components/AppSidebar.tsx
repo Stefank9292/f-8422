@@ -38,11 +38,10 @@ export function AppSidebar() {
   // Subscribe to auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', _event, !!session);
       if (!session) {
-        // If session is null (user logged out), force close the sidebar
         setOpen(false);
       } else {
-        // If session exists (user logged in), open the sidebar
         setOpen(true);
       }
     });
@@ -60,41 +59,6 @@ export function AppSidebar() {
   }, [session, setOpen]);
 
   const { data: subscriptionStatus } = useSubscription(session);
-
-  useEffect(() => {
-    let collapseTimer: NodeJS.Timeout;
-
-    const resetTimer = () => {
-      clearTimeout(collapseTimer);
-      if (state === 'expanded') {
-        collapseTimer = setTimeout(() => {
-          setOpen(false);
-        }, 20000); // 20 seconds
-      }
-    };
-
-    // Reset timer on mouse movement within sidebar
-    const handleMouseMove = () => {
-      resetTimer();
-    };
-
-    // Add event listener to sidebar element
-    const sidebarElement = document.querySelector('[data-sidebar="sidebar"]');
-    if (sidebarElement) {
-      sidebarElement.addEventListener('mousemove', handleMouseMove);
-    }
-
-    // Initial timer setup
-    resetTimer();
-
-    // Cleanup
-    return () => {
-      clearTimeout(collapseTimer);
-      if (sidebarElement) {
-        sidebarElement.removeEventListener('mousemove', handleMouseMove);
-      }
-    };
-  }, [state, setOpen]);
 
   // Handle loading state
   if (isSessionLoading) {
