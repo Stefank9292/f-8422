@@ -81,7 +81,7 @@ const SearchHistory = () => {
             No search history found
           </div>
         ) : (
-          searchHistory?.map((item) => (
+          searchHistory?.map((item: any) => (
             <div
               key={item.id}
               className="p-4 rounded-lg border bg-card text-card-foreground"
@@ -95,7 +95,9 @@ const SearchHistory = () => {
                     </span>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {item.search_results?.[0]?.results?.length || 0} results found
+                    {Array.isArray(item.search_results?.[0]?.results) 
+                      ? item.search_results[0]?.results.length 
+                      : 0} results found
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
