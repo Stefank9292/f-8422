@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, User, LogOut } from "lucide-react";
+import { Activity, User, LogOut, Crown, Rocket } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -113,13 +113,21 @@ export const RequestUsageCounter = () => {
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                          subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+
+  const getPlanIcon = () => {
+    if (isSteroidsUser) return <Rocket className="h-4 w-4" />;
+    if (isProUser) return <Crown className="h-4 w-4" />;
+    return <User className="h-4 w-4" />;
+  };
 
   return (
     <div className="px-2 py-2 space-y-4 flex flex-col items-center">
       <div className="w-full flex flex-col items-center space-y-2">
         <Avatar className="h-8 w-8">
           <AvatarFallback>
-            <User className="h-4 w-4" />
+            {getPlanIcon()}
           </AvatarFallback>
         </Avatar>
         
