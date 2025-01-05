@@ -148,7 +148,7 @@ export const RequestUsageCounter = () => {
             <>
               <Progress 
                 value={usagePercentage} 
-                className="h-1 bg-sidebar-accent/20"
+                className="h-1 bg-[#D946EF]/20"
               />
               <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
                 <span>{usedRequests}/{maxRequests}</span>
