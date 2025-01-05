@@ -86,9 +86,9 @@ export const PricingCard = ({
         </div>
       )}
       <div className="space-y-3">
-        <h2 className={`text-lg font-semibold ${isPopular ? 'text-green-500' : ''}`}>{name}</h2>
+        <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>{name}</h2>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'text-green-500' : ''}`}>
+        <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
