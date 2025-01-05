@@ -120,11 +120,11 @@
 
 @layer components {
   .instagram-gradient {
-    @apply bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D];
+    @apply bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D];
   }
 
   .primary-gradient {
-    @apply bg-gradient-to-r from-[#8B3DFF] via-[#FF3D77] to-[#FF8A3D] hover:opacity-90;
+    @apply bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] hover:opacity-90;
   }
 
   .card-hover {
