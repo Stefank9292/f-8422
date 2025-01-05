@@ -76,14 +76,14 @@ export const PricingCard = ({
         ${isPopular ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
     >
       <div className="space-y-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
             {name}
           </h2>
           {isPopular && (
             <Badge 
               variant="default" 
-              className="bg-rose-400 text-primary-foreground px-2 py-0.5 text-[11px] font-medium"
+              className="bg-rose-400 text-primary-foreground px-1.5 py-0.5 text-[9px] font-medium"
             >
               Most Popular
             </Badge>
