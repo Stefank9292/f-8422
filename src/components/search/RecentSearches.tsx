@@ -44,7 +44,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
       const { data, error } = await supabase
         .from('search_history')
         .select('id, search_query')
-        .eq('user_id', session.session.user.id)
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
 

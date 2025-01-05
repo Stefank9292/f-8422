@@ -41,8 +41,6 @@ export async function saveSearchHistory(username: string, results: InstagramPost
         // Ensure all properties are serializable
         date: post.date?.toString() || '',
         timestamp: post.timestamp?.toString() || '',
-        hashtags: Array.isArray(post.hashtags) ? post.hashtags : [],
-        mentions: Array.isArray(post.mentions) ? post.mentions : [],
       }));
 
       // Then save the search results
@@ -50,7 +48,7 @@ export async function saveSearchHistory(username: string, results: InstagramPost
         .from('search_results')
         .insert({
           search_history_id: searchHistory.id,
-          results: serializedResults as unknown as Json
+          results: serializedResults as Json
         });
 
       if (resultsError) {
