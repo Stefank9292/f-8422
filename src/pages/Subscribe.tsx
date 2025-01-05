@@ -77,62 +77,63 @@ const SubscribePage = () => {
     }
   };
 
+  const handleSubscribe = async (priceId: string) => {
+    // Implement subscription logic here
+  };
+
   const pricingPlans = [
     {
-      name: "Free Plan",
+      title: "Free Plan",
       description: "Get started for free",
-      price: {
-        monthly: "0",
-        annual: { total: "0", perMonth: "0" }
-      },
+      price: "$0",
+      buttonText: "Get Started",
       features: [
-        { included: true, text: "3 Total Searches" },
-        { included: true, text: "Maximum 5 Results per Search" },
-        { included: false, text: "Bulk Search" },
-        { included: false, text: "Contact Support" },
-        { included: false, text: "Early Access to new Features" }
+        { name: "3 Total Searches", included: true },
+        { name: "Maximum 5 Results per Search", included: true },
+        { name: "Bulk Search", included: false },
+        { name: "Contact Support", included: false },
+        { name: "Early Access to new Features", included: false }
       ],
-      priceId: "free"
+      priceId: "free",
+      onClick: () => handleSubscribe("free")
     },
     {
-      name: "Creator Pro",
+      title: "Creator Pro",
       description: "For Professional Creators",
-      price: {
-        monthly: "29",
-        annual: { total: "276", perMonth: "23" }
-      },
+      price: isAnnual ? "$23/month" : "$29/month",
+      buttonText: "Subscribe",
       features: [
-        { included: true, text: "25 Total Searches" },
-        { included: true, text: "Maximum 20 Results per Search" },
-        { included: true, text: "Bulk Search" },
-        { included: true, text: "Contact Support" },
-        { included: false, text: "Early Access to new Features" }
+        { name: "25 Total Searches", included: true },
+        { name: "Maximum 20 Results per Search", included: true },
+        { name: "Bulk Search", included: true },
+        { name: "Contact Support", included: true },
+        { name: "Early Access to new Features", included: false }
       ],
-      priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
+      priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly,
+      onClick: () => handleSubscribe(isAnnual ? priceIds.premium.annual : priceIds.premium.monthly)
     },
     {
-      name: "Creator on Steroids",
+      title: "Creator on Steroids",
       description: "For Viral Marketing Gods",
-      price: {
-        monthly: "49",
-        annual: { total: "470", perMonth: "39.17" }
-      },
+      price: isAnnual ? "$39.17/month" : "$49/month",
+      buttonText: "Subscribe",
       features: [
-        { included: true, text: "Unlimited Searches" },
-        { included: true, text: "Maximum 50 Results per Search" },
-        { included: true, text: "Bulk Search" },
-        { included: true, text: "Contact Support" },
-        { included: true, text: "Early Access to new Features" }
+        { name: "Unlimited Searches", included: true },
+        { name: "Maximum 50 Results per Search", included: true },
+        { name: "Bulk Search", included: true },
+        { name: "Contact Support", included: true },
+        { name: "Early Access to new Features", included: true }
       ],
-      isPopular: true,
-      priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly
+      popular: true,
+      priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly,
+      onClick: () => handleSubscribe(isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly)
     }
   ];
 
   const { title, subtitle } = getPageTitle();
 
   if (!session) {
-    return null; // Don't render anything while checking auth
+    return null;
   }
 
   return (
@@ -170,7 +171,6 @@ const SubscribePage = () => {
               <PricingCard
                 key={index}
                 {...plan}
-                isAnnual={isAnnual}
               />
             ))}
           </div>
