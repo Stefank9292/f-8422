@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
+import { PlanButtonText } from "./subscription/PlanButtonText";
+import { useSubscriptionAction } from "@/hooks/useSubscriptionAction";
 
 interface SubscribeButtonProps {
   planId: string;
@@ -13,10 +13,6 @@ interface SubscribeButtonProps {
 }
 
 export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: SubscribeButtonProps) => {
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -39,112 +35,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     enabled: !!session?.access_token,
   });
 
-  const resetSearchUsage = async (userId: string, fromPlan: string | null, toPlan: string) => {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-    // Check current usage
-    const { count } = await supabase
-      .from('user_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('request_type', 'instagram_search')
-      .gte('created_at', startOfMonth.toISOString())
-      .lt('created_at', endOfMonth.toISOString());
-
-    const currentUsage = count || 0;
-
-    // Reset logic based on plan changes
-    const isFromUnlimited = fromPlan === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                           fromPlan === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-    const isToFreePlan = toPlan === 'free';
-    const shouldResetUsage = isFromUnlimited || (!isToFreePlan && currentUsage > 3);
-
-    if (shouldResetUsage) {
-      // Update last_reset_at for all user requests in this period
-      await supabase
-        .from('user_requests')
-        .update({ last_reset_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .gte('created_at', startOfMonth.toISOString())
-        .lt('created_at', endOfMonth.toISOString());
-    }
-  };
-
-  const handleSubscribe = async () => {
-    try {
-      setLoading(true);
-      
-      if (!session?.user.id) {
-        throw new Error('No authenticated user found');
-      }
-
-      // Handle downgrade to free plan
-      if (planId === 'free') {
-        const { error } = await supabase.functions.invoke('cancel-subscription', {
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`
-          }
-        });
-        if (error) throw error;
-        
-        // Don't reset usage when downgrading to free plan
-        toast({
-          title: "Plan Updated",
-          description: "Your subscription has been cancelled and you have been moved to the Free plan.",
-        });
-      } 
-      // Handle downgrade to Creator Pro from Creator on Steroids
-      else if (planId === "price_1QdtwnGX13ZRG2XihcM36r3W" && 
-               subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
-        const { error } = await supabase.functions.invoke('update-subscription', {
-          body: { priceId: planId },
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`
-          }
-        });
-        
-        if (error) throw error;
-        
-        // Reset usage when downgrading from unlimited plan
-        await resetSearchUsage(session.user.id, subscriptionStatus.priceId, planId);
-        
-        toast({
-          title: "Plan Updated",
-          description: "You have been successfully downgraded to the Creator Pro plan.",
-        });
-      }
-      // Handle all upgrades and new subscriptions through checkout
-      else {
-        const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-          body: { priceId: planId },
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`
-          }
-        });
-        
-        if (error) throw error;
-        
-        if (data?.url) {
-          window.location.href = data.url;
-          return;
-        }
-      }
-
-      // Invalidate the subscription status query to refresh the UI
-      queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-    } catch (error) {
-      console.error('Error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update subscription. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed && planId !== 'free') {
@@ -186,7 +77,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     if (isCurrentPlan) {
       return "bg-secondary hover:bg-secondary/80";
     }
-    return isPopular ? "bg-[#D946EF] hover:bg-[#D946EF]/90 text-white" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
+    return isPopular ? "instagram-gradient hover:opacity-90" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
   };
 
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
@@ -200,14 +91,19 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     );
   }
 
+  const handleClick = () => handleSubscriptionAction(planId, planName, subscriptionStatus);
+
   return (
     <Button 
-      onClick={handleSubscribe} 
+      onClick={handleClick} 
       disabled={loading || (isCurrentPlan && planId === 'free')}
       className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
-      {loading ? "Loading..." : getButtonText()}
+      <PlanButtonText 
+        text={loading ? "Loading..." : getButtonText()}
+        isUpgrade={!isCurrentPlan && planId !== 'free'}
+      />
     </Button>
   );
 };
