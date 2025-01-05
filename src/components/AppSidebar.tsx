@@ -35,6 +35,20 @@ export function AppSidebar() {
     },
   });
 
+  // Subscribe to auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        // If session is null (user logged out), force close the sidebar
+        setOpen(false);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [setOpen]);
+
   const { data: subscriptionStatus } = useSubscription(session);
 
   useEffect(() => {
