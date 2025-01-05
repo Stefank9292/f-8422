@@ -1,7 +1,23 @@
 import { supabase } from "@/integrations/supabase/client";
-import { InstagramPost } from "./types";
-import { transformToInstagramPost } from "./validation";
-import { trackInstagramRequest, checkRequestLimit } from "./requestTracker";
+import { InstagramPost, ApifyRequestBody } from "./types/InstagramTypes";
+import { makeApifyRequest, checkSubscriptionAndLimits } from "./services/apifyService";
+import { transformToInstagramPost } from "./transformers/postTransformer";
+
+async function trackInstagramRequest(userId: string) {
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  await supabase
+    .from('user_requests')
+    .insert({
+      user_id: userId,
+      request_type: 'instagram_search',
+      period_start: startOfDay.toISOString(),
+      period_end: endOfDay.toISOString()
+    });
+}
 
 export async function fetchInstagramPosts(
   username: string, 
@@ -14,43 +30,37 @@ export async function fetchInstagramPosts(
       throw new Error('No authenticated user found');
     }
 
-    // Get subscription status
-    const { data: subscriptionStatus } = await supabase.functions.invoke('check-subscription', {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`
-      }
-    });
-
-    // Check if user is on Steroids plan (unlimited requests)
-    const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                          subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-
-    // Only check request limit for non-Steroids users
-    if (!isSteroidsUser) {
-      const canMakeRequest = await checkRequestLimit(session.user.id);
-      if (!canMakeRequest) {
-        throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
-      }
+    const { canMakeRequest, maxRequestsPerDay } = await checkSubscriptionAndLimits(session.user.id);
+    
+    if (!canMakeRequest) {
+      throw new Error(`Daily request limit of ${maxRequestsPerDay} reached. Please upgrade your plan for more requests.`);
     }
 
-    // Track the request before making it
     await trackInstagramRequest(session.user.id);
 
-    console.log('Using Instagram URL:', username);
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: [`https://www.instagram.com/${username.replace('@', '')}/`],
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      memoryMbytes: 512,
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true
+    };
 
-    const { data, error } = await supabase.functions.invoke('instagram-scraper', {
-      body: {
-        username,
-        numberOfVideos,
-        postsNewerThan
-      },
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`
-      }
-    });
+    if (postsNewerThan) {
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
+    }
 
-    if (error) throw error;
-
+    const data = await makeApifyRequest(requestBody);
+    
     return Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
@@ -72,49 +82,46 @@ export async function fetchBulkInstagramPosts(
       throw new Error('No authenticated user found');
     }
 
-    // Get subscription status
-    const { data: subscriptionStatus } = await supabase.functions.invoke('check-subscription', {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`
-      }
-    });
-
-    // Check if user is on Steroids plan (unlimited requests)
-    const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                          subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-
-    // Only check request limit for non-Steroids users
-    if (!isSteroidsUser) {
-      const canMakeRequest = await checkRequestLimit(session.user.id);
-      if (!canMakeRequest) {
-        throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
-      }
+    const { canMakeRequest, maxRequestsPerDay } = await checkSubscriptionAndLimits(session.user.id);
+    
+    if (!canMakeRequest) {
+      throw new Error(`Daily request limit of ${maxRequestsPerDay} reached. Please upgrade your plan for more requests.`);
     }
 
-    // Track the request before making it (counts as one request regardless of number of URLs)
     await trackInstagramRequest(session.user.id);
 
-    const results = await Promise.all(
-      urls.map(async (url) => {
-        const { data, error } = await supabase.functions.invoke('instagram-scraper', {
-          body: {
-            username: url,
-            numberOfVideos,
-            postsNewerThan
-          },
-          headers: {
-            Authorization: `Bearer ${session?.access_token}`
-          }
-        });
+    const cleanUrls = urls.map(url => {
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('https://')) {
+        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}/`;
+      }
+      return cleanUrl;
+    });
 
-        if (error) throw error;
-        return data;
-      })
-    );
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: cleanUrls,
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true
+    };
 
-    const allPosts = results.flat();
-    return Array.isArray(allPosts)
-      ? allPosts.map(post => transformToInstagramPost(post))
+    if (postsNewerThan) {
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
+    }
+
+    const data = await makeApifyRequest(requestBody);
+    
+    return Array.isArray(data) 
+      ? data.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
       : [];
   } catch (error) {
