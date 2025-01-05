@@ -1,8 +1,7 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User, Crown, Rocket } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { User, Crown, Rocket, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 

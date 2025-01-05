@@ -1,7 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { Activity } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const UsageStats = () => {
@@ -13,7 +13,7 @@ export const UsageStats = () => {
     },
   });
 
-  const { data: requestStats, refetch: refetchRequestStats } = useQuery({
+  const { data: requestStats } = useQuery({
     queryKey: ['request-stats'],
     queryFn: async () => {
       if (!session?.user.id) return null;
