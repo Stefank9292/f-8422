@@ -2,8 +2,34 @@ import { BookOpen, AlertCircle, CheckCircle, Play, Mail } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const HelpCenter = () => {
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
+  const showSupport = subscriptionStatus?.subscribed;
+
   return (
     <div className="min-h-screen p-4 bg-background">
       <div className="max-w-3xl mx-auto space-y-8 pt-8">
@@ -91,22 +117,24 @@ const HelpCenter = () => {
           </AccordionItem>
         </Accordion>
 
-        <div className="border rounded-lg p-6 space-y-4">
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Need More Help?</h2>
-            <p className="text-[13px] text-muted-foreground">
-              Our support team is here to help. Get in touch with us directly.
-            </p>
+        {showSupport && (
+          <div className="border rounded-lg p-6 space-y-4">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold">Need More Help?</h2>
+              <p className="text-[13px] text-muted-foreground">
+                Our support team is here to help. Get in touch with us directly.
+              </p>
+            </div>
+            <Button 
+              variant="default" 
+              onClick={() => window.location.href = 'mailto:support@vyralsearch.com'}
+              className="w-full sm:w-auto"
+            >
+              <Mail className="mr-2 h-4 w-4" />
+              Contact Support
+            </Button>
           </div>
-          <Button 
-            variant="default" 
-            onClick={() => window.location.href = 'mailto:support@vyralsearch.com'}
-            className="w-full sm:w-auto"
-          >
-            <Mail className="mr-2 h-4 w-4" />
-            Contact Support
-          </Button>
-        </div>
+        )}
       </div>
     </div>
   );
