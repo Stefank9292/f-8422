@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2 } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
 import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 import { InstagramPost } from "@/types/instagram";
+import { Input } from "@/components/ui/input";
 
 interface SearchHistoryResult {
   id: string;
@@ -21,6 +22,7 @@ const SearchHistory = () => {
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const channel = supabase
@@ -137,6 +139,10 @@ const SearchHistory = () => {
     }
   };
 
+  const filteredHistory = searchHistory?.filter(item =>
+    item.search_query.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
@@ -152,8 +158,22 @@ const SearchHistory = () => {
         isDeletingAll={isDeletingAll}
         hasHistory={searchHistory && searchHistory.length > 0}
       />
+      
+      {searchHistory && searchHistory.length > 0 && (
+        <div className="relative w-full max-w-md mx-auto mb-6">
+          <Input
+            type="text"
+            placeholder="Search by username..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 h-10"
+          />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
+      )}
+      
       <SearchHistoryList 
-        searchHistory={searchHistory || []}
+        searchHistory={filteredHistory || []}
         onDelete={handleDelete}
         isDeleting={isDeleting}
       />
