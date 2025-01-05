@@ -7,21 +7,37 @@ export function useSubscription(session: Session | null) {
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
-        return null;
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
       }
 
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
+      try {
+        const { data, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+
+        if (error) {
+          console.error('Subscription check error:', error);
+          throw error;
         }
-      });
 
-      if (error) {
+        return data;
+      } catch (error) {
         console.error('Subscription check error:', error);
-        throw error;
+        // Return default free tier values on error
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
       }
-
-      return data;
     },
     enabled: !!session?.access_token,
     retry: (failureCount, error) => {
