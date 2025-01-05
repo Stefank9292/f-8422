@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
+import { Link } from "react-router-dom";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -89,9 +90,12 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         </div>
         <p className="text-[11px] text-muted-foreground text-center">
           Recent searches are only available on the{' '}
-          <span className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse">
+          <Link 
+            to="/subscribe" 
+            className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse hover:opacity-80 transition-opacity"
+          >
             Creator on Steroids
-          </span>{' '}
+          </Link>{' '}
           plan
         </p>
       </div>
