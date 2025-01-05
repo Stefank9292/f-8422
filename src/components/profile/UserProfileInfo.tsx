@@ -31,7 +31,7 @@ export const UserProfileInfo = ({
   return (
     <div className="w-full p-3 bg-card/50 rounded-xl border border-border/50">
       <div className="flex flex-col gap-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
           <div className="flex flex-col">
             <span className={`text-[10px] ${
@@ -48,7 +48,7 @@ export const UserProfileInfo = ({
         </div>
 
         {isUltraPlan ? (
-          <div className="flex items-start gap-3">
+          <div className="flex items-center gap-3">
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser} 
@@ -66,7 +66,7 @@ export const UserProfileInfo = ({
             </div>
           </div>
         ) : (
-          <div className="flex items-start gap-3">
+          <div className="flex items-center gap-3">
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
