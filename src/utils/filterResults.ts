@@ -31,9 +31,9 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
     if (filters.minViews && filters.minViews !== "") {
       const minViews = parseInt(filters.minViews);
       if (!isNaN(minViews)) {
-        // Ensure we're using viewsCount (GREEN column)
-        const postViews = typeof post.viewsCount === 'number' ? post.viewsCount : 0;
-        if (postViews < minViews) {
+        // We use viewsCount for the GREEN column
+        const viewsCount = post.viewsCount;
+        if (typeof viewsCount !== 'number' || viewsCount < minViews) {
           return false;
         }
       }
@@ -43,9 +43,9 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
     if (filters.minPlays && filters.minPlays !== "") {
       const minPlays = parseInt(filters.minPlays);
       if (!isNaN(minPlays)) {
-        // Ensure we're using playsCount (PINK column)
-        const postPlays = typeof post.playsCount === 'number' ? post.playsCount : 0;
-        if (postPlays < minPlays) {
+        // We use playsCount for the PINK column
+        const playsCount = post.playsCount;
+        if (typeof playsCount !== 'number' || playsCount < minPlays) {
           return false;
         }
       }
@@ -54,16 +54,22 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
     // Handle likes filter
     if (filters.minLikes && filters.minLikes !== "") {
       const minLikes = parseInt(filters.minLikes);
-      if (!isNaN(minLikes) && post.likesCount < minLikes) {
-        return false;
+      if (!isNaN(minLikes)) {
+        const likesCount = post.likesCount;
+        if (typeof likesCount !== 'number' || likesCount < minLikes) {
+          return false;
+        }
       }
     }
 
     // Handle comments filter
     if (filters.minComments && filters.minComments !== "") {
       const minComments = parseInt(filters.minComments);
-      if (!isNaN(minComments) && post.commentsCount < minComments) {
-        return false;
+      if (!isNaN(minComments)) {
+        const commentsCount = post.commentsCount;
+        if (typeof commentsCount !== 'number' || commentsCount < minComments) {
+          return false;
+        }
       }
     }
 
