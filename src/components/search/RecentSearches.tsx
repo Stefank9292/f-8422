@@ -40,9 +40,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   return (
     <div className="w-full flex flex-col items-center space-y-4 mt-6">
-      <div className="flex items-center gap-2.5">
-        <History className="h-4.5 w-4.5 text-muted-foreground" />
-        <h3 className="text-sm font-medium text-muted-foreground tracking-tight">Recent Searches</h3>
+      <div className="flex items-center gap-2">
+        <History className="w-3.5 h-3.5 text-muted-foreground" />
+        <span className="text-[11px] text-muted-foreground font-medium">Recent Searches</span>
       </div>
       <div className="w-full flex flex-wrap justify-center gap-2.5">
         {recentSearches.map((search) => (
