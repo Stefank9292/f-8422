@@ -120,10 +120,7 @@ const AuthPage = () => {
                 {loading ? "Loading..." : "Sign In"}
               </Button>
               <p className="text-xs text-center text-muted-foreground mt-4">
-                By continuing, you're confirming that you've read our{" "}
-                <a href="/terms" className="text-primary hover:underline">Terms & Conditions</a>
-                {" "}and{" "}
-                <a href="/cookies" className="text-primary hover:underline">Cookie Policy</a>
+                By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
               </p>
               <p className="text-sm text-center text-muted-foreground">
                 Don't have an account?{" "}
@@ -169,10 +166,7 @@ const AuthPage = () => {
                 {loading ? "Loading..." : "Sign Up"}
               </Button>
               <p className="text-xs text-center text-muted-foreground mt-4">
-                By continuing, you're confirming that you've read our{" "}
-                <a href="/terms" className="text-primary hover:underline">Terms & Conditions</a>
-                {" "}and{" "}
-                <a href="/cookies" className="text-primary hover:underline">Cookie Policy</a>
+                By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
               </p>
               <p className="text-sm text-center text-muted-foreground">
                 Already have an account?{" "}
