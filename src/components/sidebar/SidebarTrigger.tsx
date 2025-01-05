@@ -13,9 +13,8 @@ export function SidebarTrigger() {
       size="icon"
       onClick={toggleSidebar}
       className={cn(
-        "fixed top-4 left-4 z-50 h-8 w-8 rounded-lg border shadow-sm transition-all duration-200",
-        "md:left-[calc(var(--sidebar-width)_-_1.5rem)]",
-        isCollapsed && "md:left-[calc(var(--sidebar-width-icon)_-_1.5rem)]",
+        "fixed top-4 z-50 h-8 w-8 rounded-lg border shadow-sm transition-all duration-200",
+        "md:absolute md:left-auto md:right-[-1rem]",
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
       )}
