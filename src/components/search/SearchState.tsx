@@ -83,17 +83,19 @@ export const useSearchState = () => {
     retry: 2,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    onSuccess: () => {
-      setShouldSearch(false);
-    },
-    onError: (error: Error) => {
-      console.error('Search error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to perform search",
-        variant: "destructive",
-      });
-      setShouldSearch(false);
+    meta: {
+      onSuccess: () => {
+        setShouldSearch(false);
+      },
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Error",
+          description: "Failed to perform search",
+          variant: "destructive",
+        });
+        setShouldSearch(false);
+      }
     }
   });
 
