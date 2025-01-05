@@ -67,28 +67,28 @@ export const UserProfileInfo = ({
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 -m-1">
-                <svg className="w-[calc(100%+8px)] h-[calc(100%+8px)]" viewBox="0 0 120 120">
+            <div className="relative w-8 h-8">
+              <div className="absolute inset-0 -m-0.5">
+                <svg className="w-[calc(100%+4px)] h-[calc(100%+4px)]" viewBox="0 0 120 120">
                   <circle
                     className="text-sidebar-accent/20"
-                    strokeWidth="4"
+                    strokeWidth="8"
                     stroke="currentColor"
                     fill="none"
-                    r="56"
+                    r="54"
                     cx="60"
                     cy="60"
                   />
                   <circle
                     className="text-primary"
-                    strokeWidth="4"
+                    strokeWidth="8"
                     strokeLinecap="round"
                     stroke="currentColor"
                     fill="none"
-                    r="56"
+                    r="54"
                     cx="60"
                     cy="60"
-                    strokeDasharray={`${(1 - usagePercentage / 100) * 351.8584} 351.8584`}
+                    strokeDasharray={`${(1 - usagePercentage / 100) * 339.292} 339.292`}
                     transform="rotate(-90 60 60)"
                   />
                 </svg>
