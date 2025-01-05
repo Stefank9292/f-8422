@@ -47,6 +47,10 @@ export const useSearchState = () => {
     },
     enabled: shouldFetch && !!username && !isBulkSearching,
     retry: false,
+    staleTime: Infinity, // Prevent automatic refetching
+    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
+    refetchOnMount: false, // Prevent refetch on component mount
     meta: {
       onError: (error: Error) => {
         console.error('Search error:', error);
@@ -58,8 +62,6 @@ export const useSearchState = () => {
         setShouldFetch(false);
       }
     },
-    gcTime: 0,
-    staleTime: 0,
   });
 
   const handleSearch = () => {
