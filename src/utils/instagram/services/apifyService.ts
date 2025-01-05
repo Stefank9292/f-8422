@@ -3,7 +3,7 @@ import { ApifyRequestBody } from "../types/InstagramTypes";
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody) {
   console.log('Making Apify request to endpoint');
-  const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_KEY}`;
+  const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
   
   try {
     const response = await fetch(apiEndpoint, {
