@@ -32,9 +32,11 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle numeric filters
+    // Fix: Correctly apply viewsCount and playsCount filters
     if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) return false;
     if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) return false;
+    
+    // Handle other numeric filters
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
     if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
     if (filters.minDuration && post.duration < filters.minDuration) return false;
