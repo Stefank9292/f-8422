@@ -29,68 +29,70 @@ export const UserProfileInfo = ({
   hasReachedLimit,
 }: UserProfileInfoProps) => {
   return (
-    <div className="w-full p-4 bg-card/50 backdrop-blur-sm rounded-xl border border-border/50 shadow-sm hover:shadow-md transition-all duration-200">
-      <div className="flex flex-col gap-5">
-        <div className="flex items-center gap-4">
+    <div className="w-full p-3 bg-card/50 rounded-xl border border-border/50">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
           <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
-          <div className="flex flex-col gap-0.5">
-            <span className={`text-xs font-medium ${
+          <div className="flex flex-col">
+            <span className={`text-[10px] ${
               isSteroidsUser 
-                ? 'instagram-gradient text-transparent bg-clip-text animate-pulse'
-                : 'text-foreground/80'
+                ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-pulse font-medium'
+                : 'text-sidebar-foreground/50'
             }`}>
               {planName}
             </span>
-            <span className="text-[11px] text-muted-foreground truncate max-w-[150px]">
+            <span className="text-[9px] text-sidebar-foreground/50 truncate max-w-[150px]">
               {email}
             </span>
           </div>
         </div>
 
         {isUltraPlan ? (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <CircleProgressAvatar 
               progress={0}
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
             >
-              <Infinity className="h-4 w-4 text-foreground/80" />
+              <Infinity className="h-4 w-4 text-foreground" />
             </CircleProgressAvatar>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-medium instagram-gradient text-transparent bg-clip-text animate-pulse">
+            <div className="flex flex-col">
+              <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                 Unlimited Usage
               </span>
-              <span className="text-[11px] text-muted-foreground">
-                {usedRequests.toLocaleString()} requests this month
+              <span className="text-[9px] text-sidebar-foreground/50">
+                {usedRequests} requests this month
               </span>
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <CircleProgressAvatar 
               progress={usagePercentage}
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
             >
               <div className="flex flex-col items-center justify-center">
-                <span className="text-xs font-medium text-foreground/80">
-                  {remainingRequests.toLocaleString()}
+                <span className="text-[10px] font-medium text-foreground">
+                  {remainingRequests}
                 </span>
               </div>
             </CircleProgressAvatar>
-            <div className="flex flex-col gap-1.5">
-              <span className="text-xs text-foreground/80">Monthly Usage</span>
-              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-                <span>{usedRequests.toLocaleString()}/{maxRequests.toLocaleString()} requests</span>
-                <span className="text-primary/80 font-medium">{remainingRequests.toLocaleString()} left</span>
-                {hasReachedLimit && (
-                  <Link 
-                    to="/subscribe" 
-                    className="text-primary hover:text-primary/80 transition-colors font-medium"
-                  >
-                    Upgrade plan →
-                  </Link>
-                )}
+            <div className="flex flex-col">
+              <div className="space-y-2">
+                <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
+                <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
+                  <span>{usedRequests}/{maxRequests} requests</span>
+                  <span className="text-primary/70">{remainingRequests} left</span>
+                  {hasReachedLimit && (
+                    <Link 
+                      to="/subscribe" 
+                      className="text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Upgrade plan →
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
           </div>
