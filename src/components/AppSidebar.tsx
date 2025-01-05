@@ -35,7 +35,7 @@ export function AppSidebar() {
     },
   });
 
-  // Always keep sidebar open when there's a session
+  // Always keep sidebar open on desktop when there's a session
   useEffect(() => {
     if (session) {
       setOpen(true);

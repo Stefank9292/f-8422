@@ -1,9 +1,11 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function SidebarNavigation() {
   const { state } = useSidebar();
-  const isCollapsed = state === "collapsed";
+  const isMobile = useIsMobile();
+  const isCollapsed = isMobile && state === "collapsed";
 
   return (
     <div className="space-y-2 py-2">
