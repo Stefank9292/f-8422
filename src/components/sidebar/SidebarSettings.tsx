@@ -11,7 +11,8 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
 
-  const isCreatorPro = subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq";
+  const isCreatorPro = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W";
+  const isFreeUser = !subscriptionStatus?.subscribed;
 
   // Effect to sync state with actual theme
   useEffect(() => {
@@ -33,20 +34,13 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
 
   const secondaryMenuItems = [
     {
-      title: isCreatorPro ? "Upgrade to Creator on Steroids" : "Manage Subscription",
-      icon: isCreatorPro ? Zap : CreditCard,
+      title: isCreatorPro || isFreeUser ? "Upgrade to Creator on Steroids" : "Manage Subscription",
+      icon: isCreatorPro || isFreeUser ? Zap : CreditCard,
       url: "/subscribe",
-      showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
-      className: isCreatorPro ? 
+      showWhen: () => true, // Always show this button
+      className: (isCreatorPro || isFreeUser) ? 
         "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] text-white hover:from-[#FFE55C] hover:via-[#FFB52E] hover:to-[#FFA033] transition-all duration-300" 
         : undefined
-    },
-    {
-      title: "Upgrade to Pro",
-      icon: Star,
-      url: "/subscribe",
-      className: "text-orange-600 dark:text-orange-400",
-      showWhen: (subscriptionStatus: any) => !subscriptionStatus?.subscribed,
     },
     {
       title: "Help Center",
@@ -74,7 +68,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       <div className="mt-2 space-y-1">
         {secondaryMenuItems.map((item) => {
           // Skip rendering if showWhen condition is defined and returns false
-          if (item.showWhen && !item.showWhen(subscriptionStatus)) {
+          if (item.showWhen && !item.showWhen()) {
             return null;
           }
 
@@ -93,7 +87,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
             >
               <IconComponent 
                 className={`h-3.5 w-3.5 transition-transform duration-500 ease-spring
-                  ${isCreatorPro && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
+                  ${(isCreatorPro || isFreeUser) && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
               />
               <span>{item.title}</span>
