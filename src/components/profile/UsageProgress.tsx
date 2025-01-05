@@ -1,6 +1,6 @@
 import { Progress } from "@/components/ui/progress";
-import { Activity } from "lucide-react";
 import { Link } from "react-router-dom";
+import { UserAvatar } from "./UserAvatar";
 
 interface UsageProgressProps {
   isUltraPlan: boolean;
@@ -9,6 +9,8 @@ interface UsageProgressProps {
   maxRequests: number;
   remainingRequests: number;
   hasReachedLimit: boolean;
+  isSteroidsUser: boolean;
+  isProUser: boolean;
 }
 
 export const UsageProgress = ({
@@ -18,12 +20,18 @@ export const UsageProgress = ({
   maxRequests,
   remainingRequests,
   hasReachedLimit,
+  isSteroidsUser,
+  isProUser,
 }: UsageProgressProps) => {
   return (
     <div className="w-full space-y-2 px-3 py-2 bg-card/30 rounded-lg border border-border/50">
       <div className="flex items-center justify-between text-[10px] text-sidebar-foreground/70">
         <div className="flex items-center gap-1.5">
-          <Activity className="h-3 w-3" />
+          <UserAvatar 
+            isSteroidsUser={isSteroidsUser} 
+            isProUser={isProUser} 
+            className="h-3 w-3"
+          />
           <span>Monthly Usage</span>
         </div>
         {!isUltraPlan && (
