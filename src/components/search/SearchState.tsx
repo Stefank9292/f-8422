@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
-import { InstagramPost } from "@/types/instagram";
+import { InstagramPost } from "@/utils/instagram/types/InstagramTypes";
 import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 import { useRequestCount } from "@/hooks/useRequestCount";
 

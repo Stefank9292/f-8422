@@ -1,21 +1,3 @@
-export interface ApifyRequestBody {
-  addParentData: boolean;
-  directUrls: string[];
-  enhanceUserSearchWithFacebookPage: boolean;
-  isUserReelFeedURL: boolean;
-  isUserTaggedFeedURL: boolean;
-  resultsLimit: number;
-  resultsType: string;
-  searchLimit: number;
-  searchType: string;
-  memoryMbytes: number;
-  maxPosts: number;
-  mediaTypes: string[];
-  expandVideo: boolean;
-  includeVideoMetadata: boolean;
-  onlyPostsNewerThan?: string;
-}
-
 export interface InstagramPost {
   url: string;
   caption: string;
@@ -33,4 +15,23 @@ export interface InstagramPost {
   ownerUsername: string;
   ownerId: string;
   locationName?: string;
+  videoUrl?: string;
+}
+
+export interface ApifyRequestBody {
+  addParentData: boolean;
+  directUrls: string[];
+  enhanceUserSearchWithFacebookPage: boolean;
+  isUserReelFeedURL: boolean;
+  isUserTaggedFeedURL: boolean;
+  resultsLimit: number;
+  resultsType: string;
+  searchLimit: number;
+  searchType: string;
+  memoryMbytes: number;
+  maxPosts: number;
+  mediaTypes: string[];
+  expandVideo: boolean;
+  includeVideoMetadata: boolean;
+  onlyPostsNewerThan?: string;
 }

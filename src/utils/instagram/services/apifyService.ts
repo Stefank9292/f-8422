@@ -1,95 +1,150 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ApifyRequestBody } from "../types/InstagramTypes";
+import { APIFY_CONFIG, APIFY_ENDPOINT } from '../config/apifyConfig';
+import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
+import { transformToInstagramPost } from '../validation/postValidator';
 
-export async function makeApifyRequest(requestBody: ApifyRequestBody) {
-  console.log('Making Apify request to endpoint');
-  const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1`;
-  
-  try {
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody)
-    });
+async function updateUserClickCount() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user.id) return;
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error('API Error Response:', errorBody);
-      
-      if (response.status === 402) {
-        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
-      }
-      
-      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
-    }
-
-    const data = await response.json();
-    console.log('Successfully received data from Apify');
-    return data;
-  } catch (error) {
-    console.error('Error in makeApifyRequest:', error);
-    throw error;
-  }
-}
-
-export async function checkSubscriptionAndLimits(userId: string): Promise<{
-  canMakeRequest: boolean;
-  maxRequestsPerDay: number;
-  isSteroidsUser: boolean;
-}> {
-  console.log('Checking subscription and limits for user:', userId);
-  
-  // Get subscription status
-  const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke(
-    'check-subscription',
-    {
-      body: { userId }
-    }
-  );
-
-  if (subscriptionError) {
-    console.error('Error checking subscription:', subscriptionError);
-    throw new Error('Failed to check subscription status');
-  }
-
-  const isSteroidsUser = 
-    subscriptionData?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-    subscriptionData?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-
-  const isProUser = 
-    subscriptionData?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-    subscriptionData?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
-
-  // Get current day's request count
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  const { count } = await supabase
+  await supabase
     .from('user_requests')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('request_type', 'instagram_search')
-    .gte('created_at', startOfDay.toISOString())
-    .lt('created_at', endOfDay.toISOString());
+    .insert({
+      user_id: session.user.id,
+      request_type: 'instagram_search',
+      period_start: startOfDay.toISOString(),
+      period_end: endOfDay.toISOString()
+    });
+}
 
-  const currentRequests = count || 0;
-  const maxRequestsPerDay = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
-  const canMakeRequest = currentRequests < maxRequestsPerDay;
-
-  console.log('Subscription check results:', {
-    currentRequests,
-    maxRequestsPerDay,
-    canMakeRequest,
-    isSteroidsUser
+async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
+  console.log('Making Apify request with config:', { ...APIFY_CONFIG, requestBody });
+  
+  const response = await fetch(APIFY_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      ...requestBody,
+      ...APIFY_CONFIG
+    })
   });
 
-  return {
-    canMakeRequest,
-    maxRequestsPerDay,
-    isSteroidsUser
-  };
+  if (!response.ok) {
+    const errorBody = await response.text();
+    console.error('API Error Response:', errorBody);
+    
+    if (response.status === 402) {
+      throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+    }
+    
+    throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
+  }
+
+  const data = await response.json();
+  console.log('Received response from Apify:', data);
+  
+  return Array.isArray(data) 
+    ? data.map(post => transformToInstagramPost(post))
+         .filter((post): post is InstagramPost => post !== null)
+    : [];
+}
+
+export async function fetchInstagramPosts(
+  username: string, 
+  numberOfVideos: number = 3,
+  postsNewerThan?: Date
+): Promise<InstagramPost[]> {
+  try {
+    await updateUserClickCount();
+    
+    console.log('Fetching Instagram posts for:', username);
+    console.log('Number of videos requested:', numberOfVideos);
+    console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
+    
+    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}/`;
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: [instagramUrl],
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true,
+      memoryMbytes: APIFY_CONFIG.memoryMbytes
+    };
+
+    if (postsNewerThan instanceof Date) {
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
+    }
+
+    const posts = await makeApifyRequest(requestBody);
+    console.log('Processed posts:', posts);
+    return posts;
+  } catch (error) {
+    console.error('Error fetching Instagram posts:', error);
+    throw error;
+  }
+}
+
+export async function fetchBulkInstagramPosts(
+  urls: string[],
+  numberOfVideos: number = 3,
+  postsNewerThan?: Date
+): Promise<InstagramPost[]> {
+  try {
+    await updateUserClickCount();
+    
+    console.log('Fetching bulk Instagram posts for URLs:', urls);
+    console.log('Number of videos per profile:', numberOfVideos);
+    console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
+
+    const cleanUrls = urls.map(url => {
+      let cleanUrl = url.trim();
+      if (!cleanUrl.startsWith('https://')) {
+        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}/`;
+      }
+      return cleanUrl;
+    });
+
+    const requestBody: ApifyRequestBody = {
+      addParentData: false,
+      directUrls: cleanUrls,
+      enhanceUserSearchWithFacebookPage: false,
+      isUserReelFeedURL: false,
+      isUserTaggedFeedURL: false,
+      resultsLimit: numberOfVideos,
+      resultsType: "posts",
+      searchLimit: 1,
+      searchType: "user",
+      maxPosts: numberOfVideos,
+      mediaTypes: ["VIDEO"],
+      expandVideo: true,
+      includeVideoMetadata: true,
+      memoryMbytes: APIFY_CONFIG.memoryMbytes
+    };
+
+    if (postsNewerThan instanceof Date) {
+      requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
+    }
+
+    const posts = await makeApifyRequest(requestBody);
+    console.log('Processed bulk posts:', posts);
+    return posts;
+  } catch (error) {
+    console.error('Error fetching bulk Instagram posts:', error);
+    throw error;
+  }
 }
