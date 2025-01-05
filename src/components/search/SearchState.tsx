@@ -47,10 +47,10 @@ export const useSearchState = () => {
     },
     enabled: shouldFetch && !!username && !isBulkSearching,
     retry: false,
-    staleTime: Infinity, // Prevent automatic refetching
-    cacheTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchOnWindowFocus: false, // Prevent refetch on window focus
-    refetchOnMount: false, // Prevent refetch on component mount
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
     meta: {
       onError: (error: Error) => {
         console.error('Search error:', error);
@@ -87,6 +87,8 @@ export const useSearchState = () => {
       return;
     }
 
+    // Reset any existing results before new search
+    queryClient.removeQueries({ queryKey: ['instagram-posts'] });
     setBulkSearchResults([]);
     setShouldFetch(true);
   };
