@@ -25,15 +25,15 @@ export const PostTableRow = ({
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
-      <TableCell className="py-3 text-xs text-muted-foreground font-medium">
+      <TableCell className="py-4 text-xs text-muted-foreground font-medium">
         @{post.ownerUsername}
       </TableCell>
-      <TableCell className="max-w-xs py-3">
+      <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {truncateCaption(post.caption)}
+                {post.caption.slice(0, 15)}...
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
@@ -50,25 +50,25 @@ export const PostTableRow = ({
           </Button>
         </div>
       </TableCell>
-      <TableCell className="text-center py-3 text-xs text-muted-foreground" title={post.timestamp}>
+      <TableCell className="text-center py-4 text-xs text-muted-foreground align-middle" title={post.timestamp}>
         {post.date}
       </TableCell>
-      <TableCell className="text-center py-3 text-xs font-medium text-green-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
         {formatNumber(post.playsCount)}
       </TableCell>
-      <TableCell className="text-center py-3 text-xs font-medium text-primary">
+      <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
         {formatNumber(post.viewsCount)}
       </TableCell>
-      <TableCell className="text-center py-3 text-xs font-medium text-rose-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
         {formatNumber(post.likesCount)}
       </TableCell>
-      <TableCell className="text-center py-3 text-xs font-medium text-blue-400">
+      <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
         {formatNumber(post.commentsCount)}
       </TableCell>
-      <TableCell className="text-center py-3 text-xs font-medium text-orange-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
         {formattedEngagement}
       </TableCell>
-      <TableCell className="text-center py-3">
+      <TableCell className="text-center py-4 align-middle">
         <Button 
           variant="ghost" 
           size="icon"
@@ -78,7 +78,7 @@ export const PostTableRow = ({
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
         </Button>
       </TableCell>
-      <TableCell className="text-center py-3">
+      <TableCell className="text-center py-4 align-middle">
         <Button 
           variant="ghost" 
           size="icon"
