@@ -1,5 +1,6 @@
-import { BookOpen, AlertCircle, CheckCircle } from "lucide-react";
+import { BookOpen, AlertCircle, CheckCircle, Play } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 const HelpCenter = () => {
   return (
@@ -10,6 +11,21 @@ const HelpCenter = () => {
           <p className="text-[13px] text-muted-foreground">
             Find guides and tutorials to help you get the most out of VyralSearch
           </p>
+        </div>
+
+        <div className="relative rounded-xl overflow-hidden border">
+          <AspectRatio ratio={16 / 9}>
+            <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center group cursor-pointer hover:bg-black/30 transition-colors">
+              <div className="h-16 w-16 rounded-full bg-white/25 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
+                <Play className="h-8 w-8 text-white fill-white translate-x-0.5" />
+              </div>
+            </div>
+            <img 
+              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
+              alt="Tutorial Video Placeholder"
+              className="object-cover w-full h-full"
+            />
+          </AspectRatio>
         </div>
 
         <Accordion type="single" collapsible className="w-full space-y-2">
