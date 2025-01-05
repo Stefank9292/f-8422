@@ -46,10 +46,14 @@ export const UserProfileInfo = ({
           </span>
 
           {isUltraPlan ? (
-            <div className="flex items-center gap-3 mt-4">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] flex items-center justify-center">
+            <div className="flex items-start gap-3 mt-4">
+              <UserAvatar 
+                isSteroidsUser={false} 
+                isProUser={false} 
+                className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]"
+              >
                 <Infinity className="h-4 w-4 text-white" />
-              </div>
+              </UserAvatar>
               <div className="flex flex-col">
                 <span className="text-[11px] text-sidebar-foreground/70">
                   <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
