@@ -33,6 +33,12 @@ export function AppSidebar() {
       }
       return session;
     },
+    // Initialize sidebar state as soon as we get the session
+    onSuccess: (session) => {
+      if (session) {
+        setOpen(true);
+      }
+    },
   });
 
   // Subscribe to auth state changes
