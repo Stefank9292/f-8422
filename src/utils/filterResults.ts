@@ -1,4 +1,5 @@
 import { InstagramPost } from "@/types/instagram";
+import { parse, isAfter } from "date-fns";
 
 export interface FilterState {
   postsNewerThan: string;
@@ -12,12 +13,26 @@ export interface FilterState {
 
 export const filterResults = (results: InstagramPost[], filters: FilterState) => {
   return results.filter(post => {
+    // Handle date filtering
     if (filters.postsNewerThan) {
-      const [day, month, year] = filters.postsNewerThan.split('.');
-      const filterDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      const postDate = new Date(post.timestamp);
-      if (postDate < filterDate) return false;
+      try {
+        // Parse the filter date from dd.MM.yyyy format
+        const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
+        
+        // Parse the post date (assuming it's in ISO format)
+        const postDate = new Date(post.date);
+        
+        // Return false if the post date is before the filter date
+        if (!isAfter(postDate, filterDate)) {
+          return false;
+        }
+      } catch (error) {
+        console.error('Date parsing error:', error);
+        return false;
+      }
     }
+
+    // Handle numeric filters
     if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) return false;
     if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) return false;
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
