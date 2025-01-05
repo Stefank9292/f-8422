@@ -91,7 +91,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
             >
               <IconComponent 
                 className={`h-3.5 w-3.5 transition-transform duration-500 ease-spring
-                  ${isUpgradeButton ? 'animate-synchronized-pulse bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] [&>path]:fill-transparent [&>path]:stroke-white' : ''}
+                  ${isUpgradeButton ? 'bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] [&>path]:fill-transparent [&>path]:stroke-white' : ''}
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`}
               />
               {isUpgradeButton ? (
