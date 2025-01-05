@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchHistoryItem } from "@/components/history/SearchHistoryItem";
+import { InstagramPost } from "@/types/instagram";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,13 +18,21 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
+interface SearchHistoryResult {
+  id: string;
+  search_query: string;
+  created_at: string;
+  search_results: Array<{
+    results: Record<string, any>[];
+  }>;
+}
+
 const SearchHistory = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
 
-  // Set up real-time subscription
   useEffect(() => {
     const channel = supabase
       .channel('search-history-changes')
@@ -63,7 +72,27 @@ const SearchHistory = () => {
         .limit(10);
 
       if (error) throw error;
-      return data;
+
+      // Transform the data to match the expected types
+      return (data as SearchHistoryResult[]).map(item => ({
+        id: item.id,
+        search_query: item.search_query,
+        created_at: item.created_at,
+        search_results: item.search_results?.map(sr => ({
+          results: sr.results.map(result => ({
+            ownerUsername: String(result.ownerUsername || ''),
+            caption: String(result.caption || ''),
+            date: String(result.date || ''),
+            playsCount: Number(result.playsCount || 0),
+            viewsCount: Number(result.viewsCount || 0),
+            likesCount: Number(result.likesCount || 0),
+            commentsCount: Number(result.commentsCount || 0),
+            duration: String(result.duration || ''),
+            engagement: String(result.engagement || ''),
+            url: String(result.url || ''),
+          } as InstagramPost))
+        }))
+      }));
     },
   });
 
