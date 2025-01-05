@@ -14,6 +14,9 @@ interface PricingCardProps {
   onClick: () => void;
   popular?: boolean;
   loading?: boolean;
+  isAnnual?: boolean;
+  name?: string;
+  priceId?: string;
 }
 
 export const PricingCard = ({
