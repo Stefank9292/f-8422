@@ -36,12 +36,14 @@ export const SearchFilters = ({
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      <FilterHeader
-        totalResults={totalResults}
-        filteredResults={filteredResults}
-        onReset={onReset}
-        currentPosts={currentPosts}
-      />
+      <div className="hidden md:block">
+        <FilterHeader
+          totalResults={totalResults}
+          filteredResults={filteredResults}
+          onReset={onReset}
+          currentPosts={currentPosts}
+        />
+      </div>
 
       <div className="md:hidden">
         <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -54,7 +56,13 @@ export const SearchFilters = ({
               <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
             </Button>
           </CollapsibleTrigger>
-          <CollapsibleContent className="mt-4">
+          <CollapsibleContent className="mt-4 space-y-4">
+            <FilterHeader
+              totalResults={totalResults}
+              filteredResults={filteredResults}
+              onReset={onReset}
+              currentPosts={currentPosts}
+            />
             <div className="grid grid-cols-1 gap-6 bg-card/50 p-6 rounded-lg">
               <FilterInput
                 icon={Calendar}
