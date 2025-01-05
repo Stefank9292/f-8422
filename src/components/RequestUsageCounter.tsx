@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Activity, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
@@ -89,13 +89,13 @@ export const RequestUsageCounter = () => {
     navigate("/auth");
   };
 
-  // Updated price IDs and plan names
   const isUltraPlan = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                       subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
   const maxRequests = isUltraPlan ? Infinity : (subscriptionStatus?.maxClicks || 3);
   const usedRequests = requestStats || 0;
   const remainingRequests = isUltraPlan ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isUltraPlan ? 0 : ((usedRequests / maxRequests) * 100);
+  const hasReachedLimit = usedRequests >= maxRequests;
 
   const getPlanName = () => {
     if (!subscriptionStatus?.subscribed) return 'Free';
@@ -162,6 +162,14 @@ export const RequestUsageCounter = () => {
                 <span>{usedRequests}/{maxRequests}</span>
                 <span>{remainingRequests} left</span>
               </div>
+              {hasReachedLimit && !isUltraPlan && (
+                <Link 
+                  to="/subscribe" 
+                  className="text-[9px] text-primary hover:text-primary/80 transition-colors mt-1 inline-block"
+                >
+                  Upgrade plan for more searches →
+                </Link>
+              )}
             </>
           )}
         </div>
