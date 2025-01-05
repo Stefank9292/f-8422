@@ -39,12 +39,14 @@ export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsPr
           >
             <item.icon className="h-3.5 w-3.5" />
             <span>{item.title}</span>
-            <Badge 
-              variant="secondary" 
-              className="ml-1 text-[8px] text-primary font-medium bg-transparent border-0 p-0"
-            >
-              BETA
-            </Badge>
+            {item.title === "Viral Video Search" && (
+              <Badge 
+                variant="secondary" 
+                className="ml-1 text-[8px] text-primary font-medium bg-transparent border-0 p-0"
+              >
+                BETA
+              </Badge>
+            )}
           </button>
         ))}
       </div>
