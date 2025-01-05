@@ -27,6 +27,7 @@ export interface ApifyRequestBody {
   resultsType: string;
   searchLimit: number;
   searchType: string;
+  memoryMbytes?: number;
   maxPosts: number;
   mediaTypes: string[];
   expandVideo: boolean;
