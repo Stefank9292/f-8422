@@ -20,7 +20,7 @@ serve(async (req) => {
       throw new Error('No authorization header')
     }
 
-    // Create Supabase client with service role key
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',

@@ -57,6 +57,22 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
           description: "Your subscription has been cancelled and you have been moved to the Free plan immediately.",
         });
       } 
+      // Handle upgrade to Creator on Steroids from Creator Pro
+      else if (subscriptionStatus?.priceId && planId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
+        const { error } = await supabase.functions.invoke('update-subscription', {
+          body: { priceId: planId },
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`
+          }
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Plan Updated",
+          description: "You have been successfully upgraded to the Creator on Steroids plan.",
+        });
+      }
       // Handle downgrade to Creator Pro from Creator on Steroids
       else if (planId === "price_1QdtwnGX13ZRG2XihcM36r3W" && subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
         const { error } = await supabase.functions.invoke('update-subscription', {
@@ -73,7 +89,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
           description: "You have been successfully downgraded to the Creator Pro plan.",
         });
       }
-      // Handle upgrades through checkout
+      // Handle all other cases through checkout
       else {
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
           body: { priceId: planId },
