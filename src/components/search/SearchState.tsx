@@ -20,24 +20,6 @@ export const useSearchState = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Query for fetching Instagram posts
-  const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
-    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
-    enabled: !!username && shouldSearch,
-    onSuccess: () => {
-      setShouldSearch(false);
-    },
-    onError: (error: Error) => {
-      setShouldSearch(false);
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -172,6 +154,6 @@ export const useSearchState = () => {
     handleSearch,
     handleBulkSearch,
     displayPosts,
-    subscriptionStatus,
+    subscriptionStatus, // Add this to expose subscription status
   };
 };
