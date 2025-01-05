@@ -21,6 +21,8 @@ interface SearchHistoryItemProps {
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
+  const [sortKey, setSortKey] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   
   // Filter for valid clips only, remove undefined values and posts with 0 views/plays
   const allResults = item.search_results?.[0]?.results || [];
@@ -108,11 +110,45 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
   };
 
+  const handleSort = (key: string) => {
+    // If clicking the same column, toggle direction
+    if (sortKey === key) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      // If clicking a new column, set it as the sort key and default to descending
+      setSortKey(key);
+      setSortDirection("desc");
+    }
+  };
+
+  // Apply sorting to filtered results
+  const sortResults = (posts: InstagramPost[]) => {
+    if (!sortKey) return posts;
+
+    return [...posts].sort((a: any, b: any) => {
+      if (sortKey === 'date') {
+        const dateA = new Date(a[sortKey]).getTime();
+        const dateB = new Date(b[sortKey]).getTime();
+        return sortDirection === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      
+      const valueA = a[sortKey];
+      const valueB = b[sortKey];
+      
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+      }
+      
+      return 0;
+    });
+  };
+
   const filteredResults = filterResults(results, filters);
-  const totalPages = Math.ceil(filteredResults.length / pageSize);
+  const sortedResults = sortResults(filteredResults);
+  const totalPages = Math.ceil(sortedResults.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const currentPosts = filteredResults.slice(startIndex, endIndex);
+  const currentPosts = sortedResults.slice(startIndex, endIndex);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -151,11 +187,13 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
           <div className="rounded-lg overflow-hidden">
             <TableContent
               currentPosts={currentPosts}
-              handleSort={() => {}}
+              handleSort={handleSort}
               handleCopyCaption={handleCopyCaption}
               handleDownload={handleDownload}
               formatNumber={formatNumber}
               truncateCaption={truncateCaption}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
             />
           </div>
           <TablePagination

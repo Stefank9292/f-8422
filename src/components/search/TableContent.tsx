@@ -4,7 +4,6 @@ import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState } from "react";
 
 interface TableContentProps {
   currentPosts: any[];
@@ -13,6 +12,8 @@ interface TableContentProps {
   handleDownload: (videoUrl: string) => void;
   formatNumber: (num: number) => string;
   truncateCaption: (caption: string) => string;
+  sortKey?: string;
+  sortDirection?: "asc" | "desc";
 }
 
 export type SortDirection = "asc" | "desc";
@@ -24,22 +25,10 @@ export const TableContent = ({
   handleDownload,
   formatNumber,
   truncateCaption,
+  sortKey,
+  sortDirection,
 }: TableContentProps) => {
   const isMobile = useIsMobile();
-  const [sortKey, setSortKey] = useState<string>("");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-
-  const handleSortClick = (key: string) => {
-    // If clicking the same column, toggle direction
-    if (sortKey === key) {
-      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
-    } else {
-      // If clicking a new column, set it as the sort key and default to ascending
-      setSortKey(key);
-      setSortDirection("asc");
-    }
-    handleSort(key);
-  };
 
   if (isMobile) {
     return (
@@ -63,7 +52,7 @@ export const TableContent = ({
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
           <PostTableHeader 
-            onSort={handleSortClick} 
+            onSort={handleSort} 
             sortKey={sortKey}
             sortDirection={sortDirection}
           />
