@@ -140,11 +140,12 @@ export const SearchFilters = ({
               ))}
               <div className="flex flex-col gap-3 pt-4">
                 <Button 
-                  variant="ghost" 
+                  variant="outline" 
+                  size="sm" 
                   onClick={onReset}
-                  className="h-8 px-4 text-xs font-medium text-muted-foreground hover:text-foreground flex items-center justify-center"
+                  className="w-full h-10 text-xs font-medium"
                 >
-                  <X className="w-4 h-4 mr-2 opacity-70" />
+                  <X className="w-3.5 h-3.5 mr-2" />
                   Reset Filters
                 </Button>
                 <ExportCSV currentPosts={currentPosts} />
