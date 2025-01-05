@@ -101,23 +101,25 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
               <X className="w-4 h-4" />
               Cancel
             </Button>
+
             <Button
               onClick={handleSearch}
-              className="h-10 px-6 text-sm font-medium bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 text-white"
+              className="h-10 px-6 text-sm font-medium primary-gradient text-white"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Searching...
                 </>
               ) : (
                 <>
-                  <Search className="w-4 h-4" />
-                  Search Videos
+                  <Search className="mr-2 h-4 w-4" />
+                  Search
                 </>
               )}
             </Button>
+
           </div>
         </div>
       </DialogContent>

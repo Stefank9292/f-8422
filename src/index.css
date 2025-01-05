@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 199 89% 48%;
+    --primary: 184 100% 45%;
     --primary-foreground: 355.7 100% 97.3%;
 
     --secondary: 240 4.8% 95.9%;
@@ -30,18 +30,18 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 199 89% 48%;
+    --ring: 184 100% 45%;
 
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary: 184 100% 45%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-ring: 184 100% 45%;
   }
 
   .dark {
@@ -54,7 +54,7 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 199 89% 48%;
+    --primary: 184 100% 45%;
     --primary-foreground: 355.7 100% 97.3%;
 
     --secondary: 240 3.7% 15.9%;
@@ -71,16 +71,16 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 199 89% 48%;
+    --ring: 184 100% 45%;
 
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary: 184 100% 45%;
     --sidebar-primary-foreground: 355.7 100% 97.3%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-ring: 184 100% 45%;
   }
 }
 
@@ -94,7 +94,6 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Enhanced typography */
   h1 {
     @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
     letter-spacing: -0.02em;
@@ -121,11 +120,11 @@
 
 @layer components {
   .instagram-gradient {
-    @apply bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB];
+    @apply bg-gradient-to-r from-[#00C6FB] via-[#38EF7D] to-[#40E0D0];
   }
 
   .primary-gradient {
-    @apply bg-gradient-to-r from-[#0EA5E9] via-[#33C3F0] to-[#1EAEDB] hover:opacity-90;
+    @apply bg-gradient-to-r from-[#00C6FB] via-[#38EF7D] to-[#40E0D0] hover:opacity-90;
   }
 
   .card-hover {
@@ -136,7 +135,6 @@
     @apply transition-all duration-300 ease-spring;
   }
 
-  /* Enhanced Material Design components */
   .material-card {
     @apply bg-card rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200;
   }
@@ -163,17 +161,14 @@
            hover:bg-secondary/80;
   }
 
-  /* Enhanced container */
   .responsive-container {
     @apply w-full px-6 mx-auto sm:px-8 md:px-12 lg:px-16 max-w-7xl;
   }
 
-  /* Enhanced grid */
   .responsive-grid {
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
   }
 
-  /* Enhanced spacing */
   .touch-spacing {
     @apply space-y-8 md:space-y-12;
   }
