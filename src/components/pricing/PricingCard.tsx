@@ -70,10 +70,15 @@ export const PricingCard = ({
     }
   };
 
+  // Check if this is the Creator on Steroids plan to keep its gradient
+  const isSteroidsCard = name === "Creator on Steroids";
+
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+        ${isPopular ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105' : ''}
+        ${isSteroidsCard ? 'bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] text-white backdrop-blur-sm' : 'bg-[#1a365d]'}
+        ${!isSteroidsCard ? 'text-white' : ''}`}
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -86,13 +91,13 @@ export const PricingCard = ({
         </div>
       )}
       <div className="space-y-3">
-        <h2 className={`text-lg font-semibold ${isPopular ? 'text-primary' : ''}`}>{name}</h2>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'text-primary' : ''}`}>
+        <h2 className={`text-lg font-semibold ${isPopular && !isSteroidsCard ? 'text-white' : ''}`}>{name}</h2>
+        <p className={`text-[11px] ${isSteroidsCard ? 'text-white/80' : 'text-white/70'} leading-relaxed`}>{description}</p>
+        <div className={`text-xl font-bold ${isPopular && !isSteroidsCard ? 'text-white' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
-              <span className="text-[11px] text-muted-foreground ml-2">(${price.annual.perMonth}/mo)</span>
+              <span className={`text-[11px] ${isSteroidsCard ? 'text-white/80' : 'text-white/70'} ml-2`}>(${price.annual.perMonth}/mo)</span>
             </>
           ) : (
             `$${price.monthly}/mo`
