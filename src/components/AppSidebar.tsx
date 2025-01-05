@@ -81,7 +81,7 @@ export function AppSidebar() {
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <Separator className="my-4" />
+                  <Separator />
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
