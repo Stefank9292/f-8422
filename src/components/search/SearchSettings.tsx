@@ -75,7 +75,7 @@ export const SearchSettings = ({
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
         className="w-full flex items-center justify-center gap-2 py-2 text-[11px] text-gray-700 dark:text-gray-200 
-                 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors rounded-lg"
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg"
         disabled={disabled}
       >
         <Settings2 className="w-3.5 h-3.5" />
