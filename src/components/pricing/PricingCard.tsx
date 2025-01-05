@@ -82,8 +82,9 @@ export const PricingCard = ({
           </h2>
           {isPopular && (
             <Badge 
-              variant="default" 
-              className="bg-rose-400 text-primary-foreground px-1 py-0.5 text-[8px] font-medium"
+              variant="outline"
+              className="instagram-gradient bg-clip-text text-transparent border px-1 py-0.5 text-[8px] font-medium animate-pulse 
+                        [background:linear-gradient(to_right,#D946EF,#FF3D77,#FF8A3D)_padding-box,linear-gradient(to_right,#D946EF,#FF3D77,#FF8A3D)_border-box] border-transparent"
             >
               Best
             </Badge>
