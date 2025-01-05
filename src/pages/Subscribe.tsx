@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
 import { CancelSubscriptionButton } from "@/components/CancelSubscriptionButton";
+import { useNavigate } from "react-router-dom";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
+  const navigate = useNavigate();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -16,6 +18,27 @@ const SubscribePage = () => {
       return data.session;
     },
   });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        navigate('/auth');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -108,6 +131,10 @@ const SubscribePage = () => {
   ];
 
   const { title, subtitle } = getPageTitle();
+
+  if (!session) {
+    return null; // Don't render anything while checking auth
+  }
 
   return (
     <div className="min-h-screen p-4 bg-background">
