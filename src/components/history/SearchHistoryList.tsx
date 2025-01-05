@@ -27,8 +27,22 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
     },
   });
 
-  const { subscriptionStatus } = useSubscriptionLimits(session);
-  const isSteroidsUser = subscriptionStatus === 'ultra';
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
 
   if (!isSteroidsUser) {
     return (

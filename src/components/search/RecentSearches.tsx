@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 import { Link } from "react-router-dom";
 
 interface RecentSearchesProps {
@@ -22,8 +21,22 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     },
   });
 
-  const { subscriptionStatus } = useSubscriptionLimits(session);
-  const isSteroidsUser = subscriptionStatus === 'ultra';
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
 
   // Set up real-time listener for search history changes
   useEffect(() => {
