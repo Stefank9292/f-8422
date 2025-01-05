@@ -32,15 +32,23 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Fix: Correctly apply playsCount and viewsCount filters
-    if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
-    if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
-    
-    // Handle other numeric filters
+    // Apply numeric filters, matching the table column order
+    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) return false;
+    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) return false;
     if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
     if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
-    if (filters.minDuration && post.duration < filters.minDuration) return false;
-    if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
+    
+    // Handle duration filter if present
+    if (filters.minDuration && post.duration) {
+      const postDuration = parseInt(post.duration.split(':')[0]) * 60 + parseInt(post.duration.split(':')[1]);
+      if (postDuration < parseInt(filters.minDuration)) return false;
+    }
+    
+    // Handle engagement filter
+    if (filters.minEngagement) {
+      const postEngagement = parseFloat(post.engagement.replace('%', ''));
+      if (postEngagement < parseFloat(filters.minEngagement)) return false;
+    }
 
     return true;
   });
