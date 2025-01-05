@@ -1,4 +1,4 @@
-import { Calendar, Eye, Play, Heart, MessageCircle, Clock, Zap, ChevronDown, Filter } from "lucide-react";
+import { Calendar, Eye, Play, Heart, MessageCircle, Clock, Zap, ChevronDown, Filter, X } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -138,7 +138,16 @@ export const SearchFilters = ({
                   helpText={input.helpText}
                 />
               ))}
-              <div className="flex justify-center pt-4">
+              <div className="flex flex-col gap-3 pt-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onReset}
+                  className="w-full h-10 text-xs font-medium"
+                >
+                  <X className="w-3.5 h-3.5 mr-2" />
+                  Reset Filters
+                </Button>
                 <ExportCSV currentPosts={currentPosts} />
               </div>
             </div>
