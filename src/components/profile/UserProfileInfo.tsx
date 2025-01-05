@@ -41,7 +41,7 @@ export const UserProfileInfo = ({
             }`}>
               {planName}
             </span>
-            <span className="text-[11px] text-sidebar-foreground/70 truncate max-w-[150px]">
+            <span className="text-[9px] text-sidebar-foreground/50 truncate max-w-[150px]">
               {email}
             </span>
           </div>
@@ -60,7 +60,7 @@ export const UserProfileInfo = ({
               <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                 Unlimited Usage
               </span>
-              <span className="text-[11px] text-sidebar-foreground/70">
+              <span className="text-[9px] text-sidebar-foreground/50">
                 {usedRequests} requests this month
               </span>
             </div>
@@ -82,7 +82,7 @@ export const UserProfileInfo = ({
               <div className="space-y-2">
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
                 <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
-                <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
+                <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
                   <span>{usedRequests}/{maxRequests} requests</span>
                   <span className="text-primary/70">{remainingRequests} left</span>
                   {hasReachedLimit && (
