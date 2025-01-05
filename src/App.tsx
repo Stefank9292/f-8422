@@ -12,6 +12,7 @@ import Subscribe from "@/pages/Subscribe";
 import Success from "@/pages/Success";
 import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
+import SearchHistory from "@/pages/SearchHistory";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,6 +76,14 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <HelpCenter />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/history"
+                  element={
+                    <ProtectedRoute>
+                      <SearchHistory />
                     </ProtectedRoute>
                   }
                 />

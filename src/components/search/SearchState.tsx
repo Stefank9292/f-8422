@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
+import { saveSearchHistory } from "@/utils/searchHistory";
 
 export const useSearchState = () => {
   const {
@@ -76,7 +77,16 @@ export const useSearchState = () => {
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
-    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
+    queryFn: async () => {
+      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
+      // Save search history after successful fetch
+      if (results.length > 0) {
+        await saveSearchHistory(username, results);
+        // Invalidate search history query to refresh the history page
+        queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      }
+      return results;
+    },
     enabled: Boolean(username) && shouldSearch,
     staleTime: Infinity,
     gcTime: Infinity,
