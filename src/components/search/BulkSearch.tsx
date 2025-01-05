@@ -61,29 +61,30 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-xl mx-auto p-4 sm:p-6">
-        <DialogHeader className="space-y-2">
-          <DialogTitle className="text-lg sm:text-xl font-semibold tracking-tight">
+      <DialogContent className="w-[95vw] max-w-xl mx-auto p-3 sm:p-6">
+        <DialogHeader className="space-y-2 mb-4">
+          <DialogTitle className="text-base sm:text-xl font-semibold tracking-tight">
             Bulk Search
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
+          <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
             Enter Instagram URLs (one per line) to search multiple profiles at once.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-3 sm:space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">
-              Instagram URLs (max {MAX_URLS})
+            <label className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1">
+              Instagram URLs
+              <span className="text-[10px] text-muted-foreground">(max {MAX_URLS})</span>
             </label>
             <Textarea
               placeholder={`Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
-              className="min-h-[150px] sm:min-h-[200px] font-mono text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20"
+              className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
               disabled={isLoading}
             />
-            <p className={`text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
+            <p className={`text-[10px] sm:text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
             </p>
           </div>
@@ -98,30 +99,30 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             disabled={isLoading}
           />
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
             <Button
               variant="outline"
               onClick={onClose}
-              className="h-12 sm:h-10 px-6 text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20 w-full sm:w-auto"
+              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20"
               disabled={isLoading}
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-3.5 h-3.5 mr-2" />
               Cancel
             </Button>
 
             <Button
               onClick={handleSearch}
-              className="h-12 sm:h-10 px-6 text-sm font-medium primary-gradient text-white w-full sm:w-auto mb-2 sm:mb-0"
+              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white mb-2 sm:mb-0"
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   Searching...
                 </>
               ) : (
                 <>
-                  <Search className="mr-2 h-4 w-4" />
+                  <Search className="mr-2 h-3.5 w-3.5" />
                   Search
                 </>
               )}

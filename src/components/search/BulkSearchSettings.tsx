@@ -74,38 +74,38 @@ export const BulkSearchSettings = ({
     <div className="w-full mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-center gap-2 py-3 sm:py-2 text-[11px] text-gray-700 dark:text-gray-200 
-                 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors rounded-lg"
+        className="inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-200 
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg mx-auto"
         disabled={disabled}
       >
-        <Settings2 className="w-3.5 h-3.5" />
+        <Settings2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         <span className="font-medium">Search Settings</span>
       </button>
 
       {isSettingsOpen && (
-        <div className="mt-3 p-4 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
+        <div className="mt-2 sm:mt-3 p-2.5 sm:p-4 space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 rounded-lg 
                       border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200">
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <span className="text-sm sm:text-[11px] font-medium">Number of Videos per Profile</span>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] sm:text-[11px] font-medium">Number of Videos per Profile</span>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                    <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-400 cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-[10px]">Maximum number of videos to fetch per profile</p>
+                    <p className="text-[9px] sm:text-[10px]">Maximum number of videos to fetch per profile</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <span className="text-sm sm:text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+              <span className="text-[10px] sm:text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                 {localNumberOfVideos}
               </span>
             </div>
             <Slider
               value={[localNumberOfVideos]}
-              onValueChange={(value) => setLocalNumberOfVideos(value[0])}
-              onPointerUp={() => setNumberOfVideos(localNumberOfVideos)}
+              onValueChange={handleSliderChange}
+              onPointerUp={handleSliderPointerUp}
               min={1}
               max={maxVideos}
               step={1}
@@ -115,26 +115,26 @@ export const BulkSearchSettings = ({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
-              <span className="text-sm sm:text-[11px] font-medium">Posts newer than</span>
+            <div className="flex items-center gap-1">
+              <CalendarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500" />
+              <span className="text-[10px] sm:text-[11px] font-medium">Posts newer than</span>
               {isFreeUser && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Lock className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                    <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-[10px]">Upgrade to filter by date</p>
+                    <p className="text-[9px] sm:text-[10px]">Upgrade to filter by date</p>
                   </TooltipContent>
                 </Tooltip>
               )}
               {!isFreeUser && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                    <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground cursor-help" />
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-[10px]">Limited to posts from the last 90 days</p>
+                    <p className="text-[9px] sm:text-[10px]">Limited to posts from the last 90 days</p>
                   </TooltipContent>
                 </Tooltip>
               )}
@@ -144,7 +144,7 @@ export const BulkSearchSettings = ({
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-10 justify-start text-sm sm:text-[11px] font-normal",
+                    "w-full h-8 justify-start text-[10px] sm:text-[11px] font-normal",
                     !selectedDate && "text-muted-foreground",
                     isFreeUser && "opacity-50 cursor-not-allowed"
                   )}
@@ -163,6 +163,7 @@ export const BulkSearchSettings = ({
                       date > new Date() || date < ninetyDaysAgo
                     }
                     initialFocus
+                    className="rounded-lg border shadow-sm"
                   />
                 </PopoverContent>
               )}
