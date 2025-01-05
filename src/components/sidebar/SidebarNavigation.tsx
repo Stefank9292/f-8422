@@ -38,10 +38,8 @@ export function SidebarNavigation() {
 
   return (
     <div className="space-y-2 py-2">
-      <div className={cn("flex items-center justify-between px-4 py-2", isCollapsed ? "h-auto" : "h-[40px]")}>
-        <span className={cn("text-sm font-medium transition-all duration-200", isCollapsed ? "opacity-0 hidden" : "opacity-100")}>
-          Navigation
-        </span>
+      <div className={cn("flex items-center justify-between px-4 py-2", "h-[40px]")}>
+        <span className="text-sm font-medium">Navigation</span>
       </div>
       <nav className="space-y-1 px-2">
         <TooltipProvider delayDuration={0}>
@@ -53,15 +51,20 @@ export function SidebarNavigation() {
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring",
-                    isCollapsed && "justify-center"
+                    // Only apply collapsed styles on mobile
+                    "md:justify-start",
+                    "sm:justify-center sm:px-2"
                   )}
                 >
                   <item.icon className="h-4 w-4" />
-                  {!isCollapsed && <span>{item.title}</span>}
+                  <span className={cn(
+                    "md:inline", // Always show text on desktop
+                    "sm:hidden" // Hide on mobile when collapsed
+                  )}>{item.title}</span>
                 </Link>
               </TooltipTrigger>
               {isCollapsed && (
-                <TooltipContent side="right">
+                <TooltipContent side="right" className="md:hidden">
                   {item.title}
                 </TooltipContent>
               )}
