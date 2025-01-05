@@ -18,7 +18,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
       url: "/subscribe",
       showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
       className: isCreatorPro ? 
-        "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] text-white hover:from-[#FFE55C] hover:via-[#FFB52E] hover:to-[#FFA033] animate-pulse hover:animate-none transition-all duration-300" 
+        "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] text-white hover:from-[#FFE55C] hover:via-[#FFB52E] hover:to-[#FFA033] transition-all duration-300" 
         : undefined
     },
     {
