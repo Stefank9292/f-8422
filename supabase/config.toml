@@ -1,16 +1,50 @@
 project_id = "uubpxlhfkxqjrsgnwlzh"
 
-[functions.create-checkout-session]
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+
+[db]
+port = 54322
+
+[studio]
+enabled = true
+port = 54323
+
+[inbucket]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+
+[realtime]
+enabled = true
+
+[[functions]]
+name = "check-subscription"
 verify_jwt = true
 
-[functions.check-subscription]
+[[functions]]
+name = "create-checkout-session"
 verify_jwt = true
 
-[functions.cancel-subscription]
+[[functions]]
+name = "update-subscription"
 verify_jwt = true
 
-[functions.resume-subscription]
+[[functions]]
+name = "cancel-subscription"
 verify_jwt = true
 
-[functions.update-subscription]
+[[functions]]
+name = "resume-subscription"
+verify_jwt = true
+
+[[functions]]
+name = "instagram-scraper"
 verify_jwt = true
