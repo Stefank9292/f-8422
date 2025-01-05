@@ -63,10 +63,11 @@ export const ExportCSV = ({ currentPosts }: ExportCSVProps) => {
   return (
     <Button 
       variant="outline" 
+      size="sm" 
       onClick={handleExportCSV}
-      className="w-full h-12 rounded-xl text-sm font-medium"
+      className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50"
     >
-      <Download className="w-4 h-4 mr-2" />
+      <Download className="w-3.5 h-3.5 mr-1.5" />
       Export CSV
     </Button>
   );

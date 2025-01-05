@@ -4,7 +4,6 @@ import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ExportCSV } from "./ExportCSV";
 
 interface FiltersType {
   minViews: string;
@@ -64,13 +63,14 @@ export const SearchFilters = ({
               onReset={onReset}
               currentPosts={currentPosts}
             />
-            <div className="space-y-6 bg-card/50 p-6 rounded-lg">
+            <div className="grid grid-cols-1 gap-6 bg-card/50 p-6 rounded-lg">
               <FilterInput
                 icon={Calendar}
                 label="Posts newer than"
                 value={filters.postsNewerThan}
                 onChange={(value) => onFilterChange('postsNewerThan', value)}
                 placeholder="dd.mm.yyyy"
+                helpText="Limited to posts from the last 90 days"
                 isDatePicker={true}
               />
 
@@ -125,23 +125,20 @@ export const SearchFilters = ({
                 onChange={(value) => onFilterChange('minEngagement', value)}
                 placeholder="e.g. 5"
               />
-
-              <div className="pt-4">
-                <ExportCSV currentPosts={currentPosts} />
-              </div>
             </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
 
       <div className="hidden md:block">
-        <div className="space-y-6 bg-card/50 p-6 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-card/50 p-6 rounded-lg">
           <FilterInput
             icon={Calendar}
             label="Posts newer than"
             value={filters.postsNewerThan}
             onChange={(value) => onFilterChange('postsNewerThan', value)}
             placeholder="dd.mm.yyyy"
+            helpText="Limited to posts from the last 90 days"
             isDatePicker={true}
           />
 
@@ -196,10 +193,6 @@ export const SearchFilters = ({
             onChange={(value) => onFilterChange('minEngagement', value)}
             placeholder="e.g. 5"
           />
-
-          <div className="pt-4">
-            <ExportCSV currentPosts={currentPosts} />
-          </div>
         </div>
       </div>
     </div>
