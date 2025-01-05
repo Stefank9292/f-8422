@@ -1,4 +1,4 @@
-import { X, Instagram } from "lucide-react";
+import { X, Instagram, History } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,10 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   return (
     <div className="w-full flex flex-col items-center space-y-3 mt-4">
-      <h3 className="text-sm font-medium text-muted-foreground">Recent Searches</h3>
+      <div className="flex items-center gap-2">
+        <History className="h-4 w-4 text-muted-foreground" />
+        <h3 className="text-sm font-medium text-muted-foreground">Recent Searches</h3>
+      </div>
       <div className="w-full flex flex-wrap justify-center gap-2">
         {recentSearches.map((search) => (
           <div
@@ -49,7 +52,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                      px-4 py-2 rounded-full transition-all duration-200 
                      border border-border/50 hover:border-border/80"
           >
-            <Instagram className="h-3.5 w-3.5 text-muted-foreground" />
+            <Instagram className="h-3.5 w-3.5 text-primary" />
             <button
               onClick={() => onSelect(search.search_query)}
               className="text-xs text-foreground/80 hover:text-foreground font-medium"
@@ -59,7 +62,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="h-4 w-4 transition-colors"
               onClick={() => handleRemove(search.id)}
             >
               <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
