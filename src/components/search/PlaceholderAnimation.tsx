@@ -19,12 +19,11 @@ export const usePlaceholderAnimation = () => {
       timer = setTimeout(() => {
         setCurrentWordIndex((prev) => (prev + 1) % words.length);
         setCharIndex(0);
-        setPlaceholder("");
       }, 1500);
     }
 
     return () => clearTimeout(timer);
   }, [charIndex, currentWordIndex]);
 
-  return placeholder || words[currentWordIndex];
+  return placeholder || words[currentWordIndex].slice(0, 1);
 };
