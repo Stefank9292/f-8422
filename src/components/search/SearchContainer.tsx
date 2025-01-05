@@ -66,7 +66,7 @@ export const SearchContainer = ({
           onClick={handleSearch} 
           disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
           className={cn(
-            "w-full h-8 text-[11px] font-medium transition-all duration-300",
+            "w-full h-10 text-[11px] font-medium transition-all duration-300",
             username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             hasReachedLimit && "opacity-50 cursor-not-allowed"
