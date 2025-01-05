@@ -58,7 +58,7 @@ export const useSearchState = () => {
         setShouldFetch(false);
       }
     },
-    onSuccess: () => {
+    onSettled: () => {
       setShouldFetch(false);
     }
   });

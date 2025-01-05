@@ -2,28 +2,36 @@ import { supabase } from "@/integrations/supabase/client";
 import { ApifyRequestBody } from "../types/InstagramTypes";
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody) {
+  console.log('Making Apify request to endpoint');
   const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=${process.env.APIFY_API_KEY}`;
   
-  const response = await fetch(apiEndpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(requestBody)
-  });
+  try {
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error('API Error Response:', errorBody);
-    
-    if (response.status === 402) {
-      throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('API Error Response:', errorBody);
+      
+      if (response.status === 402) {
+        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+      }
+      
+      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
     }
-    
-    throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
-  }
 
-  return await response.json();
+    const data = await response.json();
+    console.log('Successfully received data from Apify');
+    return data;
+  } catch (error) {
+    console.error('Error in makeApifyRequest:', error);
+    throw error;
+  }
 }
 
 export async function checkSubscriptionAndLimits(userId: string): Promise<{
@@ -31,6 +39,8 @@ export async function checkSubscriptionAndLimits(userId: string): Promise<{
   maxRequestsPerDay: number;
   isSteroidsUser: boolean;
 }> {
+  console.log('Checking subscription and limits for user:', userId);
+  
   // Get subscription status
   const { data: subscriptionData, error: subscriptionError } = await supabase.functions.invoke(
     'check-subscription',
@@ -40,6 +50,7 @@ export async function checkSubscriptionAndLimits(userId: string): Promise<{
   );
 
   if (subscriptionError) {
+    console.error('Error checking subscription:', subscriptionError);
     throw new Error('Failed to check subscription status');
   }
 
@@ -68,6 +79,13 @@ export async function checkSubscriptionAndLimits(userId: string): Promise<{
   const currentRequests = count || 0;
   const maxRequestsPerDay = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
   const canMakeRequest = currentRequests < maxRequestsPerDay;
+
+  console.log('Subscription check results:', {
+    currentRequests,
+    maxRequestsPerDay,
+    canMakeRequest,
+    isSteroidsUser
+  });
 
   return {
     canMakeRequest,

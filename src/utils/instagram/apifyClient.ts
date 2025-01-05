@@ -25,6 +25,7 @@ export async function fetchInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
+    console.log('Starting fetchInstagramPosts for:', username);
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
@@ -59,7 +60,9 @@ export async function fetchInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
+    console.log('Making Apify request with body:', requestBody);
     const data = await makeApifyRequest(requestBody);
+    console.log('Received response from Apify:', data);
     
     return Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
@@ -77,6 +80,7 @@ export async function fetchBulkInstagramPosts(
   postsNewerThan?: Date
 ): Promise<InstagramPost[]> {
   try {
+    console.log('Starting fetchBulkInstagramPosts for URLs:', urls);
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
@@ -119,7 +123,9 @@ export async function fetchBulkInstagramPosts(
       requestBody.onlyPostsNewerThan = postsNewerThan.toISOString().split('T')[0];
     }
 
+    console.log('Making bulk Apify request with body:', requestBody);
     const data = await makeApifyRequest(requestBody);
+    console.log('Received bulk response from Apify:', data);
     
     return Array.isArray(data) 
       ? data.map(post => transformToInstagramPost(post))
