@@ -37,14 +37,6 @@ export const UserProfileInfo = ({
           <span className="text-[11px] text-sidebar-foreground/70 truncate max-w-[150px]">
             {email}
           </span>
-          {isUltraPlan ? (
-            <div className="flex items-center gap-1">
-              <CircleUserRound className="w-3.5 h-3.5 text-primary animate-pulse" />
-              <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
-                Unlimited Usage
-              </span>
-            </div>
-          ) : null}
           <div className="flex items-center gap-1">
             <span className={`text-[10px] ${
               isSteroidsUser 
@@ -59,6 +51,12 @@ export const UserProfileInfo = ({
           <div className="mt-4">
             {isUltraPlan ? (
               <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <CircleUserRound className="w-3.5 h-3.5 text-primary animate-pulse" />
+                  <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+                    Unlimited Usage
+                  </span>
+                </div>
                 <span className="text-[10px] text-sidebar-foreground/60">
                   {usedRequests} requests this month
                 </span>
