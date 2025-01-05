@@ -87,7 +87,7 @@ export const SearchContainer = ({
           ) : hasReachedLimit ? (
             <>
               <Search className="mr-2 h-3.5 w-3.5" />
-              Daily Limit Reached ({requestCount}/{maxRequests})
+              Monthly Limit Reached ({requestCount}/{maxRequests})
             </>
           ) : (
             <>

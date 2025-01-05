@@ -128,7 +128,7 @@ export const SearchBar = ({
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder={`${placeholder} (${usedRequests}/${maxRequests === Infinity ? '∞' : maxRequests} searches used)`}
+          placeholder={`${placeholder} (${usedRequests}/${maxRequests === Infinity ? '∞' : maxRequests} monthly searches used)`}
           className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
                    focus:border-[#D946EF] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
