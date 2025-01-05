@@ -63,7 +63,7 @@ const HelpCenter = () => {
                 Getting Started
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-[13px] text-muted-foreground">
+            <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-4">
                 <p className="font-medium text-foreground">Welcome to VyralSearch</p>
                 <div className="space-y-2">
@@ -85,7 +85,7 @@ const HelpCenter = () => {
                 Known Issues
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-[13px] text-muted-foreground">
+            <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-4">
                 <p className="font-medium text-foreground">Current Limitations</p>
                 <div className="space-y-2">
@@ -104,7 +104,7 @@ const HelpCenter = () => {
                 Best Practices
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-[13px] text-muted-foreground">
+            <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-4">
                 <p className="font-medium text-foreground">Tips for Better Results</p>
                 <div className="space-y-2">
