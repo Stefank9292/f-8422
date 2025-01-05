@@ -74,7 +74,7 @@ export const BulkSearchSettings = ({
     <div className="w-full mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-center gap-2 py-2 text-[11px] text-gray-700 dark:text-gray-200 
+        className="w-full flex items-center justify-center gap-2 py-3 sm:py-2 text-[11px] text-gray-700 dark:text-gray-200 
                  hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors rounded-lg"
         disabled={disabled}
       >
@@ -83,12 +83,12 @@ export const BulkSearchSettings = ({
       </button>
 
       {isSettingsOpen && (
-        <div className="mt-2 p-3 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
+        <div className="mt-3 p-4 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
                       border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-medium">Number of Videos per Profile</span>
+                <span className="text-sm sm:text-[11px] font-medium">Number of Videos per Profile</span>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
@@ -98,14 +98,14 @@ export const BulkSearchSettings = ({
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+              <span className="text-sm sm:text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                 {localNumberOfVideos}
               </span>
             </div>
             <Slider
               value={[localNumberOfVideos]}
-              onValueChange={handleSliderChange}
-              onPointerUp={handleSliderPointerUp}
+              onValueChange={(value) => setLocalNumberOfVideos(value[0])}
+              onPointerUp={() => setNumberOfVideos(localNumberOfVideos)}
               min={1}
               max={maxVideos}
               step={1}
@@ -117,7 +117,7 @@ export const BulkSearchSettings = ({
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
-              <span className="text-[11px] font-medium">Posts newer than</span>
+              <span className="text-sm sm:text-[11px] font-medium">Posts newer than</span>
               {isFreeUser && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -144,7 +144,7 @@ export const BulkSearchSettings = ({
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-8 justify-start text-[11px] font-normal",
+                    "w-full h-10 justify-start text-sm sm:text-[11px] font-normal",
                     !selectedDate && "text-muted-foreground",
                     isFreeUser && "opacity-50 cursor-not-allowed"
                   )}
