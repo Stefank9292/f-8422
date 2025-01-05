@@ -6,6 +6,7 @@ import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
 import { SearchFilters } from "../search/SearchFilters";
 import { TableContent } from "../search/TableContent";
+import { TablePagination } from "../search/TablePagination";
 import { useToast } from "@/hooks/use-toast";
 
 interface SearchHistoryItemProps {
@@ -23,6 +24,8 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
   const results = item.search_results?.[0]?.results || [];
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState({
     postsNewerThan: "",
     minViews: "",
@@ -35,6 +38,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleResetFilters = () => {
@@ -47,6 +51,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       minDuration: "",
       minEngagement: "",
     });
+    setCurrentPage(1); // Reset to first page when filters are reset
   };
 
   const filteredResults = results.filter(post => {
@@ -102,6 +107,22 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   const truncateCaption = (caption: string) => {
     return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
+  };
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredResults.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPosts = filteredResults.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    const newPageSize = parseInt(value);
+    setPageSize(newPageSize);
+    setCurrentPage(1);
   };
 
   return (
@@ -160,7 +181,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
           </div>
           <div className="rounded-lg overflow-hidden">
             <TableContent
-              currentPosts={filteredResults}
+              currentPosts={currentPosts}
               handleSort={() => {}}
               handleCopyCaption={handleCopyCaption}
               handleDownload={handleDownload}
@@ -168,6 +189,16 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               truncateCaption={truncateCaption}
             />
           </div>
+          {filteredResults.length > 25 && (
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              pageSize={pageSize}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+              totalResults={filteredResults.length}
+            />
+          )}
         </div>
       )}
     </div>
