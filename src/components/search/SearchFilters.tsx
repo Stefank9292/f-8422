@@ -121,14 +121,7 @@ export const SearchFilters = ({
               {filterInputs.map((input, index) => (
                 <FilterInput
                   key={index}
-                  icon={input.icon}
-                  label={input.label}
-                  value={input.value}
-                  onChange={input.onChange}
-                  placeholder={input.placeholder}
-                  type={input.type}
-                  isDatePicker={input.isDatePicker}
-                  helpText={input.helpText}
+                  {...input}
                 />
               ))}
               <div className="flex flex-col gap-3 pt-4">
@@ -153,14 +146,7 @@ export const SearchFilters = ({
           {filterInputs.map((input, index) => (
             <FilterInput
               key={index}
-              icon={input.icon}
-              label={input.label}
-              value={input.value}
-              onChange={input.onChange}
-              placeholder={input.placeholder}
-              type={input.type}
-              isDatePicker={input.isDatePicker}
-              helpText={input.helpText}
+              {...input}
             />
           ))}
         </div>

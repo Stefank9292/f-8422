@@ -17,6 +17,7 @@ interface FilterInputProps {
   placeholder?: string;
   type?: string;
   isDatePicker?: boolean;
+  helpText?: string;
 }
 
 export const FilterInput = ({
@@ -27,6 +28,7 @@ export const FilterInput = ({
   placeholder,
   type = "text",
   isDatePicker,
+  helpText,
 }: FilterInputProps) => {
   const [date, setDate] = useState<Date>();
 
@@ -70,6 +72,9 @@ export const FilterInput = ({
             />
           </PopoverContent>
         </Popover>
+        {helpText && (
+          <p className="text-[10px] text-muted-foreground mt-1">{helpText}</p>
+        )}
       </div>
     );
   }
@@ -93,6 +98,9 @@ export const FilterInput = ({
         placeholder={placeholder}
         className="h-8"
       />
+      {helpText && (
+        <p className="text-[10px] text-muted-foreground mt-1">{helpText}</p>
+      )}
     </div>
   );
 };
