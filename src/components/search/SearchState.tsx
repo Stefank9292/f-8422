@@ -110,7 +110,12 @@ export const useSearchState = () => {
       
       return results;
     },
-    enabled: false, // This ensures the query won't run automatically
+    enabled: shouldSearch,
+    meta: {
+      onSettled: () => {
+        setShouldSearch(false);
+      }
+    }
   });
 
   const getMaxRequests = () => {
@@ -138,7 +143,6 @@ export const useSearchState = () => {
 
     setBulkSearchResults([]);
     setShouldSearch(true);
-    queryClient.refetchQueries({ queryKey: ['instagram-posts'] });
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
