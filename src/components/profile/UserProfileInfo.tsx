@@ -50,8 +50,8 @@ export const UserProfileInfo = ({
         {isUltraPlan ? (
           <div className="flex items-start gap-3">
             <UserAvatar 
-              isSteroidsUser={false} 
-              isProUser={false} 
+              isSteroidsUser={isSteroidsUser} 
+              isProUser={isProUser} 
               className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]"
             >
               <Infinity className="h-4 w-4 text-white" />
@@ -66,20 +66,35 @@ export const UserProfileInfo = ({
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            <span className="text-[11px] text-sidebar-foreground/70">Monthly Usage</span>
-            <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
-            <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
-              <span>{usedRequests}/{maxRequests} requests</span>
-              <span className="text-primary/70">{remainingRequests} left</span>
-              {hasReachedLimit && (
-                <Link 
-                  to="/subscribe" 
-                  className="text-primary hover:text-primary/80 transition-colors"
-                >
-                  Upgrade plan →
-                </Link>
-              )}
+          <div className="flex items-start gap-3">
+            <UserAvatar 
+              isSteroidsUser={isSteroidsUser} 
+              isProUser={isProUser}
+              className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]"
+            >
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-[10px] font-medium text-white">
+                  {remainingRequests}
+                </span>
+              </div>
+            </UserAvatar>
+            <div className="flex flex-col">
+              <div className="space-y-2">
+                <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
+                <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
+                <div className="flex justify-between text-[9px] text-sidebar-foreground/60">
+                  <span>{usedRequests}/{maxRequests} requests</span>
+                  <span className="text-primary/70">{remainingRequests} left</span>
+                  {hasReachedLimit && (
+                    <Link 
+                      to="/subscribe" 
+                      className="text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Upgrade plan →
+                    </Link>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
