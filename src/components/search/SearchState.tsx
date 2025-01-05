@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
@@ -18,7 +18,6 @@ export const useSearchState = () => {
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
   const [shouldSearch, setShouldSearch] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -99,16 +98,8 @@ export const useSearchState = () => {
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
-    queryFn: async ({ signal }) => {
-      // Store the abort controller for potential cancellation
-      abortControllerRef.current = new AbortController();
-      
-      const results = await fetchInstagramPosts(
-        username, 
-        numberOfVideos, 
-        selectedDate,
-        signal || abortControllerRef.current.signal
-      );
+    queryFn: async () => {
+      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
       
       // Save search results to history and invalidate queries
       if (results.length > 0) {
@@ -123,7 +114,6 @@ export const useSearchState = () => {
     meta: {
       onSettled: () => {
         setShouldSearch(false);
-        abortControllerRef.current = null;
       }
     }
   });
@@ -153,17 +143,6 @@ export const useSearchState = () => {
 
     setBulkSearchResults([]);
     setShouldSearch(true);
-  };
-
-  const cancelSearch = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-      setShouldSearch(false);
-      toast({
-        description: "Search cancelled",
-      });
-    }
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
@@ -208,7 +187,6 @@ export const useSearchState = () => {
     maxRequests: getMaxRequests(),
     handleSearch,
     handleBulkSearch,
-    cancelSearch,
     displayPosts,
     subscriptionStatus,
   };

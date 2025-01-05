@@ -11,7 +11,6 @@ const Index = () => {
     maxRequests,
     handleSearch,
     handleBulkSearch,
-    cancelSearch,
     displayPosts,
   } = useSearchState();
 
@@ -25,7 +24,6 @@ const Index = () => {
       maxRequests={maxRequests}
       handleSearch={handleSearch}
       handleBulkSearch={handleBulkSearch}
-      cancelSearch={cancelSearch}
       displayPosts={displayPosts}
     />
   );
