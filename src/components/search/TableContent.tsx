@@ -24,8 +24,7 @@ export const TableContent = ({
     <TooltipProvider>
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
-          <PostTableHeader onSort={handleSort} />
-          <TableBody>
+          <TableBody className="divide-y divide-border">
             {currentPosts.map((post, index) => (
               <PostTableRow
                 key={index}
