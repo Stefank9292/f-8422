@@ -152,12 +152,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       return "bg-secondary hover:bg-secondary/80";
     }
     
-    // Keep gradient only for Creator on Steroids plan
-    if (isPopular) {
-      return "primary-gradient text-primary-foreground";
-    }
-    
-    // Navy blue for all other plans (Free and Creator Pro)
+    // Navy blue for all plans (including Creator on Steroids)
     return "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white";
   };
 
