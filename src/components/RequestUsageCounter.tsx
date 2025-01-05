@@ -149,7 +149,9 @@ export const RequestUsageCounter = () => {
         <div className="space-y-1">
           {isUltraPlan ? (
             <div className="text-[9px] text-sidebar-foreground/60 flex items-center justify-center gap-1">
-              <span>Unlimited Usage</span>
+              <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+                Unlimited Usage
+              </span>
               <span className="text-green-500">•</span>
               <span>{usedRequests} requests this month</span>
             </div>
