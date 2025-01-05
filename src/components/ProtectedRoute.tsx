@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const location = useLocation();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Initial session check
@@ -32,17 +34,26 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log("Auth state change:", event);
       if (event === 'SIGNED_OUT') {
-        // Clear local session data
+        // Clear local session data and query cache
         setSession(null);
+        queryClient.clear();
       } else {
         setSession(currentSession);
       }
     });
 
+    // Clear query cache when navigating to a new route
+    const clearQueryCache = () => {
+      queryClient.clear();
+    };
+
+    window.addEventListener('popstate', clearQueryCache);
+
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('popstate', clearQueryCache);
     };
-  }, []);
+  }, [queryClient]);
 
   if (session === undefined) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;

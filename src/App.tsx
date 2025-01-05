@@ -19,9 +19,9 @@ const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
       gcTime: 1000 * 60 * 10, // Keep unused data in cache for 10 minutes
       retry: 3, // Retry failed requests 3 times
-      refetchOnWindowFocus: false, // Don't refetch on window focus
-      refetchOnReconnect: false, // Don't refetch on reconnect
-      refetchOnMount: false, // Don't refetch on component mount
+      refetchOnWindowFocus: true, // Enable refetch on window focus
+      refetchOnReconnect: true, // Enable refetch on reconnect
+      refetchOnMount: true, // Enable refetch on component mount
     },
   },
 });
