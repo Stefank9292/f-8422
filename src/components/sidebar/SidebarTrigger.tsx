@@ -15,6 +15,8 @@ export function SidebarTrigger() {
       className={cn(
         "fixed top-4 left-4 z-50 h-8 w-8 rounded-lg border shadow-sm transition-all duration-200",
         "md:hidden", // Only show on mobile
+        "bg-background hover:bg-background/90", // Solid background in all states
+        "dark:bg-sidebar dark:hover:bg-sidebar/90", // Dark mode solid background
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
       )}
