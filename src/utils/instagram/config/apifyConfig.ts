@@ -8,4 +8,5 @@ export const APIFY_CONFIG = {
   }
 };
 
-export const APIFY_ENDPOINT = 'https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=apify_api_yT1CTZA7SyxHa9eRpx9lI2Fkjhj7Dr0rili1';
+// Remove hardcoded API key, we'll use the one from Supabase
+export const APIFY_BASE_ENDPOINT = 'https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items';

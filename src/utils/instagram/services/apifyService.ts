@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { APIFY_CONFIG, APIFY_ENDPOINT } from '../config/apifyConfig';
+import { APIFY_CONFIG, APIFY_BASE_ENDPOINT } from '../config/apifyConfig';
 import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
@@ -27,7 +27,15 @@ export async function checkSubscriptionAndLimits(userId: string) {
 export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   console.log('Making Apify request with config:', { ...APIFY_CONFIG, requestBody });
   
-  const response = await fetch(APIFY_ENDPOINT, {
+  // Get the API key from Supabase Functions
+  const { data: { key: apifyApiKey }, error: keyError } = await supabase.functions.invoke('get-apify-key');
+  
+  if (keyError || !apifyApiKey) {
+    console.error('Failed to get Apify API key:', keyError);
+    throw new Error('Failed to get Apify API key');
+  }
+
+  const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${apifyApiKey}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
