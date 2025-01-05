@@ -81,22 +81,23 @@ export const UserProfileInfo = ({
               </div>
             </UserAvatar>
             <div className="flex flex-col">
-              <div className="space-y-2">
-                <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
-                <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
-                <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
-                  <span>{usedRequests}</span>
-                  <span className="text-primary/70">{remainingRequests} left</span>
-                  {hasReachedLimit && (
-                    <Link 
-                      to="/subscribe" 
-                      className="text-primary hover:text-primary/80 transition-colors"
-                    >
-                      Upgrade plan →
-                    </Link>
-                  )}
+              {isSteroidsUser ? (
+                <div className="space-y-2">
+                  <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
+                  <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
+                  <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
+                    <span>{usedRequests}</span>
+                    <span className="text-primary/70">{remainingRequests} left</span>
+                  </div>
                 </div>
-              </div>
+              ) : hasReachedLimit && (
+                <Link 
+                  to="/subscribe" 
+                  className="text-[10px] text-primary hover:text-primary/80 transition-colors"
+                >
+                  Upgrade plan →
+                </Link>
+              )}
             </div>
           </div>
         )}
