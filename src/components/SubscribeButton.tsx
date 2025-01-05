@@ -8,9 +8,10 @@ interface SubscribeButtonProps {
   planId: string;
   planName: string;
   isPopular?: boolean;
+  isAnnual: boolean;
 }
 
-export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButtonProps) => {
+export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -117,6 +118,15 @@ export const SubscribeButton = ({ planId, planName, isPopular }: SubscribeButton
     const isCurrentPlan = subscriptionStatus?.priceId === planId;
     if (isCurrentPlan) {
       return "Current Plan";
+    }
+
+    // Check if user has monthly subscription and this is the annual version of their plan
+    const isMonthlyToAnnualUpgrade = isAnnual && 
+      ((subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" && planId === "price_1QdHTrDoPDXfOSZFhVlGuUAd") || // Pro monthly to annual
+       (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" && planId === "price_1QdHUGDoPDXfOSZFGaGscfw5")); // Steroids monthly to annual
+
+    if (isMonthlyToAnnualUpgrade) {
+      return "Save 20% now by upgrading to annual";
     }
 
     // If user has Creator on Steroids plan (viewing Creator Pro button)
