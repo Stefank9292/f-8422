@@ -1,4 +1,4 @@
-import { CreditCard, Moon, HelpCircle, MessageCircle, Star } from "lucide-react";
+import { CreditCard, Moon, HelpCircle, MessageCircle, Star, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface SidebarSettingsProps {
@@ -9,12 +9,17 @@ interface SidebarSettingsProps {
 export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSettingsProps) {
   const navigate = useNavigate();
 
+  const isCreatorPro = subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq";
+
   const secondaryMenuItems = [
     {
-      title: "Manage Subscription",
-      icon: CreditCard,
+      title: isCreatorPro ? "Upgrade to Creator on Steroids" : "Manage Subscription",
+      icon: isCreatorPro ? Zap : CreditCard,
       url: "/subscribe",
       showWhen: (subscriptionStatus: any) => subscriptionStatus?.subscribed,
+      className: isCreatorPro ? 
+        "bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FF8C00] text-white hover:from-[#FFE55C] hover:via-[#FFB52E] hover:to-[#FFA033] animate-pulse hover:animate-none transition-all duration-300" 
+        : undefined
     },
     {
       title: "Upgrade to Pro",
@@ -63,7 +68,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
                   : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/20')
               } transition-colors`}
             >
-              <item.icon className="h-3.5 w-3.5" />
+              <item.icon className={`h-3.5 w-3.5 ${isCreatorPro && item.icon === Zap ? 'animate-bounce' : ''}`} />
               <span>{item.title}</span>
             </button>
           );
