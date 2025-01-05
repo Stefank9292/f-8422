@@ -61,10 +61,10 @@ const FAQ = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full justify-start gap-2 bg-transparent h-auto p-0 mb-8">
+          <TabsList className="w-full flex flex-wrap justify-start gap-2 bg-transparent h-auto p-0 mb-8">
             <TabsTrigger 
               value="all" 
-              className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="rounded-full px-4 py-2 text-sm md:px-6 md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               All Questions
             </TabsTrigger>
@@ -72,7 +72,7 @@ const FAQ = () => {
               <TabsTrigger
                 key={category}
                 value={category}
-                className="rounded-full px-6 py-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
+                className="rounded-full px-4 py-2 text-sm md:px-6 md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
               >
                 {category}
               </TabsTrigger>
