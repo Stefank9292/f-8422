@@ -41,6 +41,9 @@ export function AppSidebar() {
       if (!session) {
         // If session is null (user logged out), force close the sidebar
         setOpen(false);
+      } else {
+        // If session exists (user logged in), open the sidebar
+        setOpen(true);
       }
     });
 
@@ -48,6 +51,13 @@ export function AppSidebar() {
       subscription.unsubscribe();
     };
   }, [setOpen]);
+
+  // Set initial sidebar state based on session
+  useEffect(() => {
+    if (session) {
+      setOpen(true);
+    }
+  }, [session, setOpen]);
 
   const { data: subscriptionStatus } = useSubscription(session);
 
