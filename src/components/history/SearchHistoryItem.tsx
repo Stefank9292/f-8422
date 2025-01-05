@@ -1,13 +1,11 @@
 import { useState } from "react";
-import { format } from "date-fns";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { InstagramPost } from "@/types/instagram";
-import { cn } from "@/lib/utils";
 import { SearchFilters } from "../search/SearchFilters";
 import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
-import { useToast } from "@/hooks/use-toast";
+import { SearchHistoryItemHeader } from "./SearchHistoryItemHeader";
+import { filterResults, FilterState } from "@/utils/filterResults";
 
 interface SearchHistoryItemProps {
   item: {
@@ -26,7 +24,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const results = item.search_results?.[0]?.results || [];
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FilterState>({
     postsNewerThan: "",
     minViews: "",
     minPlays: "",
@@ -51,24 +49,8 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       minDuration: "",
       minEngagement: "",
     });
-    setCurrentPage(1); // Reset to first page when filters are reset
+    setCurrentPage(1);
   };
-
-  const filteredResults = results.filter(post => {
-    if (filters.postsNewerThan) {
-      const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
-      const postDate = new Date(post.timestamp);
-      if (postDate < filterDate) return false;
-    }
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) return false;
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) return false;
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
-    if (filters.minDuration && post.duration < filters.minDuration) return false;
-    if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
-
-    return true;
-  });
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -109,7 +91,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
   };
 
-  // Calculate pagination
+  const filteredResults = filterResults(results, filters);
   const totalPages = Math.ceil(filteredResults.length / pageSize);
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
@@ -127,45 +109,15 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   return (
     <div className="animate-fade-in">
-      <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <span className="font-medium truncate">@{item.search_query}</span>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              {format(new Date(item.created_at), 'MMM d, HH:mm')}
-            </span>
-            <span className="text-xs text-muted-foreground whitespace-nowrap">
-              ({results.length})
-            </span>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className={cn(
-                "h-8 w-8 p-0 transition-transform duration-200",
-                isExpanded && "bg-accent"
-              )}
-            >
-              {isExpanded ? (
-                <ChevronUp className="h-4 w-4" />
-              ) : (
-                <ChevronDown className="h-4 w-4" />
-              )}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(item.id)}
-              disabled={isDeleting}
-              className="h-8 w-8 p-0"
-            >
-              <Trash2 className="h-4 w-4 text-destructive" />
-            </Button>
-          </div>
-        </div>
-      </div>
+      <SearchHistoryItemHeader
+        query={item.search_query}
+        date={item.created_at}
+        resultsCount={results.length}
+        isExpanded={isExpanded}
+        onToggleExpand={() => setIsExpanded(!isExpanded)}
+        onDelete={() => onDelete(item.id)}
+        isDeleting={isDeleting}
+      />
       
       {isExpanded && results.length > 0 && (
         <div className="mt-3 space-y-4 animate-fade-in">
