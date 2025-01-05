@@ -32,7 +32,14 @@ export const UsageProgress = ({
             isProUser={isProUser} 
             className="h-3 w-3"
           />
-          <span>Monthly Usage</span>
+          <div className="flex flex-col">
+            <span>Monthly Usage</span>
+            {isUltraPlan ? (
+              <span className="text-[9px] text-sidebar-foreground/60">
+                {usedRequests} requests this month
+              </span>
+            ) : null}
+          </div>
         </div>
         {!isUltraPlan && (
           <span className="text-primary/70">{remainingRequests} left</span>
@@ -46,7 +53,6 @@ export const UsageProgress = ({
               Unlimited Usage
             </span>
             <span className="text-green-500">•</span>
-            <span>{usedRequests} requests this month</span>
           </div>
         ) : (
           <>

@@ -134,6 +134,8 @@ export const RequestUsageCounter = () => {
         maxRequests={maxRequests}
         remainingRequests={remainingRequests}
         hasReachedLimit={hasReachedLimit}
+        isSteroidsUser={isSteroidsUser}
+        isProUser={isProUser}
       />
     </div>
   );
