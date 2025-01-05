@@ -67,21 +67,47 @@ export const UserProfileInfo = ({
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <UserAvatar 
-              isSteroidsUser={isSteroidsUser} 
-              isProUser={isProUser}
-              className="bg-muted border border-border"
-            >
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-[10px] font-medium text-foreground">
-                  {remainingRequests}
-                </span>
+            <div className="relative">
+              <div className="absolute inset-0 -m-1">
+                <svg className="w-[calc(100%+8px)] h-[calc(100%+8px)]" viewBox="0 0 120 120">
+                  <circle
+                    className="text-sidebar-accent/20"
+                    strokeWidth="4"
+                    stroke="currentColor"
+                    fill="none"
+                    r="56"
+                    cx="60"
+                    cy="60"
+                  />
+                  <circle
+                    className="text-primary"
+                    strokeWidth="4"
+                    strokeLinecap="round"
+                    stroke="currentColor"
+                    fill="none"
+                    r="56"
+                    cx="60"
+                    cy="60"
+                    strokeDasharray={`${(1 - usagePercentage / 100) * 351.8584} 351.8584`}
+                    transform="rotate(-90 60 60)"
+                  />
+                </svg>
               </div>
-            </UserAvatar>
+              <UserAvatar 
+                isSteroidsUser={isSteroidsUser} 
+                isProUser={isProUser}
+                className="bg-muted border border-border relative z-10"
+              >
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-[10px] font-medium text-foreground">
+                    {remainingRequests}
+                  </span>
+                </div>
+              </UserAvatar>
+            </div>
             <div className="flex flex-col">
               <div className="space-y-2">
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
-                <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
                 <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
                   <span>{usedRequests}/{maxRequests} requests</span>
                   <span className="text-primary/70">{remainingRequests} left</span>
