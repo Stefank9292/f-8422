@@ -1,5 +1,6 @@
-import { CreditCard, Moon, HelpCircle, MessageCircle, Star, Zap } from "lucide-react";
+import { CreditCard, Moon, Sun, HelpCircle, MessageCircle, Star, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 interface SidebarSettingsProps {
   currentPath: string;
@@ -8,8 +9,27 @@ interface SidebarSettingsProps {
 
 export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSettingsProps) {
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
 
   const isCreatorPro = subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq";
+
+  // Effect to sync state with actual theme
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDark(document.documentElement.classList.contains('dark'));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   const secondaryMenuItems = [
     {
@@ -40,10 +60,11 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
     },
     {
       title: "Dark Mode",
-      icon: Moon,
+      icon: isDark ? Sun : Moon,
       onClick: () => {
         document.documentElement.classList.toggle('dark');
       },
+      className: "group",
     },
   ];
 
@@ -57,6 +78,8 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
             return null;
           }
 
+          const IconComponent = item.icon;
+          
           return (
             <button
               key={item.title}
@@ -68,7 +91,11 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
                   : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/20')
               } transition-colors`}
             >
-              <item.icon className={`h-3.5 w-3.5 ${isCreatorPro && item.icon === Zap ? 'animate-bounce' : ''}`} />
+              <IconComponent 
+                className={`h-3.5 w-3.5 transition-transform duration-500 ease-spring
+                  ${isCreatorPro && item.icon === Zap ? 'animate-bounce' : ''}
+                  ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
+              />
               <span>{item.title}</span>
             </button>
           );
