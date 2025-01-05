@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { BulkSearch } from "./BulkSearch";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SearchBarProps {
@@ -23,13 +23,20 @@ export const SearchBar = ({
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
+  const queryClient = useQueryClient();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return null;
-
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`
@@ -38,14 +45,71 @@ export const SearchBar = ({
       if (error) throw error;
       return data;
     },
-    enabled: false,
+    enabled: !!session?.access_token,
   });
+
+  const { data: requestStats } = useQuery({
+    queryKey: ['request-stats'],
+    queryFn: async () => {
+      if (!session?.user.id) return null;
+      
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+      const { count } = await supabase
+        .from('user_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', session.user.id)
+        .eq('request_type', 'instagram_search')
+        .gte('created_at', startOfMonth.toISOString())
+        .lt('created_at', endOfMonth.toISOString())
+        .or(`last_reset_at.is.null,last_reset_at.lt.${startOfMonth.toISOString()}`);
+
+      return count || 0;
+    },
+    enabled: !!session?.user.id,
+  });
+
+  // Listen for real-time updates on user_requests
+  useEffect(() => {
+    if (!session?.user.id) return;
+
+    const channel = supabase
+      .channel('user-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_requests',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['request-stats'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user.id, queryClient]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading) {
       e.preventDefault();
       onSearch();
     }
+  };
+
+  const getMaxRequests = () => {
+    if (!subscriptionStatus?.priceId) return 3;
+    if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
+    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return Infinity;
+    return 3;
   };
 
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
@@ -55,12 +119,16 @@ export const SearchBar = ({
     subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0"    // Ultra Annual
   );
 
+  const maxRequests = getMaxRequests();
+  const usedRequests = requestStats || 0;
+  const remainingRequests = maxRequests === Infinity ? 'Unlimited' : Math.max(0, maxRequests - usedRequests);
+
   return (
     <>
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder={placeholder}
+          placeholder={`${placeholder} (${usedRequests}/${maxRequests === Infinity ? '∞' : maxRequests} searches used)`}
           className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
                    focus:border-[#D946EF] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
