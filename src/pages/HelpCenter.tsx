@@ -47,11 +47,12 @@ const HelpCenter = () => {
                 <Play className="h-8 w-8 text-white fill-white translate-x-0.5" />
               </div>
             </div>
-            <img 
-              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
-              alt="Tutorial Video Placeholder"
-              className="object-cover w-full h-full"
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-semibold text-muted-foreground">Tutorial Video</h3>
+                <p className="text-sm text-muted-foreground/80">Coming Soon</p>
+              </div>
+            </div>
           </AspectRatio>
         </div>
 
