@@ -7,6 +7,7 @@ import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
 import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 import { InstagramPost } from "@/types/instagram";
 import { Input } from "@/components/ui/input";
+import { transformSearchResults } from "@/utils/transformSearchResults";
 
 interface SearchHistoryResult {
   id: string;
@@ -76,7 +77,15 @@ const SearchHistory = () => {
         throw historyError;
       }
 
-      return historyData as SearchHistoryResult[];
+      // Transform the raw data to match our expected types
+      return historyData?.map(item => ({
+        id: item.id,
+        search_query: item.search_query,
+        created_at: item.created_at,
+        search_results: item.search_results?.map(sr => ({
+          results: transformSearchResults(sr as any).results
+        }))
+      })) as SearchHistoryResult[];
     },
     enabled: !!session?.user?.id,
   });

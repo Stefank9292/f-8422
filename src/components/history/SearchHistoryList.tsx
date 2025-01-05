@@ -1,4 +1,3 @@
-import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchHistoryItem } from "./SearchHistoryItem";
@@ -28,11 +27,12 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
   });
 
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
+      if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
