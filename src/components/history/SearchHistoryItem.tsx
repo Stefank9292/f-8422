@@ -22,7 +22,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
   
-  // Filter for valid clips only and remove undefined values
+  // Filter for valid clips only, remove undefined values and posts with 0 views/plays
   const allResults = item.search_results?.[0]?.results || [];
   const results = allResults.filter(post => {
     return post && 
@@ -34,7 +34,10 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
            post.viewsCount !== undefined &&
            post.likesCount !== undefined &&
            post.commentsCount !== undefined &&
-           post.engagement !== undefined;
+           post.engagement !== undefined &&
+           // Filter out posts with 0 views or plays
+           post.playsCount > 0 &&
+           post.viewsCount > 0;
   });
 
   const [currentPage, setCurrentPage] = useState(1);
