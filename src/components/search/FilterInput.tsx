@@ -37,15 +37,14 @@ export const FilterInput = ({
   };
 
   if (isDatePicker) {
-    // Calculate the date 90 days ago
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-          <label className="text-xs font-medium">{label}</label>
+          <Icon className="w-4 h-4 text-muted-foreground" />
+          <label className="text-base font-medium">{label}</label>
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -54,18 +53,18 @@ export const FilterInput = ({
                 type="text"
                 placeholder={placeholder}
                 value={value}
-                className="h-8 text-xs pl-8"
+                className="h-12 rounded-xl text-sm pl-10"
                 readOnly
               />
-              <CalendarIcon className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-muted-foreground w-3.5 h-3.5" />
+              <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               {value && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8"
                   onClick={handleResetDate}
                 >
-                  <X className="h-3.5 w-3.5" />
+                  <X className="h-4 w-4" />
                 </Button>
               )}
             </div>
@@ -75,14 +74,13 @@ export const FilterInput = ({
               mode="single"
               selected={value ? new Date(value.split('.').reverse().join('-')) : undefined}
               onSelect={handleDateSelect}
-              disabled={(date) => {
-                return date > new Date() || date < ninetyDaysAgo;
-              }}
+              disabled={(date) => date > new Date() || date < ninetyDaysAgo}
               initialFocus
               className="rounded-md border"
             />
           </PopoverContent>
         </Popover>
+        <p className="text-sm text-muted-foreground">Limited to posts from the last 90 days</p>
       </div>
     );
   }
@@ -90,15 +88,15 @@ export const FilterInput = ({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-        <label className="text-xs font-medium">{label}</label>
+        <Icon className="w-4 h-4 text-muted-foreground" />
+        <label className="text-base font-medium">{label}</label>
       </div>
       <Input
         type={type}
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-8 text-xs"
+        className="h-12 rounded-xl text-sm"
       />
     </div>
   );
