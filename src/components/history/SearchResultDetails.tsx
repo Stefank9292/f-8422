@@ -1,14 +1,18 @@
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
 import { format, isValid, parseISO } from "date-fns";
-import { Instagram, Play, Eye, Heart, MessageCircle, Clock, Zap } from "lucide-react";
+import { Instagram, Play, Eye, Heart, MessageCircle, Clock, Zap, Download, ExternalLink, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SearchResultDetailsProps {
   result: InstagramPost;
 }
 
 export function SearchResultDetails({ result }: SearchResultDetailsProps) {
+  const { toast } = useToast();
+
   const formatDate = (dateString: string) => {
     try {
       const date = parseISO(dateString);
@@ -19,6 +23,37 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
     } catch (error) {
       console.error('Error formatting date:', error);
       return 'Invalid date';
+    }
+  };
+
+  const handleCopyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      description: "Caption copied to clipboard",
+    });
+  };
+
+  const handleDownload = async (videoUrl: string) => {
+    try {
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `video-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        description: "Download started",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        variant: "destructive",
+        description: "Failed to download video",
+      });
     }
   };
 
@@ -36,43 +71,100 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
             @{result.ownerUsername}
           </a>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-3"
-          onClick={() => window.open(result.url, '_blank')}
-        >
-          View Post
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => handleCopyCaption(result.caption)}
+          >
+            <Copy className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0"
+            onClick={() => window.open(result.url, '_blank')}
+          >
+            <ExternalLink className="h-4 w-4 text-rose-400" />
+          </Button>
+          {result.videoUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => handleDownload(result.videoUrl!)}
+            >
+              <Download className="h-4 w-4 text-blue-400" />
+            </Button>
+          )}
+        </div>
       </div>
       
-      <p className="text-sm text-muted-foreground line-clamp-2">{result.caption}</p>
+      <div className="relative">
+        <p className="text-sm text-muted-foreground line-clamp-2">{result.caption}</p>
+      </div>
       
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <div className="flex items-center gap-2">
-          <Play className="w-4 h-4 text-primary" />
-          <span className="text-sm">{result.playsCount.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-green-500" />
-          <span className="text-sm">{result.viewsCount.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Heart className="w-4 h-4 text-rose-500" />
-          <span className="text-sm">{result.likesCount.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-blue-500" />
-          <span className="text-sm">{result.commentsCount.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock className="w-4 h-4 text-orange-500" />
-          <span className="text-sm">{result.duration}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-yellow-500" />
-          <span className="text-sm">{result.engagement}% engagement</span>
-        </div>
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <Play className="w-4 h-4 text-primary" />
+              <span className="text-sm">{result.playsCount.toLocaleString()}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Plays</TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-green-500" />
+              <span className="text-sm">{result.viewsCount.toLocaleString()}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Views</TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <Heart className="w-4 h-4 text-rose-500" />
+              <span className="text-sm">{result.likesCount.toLocaleString()}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Likes</TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-blue-500" />
+              <span className="text-sm">{result.commentsCount.toLocaleString()}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Comments</TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-orange-500" />
+              <span className="text-sm">{result.duration}</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Duration</TooltipContent>
+        </Tooltip>
+        
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-yellow-500" />
+              <span className="text-sm">{result.engagement}% engagement</span>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>Engagement Rate</TooltipContent>
+        </Tooltip>
       </div>
       
       <div className="text-xs text-muted-foreground">
