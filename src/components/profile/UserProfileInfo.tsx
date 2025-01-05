@@ -1,6 +1,7 @@
 import { UserAvatar } from "./UserAvatar";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
+import { CircleUserRound } from "lucide-react";
 
 interface UserProfileInfoProps {
   email: string | undefined;
@@ -50,9 +51,12 @@ export const UserProfileInfo = ({
           <div className="mt-4">
             {isUltraPlan ? (
               <div className="flex flex-col">
-                <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
-                  Unlimited Usage
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <CircleUserRound className="w-3.5 h-3.5 text-primary animate-pulse" />
+                  <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+                    Unlimited Usage
+                  </span>
+                </div>
                 <span className="text-[10px] text-sidebar-foreground/60">
                   {usedRequests} requests this month
                 </span>
