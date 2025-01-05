@@ -64,7 +64,7 @@ const HelpCenter = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <p className="font-medium text-foreground">Welcome to VyralSearch</p>
                 <div className="space-y-2">
                   <p>Get started with our platform in three simple steps:</p>
@@ -86,7 +86,7 @@ const HelpCenter = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <p className="font-medium text-foreground">Current Limitations</p>
                 <div className="space-y-2">
                   <p>• Private Instagram accounts cannot be searched</p>
@@ -105,7 +105,7 @@ const HelpCenter = () => {
               </div>
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <p className="font-medium text-foreground">Tips for Better Results</p>
                 <div className="space-y-2">
                   <p>• Use specific usernames rather than broad searches</p>
