@@ -5,6 +5,7 @@ import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
+import { InstagramPost } from "@/types/instagram";
 
 export const useSearchState = () => {
   const {
@@ -15,7 +16,7 @@ export const useSearchState = () => {
   } = useSearchStore();
   
   const [isBulkSearching, setIsBulkSearching] = useState(false);
-  const [bulkSearchResults, setBulkSearchResults] = useState<any[]>([]);
+  const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
   const [shouldSearch, setShouldSearch] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -58,7 +59,6 @@ export const useSearchState = () => {
           filter: `user_id=eq.${session.user.id}`
         },
         () => {
-          // Invalidate subscription status query to trigger a refresh
           queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
           toast({
             title: "Subscription Updated",
@@ -94,6 +94,17 @@ export const useSearchState = () => {
       return count || 0;
     },
     enabled: !!session?.user.id,
+  });
+
+  const { data: posts = [], isLoading } = useQuery({
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
+    enabled: shouldSearch,
+    meta: {
+      onSettled: () => {
+        setShouldSearch(false);
+      }
+    }
   });
 
   const getMaxRequests = () => {
@@ -154,6 +165,6 @@ export const useSearchState = () => {
     handleSearch,
     handleBulkSearch,
     displayPosts,
-    subscriptionStatus, // Add this to expose subscription status
+    subscriptionStatus,
   };
 };
