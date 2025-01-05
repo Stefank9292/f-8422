@@ -58,9 +58,8 @@ export const useSearchState = () => {
         setShouldFetch(false);
       }
     },
-    onSettled: () => {
-      setShouldFetch(false);
-    }
+    gcTime: 0,
+    staleTime: 0,
   });
 
   const handleSearch = () => {
