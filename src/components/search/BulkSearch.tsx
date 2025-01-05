@@ -71,8 +71,8 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 sm:space-y-6">
-          <div className="space-y-2">
+        <div className="space-y-3 sm:space-y-6 flex flex-col items-center">
+          <div className="space-y-2 w-full max-w-md mx-auto">
             <label className="text-xs sm:text-sm font-medium text-foreground flex items-center gap-1">
               Instagram URLs
               <span className="text-[10px] text-muted-foreground">(max {MAX_URLS})</span>
@@ -99,7 +99,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             disabled={isLoading}
           />
 
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 mt-4 sm:mt-6">
+          <div className="flex flex-col-reverse sm:flex-row justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 w-full max-w-md">
             <Button
               variant="outline"
               onClick={onClose}
