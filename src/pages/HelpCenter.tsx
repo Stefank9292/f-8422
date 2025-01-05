@@ -87,7 +87,7 @@ const HelpCenter = () => {
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-2">
-                <p className="font-medium text-foreground">Current Limitations</p>
+                <p className="font-medium text-foreground">Make sure to search properly</p>
                 <div className="space-y-2">
                   <p>• Private Instagram accounts cannot be searched</p>
                   <p>• Some videos may have limited metadata available</p>
@@ -106,7 +106,7 @@ const HelpCenter = () => {
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-2">
-                <p className="font-medium text-foreground">Tips for Better Results</p>
+                <p className="font-medium text-foreground">Try these tips to get the best results</p>
                 <div className="space-y-2">
                   <p>• Use specific usernames rather than broad searches</p>
                   <p>• Filter results by engagement rates for better insights</p>
