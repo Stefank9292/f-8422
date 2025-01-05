@@ -52,7 +52,6 @@ export const CancelSubscriptionButton = ({
         description: "Your subscription will be cancelled at the end of the billing period.",
       });
 
-      // Invalidate the subscription status query to refresh the UI
       queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
     } catch (error) {
       console.error('Error:', error);
@@ -102,7 +101,7 @@ export const CancelSubscriptionButton = ({
           <AlertDialogAction 
             onClick={handleCancel} 
             disabled={loading}
-            className="text-[11px] h-8 primary-gradient"
+            className="text-[11px] h-8 bg-[#1a365d] hover:bg-[#1a365d]/90 text-white"
           >
             {loading ? "Cancelling..." : "Yes, Cancel Subscription"}
           </AlertDialogAction>

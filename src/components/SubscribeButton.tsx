@@ -121,21 +121,18 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       return "Current Plan";
     }
 
-    // Check if user has monthly subscription and this is the annual version of their plan
     const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") || // Pro monthly to annual
-       (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0")); // Steroids monthly to annual
+      ((subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") || 
+       (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
 
     if (isMonthlyToAnnualUpgrade) {
       return "Save 20% now by upgrading to annual";
     }
 
-    // If user has Creator on Steroids plan (viewing Creator Pro button)
     if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
       return "Downgrade to Creator Pro";
     }
 
-    // If user has Creator Pro plan (viewing Creator on Steroids button)
     if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
       return "Upgrade to Creator on Steroids";
     }
@@ -151,12 +148,9 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     if (isCurrentPlan) {
       return "bg-secondary hover:bg-secondary/80";
     }
-    
-    // Navy blue for all plans (including Creator on Steroids)
     return "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white";
   };
 
-  // Show cancel subscription button for current paid plans
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
     return (
       <CancelSubscriptionButton 
