@@ -94,7 +94,7 @@ export const SearchSettings = ({
       {isSettingsOpen && (
         <div className="mt-2 p-3 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
                       border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200
-                      w-full max-w-sm mx-auto">
+                      w-full max-w-md mx-auto">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
