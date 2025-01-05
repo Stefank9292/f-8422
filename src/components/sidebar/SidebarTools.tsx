@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, History } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,6 +15,11 @@ export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsPr
       title: "Viral Video Search",
       url: "/",
       icon: Search,
+    },
+    {
+      title: "Search History",
+      url: "/history",
+      icon: History,
     },
   ];
 
