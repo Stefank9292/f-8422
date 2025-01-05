@@ -18,6 +18,11 @@ export const PostTableRow = ({
   formatNumber,
   truncateCaption 
 }: PostTableRowProps) => {
+  // Format engagement rate to always show 2 decimal places
+  const formattedEngagement = typeof post.engagement === 'string' 
+    ? `${parseFloat(post.engagement).toFixed(2)}%`
+    : `${post.engagement.toFixed(2)}%`;
+
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-3 text-xs text-muted-foreground font-medium">
@@ -61,7 +66,7 @@ export const PostTableRow = ({
         {formatNumber(post.commentsCount)}
       </TableCell>
       <TableCell className="text-center py-3 text-xs font-medium text-orange-500">
-        {post.engagement}
+        {formattedEngagement}
       </TableCell>
       <TableCell className="text-center py-3">
         <Button 
