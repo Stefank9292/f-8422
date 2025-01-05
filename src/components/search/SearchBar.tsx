@@ -4,6 +4,7 @@ import { BulkSearch } from "./BulkSearch";
 import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { usePlaceholderAnimation } from "./PlaceholderAnimation";
 import { BulkSearchButton } from "./BulkSearchButton";
 
 interface SearchBarProps {
@@ -22,6 +23,7 @@ export const SearchBar = ({
   isLoading 
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
+  const placeholder = usePlaceholderAnimation();
   const queryClient = useQueryClient();
 
   const { data: session } = useQuery({
@@ -114,7 +116,7 @@ export const SearchBar = ({
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder="This is a place holder"
+          placeholder={placeholder}
           className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
                    focus:border-[#D946EF] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
