@@ -20,6 +20,11 @@ export const MobilePostRow = ({
   truncateCaption,
 }: MobilePostRowProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Format engagement rate to always show 2 decimal places
+  const formattedEngagement = typeof post.engagement === 'string' 
+    ? `${parseFloat(post.engagement).toFixed(2)}%`
+    : `${post.engagement.toFixed(2)}%`;
 
   return (
     <Collapsible
@@ -83,7 +88,7 @@ export const MobilePostRow = ({
           <div className="flex items-center gap-2 col-span-2">
             <Zap className="h-3.5 w-3.5 text-orange-500" />
             <span className="text-xs font-medium text-orange-500">
-              {post.engagement}
+              {formattedEngagement}
             </span>
           </div>
         </div>

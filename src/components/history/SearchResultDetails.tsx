@@ -43,6 +43,11 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
     }
   };
 
+  // Format engagement rate to always show 2 decimal places
+  const formattedEngagement = typeof result.engagement === 'string' 
+    ? `${parseFloat(result.engagement).toFixed(2)}%`
+    : `${result.engagement.toFixed(2)}%`;
+
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
       <div className="flex flex-col space-y-3">
@@ -135,7 +140,7 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
             <TooltipTrigger asChild>
               <div className="flex items-center gap-2">
                 <Zap className="w-3.5 h-3.5 text-yellow-500" />
-                <span>{result.engagement}%</span>
+                <span>{formattedEngagement}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>Engagement Rate</TooltipContent>
