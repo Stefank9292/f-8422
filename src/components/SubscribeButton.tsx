@@ -144,7 +144,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     if (isCurrentPlan) {
       return "bg-secondary hover:bg-secondary/80";
     }
-    return isPopular ? "bg-[#D946EF] hover:bg-[#D946EF]/90 text-white" : "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white";
+    return isPopular ? "bg-[#D946EF] hover:bg-[#D946EF]/90 text-white" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
   };
 
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {

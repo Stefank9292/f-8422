@@ -56,7 +56,7 @@ export const ResumeSubscriptionButton = ({ children, className }: ResumeSubscrip
     <Button 
       onClick={handleResume} 
       disabled={loading}
-      className={`primary-gradient ${className}`}
+      className={`bg-[#D946EF] hover:bg-[#D946EF]/90 text-white ${className}`}
     >
       {loading ? "Resuming..." : children || "Resume Subscription"}
     </Button>
