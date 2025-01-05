@@ -51,7 +51,7 @@ export const PricingCard = ({
         { included: false, text: "Contact Support" },
         { included: false, text: "Early Access to new Features" }
       ];
-    } else if (priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+    } else if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return [
         { included: true, text: "25 Total Searches" },
         { included: true, text: "Maximum 20 Results per Search" },
