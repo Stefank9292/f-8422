@@ -14,10 +14,23 @@ export async function fetchInstagramPosts(
       throw new Error('No authenticated user found');
     }
 
-    // Check if user has reached their request limit
-    const canMakeRequest = await checkRequestLimit(session.user.id);
-    if (!canMakeRequest) {
-      throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+    // Get subscription status
+    const { data: subscriptionStatus } = await supabase.functions.invoke('check-subscription', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+
+    // Check if user is on Steroids plan (unlimited requests)
+    const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                          subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
+    // Only check request limit for non-Steroids users
+    if (!isSteroidsUser) {
+      const canMakeRequest = await checkRequestLimit(session.user.id);
+      if (!canMakeRequest) {
+        throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+      }
     }
 
     // Track the request before making it
@@ -59,10 +72,23 @@ export async function fetchBulkInstagramPosts(
       throw new Error('No authenticated user found');
     }
 
-    // Check if user has reached their request limit
-    const canMakeRequest = await checkRequestLimit(session.user.id);
-    if (!canMakeRequest) {
-      throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+    // Get subscription status
+    const { data: subscriptionStatus } = await supabase.functions.invoke('check-subscription', {
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+
+    // Check if user is on Steroids plan (unlimited requests)
+    const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                          subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
+    // Only check request limit for non-Steroids users
+    if (!isSteroidsUser) {
+      const canMakeRequest = await checkRequestLimit(session.user.id);
+      if (!canMakeRequest) {
+        throw new Error('Daily request limit reached. Please upgrade your plan for more requests.');
+      }
     }
 
     // Track the request before making it (counts as one request regardless of number of URLs)

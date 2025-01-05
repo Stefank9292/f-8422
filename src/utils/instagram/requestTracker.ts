@@ -41,11 +41,13 @@ export async function checkRequestLimit(userId: string): Promise<boolean> {
   });
 
   // Define limits based on subscription tier
-  let dailyLimit = 25; // Free tier
-  if (subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
-    dailyLimit = 100; // Pro tier
-  } else if (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
-    dailyLimit = 500; // Ultra tier
+  let dailyLimit = 3; // Free tier
+  if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+      subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    dailyLimit = 25; // Pro tier
+  } else if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+             subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+    dailyLimit = Infinity; // Steroids tier
   }
 
   return (count || 0) < dailyLimit;
