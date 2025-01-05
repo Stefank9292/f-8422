@@ -79,17 +79,19 @@ export const SearchFilters = ({
     },
     {
       icon: Clock,
-      label: "Minimum Duration",
+      label: "Minimum Duration (seconds)",
       value: filters.minDuration,
       onChange: (value: string) => onFilterChange('minDuration', value),
-      placeholder: "e.g. 30"
+      placeholder: "e.g. 30",
+      type: "number"
     },
     {
       icon: Zap,
-      label: "Minimum Engagement",
+      label: "Minimum Engagement (%)",
       value: filters.minEngagement,
       onChange: (value: string) => onFilterChange('minEngagement', value),
-      placeholder: "e.g. 5"
+      placeholder: "e.g. 5",
+      type: "number"
     }
   ];
 

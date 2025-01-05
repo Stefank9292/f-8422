@@ -24,7 +24,8 @@ export const FilterInput = ({
   onChange, 
   placeholder, 
   type = "text",
-  isDatePicker = false
+  isDatePicker = false,
+  helpText
 }: FilterInputProps) => {
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
@@ -34,6 +35,16 @@ export const FilterInput = ({
 
   const handleResetDate = () => {
     onChange('');
+  };
+
+  const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow positive numbers
+    if (type === "number" && value !== "") {
+      const num = parseInt(value);
+      if (num < 0) return;
+    }
+    onChange(value);
   };
 
   if (isDatePicker) {
@@ -46,6 +57,9 @@ export const FilterInput = ({
         <div className="flex items-center gap-2">
           <Icon className="w-3.5 h-3.5 text-muted-foreground" />
           <label className="text-xs font-medium">{label}</label>
+          {helpText && (
+            <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
+          )}
         </div>
         <Popover>
           <PopoverTrigger asChild>
@@ -92,13 +106,17 @@ export const FilterInput = ({
       <div className="flex items-center gap-2">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <label className="text-xs font-medium">{label}</label>
+        {helpText && (
+          <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
+        )}
       </div>
       <Input
         type={type}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={handleNumericInput}
         className="h-8 text-xs"
+        min={type === "number" ? "0" : undefined}
       />
     </div>
   );
