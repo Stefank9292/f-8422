@@ -1,5 +1,5 @@
 import { X, Instagram, History } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
@@ -10,25 +10,54 @@ interface RecentSearchesProps {
 
 export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
+  const queryClient = useQueryClient();
+
+  // Set up real-time listener for search history changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('search-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history'
+        },
+        () => {
+          // Invalidate and refetch recent searches when search history changes
+          queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.session?.user?.id) return [];
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return [];
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('search_history')
         .select('id, search_query')
         .eq('user_id', session.session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
 
+      if (error) {
+        console.error('Error fetching recent searches:', error);
+        throw error;
+      }
+
       return data || [];
     },
   });
 
-  const handleRemove = (id: string, query: string) => {
+  const handleRemove = (id: string) => {
     setHiddenSearches(prev => [...prev, id]);
   };
 
@@ -58,10 +87,10 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-1 w-1 p-0 hover:bg-transparent"
-              onClick={() => handleRemove(search.id, search.search_query)}
+              className="h-4 w-4 p-0 hover:bg-transparent"
+              onClick={() => handleRemove(search.id)}
             >
-              <X className="h-1 w-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+              <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
               <span className="sr-only">Remove search</span>
             </Button>
           </div>

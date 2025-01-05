@@ -100,10 +100,14 @@ export const useSearchState = () => {
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
       const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
-      // Save search results to history
+      
+      // Save search results to history and invalidate queries
       if (results.length > 0) {
         await saveSearchHistory(username, results);
+        queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+        queryClient.invalidateQueries({ queryKey: ['search-history'] });
       }
+      
       return results;
     },
     enabled: shouldSearch,
@@ -150,13 +154,18 @@ export const useSearchState = () => {
     try {
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
-      // Save each bulk search result to history
+      
+      // Save each bulk search result to history and invalidate queries
       for (const url of urls) {
         const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
         if (urlResults.length > 0) {
           await saveSearchHistory(url, urlResults);
         }
       }
+      
+      queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
+      queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      
       setBulkSearchResults(results);
       return results;
     } catch (error) {

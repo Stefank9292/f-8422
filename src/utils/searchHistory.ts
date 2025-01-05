@@ -35,15 +35,22 @@ export async function saveSearchHistory(username: string, results: InstagramPost
         throw searchError;
       }
 
-      // Serialize the results to ensure they match the Json type
-      const serializedResults = JSON.parse(JSON.stringify(validResults)) as Json;
+      // Convert InstagramPost[] to a format that matches the Json type
+      const serializedResults = validResults.map(post => ({
+        ...post,
+        // Ensure all properties are serializable
+        date: post.date?.toString() || '',
+        timestamp: post.timestamp?.toString() || '',
+        hashtags: Array.isArray(post.hashtags) ? post.hashtags : [],
+        mentions: Array.isArray(post.mentions) ? post.mentions : [],
+      }));
 
       // Then save the search results
       const { error: resultsError } = await supabase
         .from('search_results')
         .insert({
           search_history_id: searchHistory.id,
-          results: serializedResults
+          results: serializedResults as unknown as Json
         });
 
       if (resultsError) {
