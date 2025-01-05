@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost } from "@/types/instagram";
+import { Json } from "@/integrations/supabase/types";
 
 export async function saveSearchHistory(username: string, results: InstagramPost[]) {
   try {
@@ -34,12 +35,15 @@ export async function saveSearchHistory(username: string, results: InstagramPost
         throw searchError;
       }
 
+      // Serialize the results to ensure they match the Json type
+      const serializedResults = JSON.parse(JSON.stringify(validResults)) as Json;
+
       // Then save the search results
       const { error: resultsError } = await supabase
         .from('search_results')
         .insert({
           search_history_id: searchHistory.id,
-          results: validResults
+          results: serializedResults
         });
 
       if (resultsError) {
