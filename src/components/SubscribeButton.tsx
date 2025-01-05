@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
 
 interface SubscribeButtonProps {
   planId: string;
@@ -160,10 +161,22 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     return "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white";
   };
 
+  // Show cancel subscription button for current paid plans
+  if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
+    return (
+      <CancelSubscriptionButton 
+        isCanceled={subscriptionStatus?.canceled}
+        className="w-full"
+      >
+        Cancel Subscription
+      </CancelSubscriptionButton>
+    );
+  }
+
   return (
     <Button 
       onClick={handleSubscribe} 
-      disabled={loading || isCurrentPlan}
+      disabled={loading || (isCurrentPlan && planId === 'free')}
       className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
