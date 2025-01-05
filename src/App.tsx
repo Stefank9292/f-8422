@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ResetPassword } from "@/components/auth/ResetPassword";
 import Index from "@/pages/Index";
@@ -32,6 +33,7 @@ function App() {
         <SidebarProvider defaultOpen>
           <div className="min-h-screen flex w-full animate-in fade-in duration-200">
             <AppSidebar />
+            <SidebarTrigger />
             <main className="flex-1 overflow-y-auto">
               <Routes>
                 <Route path="/auth" element={<Auth />} />
