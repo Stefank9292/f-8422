@@ -133,10 +133,6 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       return "Downgrade to Creator Pro";
     }
 
-    if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
-      return "Upgrade to Creator on Steroids";
-    }
-
     return `Upgrade to ${planName}`;
   };
 
