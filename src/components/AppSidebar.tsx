@@ -35,19 +35,21 @@ export function AppSidebar() {
     },
   });
 
-  // Always keep sidebar open on desktop when there's a session
+  // Always keep sidebar open when there's a session
   useEffect(() => {
-    if (session && window.innerWidth >= 768) { // 768px is the md breakpoint
+    if (session) {
       setOpen(true);
     }
   }, [session, setOpen]);
 
   const { data: subscriptionStatus } = useSubscription(session);
 
+  // Handle loading state
   if (isSessionLoading) {
     return null;
   }
 
+  // If there's no session after loading, don't render the sidebar
   if (!session) {
     return null;
   }
