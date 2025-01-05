@@ -98,7 +98,7 @@ export const SearchBar = ({
   }, [session?.user.id, queryClient]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isLoading) {
+    if (e.key === 'Enter' && !isLoading && username.trim()) {
       e.preventDefault();
       onSearch();
     }

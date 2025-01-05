@@ -48,7 +48,16 @@ export const SearchContainer = ({
   } = useSearchStore();
 
   const onSearchClick = () => {
-    if (!isLoading && !isBulkSearching && username) {
+    if (!username.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter an Instagram username",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isLoading && !isBulkSearching) {
       if (hasReachedLimit) {
         toast({
           title: "Monthly Limit Reached",
@@ -81,7 +90,7 @@ export const SearchContainer = ({
 
         <Button 
           onClick={onSearchClick}
-          disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
+          disabled={isLoading || isBulkSearching || !username.trim() || hasReachedLimit}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
             username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
