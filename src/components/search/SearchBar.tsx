@@ -43,11 +43,8 @@ export const SearchBar = ({
       if (error) throw error;
       return data;
     },
+    enabled: false,
   });
-
-  const isPaidUser = subscriptionStatus?.priceId && 
-    (subscriptionStatus.priceId.startsWith("price_1QdBd2") || // Pro plans
-     subscriptionStatus.priceId.startsWith("price_1QdC54")); // Steroids plans
 
   useEffect(() => {
     let initialTimeout: NodeJS.Timeout;
@@ -60,6 +57,7 @@ export const SearchBar = ({
     };
 
     if (!username) {
+      // Show default placeholder for 3 seconds before starting animation
       initialTimeout = setTimeout(() => {
         startTypingAnimation();
       }, 3000);
@@ -86,6 +84,7 @@ export const SearchBar = ({
           setCurrentCharIndex(prev => prev + 1);
         }, typingSpeed);
       } else {
+        // Move to next example after a pause
         typingTimeout = setTimeout(() => {
           setCurrentCharIndex(0);
           setCurrentExampleIndex((prev) => (prev + 1) % examples.length);
@@ -103,6 +102,10 @@ export const SearchBar = ({
     }
   };
 
+  const isBulkSearchEnabled = subscriptionStatus?.priceId && 
+    (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" || 
+     subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3");
+
   return (
     <>
       <div className="relative w-full">
@@ -118,7 +121,7 @@ export const SearchBar = ({
           disabled={isLoading}
         />
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
-        {isPaidUser && (
+        {isBulkSearchEnabled && (
           <Button
             variant="ghost"
             className="absolute right-2 top-1/2 transform -translate-y-1/2 
@@ -134,7 +137,7 @@ export const SearchBar = ({
         )}
       </div>
 
-      {isPaidUser && (
+      {isBulkSearchEnabled && (
         <BulkSearch
           isOpen={isBulkSearchOpen}
           onClose={() => setIsBulkSearchOpen(false)}
