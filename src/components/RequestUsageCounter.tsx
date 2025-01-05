@@ -1,9 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserProfileInfo } from "./profile/UserProfileInfo";
-import { UsageProgress } from "./profile/UsageProgress";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
@@ -105,25 +103,18 @@ export const RequestUsageCounter = () => {
                     subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
 
   return (
-    <div className="px-2 py-2 space-y-4 flex flex-col items-center">
+    <div className="px-2 py-2">
       <UserProfileInfo
         email={session?.user?.email}
         planName={getPlanName()}
         isSteroidsUser={isSteroidsUser}
         isProUser={isProUser}
-      />
-
-      <div className="w-full h-px bg-sidebar-border my-2" />
-
-      <UsageProgress
         isUltraPlan={isUltraPlan}
         usagePercentage={usagePercentage}
         usedRequests={usedRequests}
         maxRequests={maxRequests}
         remainingRequests={remainingRequests}
         hasReachedLimit={hasReachedLimit}
-        isSteroidsUser={isSteroidsUser}
-        isProUser={isProUser}
       />
     </div>
   );
