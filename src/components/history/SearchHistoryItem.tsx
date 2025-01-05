@@ -21,9 +21,22 @@ interface SearchHistoryItemProps {
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
+  
+  // Filter for valid clips only and remove undefined values
   const allResults = item.search_results?.[0]?.results || [];
-  // Filter for clips only
-  const results = allResults.filter(post => post.productType?.toLowerCase() === 'clips');
+  const results = allResults.filter(post => {
+    return post && 
+           typeof post === 'object' && 
+           post.productType?.toLowerCase() === 'clips' &&
+           post.ownerUsername && 
+           post.caption && 
+           post.playsCount !== undefined &&
+           post.viewsCount !== undefined &&
+           post.likesCount !== undefined &&
+           post.commentsCount !== undefined &&
+           post.engagement !== undefined;
+  });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState<FilterState>({
