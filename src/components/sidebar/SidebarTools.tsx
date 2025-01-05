@@ -34,7 +34,7 @@ export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsPr
             className={`w-full px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] ${
               currentPath === item.url 
                 ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-                : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/20'
+                : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/20 hover:text-sidebar-foreground'
             } transition-colors group relative`}
           >
             <item.icon className="h-3.5 w-3.5" />
