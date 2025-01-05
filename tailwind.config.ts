@@ -91,12 +91,18 @@ export default {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
         },
+        "ring": {
+          "0%": { transform: "scale(1)", opacity: "1" },
+          "70%": { transform: "scale(1.1)", opacity: "0.7" },
+          "100%": { transform: "scale(1)", opacity: "1" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
         "scale-in": "scale-in 0.2s ease-out",
+        "ring": "ring 3s ease-in-out infinite",
       },
       transitionTimingFunction: {
         'spring': 'cubic-bezier(0.37, 0, 0.63, 1)',

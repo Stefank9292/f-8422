@@ -93,7 +93,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
             >
               <IconComponent 
                 className={`h-3.5 w-3.5 transition-transform duration-500 ease-spring
-                  ${isCreatorPro && item.icon === Zap ? 'animate-bounce' : ''}
+                  ${isCreatorPro && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
               />
               <span>{item.title}</span>
