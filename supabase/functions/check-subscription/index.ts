@@ -8,8 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('Check subscription function called');
-
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -18,7 +16,6 @@ serve(async (req) => {
   try {
     // Get the authorization header
     const authHeader = req.headers.get('Authorization');
-    console.log('Auth header present:', !!authHeader);
     
     if (!authHeader) {
       console.error('No authorization header provided');
@@ -32,15 +29,18 @@ serve(async (req) => {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
     );
 
     // Get user from the JWT token
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
-
-    console.log('User found:', !!user);
-    console.log('User error:', userError);
 
     if (userError || !user) {
       console.error('Error getting user:', userError);
