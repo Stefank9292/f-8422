@@ -8,6 +8,8 @@ import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SearchContainerProps {
   username: string;
@@ -43,6 +45,26 @@ export const SearchContainer = ({
     setFilters,
     resetFilters
   } = useSearchStore();
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return null;
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isPaidUser = subscriptionStatus?.priceId && 
+    (subscriptionStatus.priceId.startsWith("price_1QdBd2") || // Pro plans
+     subscriptionStatus.priceId.startsWith("price_1QdC54")); // Steroids plans
 
   return (
     <div className="responsive-container flex flex-col items-center justify-start min-h-screen py-12 md:py-16 space-y-8 md:space-y-12 animate-in fade-in duration-300">
@@ -90,15 +112,17 @@ export const SearchContainer = ({
           )}
         </Button>
 
-        <SearchSettings
-          isSettingsOpen={isSettingsOpen}
-          setIsSettingsOpen={setIsSettingsOpen}
-          numberOfVideos={numberOfVideos}
-          setNumberOfVideos={setNumberOfVideos}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching}
-        />
+        {isPaidUser && (
+          <SearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            disabled={isLoading || isBulkSearching}
+          />
+        )}
       </div>
 
       {displayPosts.length > 0 && (
