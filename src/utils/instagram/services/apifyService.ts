@@ -27,43 +27,53 @@ export async function checkSubscriptionAndLimits(userId: string) {
 export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   console.log('Making Apify request with config:', { ...APIFY_CONFIG, requestBody });
   
-  // Get the API key from Supabase Functions
-  const { data: { key: apifyApiKey }, error: keyError } = await supabase.functions.invoke('get-apify-key');
-  
-  if (keyError || !apifyApiKey) {
-    console.error('Failed to get Apify API key:', keyError);
-    throw new Error('Failed to get Apify API key');
-  }
-
-  const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${apifyApiKey}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      ...requestBody,
-      ...APIFY_CONFIG
-    })
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    console.error('API Error Response:', errorBody);
+  try {
+    // Get the API key from Supabase Functions
+    const { data, error } = await supabase.functions.invoke('get-apify-key');
     
-    if (response.status === 402) {
-      throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+    if (error) {
+      console.error('Failed to invoke get-apify-key function:', error);
+      throw new Error('Failed to get Apify API key: ' + error.message);
     }
     
-    throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
-  }
+    if (!data?.key) {
+      console.error('No API key returned from get-apify-key function');
+      throw new Error('No Apify API key available');
+    }
 
-  const data = await response.json();
-  console.log('Received response from Apify:', data);
-  
-  return Array.isArray(data) 
-    ? data.map(post => transformToInstagramPost(post))
-         .filter((post): post is InstagramPost => post !== null)
-    : [];
+    const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${data.key}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...requestBody,
+        ...APIFY_CONFIG
+      })
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('API Error Response:', errorBody);
+      
+      if (response.status === 402) {
+        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
+      }
+      
+      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
+    }
+
+    const data = await response.json();
+    console.log('Received response from Apify:', data);
+    
+    return Array.isArray(data) 
+      ? data.map(post => transformToInstagramPost(post))
+           .filter((post): post is InstagramPost => post !== null)
+      : [];
+  } catch (error) {
+    console.error('Error in makeApifyRequest:', error);
+    throw error;
+  }
 }
 
 export async function fetchInstagramPosts(

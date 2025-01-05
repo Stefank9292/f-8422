@@ -17,3 +17,6 @@ verify_jwt = true
 
 [functions.instagram-scraper]
 verify_jwt = true
+
+[functions.get-apify-key]
+verify_jwt = false
