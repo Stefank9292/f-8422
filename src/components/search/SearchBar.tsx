@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Search, List } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,11 +23,6 @@ export const SearchBar = ({
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
-  const examples = ["garyvee", "hormozi", "forbes"];
-  const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const typingSpeed = 100;
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -45,53 +40,6 @@ export const SearchBar = ({
     },
     enabled: false,
   });
-
-  useEffect(() => {
-    let initialTimeout: NodeJS.Timeout;
-    let typingTimeout: NodeJS.Timeout;
-
-    const startTypingAnimation = () => {
-      setIsTyping(true);
-      setCurrentExampleIndex(0);
-      setCurrentCharIndex(0);
-    };
-
-    if (!username) {
-      initialTimeout = setTimeout(() => {
-        startTypingAnimation();
-      }, 3000);
-    } else {
-      setIsTyping(false);
-      setPlaceholder("Enter Instagram username or profile URL");
-    }
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearTimeout(typingTimeout);
-    };
-  }, [username]);
-
-  useEffect(() => {
-    let typingTimeout: NodeJS.Timeout;
-
-    if (isTyping && !username) {
-      const currentExample = examples[currentExampleIndex];
-
-      if (currentCharIndex <= currentExample.length) {
-        typingTimeout = setTimeout(() => {
-          setPlaceholder(currentExample.substring(0, currentCharIndex));
-          setCurrentCharIndex(prev => prev + 1);
-        }, typingSpeed);
-      } else {
-        typingTimeout = setTimeout(() => {
-          setCurrentCharIndex(0);
-          setCurrentExampleIndex((prev) => (prev + 1) % examples.length);
-        }, 1000);
-      }
-    }
-
-    return () => clearTimeout(typingTimeout);
-  }, [currentCharIndex, currentExampleIndex, examples, isTyping, username]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading) {

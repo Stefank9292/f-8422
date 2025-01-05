@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { InstagramPost } from "@/types/instagram";
-import confetti from 'canvas-confetti';
 
 export const useSearchState = () => {
   const {
@@ -19,7 +18,6 @@ export const useSearchState = () => {
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
   const [shouldSearch, setShouldSearch] = useState(false);
-  const [searchRequestId, setSearchRequestId] = useState<string>('');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -99,7 +97,7 @@ export const useSearchState = () => {
   });
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate, searchRequestId],
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
       const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
       
@@ -108,23 +106,11 @@ export const useSearchState = () => {
         await saveSearchHistory(username, results);
         queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
         queryClient.invalidateQueries({ queryKey: ['search-history'] });
-        
-        // Trigger confetti only for successful searches
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
       }
       
       return results;
     },
-    enabled: shouldSearch,
-    meta: {
-      onSettled: () => {
-        setShouldSearch(false);
-      }
-    }
+    enabled: false, // This ensures the query won't run automatically
   });
 
   const getMaxRequests = () => {
@@ -152,8 +138,7 @@ export const useSearchState = () => {
 
     setBulkSearchResults([]);
     setShouldSearch(true);
-    // Generate a new search request ID to ensure the query is treated as new
-    setSearchRequestId(Date.now().toString());
+    queryClient.refetchQueries({ queryKey: ['instagram-posts'] });
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
@@ -178,16 +163,6 @@ export const useSearchState = () => {
       queryClient.invalidateQueries({ queryKey: ['search-history'] });
       
       setBulkSearchResults(results);
-      
-      // Trigger confetti for successful bulk search
-      if (results.length > 0) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
-        });
-      }
-      
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
