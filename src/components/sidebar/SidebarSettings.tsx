@@ -84,7 +84,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
                 item.className || 
                 (item.url && currentPath === item.url 
                   ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-                  : 'text-sidebar-foreground/70 hover:bg-sidebar-accent/20')
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent/20 hover:text-sidebar-accent-foreground')
               } transition-colors`}
             >
               <IconComponent 
