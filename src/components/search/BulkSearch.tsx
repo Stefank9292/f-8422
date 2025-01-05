@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { BulkSearchSettings } from "./BulkSearchSettings";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BulkSearchProps {
@@ -99,20 +99,10 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             disabled={isLoading}
           />
 
-          <div className="flex flex-col-reverse sm:flex-row justify-center gap-2 sm:gap-3 mt-4 sm:mt-6 w-full">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20 rounded-xl"
-              disabled={isLoading}
-            >
-              <X className="w-3.5 h-3.5 mr-2" />
-              Cancel
-            </Button>
-
+          <div className="flex justify-center w-full">
             <Button
               onClick={handleSearch}
-              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white mb-2 sm:mb-0 rounded-xl"
+              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white rounded-xl"
               disabled={isLoading}
             >
               {isLoading ? (
