@@ -85,7 +85,7 @@ export const UserProfileInfo = ({
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
                 <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
                 <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
-                  <span>{usedRequests} requests</span>
+                  <span>{usedRequests}</span>
                   <span className="text-primary/70">{remainingRequests} left</span>
                   {hasReachedLimit && (
                     <Link 
