@@ -71,11 +71,11 @@ export const BulkSearchSettings = ({
   };
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full flex flex-col items-center justify-center">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
         className="inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-200 
-                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg mx-auto"
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg"
         disabled={disabled}
       >
         <Settings2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
@@ -84,7 +84,8 @@ export const BulkSearchSettings = ({
 
       {isSettingsOpen && (
         <div className="mt-2 sm:mt-3 p-2.5 sm:p-4 space-y-3 sm:space-y-4 bg-white dark:bg-gray-800 rounded-lg 
-                      border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200">
+                      border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200
+                      w-full max-w-sm mx-auto">
           <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
