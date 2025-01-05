@@ -82,7 +82,7 @@ export const UserProfileInfo = ({
               <div className="space-y-2">
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
                 <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
-                  <span>{usedRequests} {maxRequests} requests</span>
+                  <span>{usedRequests} {maxRequests}</span>
                   <span className="text-primary/70">{remainingRequests} left</span>
                   {hasReachedLimit && (
                     <Link 
