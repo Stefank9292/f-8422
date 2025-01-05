@@ -61,7 +61,7 @@ export const PricingCard = ({
       ];
     } else {
       return [
-        { included: true, text: "Unlimited Searches", className: "animate-pulse" },
+        { included: true, text: "Unlimited Searches" },
         { included: true, text: "Maximum 50 Results per Search" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },
@@ -77,12 +77,12 @@ export const PricingCard = ({
     >
       <div className="space-y-3">
         <div className="flex items-center gap-1.5">
-          <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
+          <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : ''}`}>
             {name}
           </h2>
         </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
+        <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
