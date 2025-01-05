@@ -23,7 +23,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { state, setOpen } = useSidebar();
 
-  const { data: session, isLoading: isSessionLoading, refetch: refetchSession } = useQuery({
+  const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -33,32 +33,24 @@ export function AppSidebar() {
       }
       return session;
     },
-    // Initialize sidebar state as soon as we get the session
-    onSuccess: (session) => {
-      if (session) {
-        setOpen(true);
-      }
-    },
   });
 
   // Subscribe to auth state changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         // If session is null (user logged out), force close the sidebar
         setOpen(false);
       } else {
-        // If session exists (user logged in), open the sidebar and refetch session
+        // If session exists (user logged in), open the sidebar
         setOpen(true);
-        await refetchSession();
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [setOpen, refetchSession]);
+  }, [setOpen]);
 
   // Set initial sidebar state based on session
   useEffect(() => {
