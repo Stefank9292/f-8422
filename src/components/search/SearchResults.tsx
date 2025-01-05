@@ -20,8 +20,8 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const currentPosts = sortedResults.slice(indexOfFirstPost, indexOfLastPost);
 
   const handleSort = (key: string) => {
-    const isAsc = currentSortKey === key ? !sortDirection : true;
-    setSortDirection(isAsc ? "asc" : "desc");
+    const newDirection = currentSortKey === key && sortDirection === "asc" ? "desc" : "asc";
+    setSortDirection(newDirection);
     setCurrentSortKey(key);
 
     const sorted = [...sortedResults].sort((a, b) => {
@@ -39,7 +39,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
         comparison = a[key] - b[key];
       }
 
-      return isAsc ? comparison : -comparison;
+      return newDirection === "asc" ? comparison : -comparison;
     });
 
     setSortedResults(sorted);

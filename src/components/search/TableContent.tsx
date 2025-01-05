@@ -30,9 +30,9 @@ export const TableContent = ({
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
 
   const handleSortClick = (key: string) => {
+    // If clicking the same column, toggle direction
     if (sortKey === key) {
-      // If clicking the same column, toggle direction
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
     } else {
       // If clicking a new column, set it as the sort key and default to ascending
       setSortKey(key);
