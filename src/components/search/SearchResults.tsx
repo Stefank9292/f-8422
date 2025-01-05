@@ -32,6 +32,26 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
+    // Log the metadata of the last result when posts change
+    if (posts.length > 0) {
+      const lastPost = posts[posts.length - 1];
+      console.log('Last Post Metadata:', {
+        username: lastPost.ownerUsername,
+        date: lastPost.date,
+        timestamp: lastPost.timestamp,
+        engagement: lastPost.engagement,
+        stats: {
+          views: lastPost.viewsCount,
+          plays: lastPost.playsCount,
+          likes: lastPost.likesCount,
+          comments: lastPost.commentsCount
+        },
+        url: lastPost.url,
+        videoUrl: lastPost.videoUrl,
+        caption: lastPost.caption
+      });
+    }
+
     const currentPostsString = JSON.stringify(posts);
     if (
       posts.length > 0 && 
