@@ -100,10 +100,12 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
           />
 
           <div className="flex justify-center w-full">
-            <Button
+            <Button 
               onClick={handleSearch}
-              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white rounded-xl"
-              disabled={isLoading}
+              disabled={isLoading || !urls}
+              className={`w-full h-10 text-[11px] font-medium transition-all duration-300 ${
+                urls ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
+              } text-white dark:text-gray-100 shadow-sm hover:shadow-md`}
             >
               {isLoading ? (
                 <>
