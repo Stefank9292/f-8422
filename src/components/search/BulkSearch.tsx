@@ -61,7 +61,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-[95vw] max-w-xl mx-auto p-3 sm:p-6">
+      <DialogContent className="w-[95vw] max-w-xl mx-auto p-3 sm:p-6 rounded-2xl sm:rounded-xl">
         <DialogHeader className="space-y-2 mb-4">
           <DialogTitle className="text-base sm:text-xl font-semibold tracking-tight">
             Bulk Search
@@ -79,7 +79,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             </label>
             <Textarea
               placeholder={`Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
-              className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20"
+              className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20 rounded-xl"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
               disabled={isLoading}
@@ -103,7 +103,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             <Button
               variant="outline"
               onClick={onClose}
-              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20"
+              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium bg-[#8E9196]/10 hover:bg-[#8E9196]/20 text-[#8E9196] border-[#8E9196]/20 rounded-xl"
               disabled={isLoading}
             >
               <X className="w-3.5 h-3.5 mr-2" />
@@ -112,7 +112,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
             <Button
               onClick={handleSearch}
-              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white mb-2 sm:mb-0"
+              className="h-10 sm:h-9 px-4 sm:px-6 text-xs sm:text-sm font-medium primary-gradient text-white mb-2 sm:mb-0 rounded-xl"
               disabled={isLoading}
             >
               {isLoading ? (
