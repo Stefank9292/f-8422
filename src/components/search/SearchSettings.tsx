@@ -74,8 +74,8 @@ export const SearchSettings = ({
     <div className="w-full max-w-2xl mx-auto">
       <button
         onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-        className="w-full flex items-center justify-center gap-2 py-2 text-[11px] text-gray-700 dark:text-gray-200 
-                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg"
+        className="inline-flex items-center justify-center gap-2 py-2 px-4 text-[11px] text-gray-700 dark:text-gray-200 
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg mx-auto"
         disabled={disabled}
       >
         <Settings2 className="w-3.5 h-3.5" />
