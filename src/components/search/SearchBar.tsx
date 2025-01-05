@@ -57,7 +57,6 @@ export const SearchBar = ({
     };
 
     if (!username) {
-      // Show default placeholder for 3 seconds before starting animation
       initialTimeout = setTimeout(() => {
         startTypingAnimation();
       }, 3000);
@@ -84,7 +83,6 @@ export const SearchBar = ({
           setCurrentCharIndex(prev => prev + 1);
         }, typingSpeed);
       } else {
-        // Move to next example after a pause
         typingTimeout = setTimeout(() => {
           setCurrentCharIndex(0);
           setCurrentExampleIndex((prev) => (prev + 1) % examples.length);
@@ -102,9 +100,13 @@ export const SearchBar = ({
     }
   };
 
-  const isBulkSearchEnabled = subscriptionStatus?.priceId && 
-    (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq" || 
-     subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3");
+  // Updated condition to show bulk search for both Pro and Ultra plans
+  const isBulkSearchEnabled = subscriptionStatus?.priceId && (
+    subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
+    subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV" || // Pro Annual
+    subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || // Ultra Monthly
+    subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0"    // Ultra Annual
+  );
 
   return (
     <>
