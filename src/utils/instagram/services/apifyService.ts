@@ -3,26 +3,28 @@ import { APIFY_CONFIG, APIFY_ENDPOINT } from '../config/apifyConfig';
 import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
-async function updateUserClickCount() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.user.id) return;
-
+export async function checkSubscriptionAndLimits(userId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(startOfDay);
   endOfDay.setDate(endOfDay.getDate() + 1);
 
-  await supabase
+  const { count } = await supabase
     .from('user_requests')
-    .insert({
-      user_id: session.user.id,
-      request_type: 'instagram_search',
-      period_start: startOfDay.toISOString(),
-      period_end: endOfDay.toISOString()
-    });
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('request_type', 'instagram_search')
+    .gte('created_at', startOfDay.toISOString())
+    .lt('created_at', endOfDay.toISOString());
+
+  const maxRequestsPerDay = 100; // Default daily limit
+  return {
+    canMakeRequest: (count || 0) < maxRequestsPerDay,
+    maxRequestsPerDay
+  };
 }
 
-async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
+export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   console.log('Making Apify request with config:', { ...APIFY_CONFIG, requestBody });
   
   const response = await fetch(APIFY_ENDPOINT, {
@@ -147,4 +149,23 @@ export async function fetchBulkInstagramPosts(
     console.error('Error fetching bulk Instagram posts:', error);
     throw error;
   }
+}
+
+async function updateUserClickCount() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user.id) return;
+
+  const now = new Date();
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  await supabase
+    .from('user_requests')
+    .insert({
+      user_id: session.user.id,
+      request_type: 'instagram_search',
+      period_start: startOfDay.toISOString(),
+      period_end: endOfDay.toISOString()
+    });
 }
