@@ -9,7 +9,11 @@ interface SearchResultsProps {
 
 export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortedResults, setSortedResults] = useState([...searchResults]);
+  // Filter out results with 0 views or plays before setting initial state
+  const validResults = searchResults.filter(post => 
+    post.playsCount > 0 && post.viewsCount > 0
+  );
+  const [sortedResults, setSortedResults] = useState([...validResults]);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentSortKey, setCurrentSortKey] = useState<string>("");
   const { toast } = useToast();
