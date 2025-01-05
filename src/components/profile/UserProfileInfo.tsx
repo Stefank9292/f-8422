@@ -52,9 +52,9 @@ export const UserProfileInfo = ({
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser} 
-              className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]"
+              className="bg-muted border border-border"
             >
-              <Infinity className="h-4 w-4 text-white" />
+              <Infinity className="h-4 w-4 text-foreground" />
             </UserAvatar>
             <div className="flex flex-col">
               <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
@@ -70,10 +70,10 @@ export const UserProfileInfo = ({
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
-              className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]"
+              className="bg-muted border border-border"
             >
               <div className="flex flex-col items-center justify-center">
-                <span className="text-[10px] font-medium text-white">
+                <span className="text-[10px] font-medium text-foreground">
                   {remainingRequests}
                 </span>
               </div>
