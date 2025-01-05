@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SearchResultDetails } from "./SearchResultDetails";
 import { InstagramPost } from "@/types/instagram";
+import { cn } from "@/lib/utils";
 
 interface SearchHistoryItemProps {
   item: {
@@ -22,8 +23,8 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const results = item.search_results?.[0]?.results || [];
 
   return (
-    <div className="space-y-2">
-      <div className="p-4 rounded-lg border bg-card text-card-foreground">
+    <div className="space-y-2 animate-fade-in">
+      <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
@@ -41,6 +42,10 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
+              className={cn(
+                "transition-transform duration-200",
+                isExpanded && "bg-accent"
+              )}
             >
               {isExpanded ? (
                 <ChevronUp className="h-4 w-4" />
@@ -61,7 +66,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       </div>
       
       {isExpanded && results.length > 0 && (
-        <div className="pl-4 space-y-4">
+        <div className="pl-4 space-y-4 animate-fade-in">
           {results.map((result, index) => (
             <SearchResultDetails key={index} result={result} />
           ))}

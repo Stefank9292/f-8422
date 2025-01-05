@@ -3,20 +3,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { SearchHistoryItem } from "@/components/history/SearchHistoryItem";
+import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
+import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 import { InstagramPost } from "@/types/instagram";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 
 interface SearchHistoryResult {
   id: string;
@@ -73,7 +62,6 @@ const SearchHistory = () => {
 
       if (error) throw error;
 
-      // Transform the data to match the expected types
       return (data as SearchHistoryResult[]).map(item => ({
         id: item.id,
         search_query: item.search_query,
@@ -159,60 +147,16 @@ const SearchHistory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
-      <div className="flex justify-between items-center">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Search History</h1>
-          <p className="text-sm text-muted-foreground">
-            Your last 10 searches are shown here
-          </p>
-        </div>
-        {searchHistory && searchHistory.length > 0 && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                variant="destructive" 
-                disabled={isDeletingAll}
-                className="ml-4"
-              >
-                {isDeletingAll ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Delete All"
-                )}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete All Search History</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete all your search history.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteAll}>Continue</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </div>
-
-      <div className="space-y-4">
-        {searchHistory?.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            No search history found
-          </div>
-        ) : (
-          searchHistory?.map((item) => (
-            <SearchHistoryItem
-              key={item.id}
-              item={item}
-              onDelete={handleDelete}
-              isDeleting={isDeleting}
-            />
-          ))
-        )}
-      </div>
+      <SearchHistoryHeader 
+        onDeleteAll={handleDeleteAll}
+        isDeletingAll={isDeletingAll}
+        hasHistory={searchHistory && searchHistory.length > 0}
+      />
+      <SearchHistoryList 
+        searchHistory={searchHistory || []}
+        onDelete={handleDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };
