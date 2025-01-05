@@ -1,7 +1,7 @@
 import { UserAvatar } from "./UserAvatar";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, Infinity } from "lucide-react";
 
 interface UserProfileInfoProps {
   email: string | undefined;
@@ -50,11 +50,16 @@ export const UserProfileInfo = ({
 
           {isUltraPlan ? (
             <div className="flex flex-col mt-4">
-              <span className="text-[11px] text-sidebar-foreground/70">
-                <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
-                  Unlimited Usage
+              <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]">
+                  <Infinity className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-[11px] text-sidebar-foreground/70">
+                  <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+                    Unlimited Usage
+                  </span>
                 </span>
-              </span>
+              </div>
               <span className="text-[10px] text-sidebar-foreground/50">
                 {usedRequests} requests this month
               </span>
