@@ -73,7 +73,7 @@ export const PricingCard = ({
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'instagram-gradient ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+        ${isPopular ? 'instagram-gradient ring-4 ring-[#FF3D77]/20 shadow-xl scale-105 animate-pulse' : ''}`}
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
