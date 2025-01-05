@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const usePlaceholderAnimation = () => {
-  const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
+  const [placeholder, setPlaceholder] = useState("");
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
   const [exampleCharIndex, setExampleCharIndex] = useState(0);
   
@@ -22,7 +22,7 @@ export const usePlaceholderAnimation = () => {
     if (exampleCharIndex <= currentExample.length) {
       // Type the example character by character
       const typingTimer = setTimeout(() => {
-        setPlaceholder(`Enter Instagram username or profile URL (e.g., ${currentExample.slice(0, exampleCharIndex)})`);
+        setPlaceholder(currentExample.slice(0, exampleCharIndex));
         setExampleCharIndex(prev => prev + 1);
       }, 50);
       return () => clearTimeout(typingTimer);
@@ -41,16 +41,13 @@ export const usePlaceholderAnimation = () => {
 
     const currentExample = examples[currentExampleIndex];
     const erasingTimer = setTimeout(() => {
-      if (placeholder === "Enter Instagram username or profile URL") {
+      if (placeholder === "") {
         // Move to next example
         setCurrentExampleIndex((prev) => (prev + 1) % examples.length);
         setExampleCharIndex(0);
       } else {
         // Erase one character at a time
-        setPlaceholder(prev => {
-          const withoutExample = prev.replace(` (e.g., ${currentExample})`, '');
-          return withoutExample;
-        });
+        setPlaceholder(prev => prev.slice(0, -1));
       }
     }, 50);
 
