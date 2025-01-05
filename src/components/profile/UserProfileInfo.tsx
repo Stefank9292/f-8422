@@ -62,7 +62,7 @@ export const UserProfileInfo = ({
               </span>
               {isSteroidsUser && (
                 <span className="text-[9px] text-sidebar-foreground/50">
-                  {usedRequests} requests in current billing period
+                  {usedRequests} requests this month
                 </span>
               )}
             </div>
