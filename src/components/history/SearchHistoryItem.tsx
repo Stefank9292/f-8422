@@ -21,7 +21,9 @@ interface SearchHistoryItemProps {
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
-  const results = item.search_results?.[0]?.results || [];
+  const allResults = item.search_results?.[0]?.results || [];
+  // Filter for clips only
+  const results = allResults.filter(post => post.type?.toLowerCase() === 'clip');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState<FilterState>({
