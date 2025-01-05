@@ -39,23 +39,23 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   if (recentSearches.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-col items-center space-y-3 mt-4">
-      <div className="flex items-center gap-2">
-        <History className="h-4 w-4 text-muted-foreground" />
-        <h3 className="text-sm font-medium text-muted-foreground">Recent Searches</h3>
+    <div className="w-full flex flex-col items-center space-y-4 mt-6">
+      <div className="flex items-center gap-2.5">
+        <History className="h-4.5 w-4.5 text-muted-foreground" />
+        <h3 className="text-sm font-medium text-muted-foreground tracking-tight">Recent Searches</h3>
       </div>
-      <div className="w-full flex flex-wrap justify-center gap-2">
+      <div className="w-full flex flex-wrap justify-center gap-2.5">
         {recentSearches.map((search) => (
           <div
             key={search.id}
-            className="group flex items-center gap-2 bg-secondary/50 hover:bg-secondary/80 
-                     px-4 py-2 rounded-full transition-all duration-200 
+            className="group flex items-center gap-2.5 bg-secondary/50 hover:bg-secondary/80 
+                     px-5 py-2.5 rounded-full transition-all duration-200 
                      border border-border/50 hover:border-border/80"
           >
             <Instagram className="h-3.5 w-3.5 text-primary" />
             <button
               onClick={() => onSelect(search.search_query)}
-              className="text-xs text-foreground/80 hover:text-foreground font-medium"
+              className="text-sm text-foreground/80 hover:text-foreground font-medium"
             >
               {search.search_query}
             </button>
