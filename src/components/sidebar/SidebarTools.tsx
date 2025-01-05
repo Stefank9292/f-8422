@@ -36,7 +36,7 @@ export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsPr
             <span>{item.title}</span>
             <Badge 
               variant="secondary" 
-              className="ml-1 text-[9px] bg-white/10 text-white/70 px-1.5 py-0"
+              className="ml-1 text-[9px] bg-primary/20 text-primary px-1.5 py-0 font-medium"
             >
               BETA
             </Badge>
