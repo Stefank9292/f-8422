@@ -34,7 +34,11 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
         <div className="text-center space-y-2">
           <h3 className="font-semibold text-lg">Search History Locked</h3>
           <p className="text-sm text-muted-foreground max-w-md">
-            Search history is only available on the Creator on Steroids plan. Upgrade your subscription to access this feature.
+            Search history is only available on the{' '}
+            <span className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse">
+              Creator on Steroids
+            </span>{' '}
+            plan. Upgrade your subscription to access this feature.
           </p>
         </div>
       </div>
