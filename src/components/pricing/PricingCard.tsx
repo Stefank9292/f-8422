@@ -75,18 +75,20 @@ export const PricingCard = ({
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
         ${isPopular ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
     >
-      {isPopular && (
-        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-          <Badge 
-            variant="default" 
-            className="bg-rose-400 text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg"
-          >
-            Most Popular
-          </Badge>
-        </div>
-      )}
       <div className="space-y-3">
-        <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>{name}</h2>
+        <div className="flex items-center gap-2">
+          <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
+            {name}
+          </h2>
+          {isPopular && (
+            <Badge 
+              variant="default" 
+              className="bg-rose-400 text-primary-foreground px-2 py-0.5 text-[11px] font-medium"
+            >
+              Most Popular
+            </Badge>
+          )}
+        </div>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
         <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-pulse' : ''}`}>
           {isAnnual ? (
