@@ -38,20 +38,26 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
       currentPostsString !== previousPostsRef.current &&
       !hasTriggeredConfetti.current
     ) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#1DA1F2', '#14171A', '#657786', '#AAB8C2'],
-        angle: 90,
-        startVelocity: 30,
-        gravity: 0.5,
-        drift: 0,
-        ticks: 200,
-        decay: 0.9,
-        scalar: 0.8,
-        zIndex: 100,
-      });
+      const rect = document.querySelector('main')?.getBoundingClientRect();
+      if (rect) {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { 
+            x: (rect.left + rect.width / 2) / window.innerWidth,
+            y: (rect.top + rect.height / 2) / window.innerHeight 
+          },
+          colors: ['#D946EF', '#E1306C', '#8B5CF6', '#9b87f5'],
+          angle: 90,
+          startVelocity: 30,
+          gravity: 0.5,
+          drift: 0,
+          ticks: 200,
+          decay: 0.9,
+          scalar: 0.8,
+          zIndex: 100,
+        });
+      }
       hasTriggeredConfetti.current = true;
       previousPostsRef.current = currentPostsString;
     }
