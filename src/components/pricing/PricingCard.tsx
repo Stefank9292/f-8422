@@ -71,7 +71,7 @@ export const PricingCard = ({
   };
 
   return (
-    <Card className={`p-4 space-y-4 relative ${isPopular ? 'border-2 border-primary ring-2 ring-primary/20 shadow-lg' : ''}`}>
+    <Card className={`p-4 space-y-4 relative max-w-sm mx-auto w-full ${isPopular ? 'border-2 border-primary ring-2 ring-primary/20 shadow-lg' : ''}`}>
       {isPopular && (
         <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
           <Badge variant="default" className="bg-primary text-primary-foreground px-3 py-0.5 text-[10px]">
