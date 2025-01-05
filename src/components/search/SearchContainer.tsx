@@ -3,6 +3,7 @@ import { SearchBar } from "./SearchBar";
 import { SearchSettings } from "./SearchSettings";
 import { SearchFilters } from "./SearchFilters";
 import { SearchResults } from "./SearchResults";
+import { RecentSearches } from "./RecentSearches";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -99,6 +100,8 @@ export const SearchContainer = ({
           setSelectedDate={setSelectedDate}
           disabled={isLoading || isBulkSearching}
         />
+
+        <RecentSearches onSelect={setUsername} />
       </div>
 
       {displayPosts.length > 0 && (
