@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Settings2, Minus, Plus, HelpCircle } from "lucide-react";
+import { Calendar as CalendarIcon, Settings2, HelpCircle } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Slider } from "@/components/ui/slider";
 
 interface BulkSearchSettingsProps {
   isSettingsOpen: boolean;
@@ -25,8 +27,9 @@ export const BulkSearchSettings = ({
   setNumberOfVideos,
   selectedDate,
   setSelectedDate,
-  disabled = false
+  disabled = false,
 }: BulkSearchSettingsProps) => {
+  const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -55,6 +58,14 @@ export const BulkSearchSettings = ({
 
   const maxVideos = getMaxVideos();
 
+  const handleSliderChange = (value: number[]) => {
+    setLocalNumberOfVideos(value[0]);
+  };
+
+  const handleSliderPointerUp = () => {
+    setNumberOfVideos(localNumberOfVideos);
+  };
+
   return (
     <div className="w-full mx-auto">
       <button
@@ -74,42 +85,43 @@ export const BulkSearchSettings = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-medium">Number of Videos per Profile</span>
-                <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-[10px]">Maximum number of videos to fetch per profile</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
-                {numberOfVideos}
+                {localNumberOfVideos}
               </span>
             </div>
-            <div className="flex items-center justify-end gap-2 bg-gray-50/50 dark:bg-gray-700/30 p-2 rounded">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setNumberOfVideos(Math.max(1, numberOfVideos - 1))}
-                disabled={numberOfVideos <= 1 || disabled}
-                className="h-7 w-7 rounded"
-              >
-                <Minus className="h-3 w-3" />
-              </Button>
-              <span className="text-sm font-medium min-w-[2ch] text-center">
-                {numberOfVideos}
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setNumberOfVideos(Math.min(maxVideos, numberOfVideos + 1))}
-                disabled={numberOfVideos >= maxVideos || disabled}
-                className="h-7 w-7 rounded"
-              >
-                <Plus className="h-3 w-3" />
-              </Button>
-            </div>
+            <Slider
+              value={[localNumberOfVideos]}
+              onValueChange={handleSliderChange}
+              onPointerUp={handleSliderPointerUp}
+              min={1}
+              max={maxVideos}
+              step={1}
+              disabled={disabled}
+              className="w-full"
+            />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
               <span className="text-[11px] font-medium">Posts newer than</span>
-              <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">Limited to posts from the last 90 days</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
             <Popover>
               <PopoverTrigger asChild>
@@ -136,9 +148,6 @@ export const BulkSearchSettings = ({
                 />
               </PopoverContent>
             </Popover>
-            <p className="text-[11px] text-gray-500">
-              Limited to posts from the last 90 days
-            </p>
           </div>
         </div>
       )}
