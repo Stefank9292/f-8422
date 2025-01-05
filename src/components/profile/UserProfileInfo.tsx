@@ -90,13 +90,20 @@ export const UserProfileInfo = ({
                     <span className="text-primary/70">{remainingRequests} left</span>
                   </div>
                 </div>
-              ) : hasReachedLimit && (
-                <Link 
-                  to="/subscribe" 
-                  className="text-[10px] text-primary hover:text-primary/80 transition-colors"
-                >
-                  Upgrade plan →
-                </Link>
+              ) : (
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-sidebar-foreground/50">
+                    {remainingRequests} searches left
+                  </span>
+                  {hasReachedLimit && (
+                    <Link 
+                      to="/subscribe" 
+                      className="text-[10px] text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Upgrade plan →
+                    </Link>
+                  )}
+                </div>
               )}
             </div>
           </div>
