@@ -20,8 +20,8 @@ interface SearchHistoryHeaderProps {
 
 export function SearchHistoryHeader({ onDeleteAll, isDeletingAll, hasHistory }: SearchHistoryHeaderProps) {
   return (
-    <div className="flex justify-between items-center">
-      <div className="space-y-2">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 p-1">
+      <div className="space-y-1.5">
         <h1 className="text-2xl font-bold tracking-tight">Search History</h1>
         <p className="text-sm text-muted-foreground">
           Your last 10 searches are shown here
@@ -33,13 +33,12 @@ export function SearchHistoryHeader({ onDeleteAll, isDeletingAll, hasHistory }: 
             <Button 
               variant="destructive" 
               disabled={isDeletingAll}
-              className="ml-4"
+              className="w-full sm:w-auto"
             >
               {isDeletingAll ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                "Delete All"
-              )}
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
+              Delete All
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

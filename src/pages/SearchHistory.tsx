@@ -139,14 +139,14 @@ const SearchHistory = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl space-y-8">
+    <div className="container mx-auto py-6 sm:py-8 space-y-6 sm:space-y-8">
       <SearchHistoryHeader 
         onDeleteAll={handleDeleteAll}
         isDeletingAll={isDeletingAll}

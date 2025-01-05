@@ -14,7 +14,7 @@ interface SearchHistoryListProps {
 export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: SearchHistoryListProps) {
   if (searchHistory?.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
+      <div className="text-center py-12 text-muted-foreground">
         No search history found
       </div>
     );

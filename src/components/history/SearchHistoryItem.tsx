@@ -106,9 +106,9 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   return (
     <div className="animate-fade-in">
-      <div className="p-3 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
+      <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             <span className="font-medium truncate">@{item.search_query}</span>
             <span className="text-xs text-muted-foreground whitespace-nowrap">
               {format(new Date(item.created_at), 'MMM d, HH:mm')}
@@ -117,7 +117,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               ({results.length})
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <Button
               variant="ghost"
               size="sm"
@@ -147,23 +147,27 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       </div>
       
       {isExpanded && results.length > 0 && (
-        <div className="pl-2 pt-2 space-y-4 animate-fade-in">
-          <SearchFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={handleResetFilters}
-            totalResults={results.length}
-            filteredResults={filteredResults.length}
-            currentPosts={filteredResults}
-          />
-          <TableContent
-            currentPosts={filteredResults}
-            handleSort={() => {}}
-            handleCopyCaption={handleCopyCaption}
-            handleDownload={handleDownload}
-            formatNumber={formatNumber}
-            truncateCaption={truncateCaption}
-          />
+        <div className="mt-3 space-y-4 animate-fade-in">
+          <div className="px-1">
+            <SearchFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onReset={handleResetFilters}
+              totalResults={results.length}
+              filteredResults={filteredResults.length}
+              currentPosts={filteredResults}
+            />
+          </div>
+          <div className="rounded-lg overflow-hidden">
+            <TableContent
+              currentPosts={filteredResults}
+              handleSort={() => {}}
+              handleCopyCaption={handleCopyCaption}
+              handleDownload={handleDownload}
+              formatNumber={formatNumber}
+              truncateCaption={truncateCaption}
+            />
+          </div>
         </div>
       )}
     </div>
