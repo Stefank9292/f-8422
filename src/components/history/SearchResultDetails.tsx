@@ -1,6 +1,6 @@
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { Instagram, Play, Eye, Heart, MessageCircle, Clock } from "lucide-react";
 
 interface SearchResultDetailsProps {
@@ -8,6 +8,19 @@ interface SearchResultDetailsProps {
 }
 
 export function SearchResultDetails({ result }: SearchResultDetailsProps) {
+  const formatDate = (dateString: string) => {
+    try {
+      const date = parseISO(dateString);
+      if (!isValid(date)) {
+        return 'Invalid date';
+      }
+      return format(date, 'MMM d, yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Invalid date';
+    }
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm">
       <div className="flex items-center gap-2">
@@ -45,7 +58,7 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
         </div>
       </div>
       <div className="flex justify-between items-center text-sm text-muted-foreground">
-        <span>{format(new Date(result.date), 'MMM d, yyyy')}</span>
+        <span>{formatDate(result.date)}</span>
         <span>{result.engagement}% engagement</span>
       </div>
     </div>
