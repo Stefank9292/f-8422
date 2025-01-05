@@ -98,7 +98,14 @@ export const useSearchState = () => {
 
   const { data: posts = [], isLoading } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
-    queryFn: () => fetchInstagramPosts(username, numberOfVideos, selectedDate),
+    queryFn: async () => {
+      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
+      // Save search results to history
+      if (results.length > 0) {
+        await saveSearchHistory(username, results);
+      }
+      return results;
+    },
     enabled: shouldSearch,
     meta: {
       onSettled: () => {
@@ -143,6 +150,13 @@ export const useSearchState = () => {
     try {
       await queryClient.invalidateQueries({ queryKey: ['instagram-posts'] });
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
+      // Save each bulk search result to history
+      for (const url of urls) {
+        const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
+        if (urlResults.length > 0) {
+          await saveSearchHistory(url, urlResults);
+        }
+      }
       setBulkSearchResults(results);
       return results;
     } catch (error) {

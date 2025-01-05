@@ -27,7 +27,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const results = allResults.filter(post => {
     return post && 
            typeof post === 'object' && 
-           post.productType?.toLowerCase() === 'clips' &&
            post.ownerUsername && 
            post.caption && 
            post.playsCount !== undefined &&

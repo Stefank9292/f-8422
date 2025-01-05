@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
+import { InstagramPost } from "@/types/instagram";
 
-export async function saveSearchHistory(username: string, results: any[]) {
+export async function saveSearchHistory(username: string, results: InstagramPost[]) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user?.id) {
@@ -8,36 +9,48 @@ export async function saveSearchHistory(username: string, results: any[]) {
       return null;
     }
 
-    const { data: searchHistory, error: searchError } = await supabase
-      .from('search_history')
-      .insert({
-        search_query: username,
-        search_type: 'single',
-        user_id: session.user.id
-      })
-      .select()
-      .single();
+    // Filter out invalid results before saving
+    const validResults = results.filter(post => 
+      post && 
+      post.playsCount > 0 && 
+      post.viewsCount > 0
+    );
 
-    if (searchError) {
-      console.error('Error saving search history:', searchError);
-      throw searchError;
-    }
+    // Only save if we have valid results
+    if (validResults.length > 0) {
+      // First create the search history entry
+      const { data: searchHistory, error: searchError } = await supabase
+        .from('search_history')
+        .insert({
+          search_query: username,
+          search_type: 'instagram_search',
+          user_id: session.user.id
+        })
+        .select()
+        .single();
 
-    if (results && results.length > 0) {
+      if (searchError) {
+        console.error('Error saving search history:', searchError);
+        throw searchError;
+      }
+
+      // Then save the search results
       const { error: resultsError } = await supabase
         .from('search_results')
         .insert({
           search_history_id: searchHistory.id,
-          results: JSON.parse(JSON.stringify(results))
+          results: validResults
         });
 
       if (resultsError) {
         console.error('Error saving search results:', resultsError);
         throw resultsError;
       }
+
+      return searchHistory;
     }
 
-    return searchHistory;
+    return null;
   } catch (error) {
     console.error('Error storing search results:', error);
     throw error;
