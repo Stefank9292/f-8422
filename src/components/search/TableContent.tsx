@@ -4,6 +4,7 @@ import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useState } from "react";
 
 interface TableContentProps {
   currentPosts: any[];
@@ -14,6 +15,8 @@ interface TableContentProps {
   truncateCaption: (caption: string) => string;
 }
 
+export type SortDirection = "asc" | "desc";
+
 export const TableContent = ({
   currentPosts,
   handleSort,
@@ -23,6 +26,20 @@ export const TableContent = ({
   truncateCaption,
 }: TableContentProps) => {
   const isMobile = useIsMobile();
+  const [sortKey, setSortKey] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  const handleSortClick = (key: string) => {
+    if (sortKey === key) {
+      // If clicking the same column, toggle direction
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      // If clicking a new column, set it as the sort key and default to ascending
+      setSortKey(key);
+      setSortDirection("asc");
+    }
+    handleSort(key);
+  };
 
   if (isMobile) {
     return (
@@ -45,7 +62,11 @@ export const TableContent = ({
     <TooltipProvider>
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
-          <PostTableHeader onSort={handleSort} />
+          <PostTableHeader 
+            onSort={handleSortClick} 
+            sortKey={sortKey}
+            sortDirection={sortDirection}
+          />
           <TableBody>
             {currentPosts.map((post, index) => (
               <PostTableRow

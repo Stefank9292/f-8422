@@ -1,102 +1,49 @@
-import { useToast } from "@/hooks/use-toast";
-import { useState, useEffect, useRef } from "react";
-import confetti from 'canvas-confetti';
-import { cn } from "@/lib/utils";
-import { TablePagination } from "./TablePagination";
+import { useState } from "react";
 import { TableContent } from "./TableContent";
+import { TablePagination } from "./TablePagination";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchResultsProps {
-  posts: any[];
-  filters: {
-    postsNewerThan: string;
-    minViews: string;
-    minPlays: string;
-    minLikes: string;
-    minComments: string;
-    minDuration: string;
-    minEngagement: string;
-  };
+  searchResults: any[];
 }
 
-type SortConfig = {
-  key: string;
-  direction: 'asc' | 'desc' | null;
-};
-
-export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
-  const { toast } = useToast();
-  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
-  const previousPostsRef = useRef<string>('');
-  const confettiTriggeredRef = useRef(new Set<string>());
+export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(25);
+  const [sortedResults, setSortedResults] = useState([...searchResults]);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [currentSortKey, setCurrentSortKey] = useState<string>("");
+  const { toast } = useToast();
+  
+  const postsPerPage = 10;
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = sortedResults.slice(indexOfFirstPost, indexOfLastPost);
 
-  useEffect(() => {
-    // Log detailed metadata when posts change
-    if (posts.length > 0) {
-      const lastPost = posts[posts.length - 1];
-      console.group('Last Post Metadata Details:');
-      console.log('Basic Info:', {
-        username: lastPost.ownerUsername,
-        postUrl: lastPost.url,
-        videoUrl: lastPost.videoUrl || 'No video URL'
-      });
-      
-      console.log('Timing:', {
-        date: lastPost.date,
-        timestamp: lastPost.timestamp
-      });
-      
-      console.log('Engagement Metrics:', {
-        views: lastPost.viewsCount?.toLocaleString() || '0',
-        plays: lastPost.playsCount?.toLocaleString() || '0',
-        likes: lastPost.likesCount?.toLocaleString() || '0',
-        comments: lastPost.commentsCount?.toLocaleString() || '0',
-        engagementRate: lastPost.engagement || '0%'
-      });
-      
-      console.log('Content:', {
-        caption: lastPost.caption,
-        duration: lastPost.duration || 'N/A',
-        type: lastPost.type || 'N/A',
-        hashtags: lastPost.hashtags || [],
-        mentions: lastPost.mentions || []
-      });
-      console.groupEnd();
-    }
+  const handleSort = (key: string) => {
+    const isAsc = currentSortKey === key ? !sortDirection : true;
+    setSortDirection(isAsc ? "asc" : "desc");
+    setCurrentSortKey(key);
 
-    const currentPostsString = JSON.stringify(posts);
-    // Only trigger confetti if we have new posts and haven't shown confetti for this exact set before
-    if (
-      posts.length > 0 && 
-      currentPostsString !== previousPostsRef.current &&
-      !confettiTriggeredRef.current.has(currentPostsString)
-    ) {
-      const rect = document.querySelector('main')?.getBoundingClientRect();
-      if (rect) {
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { 
-            x: (rect.left + rect.width / 2) / window.innerWidth,
-            y: (rect.top + rect.height / 2) / window.innerHeight 
-          },
-          colors: ['#D946EF', '#E1306C', '#8B5CF6', '#9b87f5'],
-          angle: 90,
-          startVelocity: 30,
-          gravity: 0.5,
-          drift: 0,
-          ticks: 200,
-          decay: 0.9,
-          scalar: 0.8,
-          zIndex: 100,
-        });
-        // Store this set of posts in our Set to prevent future triggers
-        confettiTriggeredRef.current.add(currentPostsString);
+    const sorted = [...sortedResults].sort((a, b) => {
+      let comparison = 0;
+      
+      if (key === 'date') {
+        const dateA = new Date(a.timestamp).getTime();
+        const dateB = new Date(b.timestamp).getTime();
+        comparison = dateA - dateB;
+      } else if (key === 'engagement') {
+        const engA = parseFloat(a[key]);
+        const engB = parseFloat(b[key]);
+        comparison = engA - engB;
+      } else {
+        comparison = a[key] - b[key];
       }
-      previousPostsRef.current = currentPostsString;
-    }
-  }, [posts]);
+
+      return isAsc ? comparison : -comparison;
+    });
+
+    setSortedResults(sorted);
+  };
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -118,10 +65,10 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       toast({
-        description: "Download started",
+        description: "Video download started",
       });
     } catch (error) {
-      console.error('Download error:', error);
+      console.error('Error downloading video:', error);
       toast({
         variant: "destructive",
         description: "Failed to download video",
@@ -129,82 +76,18 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
     }
   };
 
-  const formatNumber = (num: number) => {
-    return num?.toLocaleString() || '0';
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    }
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
   };
 
-  const truncateCaption = (caption: string) => {
-    return caption.length > 15 ? `${caption.slice(0, 15)}...` : caption;
-  };
-
-  const handleSort = (key: string) => {
-    let direction: 'asc' | 'desc' | null = 'asc';
-    
-    if (sortConfig.key === key) {
-      if (sortConfig.direction === 'asc') {
-        direction = 'desc';
-      } else if (sortConfig.direction === 'desc') {
-        direction = null;
-      }
-    }
-    
-    setSortConfig({ key, direction });
-  };
-
-  const filteredPosts = posts.filter(post => {
-    if (filters.postsNewerThan) {
-      const filterDate = new Date(filters.postsNewerThan.split('.').reverse().join('-'));
-      const postDate = new Date(post.timestamp);
-      if (postDate < filterDate) return false;
-    }
-    if (filters.minViews && post.playsCount < parseInt(filters.minViews)) return false;
-    if (filters.minPlays && post.viewsCount < parseInt(filters.minPlays)) return false;
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) return false;
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) return false;
-    if (filters.minDuration && post.duration < filters.minDuration) return false;
-    if (filters.minEngagement && parseFloat(post.engagement) < parseFloat(filters.minEngagement)) return false;
-
-    return true;
-  });
-
-  const sortedPosts = [...filteredPosts].sort((a, b) => {
-    if (sortConfig.direction === null) return 0;
-    
-    let aValue = a[sortConfig.key];
-    let bValue = b[sortConfig.key];
-    
-    if (typeof aValue === 'number' && typeof bValue === 'number') {
-      return sortConfig.direction === 'asc' ? aValue - bValue : bValue - aValue;
-    }
-    
-    if (sortConfig.key === 'date') {
-      return sortConfig.direction === 'asc' 
-        ? new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        : new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-    }
-    
-    if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortConfig.direction === 'asc' 
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    }
-    
-    return 0;
-  });
-
-  const totalPages = Math.ceil(sortedPosts.length / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const currentPosts = sortedPosts.slice(startIndex, endIndex);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (value: string) => {
-    const newPageSize = parseInt(value);
-    setPageSize(newPageSize);
-    setCurrentPage(1);
+  const truncateCaption = (caption: string): string => {
+    return caption.length > 100 ? `${caption.substring(0, 100)}...` : caption;
   };
 
   return (
@@ -217,17 +100,12 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
         formatNumber={formatNumber}
         truncateCaption={truncateCaption}
       />
-
-      {sortedPosts.length > 25 && (
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          totalResults={sortedPosts.length}
-        />
-      )}
+      <TablePagination
+        currentPage={currentPage}
+        totalPosts={sortedResults.length}
+        postsPerPage={postsPerPage}
+        onPageChange={setCurrentPage}
+      />
     </div>
   );
 };
