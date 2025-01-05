@@ -29,19 +29,19 @@ export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<I
   
   try {
     // Get the API key from Supabase Functions
-    const { data, error } = await supabase.functions.invoke('get-apify-key');
+    const { data: apifyKeyData, error: keyError } = await supabase.functions.invoke('get-apify-key');
     
-    if (error) {
-      console.error('Failed to invoke get-apify-key function:', error);
-      throw new Error('Failed to get Apify API key: ' + error.message);
+    if (keyError) {
+      console.error('Failed to invoke get-apify-key function:', keyError);
+      throw new Error('Failed to get Apify API key: ' + keyError.message);
     }
     
-    if (!data?.key) {
+    if (!apifyKeyData?.key) {
       console.error('No API key returned from get-apify-key function');
       throw new Error('No Apify API key available');
     }
 
-    const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${data.key}`, {
+    const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${apifyKeyData.key}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,11 +63,11 @@ export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<I
       throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
     }
 
-    const data = await response.json();
-    console.log('Received response from Apify:', data);
+    const responseData = await response.json();
+    console.log('Received response from Apify:', responseData);
     
-    return Array.isArray(data) 
-      ? data.map(post => transformToInstagramPost(post))
+    return Array.isArray(responseData) 
+      ? responseData.map(post => transformToInstagramPost(post))
            .filter((post): post is InstagramPost => post !== null)
       : [];
   } catch (error) {
