@@ -34,35 +34,32 @@ export const UserProfileInfo = ({
         <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
         
         <div className="flex flex-col">
-          <div className="flex items-center gap-1">
-            <span className={`text-[10px] ${
-              isSteroidsUser 
-                ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-pulse font-medium'
-                : 'text-sidebar-foreground/50'
-            }`}>
-              {planName}
-            </span>
-            <span className="text-[10px] text-sidebar-foreground/50">Plan</span>
-          </div>
+          <span className={`text-[10px] ${
+            isSteroidsUser 
+              ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-pulse font-medium'
+              : 'text-sidebar-foreground/50'
+          }`}>
+            {planName}
+          </span>
           <span className="text-[11px] text-sidebar-foreground/70 truncate max-w-[150px]">
             {email}
           </span>
 
           {isUltraPlan ? (
-            <div className="flex flex-col mt-4">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center justify-center w-4 h-4 rounded-full bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6]">
-                  <Infinity className="w-3 h-3 text-white" />
-                </div>
+            <div className="flex items-center gap-3 mt-4">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] flex items-center justify-center">
+                <Infinity className="h-4 w-4 text-white" />
+              </div>
+              <div className="flex flex-col">
                 <span className="text-[11px] text-sidebar-foreground/70">
                   <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                     Unlimited Usage
                   </span>
                 </span>
+                <span className="text-[10px] text-sidebar-foreground/50">
+                  {usedRequests} requests this month
+                </span>
               </div>
-              <span className="text-[10px] text-sidebar-foreground/50">
-                {usedRequests} requests this month
-              </span>
             </div>
           ) : (
             <div className="space-y-2 mt-4">
