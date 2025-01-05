@@ -1,5 +1,5 @@
 import { UserAvatar } from "./UserAvatar";
-import { CircleProgressAvatar } from "./CircleProgressAvatar";
+import { Progress } from "@/components/ui/progress";
 import { Link } from "react-router-dom";
 import { Infinity } from "lucide-react";
 
@@ -49,13 +49,13 @@ export const UserProfileInfo = ({
 
         {isUltraPlan ? (
           <div className="flex items-center gap-3">
-            <CircleProgressAvatar 
-              progress={0}
+            <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
-              isProUser={isProUser}
+              isProUser={isProUser} 
+              className="bg-muted border border-border"
             >
               <Infinity className="h-4 w-4 text-foreground" />
-            </CircleProgressAvatar>
+            </UserAvatar>
             <div className="flex flex-col">
               <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                 Unlimited Usage
@@ -67,22 +67,23 @@ export const UserProfileInfo = ({
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <CircleProgressAvatar 
-              progress={usagePercentage}
+            <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
+              className="bg-muted border border-border"
             >
               <div className="flex flex-col items-center justify-center">
                 <span className="text-[10px] font-medium text-foreground">
                   {remainingRequests}
                 </span>
               </div>
-            </CircleProgressAvatar>
+            </UserAvatar>
             <div className="flex flex-col">
               <div className="space-y-2">
                 <span className="text-[10px] text-sidebar-foreground/50">Monthly Usage</span>
+                <Progress value={usagePercentage} className="h-1 bg-sidebar-accent/20" />
                 <div className="flex justify-between text-[8px] text-sidebar-foreground/50">
-                  <span>{usedRequests} {maxRequests}</span>
+                  <span>{usedRequests}/{maxRequests} requests</span>
                   <span className="text-primary/70">{remainingRequests} left</span>
                   {hasReachedLimit && (
                     <Link 
