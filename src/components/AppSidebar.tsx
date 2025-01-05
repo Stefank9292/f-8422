@@ -12,7 +12,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { SidebarTools } from "./sidebar/SidebarTools";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
@@ -78,10 +77,6 @@ export function AppSidebar() {
                     currentPath={location.pathname}
                     subscriptionStatus={subscriptionStatus}
                   />
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <Separator />
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
