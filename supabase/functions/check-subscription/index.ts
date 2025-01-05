@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,6 +24,7 @@ serve(async (req) => {
       );
     }
 
+    // Create a Supabase client with the service role key
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -34,6 +36,7 @@ serve(async (req) => {
       }
     );
 
+    // Get the user from the JWT token
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
@@ -48,10 +51,12 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.email);
 
+    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     });
 
+    // Get customer by email
     const customers = await stripe.customers.list({
       email: user.email,
       limit: 1
@@ -70,6 +75,7 @@ serve(async (req) => {
       );
     }
 
+    // Get active subscriptions for the customer
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
@@ -93,17 +99,21 @@ serve(async (req) => {
     const priceId = subscription.items.data[0].price.id;
     const canceled = subscription.cancel_at_period_end;
 
-    // Updated price IDs and max clicks
+    // Get max clicks based on subscription tier
     let maxClicks = 3; // Default free plan
     if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
         priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") { // Pro Annual
-      maxClicks = 25;
+      maxClicks = 20;
     } else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || // Ultra Monthly
                priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") { // Ultra Annual
       maxClicks = Infinity;
     }
 
-    console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled, 'maxClicks:', maxClicks);
+    console.log('Active subscription found:', {
+      priceId,
+      canceled,
+      maxClicks
+    });
 
     return new Response(
       JSON.stringify({ 
