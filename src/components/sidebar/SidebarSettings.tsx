@@ -1,6 +1,7 @@
-import { CreditCard, Moon, Sun, HelpCircle, MessageCircle, Star, Zap } from "lucide-react";
+import { CreditCard, Moon, Sun, HelpCircle, MessageCircle, Star, Zap, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface SidebarSettingsProps {
   currentPath: string;
@@ -55,10 +56,12 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
     {
       title: "Dark Mode",
       icon: isDark ? Sun : Moon,
-      onClick: () => {
+      onClick: isFreeUser ? undefined : () => {
         document.documentElement.classList.toggle('dark');
       },
-      className: "group",
+      className: `group ${isFreeUser ? 'opacity-50 cursor-not-allowed' : ''}`,
+      lockIcon: isFreeUser,
+      tooltipText: isFreeUser ? "Upgrade to customize theme" : undefined
     },
   ];
 
@@ -73,8 +76,7 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
           }
 
           const IconComponent = item.icon;
-          
-          return (
+          const button = (
             <button
               key={item.title}
               onClick={item.onClick || (item.url ? () => navigate(item.url) : undefined)}
@@ -90,9 +92,25 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
                   ${(isCreatorPro || isFreeUser) && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
               />
-              <span>{item.title}</span>
+              <span className="flex-1">{item.title}</span>
+              {item.lockIcon && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
             </button>
           );
+
+          if (item.tooltipText) {
+            return (
+              <Tooltip key={item.title}>
+                <TooltipTrigger asChild>
+                  {button}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">{item.tooltipText}</p>
+                </TooltipContent>
+              </Tooltip>
+            );
+          }
+
+          return button;
         })}
       </div>
     </div>
