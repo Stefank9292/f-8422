@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -22,6 +22,29 @@ const SearchHistory = () => {
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    const channel = supabase
+      .channel('search-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history'
+        },
+        () => {
+          // Invalidate and refetch when changes occur
+          queryClient.invalidateQueries({ queryKey: ['search-history'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
