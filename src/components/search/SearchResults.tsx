@@ -32,24 +32,37 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
-    // Log the metadata of the last result when posts change
+    // Log detailed metadata when posts change
     if (posts.length > 0) {
       const lastPost = posts[posts.length - 1];
-      console.log('Last Post Metadata:', {
+      console.group('Last Post Metadata Details:');
+      console.log('Basic Info:', {
         username: lastPost.ownerUsername,
-        date: lastPost.date,
-        timestamp: lastPost.timestamp,
-        engagement: lastPost.engagement,
-        stats: {
-          views: lastPost.viewsCount,
-          plays: lastPost.playsCount,
-          likes: lastPost.likesCount,
-          comments: lastPost.commentsCount
-        },
-        url: lastPost.url,
-        videoUrl: lastPost.videoUrl,
-        caption: lastPost.caption
+        postUrl: lastPost.url,
+        videoUrl: lastPost.videoUrl || 'No video URL'
       });
+      
+      console.log('Timing:', {
+        date: lastPost.date,
+        timestamp: lastPost.timestamp
+      });
+      
+      console.log('Engagement Metrics:', {
+        views: lastPost.viewsCount?.toLocaleString() || '0',
+        plays: lastPost.playsCount?.toLocaleString() || '0',
+        likes: lastPost.likesCount?.toLocaleString() || '0',
+        comments: lastPost.commentsCount?.toLocaleString() || '0',
+        engagementRate: lastPost.engagement || '0%'
+      });
+      
+      console.log('Content:', {
+        caption: lastPost.caption,
+        duration: lastPost.duration || 'N/A',
+        type: lastPost.type || 'N/A',
+        hashtags: lastPost.hashtags || [],
+        mentions: lastPost.mentions || []
+      });
+      console.groupEnd();
     }
 
     const currentPostsString = JSON.stringify(posts);
