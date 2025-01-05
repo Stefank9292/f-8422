@@ -88,7 +88,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
           <span className="text-[11px] text-muted-foreground font-medium">Recent Searches Locked</span>
         </div>
         <p className="text-[11px] text-muted-foreground text-center">
-          Recent searches are only available on the Creator on Steroids plan
+          Recent searches are only available on the{' '}
+          <span className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse">
+            Creator on Steroids
+          </span>{' '}
+          plan
         </p>
       </div>
     );
