@@ -29,12 +29,18 @@ export const SearchHeader = () => {
             </TooltipTrigger>
             <TooltipContent className="max-w-[250px] p-4">
               <div className="space-y-2">
-                <p className="text-[11px]">You've unlocked a discount code – Time to level up! 🎉 Enjoy 25% off the Ultra Plan for your first month! 🚀</p>
+                <p className="text-[11px]">
+                  You've unlocked a discount code – Time to level up! 🎉 Enjoy 25% off the{' '}
+                  <span className="font-bold bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent animate-pulse">
+                    Creator on Steroids
+                  </span>{' '}
+                  Plan for your first month! 🚀
+                </p>
                 <button
                   onClick={copyDiscountCode}
-                  className="w-full p-2 bg-primary/10 rounded-md hover:bg-primary/20 transition-colors"
+                  className="w-full p-2 bg-[#D946EF]/10 rounded-md hover:bg-[#D946EF]/20 transition-colors group"
                 >
-                  <code className="text-sm font-bold text-primary">VYRAL25</code>
+                  <code className="text-sm font-bold text-[#D946EF] group-hover:animate-pulse">VYRAL25</code>
                 </button>
               </div>
             </TooltipContent>
