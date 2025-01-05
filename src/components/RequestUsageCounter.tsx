@@ -2,13 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import { UserProfileInfo } from "./profile/UserProfileInfo";
 import { UsageProgress } from "./profile/UsageProgress";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
   
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -78,15 +76,6 @@ export const RequestUsageCounter = () => {
     };
   }, [session?.user.id, refetchRequestStats]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out.",
-    });
-    navigate("/auth");
-  };
-
   const isUltraPlan = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                       subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
   const isProPlan = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
@@ -122,7 +111,6 @@ export const RequestUsageCounter = () => {
         planName={getPlanName()}
         isSteroidsUser={isSteroidsUser}
         isProUser={isProUser}
-        onSignOut={handleSignOut}
       />
 
       <div className="w-full h-px bg-sidebar-border my-2" />

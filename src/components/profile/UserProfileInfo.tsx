@@ -1,5 +1,4 @@
-import { LogOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UserAvatar } from "./UserAvatar";
 
 interface UserProfileInfoProps {
@@ -7,7 +6,6 @@ interface UserProfileInfoProps {
   planName: string;
   isSteroidsUser: boolean;
   isProUser: boolean;
-  onSignOut: () => void;
 }
 
 export const UserProfileInfo = ({
@@ -15,7 +13,6 @@ export const UserProfileInfo = ({
   planName,
   isSteroidsUser,
   isProUser,
-  onSignOut,
 }: UserProfileInfoProps) => {
   return (
     <div className="w-full p-3 bg-card/50 rounded-xl border border-border/50">
@@ -37,16 +34,6 @@ export const UserProfileInfo = ({
             <span className="text-[10px] text-sidebar-foreground/50">Plan</span>
           </div>
         </div>
-      </div>
-
-      <div className="mt-3 flex justify-center">
-        <button
-          onClick={onSignOut}
-          className="px-2 py-1 rounded-full flex items-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
-        >
-          <LogOut className="h-3 w-3" />
-          <span>Sign out</span>
-        </button>
       </div>
     </div>
   );

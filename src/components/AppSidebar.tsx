@@ -17,6 +17,7 @@ import { SidebarSettings } from "./sidebar/SidebarSettings";
 import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { RequestUsageCounter } from "./RequestUsageCounter";
+import { LogOut } from "lucide-react";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -81,6 +82,20 @@ export function AppSidebar() {
 
                 <SidebarMenuItem>
                   <RequestUsageCounter />
+                </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <div className="px-2 py-2">
+                    <button
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                      }}
+                      className="w-full px-2 py-1 rounded-full flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
+                    >
+                      <LogOut className="h-3 w-3" />
+                      <span>Sign out</span>
+                    </button>
+                  </div>
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
