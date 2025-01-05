@@ -6,11 +6,5 @@ interface PlanButtonTextProps {
 }
 
 export const PlanButtonText: FC<PlanButtonTextProps> = ({ text, isUpgrade }) => {
-  if (!isUpgrade) return <span>{text}</span>;
-  
-  return (
-    <span className="bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-synchronized-pulse">
-      {text}
-    </span>
-  );
+  return <span>{text}</span>;
 };

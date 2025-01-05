@@ -77,7 +77,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     if (isCurrentPlan) {
       return "bg-secondary hover:bg-secondary/80";
     }
-    return isPopular ? "instagram-gradient hover:opacity-90" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
+    return isPopular ? "bg-primary hover:bg-primary/90" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
   };
 
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
