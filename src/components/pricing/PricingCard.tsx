@@ -72,7 +72,7 @@ export const PricingCard = ({
 
   return (
     <Card 
-      className={`p-6 space-y-6 relative max-w-sm mx-auto w-full transition-all duration-300 
+      className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
         ${isPopular ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
     >
       {isPopular && (
