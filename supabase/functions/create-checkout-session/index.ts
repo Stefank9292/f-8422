@@ -95,7 +95,7 @@ serve(async (req) => {
       customer: customer_id,
       mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/subscribe?success=true`,
+      success_url: `${origin}/success`,
       cancel_url: `${origin}/subscribe?canceled=true`
     })
 
