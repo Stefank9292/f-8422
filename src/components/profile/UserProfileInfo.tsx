@@ -34,9 +34,6 @@ export const UserProfileInfo = ({
         <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
         
         <div className="flex flex-col">
-          <span className="text-[11px] text-sidebar-foreground/70 truncate max-w-[150px]">
-            {email}
-          </span>
           <div className="flex items-center gap-1">
             <span className={`text-[10px] ${
               isSteroidsUser 
@@ -47,6 +44,9 @@ export const UserProfileInfo = ({
             </span>
             <span className="text-[10px] text-sidebar-foreground/50">Plan</span>
           </div>
+          <span className="text-[11px] text-sidebar-foreground/70 truncate max-w-[150px]">
+            {email}
+          </span>
 
           {isUltraPlan ? (
             <div className="flex flex-col mt-4">
