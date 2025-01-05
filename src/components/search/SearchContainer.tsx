@@ -45,6 +45,12 @@ export const SearchContainer = ({
     resetFilters
   } = useSearchStore();
 
+  const onSearchClick = () => {
+    if (!isLoading && !isBulkSearching && username && !hasReachedLimit) {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <div className="space-y-4 sm:space-y-6 w-full max-w-md">
@@ -57,14 +63,14 @@ export const SearchContainer = ({
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         <SearchBar
           username={username}
-          onSearch={handleSearch}
+          onSearch={onSearchClick}
           onBulkSearch={handleBulkSearch}
           isLoading={isLoading || isBulkSearching}
           onUsernameChange={setUsername}
         />
 
         <Button 
-          onClick={handleSearch} 
+          onClick={onSearchClick}
           disabled={isLoading || isBulkSearching || !username || hasReachedLimit}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
