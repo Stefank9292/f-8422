@@ -87,12 +87,12 @@ const HelpCenter = () => {
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-2">
-                <p className="font-medium text-foreground">Current Limitations</p>
-                <div className="space-y-2">
-                  <p>• Private Instagram accounts cannot be searched</p>
-                  <p>• Some videos may have limited metadata available</p>
-                  <p>• Historical data beyond 90 days may be incomplete</p>
-                </div>
+                <p className="font-medium text-foreground">Make sure to search properly:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Private Instagram accounts cannot be searched</li>
+                  <li>Some videos may have limited metadata available</li>
+                  <li>Historical data beyond 90 days may be incomplete</li>
+                </ul>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -106,12 +106,12 @@ const HelpCenter = () => {
             </AccordionTrigger>
             <AccordionContent className="text-[11px] text-muted-foreground">
               <div className="space-y-2">
-                <p className="font-medium text-foreground">Tips for Better Results</p>
-                <div className="space-y-2">
-                  <p>• Use specific usernames rather than broad searches</p>
-                  <p>• Filter results by engagement rates for better insights</p>
-                  <p>• Regularly monitor successful accounts</p>
-                </div>
+                <p className="font-medium text-foreground">Try these tips to get the best results:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Use specific usernames rather than broad searches</li>
+                  <li>Filter results by engagement rates for better insights</li>
+                  <li>Regularly monitor successful accounts</li>
+                </ul>
               </div>
             </AccordionContent>
           </AccordionItem>
