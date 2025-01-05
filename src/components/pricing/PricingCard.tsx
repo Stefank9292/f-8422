@@ -48,6 +48,8 @@ export const PricingCard = ({
         { included: true, text: "3 Total Searches" },
         { included: true, text: "Maximum 5 Results per Search" },
         { included: false, text: "Bulk Search" },
+        { included: false, text: "Search History" },
+        { included: false, text: "Recent Searches" },
         { included: false, text: "Contact Support" },
         { included: false, text: "Early Access to new Features" }
       ];
@@ -56,6 +58,8 @@ export const PricingCard = ({
         { included: true, text: "25 Total Searches" },
         { included: true, text: "Maximum 20 Results per Search" },
         { included: true, text: "Bulk Search" },
+        { included: false, text: "Search History" },
+        { included: false, text: "Recent Searches" },
         { included: true, text: "Contact Support" },
         { included: false, text: "Early Access to new Features" }
       ];
@@ -64,6 +68,8 @@ export const PricingCard = ({
         { included: true, text: "Unlimited Searches" },
         { included: true, text: "Maximum 50 Results per Search" },
         { included: true, text: "Bulk Search" },
+        { included: true, text: "Search History" },
+        { included: true, text: "Recent Searches" },
         { included: true, text: "Contact Support" },
         { included: true, text: "Early Access to new Features" }
       ];
