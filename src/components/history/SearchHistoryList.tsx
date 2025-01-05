@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchHistoryItem } from "./SearchHistoryItem";
 import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface SearchHistoryListProps {
   searchHistory: Array<{
@@ -16,6 +18,7 @@ interface SearchHistoryListProps {
 }
 
 export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: SearchHistoryListProps) {
+  const navigate = useNavigate();
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -40,6 +43,13 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
             </span>{' '}
             plan. Upgrade your subscription to access this feature.
           </p>
+          <Button 
+            variant="secondary"
+            className="mt-4 bg-[#221F26] text-white hover:bg-[#403E43]"
+            onClick={() => navigate('/subscribe')}
+          >
+            View Pricing Plans
+          </Button>
         </div>
       </div>
     );
