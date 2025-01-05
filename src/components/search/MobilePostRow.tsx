@@ -30,7 +30,20 @@ export const MobilePostRow = ({
       <CollapsibleTrigger className="flex w-full items-start justify-between p-4 hover:bg-muted/50">
         <div className="flex flex-col items-start gap-2">
           <span className="text-sm font-medium">@{post.ownerUsername}</span>
-          <p className="text-xs text-muted-foreground line-clamp-3 text-left">{post.caption}</p>
+          <div className="flex items-start gap-2 w-full">
+            <p className="text-xs text-muted-foreground line-clamp-3 text-left flex-1">{post.caption}</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0 flex-shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopyCaption(post.caption);
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+            </Button>
+          </div>
           <span className="text-[10px] text-muted-foreground">{post.date}</span>
         </div>
         <ChevronDown
@@ -93,15 +106,6 @@ export const MobilePostRow = ({
           >
             <Download className="mr-2 h-3.5 w-3.5" />
             Download
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1 h-8 text-xs"
-            onClick={() => onCopyCaption(post.caption)}
-          >
-            <Copy className="mr-2 h-3.5 w-3.5" />
-            Copy
           </Button>
         </div>
       </CollapsibleContent>
