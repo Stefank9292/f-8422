@@ -6,7 +6,8 @@ import { trackInstagramRequest, checkRequestLimit } from "./requestTracker";
 export async function fetchInstagramPosts(
   username: string, 
   numberOfVideos: number = 3,
-  postsNewerThan?: Date
+  postsNewerThan?: Date,
+  signal?: AbortSignal
 ): Promise<InstagramPost[]> {
   try {
     const { data: { session } } = await supabase.auth.getSession();
@@ -46,7 +47,8 @@ export async function fetchInstagramPosts(
       },
       headers: {
         Authorization: `Bearer ${session?.access_token}`
-      }
+      },
+      signal // Pass the abort signal to the fetch request
     });
 
     if (error) throw error;
@@ -56,6 +58,10 @@ export async function fetchInstagramPosts(
            .filter((post): post is InstagramPost => post !== null)
       : [];
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      console.log('Search request was cancelled');
+      return [];
+    }
     console.error('Error fetching Instagram posts:', error);
     throw error;
   }
