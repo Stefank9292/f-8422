@@ -10,6 +10,13 @@ export async function fetchInstagramPosts(
   signal?: AbortSignal
 ): Promise<InstagramPost[]> {
   try {
+    // Add abort signal handler
+    if (signal) {
+      signal.addEventListener('abort', () => {
+        throw new DOMException('Search aborted', 'AbortError');
+      });
+    }
+
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user.id) {
       throw new Error('No authenticated user found');
@@ -47,8 +54,7 @@ export async function fetchInstagramPosts(
       },
       headers: {
         Authorization: `Bearer ${session?.access_token}`
-      },
-      signal // Pass the abort signal to the fetch request
+      }
     });
 
     if (error) throw error;
