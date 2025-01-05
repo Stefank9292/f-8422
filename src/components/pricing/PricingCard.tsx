@@ -73,22 +73,22 @@ export const PricingCard = ({
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'instagram-gradient animate-pulse shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+        ${isPopular ? 'border-2 border-[#D946EF] ring-4 ring-[#D946EF]/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
           <Badge 
             variant="default" 
-            className="instagram-gradient text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg"
+            className="bg-[#D946EF] text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg"
           >
             Most Popular
           </Badge>
         </div>
       )}
       <div className="space-y-3">
-        <h2 className={`text-lg font-semibold ${isPopular ? 'text-white' : ''}`}>{name}</h2>
+        <h2 className={`text-lg font-semibold ${isPopular ? 'text-[#D946EF]' : ''}`}>{name}</h2>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'text-white' : ''}`}>
+        <div className={`text-xl font-bold ${isPopular ? 'text-[#D946EF]' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
