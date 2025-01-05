@@ -22,7 +22,7 @@
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
 
-    --accent: 317 95% 57%;
+    --accent: 240 4.8% 95.9%;
     --accent-foreground: 240 5.9% 10%;
 
     --destructive: 0 84.2% 60.2%;
@@ -30,7 +30,7 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 317 95% 57%;
+    --ring: 240 4.8% 95.9%;
 
     --radius: 0.75rem;
 
@@ -41,7 +41,7 @@
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 317 95% 57%;
+    --sidebar-ring: 240 4.8% 95.9%;
   }
 
   .dark {
@@ -63,7 +63,7 @@
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 317 95% 57%;
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -71,7 +71,7 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 317 95% 57%;
+    --ring: 240 3.7% 15.9%;
 
     --sidebar-background: 240 10% 3.9%;
     --sidebar-foreground: 0 0% 98%;
@@ -80,7 +80,7 @@
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 317 95% 57%;
+    --sidebar-ring: 240 3.7% 15.9%;
   }
 }
 
@@ -141,14 +141,14 @@
 
   .material-input {
     @apply h-14 px-6 rounded-xl border-2 border-input bg-transparent 
-           focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
+           focus:border-primary focus:ring-2 focus:ring-secondary/20 transition-colors
            text-base md:text-lg;
   }
 
   .material-button {
     @apply h-14 px-8 rounded-xl font-medium transition-all duration-200 
            disabled:opacity-50 disabled:cursor-not-allowed
-           focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2
+           focus:outline-none focus:ring-2 focus:ring-secondary/20 focus:ring-offset-2
            active:scale-95 text-base md:text-lg;
   }
 
