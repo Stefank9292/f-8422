@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
@@ -18,7 +18,9 @@ export const useSearchState = () => {
   
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
+  const [shouldFetch, setShouldFetch] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -31,9 +33,10 @@ export const useSearchState = () => {
   const { maxRequests, subscriptionStatus } = useSubscriptionLimits(session);
   const requestCount = useRequestCount(session);
 
-  const { data: posts = [], isLoading } = useQuery({
+  const { data: posts = [], isLoading, error } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
+      console.log('Fetching Instagram posts for:', username);
       const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
       
       if (results.length > 0) {
@@ -42,7 +45,20 @@ export const useSearchState = () => {
       
       return results;
     },
-    enabled: false,
+    enabled: shouldFetch && !!username && !isBulkSearching,
+    retry: false,
+    onError: (error: Error) => {
+      console.error('Search error:', error);
+      toast({
+        title: "Search Failed",
+        description: error.message || "Failed to fetch Instagram posts",
+        variant: "destructive",
+      });
+      setShouldFetch(false);
+    },
+    onSuccess: () => {
+      setShouldFetch(false);
+    }
   });
 
   const handleSearch = () => {
@@ -69,6 +85,7 @@ export const useSearchState = () => {
     }
 
     setBulkSearchResults([]);
+    setShouldFetch(true);
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
