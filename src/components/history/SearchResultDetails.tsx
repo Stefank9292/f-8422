@@ -44,9 +44,14 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
   };
 
   // Format engagement rate to always show 2 decimal places
-  const formattedEngagement = typeof result.engagement === 'string' 
-    ? `${parseFloat(result.engagement).toFixed(2)}%`
-    : `${result.engagement.toFixed(2)}%`;
+  const formattedEngagement = (() => {
+    const engagementValue = typeof result.engagement === 'string' 
+      ? parseFloat(result.engagement)
+      : typeof result.engagement === 'number'
+        ? result.engagement
+        : 0;
+    return `${engagementValue.toFixed(2)}%`;
+  })();
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
