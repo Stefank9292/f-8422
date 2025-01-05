@@ -17,17 +17,6 @@ export async function trackInstagramRequest(userId: string) {
 }
 
 export async function checkRequestLimit(userId: string): Promise<boolean> {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session?.access_token) return false;
-
-  const { data } = await supabase.functions.invoke('check-subscription', {
-    headers: {
-      Authorization: `Bearer ${session.access_token}`
-    }
-  });
-
-  if (!data?.priceId) return true; // Free tier
-
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfDay = new Date(startOfDay);
@@ -41,11 +30,23 @@ export async function checkRequestLimit(userId: string): Promise<boolean> {
     .gte('created_at', startOfDay.toISOString())
     .lt('created_at', endOfDay.toISOString());
 
-  // Define limits based on subscription tier
-  const limits: Record<string, number> = {
-    'price_1QdBd2DoPDXfOSZFnG8aWuIq': 100, // Premium
-    'price_1QdC54DoPDXfOSZFXHBO4yB3': 500  // Ultra
-  };
+  // Get user's subscription tier
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) return false;
 
-  return count !== null && count < (limits[data.priceId] || 10);
+  const { data: subscriptionStatus } = await supabase.functions.invoke('check-subscription', {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`
+    }
+  });
+
+  // Define limits based on subscription tier
+  let dailyLimit = 25; // Free tier
+  if (subscriptionStatus?.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
+    dailyLimit = 100; // Pro tier
+  } else if (subscriptionStatus?.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") {
+    dailyLimit = 500; // Ultra tier
+  }
+
+  return (count || 0) < dailyLimit;
 }
