@@ -17,16 +17,11 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
     if (!dateString) return 'No date available';
     
     try {
-      // First, try to parse the ISO date string
       const date = parseISO(dateString);
-      
-      // Check if the parsed date is valid
       if (!isValid(date)) {
         console.error('Invalid date after parsing:', dateString);
         return 'Invalid date';
       }
-      
-      // Format the valid date
       return format(date, 'MMMM d, yyyy');
     } catch (error) {
       console.error('Error formatting date:', error, 'Date string:', dateString);
@@ -66,117 +61,117 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Instagram className="w-4 h-4" />
-          <a
-            href={result.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-medium hover:underline"
-          >
-            @{result.ownerUsername}
-          </a>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => handleCopyCaption(result.caption)}
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-8 w-8 p-0"
-            onClick={() => window.open(result.url, '_blank')}
-          >
-            <ExternalLink className="h-4 w-4 text-rose-400" />
-          </Button>
-          {result.videoUrl && (
+    <div className="p-3 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <Instagram className="w-4 h-4 flex-shrink-0" />
+            <a
+              href={result.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium hover:underline truncate"
+            >
+              @{result.ownerUsername}
+            </a>
+          </div>
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => handleDownload(result.videoUrl!)}
+              className="h-7 w-7 p-0"
+              onClick={() => handleCopyCaption(result.caption)}
             >
-              <Download className="h-4 w-4 text-blue-400" />
+              <Copy className="h-3.5 w-3.5" />
             </Button>
-          )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => window.open(result.url, '_blank')}
+            >
+              <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
+            </Button>
+            {result.videoUrl && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                onClick={() => handleDownload(result.videoUrl!)}
+              >
+                <Download className="h-3.5 w-3.5 text-blue-400" />
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
-      
-      <div className="relative">
-        <p className="text-sm text-muted-foreground line-clamp-2">{result.caption}</p>
-      </div>
-      
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <Play className="w-4 h-4 text-primary" />
-              <span className="text-sm">{result.playsCount.toLocaleString()}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Plays</TooltipContent>
-        </Tooltip>
         
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-green-500" />
-              <span className="text-sm">{result.viewsCount.toLocaleString()}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Views</TooltipContent>
-        </Tooltip>
+        <p className="text-xs text-muted-foreground line-clamp-2">{result.caption}</p>
         
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <Heart className="w-4 h-4 text-rose-500" />
-              <span className="text-sm">{result.likesCount.toLocaleString()}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Likes</TooltipContent>
-        </Tooltip>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <Play className="w-3.5 h-3.5 text-primary" />
+                <span>{result.playsCount.toLocaleString()}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Plays</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <Eye className="w-3.5 h-3.5 text-green-500" />
+                <span>{result.viewsCount.toLocaleString()}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Views</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5 text-rose-500" />
+                <span>{result.likesCount.toLocaleString()}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Likes</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <MessageCircle className="w-3.5 h-3.5 text-blue-500" />
+                <span>{result.commentsCount.toLocaleString()}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Comments</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-orange-500" />
+                <span>{result.duration}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Duration</TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-yellow-500" />
+                <span>{result.engagement}%</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>Engagement Rate</TooltipContent>
+          </Tooltip>
+        </div>
         
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <MessageCircle className="w-4 h-4 text-blue-500" />
-              <span className="text-sm">{result.commentsCount.toLocaleString()}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Comments</TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-500" />
-              <span className="text-sm">{result.duration}</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Duration</TooltipContent>
-        </Tooltip>
-        
-        <Tooltip>
-          <TooltipTrigger>
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-500" />
-              <span className="text-sm">{result.engagement}% engagement</span>
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>Engagement Rate</TooltipContent>
-        </Tooltip>
-      </div>
-      
-      <div className="text-xs text-muted-foreground">
-        Posted on {formatDate(result.date)}
+        <div className="text-[10px] text-muted-foreground">
+          {formatDate(result.date)}
+        </div>
       </div>
     </div>
   );
