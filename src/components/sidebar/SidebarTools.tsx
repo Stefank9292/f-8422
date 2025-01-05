@@ -1,6 +1,5 @@
 import { Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SidebarSection } from "./SidebarSection";
 
 interface SidebarToolsProps {
   currentPath: string;
@@ -12,7 +11,7 @@ export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsPr
 
   const items = [
     {
-      title: "Search",
+      title: "Viral Video Search",
       url: "/",
       icon: Search,
     },
