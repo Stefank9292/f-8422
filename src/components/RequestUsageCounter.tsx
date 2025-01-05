@@ -25,17 +25,16 @@ export const RequestUsageCounter = () => {
       if (!session?.user.id) return null;
       
       const now = new Date();
-      const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const endOfDay = new Date(startOfDay);
-      endOfDay.setDate(endOfDay.getDate() + 1);
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
       const { count } = await supabase
         .from('user_requests')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
         .eq('request_type', 'instagram_search')
-        .gte('created_at', startOfDay.toISOString())
-        .lt('created_at', endOfDay.toISOString());
+        .gte('created_at', startOfMonth.toISOString())
+        .lt('created_at', endOfMonth.toISOString());
 
       return count || 0;
     },
@@ -91,7 +90,9 @@ export const RequestUsageCounter = () => {
 
   const isUltraPlan = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                       subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-  const maxRequests = isUltraPlan ? Infinity : (subscriptionStatus?.maxClicks || 3);
+  const isProPlan = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+  const maxRequests = isUltraPlan ? Infinity : (isProPlan ? 25 : 3);
   const usedRequests = requestStats || 0;
   const remainingRequests = isUltraPlan ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isUltraPlan ? 0 : ((usedRequests / maxRequests) * 100);
@@ -142,7 +143,7 @@ export const RequestUsageCounter = () => {
       <div className="space-y-1.5 w-full text-center">
         <div className="flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70">
           <Activity className="h-3 w-3" />
-          <span>Daily Usage</span>
+          <span>Monthly Usage</span>
         </div>
 
         <div className="space-y-1">
@@ -150,7 +151,7 @@ export const RequestUsageCounter = () => {
             <div className="text-[9px] text-sidebar-foreground/60 flex items-center justify-center gap-1">
               <span>Unlimited Usage</span>
               <span className="text-green-500">•</span>
-              <span>{usedRequests} requests today</span>
+              <span>{usedRequests} requests this month</span>
             </div>
           ) : (
             <>
