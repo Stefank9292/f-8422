@@ -84,10 +84,10 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
             <Button
               variant="ghost"
               size="icon"
-              className="h-2 w-2 p-0 hover:bg-transparent"
+              className="h-1.5 w-1.5 p-0 hover:bg-transparent"
               onClick={() => handleRemove(search.id)}
             >
-              <X className="h-2 w-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+              <X className="h-1.5 w-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
               <span className="sr-only">Remove search</span>
             </Button>
           </div>
