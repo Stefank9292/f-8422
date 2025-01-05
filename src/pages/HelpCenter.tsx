@@ -1,6 +1,7 @@
-import { BookOpen, AlertCircle, CheckCircle, Play } from "lucide-react";
+import { BookOpen, AlertCircle, CheckCircle, Play, Mail } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Button } from "@/components/ui/button";
 
 const HelpCenter = () => {
   return (
@@ -89,6 +90,23 @@ const HelpCenter = () => {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        <div className="border rounded-lg p-6 space-y-4">
+          <div className="space-y-2">
+            <h2 className="text-lg font-semibold">Need More Help?</h2>
+            <p className="text-[13px] text-muted-foreground">
+              Our support team is here to help. Get in touch with us directly.
+            </p>
+          </div>
+          <Button 
+            variant="default" 
+            onClick={() => window.location.href = 'mailto:support@vyralsearch.com'}
+            className="w-full sm:w-auto"
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            Contact Support
+          </Button>
+        </div>
       </div>
     </div>
   );
