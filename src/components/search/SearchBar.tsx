@@ -22,8 +22,20 @@ export const SearchBar = ({
   isLoading 
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
-  const [placeholder, setPlaceholder] = useState("Enter Instagram username or profile URL");
+  const [placeholder, setPlaceholder] = useState("");
+  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const fullPlaceholder = "Enter Instagram username or profile URL";
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (currentCharIndex < fullPlaceholder.length) {
+      const timer = setTimeout(() => {
+        setPlaceholder(fullPlaceholder.slice(0, currentCharIndex + 1));
+        setCurrentCharIndex(prev => prev + 1);
+      }, 50); // Adjust typing speed here
+      return () => clearTimeout(timer);
+    }
+  }, [currentCharIndex]);
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -119,16 +131,12 @@ export const SearchBar = ({
     subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0"    // Ultra Annual
   );
 
-  const maxRequests = getMaxRequests();
-  const usedRequests = requestStats || 0;
-  const remainingRequests = maxRequests === Infinity ? 'Unlimited' : Math.max(0, maxRequests - usedRequests);
-
   return (
     <>
       <div className="relative w-full">
         <Input
           type="text"
-          placeholder={`${placeholder} (${usedRequests}/${maxRequests === Infinity ? '∞' : maxRequests} monthly searches used)`}
+          placeholder={placeholder}
           className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
                    focus:border-[#D946EF] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
