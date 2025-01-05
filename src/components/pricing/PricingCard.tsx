@@ -70,10 +70,16 @@ export const PricingCard = ({
     }
   };
 
+  const isFree = priceId === 'free';
+  const cardBorderClass = isPopular 
+    ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' 
+    : isFree 
+      ? 'border-2 border-[#1a365d]' 
+      : '';
+
   return (
     <Card 
-      className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+      className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 ${cardBorderClass}`}
     >
       {isPopular && (
         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -86,9 +92,11 @@ export const PricingCard = ({
         </div>
       )}
       <div className="space-y-3">
-        <h2 className={`text-lg font-semibold ${isPopular ? 'text-primary' : ''}`}>{name}</h2>
+        <h2 className={`text-lg font-semibold ${isPopular ? 'text-primary' : isFree ? 'text-[#1a365d]' : ''}`}>
+          {name}
+        </h2>
         <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'text-primary' : ''}`}>
+        <div className={`text-xl font-bold ${isPopular ? 'text-primary' : isFree ? 'text-[#1a365d]' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
