@@ -19,7 +19,48 @@ serve(async (req) => {
 
     // Get request body
     const requestData = await req.json()
-    const { username, numberOfVideos, postsNewerThan } = requestData
+    const { username, numberOfVideos, postsNewerThan, action } = requestData
+
+    // If action is 'cancel', get and stop the last run
+    if (action === 'cancel') {
+      const lastRunResponse = await fetch(
+        `https://api.apify.com/v2/acts/apify~instagram-scraper/runs/last?token=${apiKey}`
+      )
+      
+      if (!lastRunResponse.ok) {
+        throw new Error('Failed to fetch last run')
+      }
+
+      const lastRun = await lastRunResponse.json()
+      
+      // Only stop if the run is still in progress
+      if (lastRun.data.status === 'RUNNING') {
+        const stopResponse = await fetch(
+          `https://api.apify.com/v2/acts/apify~instagram-scraper/runs/${lastRun.data.id}/abort`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: apiKey }),
+          }
+        )
+
+        if (!stopResponse.ok) {
+          throw new Error('Failed to stop run')
+        }
+
+        return new Response(
+          JSON.stringify({ message: 'Search cancelled successfully' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      return new Response(
+        JSON.stringify({ message: 'No active search to cancel' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     console.log('Processing request for:', { username, numberOfVideos, postsNewerThan })
 

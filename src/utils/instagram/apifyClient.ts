@@ -3,6 +3,27 @@ import { InstagramPost } from "./types";
 import { transformToInstagramPost } from "./validation";
 import { trackInstagramRequest, checkRequestLimit } from "./requestTracker";
 
+export async function cancelSearch(): Promise<void> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      throw new Error('No authenticated user found');
+    }
+
+    const { error } = await supabase.functions.invoke('instagram-scraper', {
+      body: { action: 'cancel' },
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    });
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error cancelling search:', error);
+    throw error;
+  }
+}
+
 export async function fetchInstagramPosts(
   username: string, 
   numberOfVideos: number = 3,
@@ -13,6 +34,8 @@ export async function fetchInstagramPosts(
     // Add abort signal handler
     if (signal) {
       signal.addEventListener('abort', () => {
+        // When local abort is triggered, try to cancel the Apify run
+        cancelSearch().catch(console.error);
         throw new DOMException('Search aborted', 'AbortError');
       });
     }
