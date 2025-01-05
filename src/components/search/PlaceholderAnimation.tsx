@@ -5,6 +5,7 @@ export const usePlaceholderAnimation = () => {
   const [currentExampleIndex, setCurrentExampleIndex] = useState(0);
   const [exampleCharIndex, setExampleCharIndex] = useState(0);
   
+  // Ensure the examples are in the exact order specified
   const examples = ["garyvee", "hormozi", "patrickbetdavid"];
 
   // Handle example usernames typing animation
@@ -12,7 +13,7 @@ export const usePlaceholderAnimation = () => {
     const currentExample = examples[currentExampleIndex];
     
     if (exampleCharIndex === 0) {
-      // Start typing the example
+      // Start typing the example after a pause
       const startTypingTimer = setTimeout(() => {
         setExampleCharIndex(1);
       }, 1000);
@@ -24,13 +25,13 @@ export const usePlaceholderAnimation = () => {
       const typingTimer = setTimeout(() => {
         setPlaceholder(currentExample.slice(0, exampleCharIndex));
         setExampleCharIndex(prev => prev + 1);
-      }, 50);
+      }, 100); // Slightly faster typing speed
       return () => clearTimeout(typingTimer);
     } else {
       // Show complete example for a moment before starting to erase
       const pauseTimer = setTimeout(() => {
         setExampleCharIndex(-1);
-      }, 1500);
+      }, 2000); // Longer pause when fully typed
       return () => clearTimeout(pauseTimer);
     }
   }, [currentExampleIndex, exampleCharIndex]);
@@ -49,7 +50,7 @@ export const usePlaceholderAnimation = () => {
         // Erase one character at a time
         setPlaceholder(prev => prev.slice(0, -1));
       }
-    }, 50);
+    }, 50); // Quick erasing speed
 
     return () => clearTimeout(erasingTimer);
   }, [exampleCharIndex, placeholder, currentExampleIndex, examples]);
