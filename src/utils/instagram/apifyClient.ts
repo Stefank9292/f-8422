@@ -108,6 +108,7 @@ export async function fetchBulkInstagramPosts(
       resultsType: "posts",
       searchLimit: 1,
       searchType: "user",
+      memoryMbytes: 512,
       maxPosts: numberOfVideos,
       mediaTypes: ["VIDEO"],
       expandVideo: true,

@@ -47,14 +47,16 @@ export const useSearchState = () => {
     },
     enabled: shouldFetch && !!username && !isBulkSearching,
     retry: false,
-    onError: (error: Error) => {
-      console.error('Search error:', error);
-      toast({
-        title: "Search Failed",
-        description: error.message || "Failed to fetch Instagram posts",
-        variant: "destructive",
-      });
-      setShouldFetch(false);
+    meta: {
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Search Failed",
+          description: error.message || "Failed to fetch Instagram posts",
+          variant: "destructive",
+        });
+        setShouldFetch(false);
+      }
     },
     onSuccess: () => {
       setShouldFetch(false);
