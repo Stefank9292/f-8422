@@ -41,8 +41,8 @@ export const FilterInput = ({
   if (isDatePicker) {
     return (
       <div className="space-y-2">
-        <Label className="text-xs font-medium flex items-center gap-2">
-          <Icon className="w-3.5 h-3.5" />
+        <Label className="text-sm font-medium flex items-center gap-2">
+          <Icon className="h-4 w-4" />
           <span>{label}</span>
         </Label>
         <Popover>
@@ -50,7 +50,7 @@ export const FilterInput = ({
             <Button
               variant="outline"
               className={cn(
-                "w-full justify-start text-left font-normal",
+                "w-full justify-start text-left font-normal h-10",
                 !date && "text-muted-foreground"
               )}
             >
@@ -73,7 +73,7 @@ export const FilterInput = ({
           </PopoverContent>
         </Popover>
         {helpText && (
-          <p className="text-[10px] text-muted-foreground mt-1">{helpText}</p>
+          <p className="text-xs text-muted-foreground">{helpText}</p>
         )}
       </div>
     );
@@ -81,8 +81,8 @@ export const FilterInput = ({
 
   return (
     <div className="space-y-2">
-      <Label className="text-xs font-medium flex items-center gap-2">
-        <Icon className="w-3.5 h-3.5" />
+      <Label className="text-sm font-medium flex items-center gap-2">
+        <Icon className="h-4 w-4" />
         <span>{label}</span>
       </Label>
       <Input
@@ -96,10 +96,10 @@ export const FilterInput = ({
           }
         }}
         placeholder={placeholder}
-        className="h-8"
+        className="h-10"
       />
       {helpText && (
-        <p className="text-[10px] text-muted-foreground mt-1">{helpText}</p>
+        <p className="text-xs text-muted-foreground">{helpText}</p>
       )}
     </div>
   );
