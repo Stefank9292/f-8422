@@ -14,14 +14,22 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
   const { toast } = useToast();
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'No date available';
+    
     try {
+      // First, try to parse the ISO date string
       const date = parseISO(dateString);
+      
+      // Check if the parsed date is valid
       if (!isValid(date)) {
+        console.error('Invalid date after parsing:', dateString);
         return 'Invalid date';
       }
-      return format(date, 'MMM d, yyyy');
+      
+      // Format the valid date
+      return format(date, 'MMMM d, yyyy');
     } catch (error) {
-      console.error('Error formatting date:', error);
+      console.error('Error formatting date:', error, 'Date string:', dateString);
       return 'Invalid date';
     }
   };
