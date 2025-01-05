@@ -7,7 +7,9 @@ export function SidebarNavigation() {
   return (
     <>
       <div className="flex items-center justify-between px-4 py-3 border-b border-sidebar-border">
-        <span className={`text-sm font-medium ${state === 'collapsed' ? 'hidden' : ''}`}>Navigation</span>
+        <span className={`text-sm font-medium transition-opacity duration-200 ${state === 'collapsed' ? 'opacity-0' : 'opacity-100'}`}>
+          Navigation
+        </span>
         <button 
           onClick={toggleSidebar}
           className="p-1 rounded-md hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
@@ -22,7 +24,7 @@ export function SidebarNavigation() {
       <button
         onClick={toggleSidebar}
         className={`fixed left-4 top-4 z-40 p-2 rounded-md bg-background shadow-md hover:bg-accent transition-all duration-200 ${
-          state === 'collapsed' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          state === 'collapsed' ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         aria-label="Open Sidebar"
       >
