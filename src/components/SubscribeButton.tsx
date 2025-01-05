@@ -146,15 +146,29 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (planId === 'free' && !subscriptionStatus?.subscribed) || 
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
+  const getButtonStyle = () => {
+    if (isCurrentPlan) {
+      return "bg-secondary hover:bg-secondary/80";
+    }
+    
+    if (isPopular) {
+      return "primary-gradient text-primary-foreground";
+    }
+    
+    // Navy blue for free plan button
+    if (planId === 'free') {
+      return "bg-[#1a365d] hover:bg-[#1a365d]/90 text-white";
+    }
+    
+    // Solid color for Creator Pro plan
+    return "bg-[#222226] hover:bg-[#222226]/90 text-white";
+  };
+
   return (
     <Button 
       onClick={handleSubscribe} 
       disabled={loading || isCurrentPlan}
-      className={`w-full text-[11px] h-8 ${
-        isCurrentPlan 
-          ? "bg-secondary hover:bg-secondary/80" 
-          : "bg-[#222226] hover:bg-[#222226]/90 text-white"
-      }`}
+      className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
       variant={isCurrentPlan ? "secondary" : "default"}
     >
       {loading ? "Loading..." : getButtonText()}
