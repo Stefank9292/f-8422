@@ -1,13 +1,14 @@
 export const APIFY_CONFIG = {
-  // Optimal memory allocation for Instagram scraping (512MB is sufficient for most cases)
-  memoryMbytes: 512,
-  // Timeout in seconds (2 minutes is usually enough for Instagram)
-  timeoutSecs: 120,
+  // Optimal memory allocation for Instagram scraping
+  memoryMbytes: 4096, // Increased for better performance
+  // Timeout in seconds (3 minutes for thorough scraping)
+  timeoutSecs: 180,
   // Maximum concurrent requests (Instagram rate limiting consideration)
   maxConcurrency: 1,
-  // Proxy configuration (optional but recommended for production)
+  // Proxy configuration for better success rate
   proxyConfiguration: {
     useApifyProxy: true,
+    groups: ['RESIDENTIAL'], // Use residential proxies for better success rate
   },
 };
 

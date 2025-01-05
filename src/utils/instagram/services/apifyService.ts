@@ -1,24 +1,18 @@
-import { APIFY_CONFIG, APIFY_ENDPOINTS, APIFY_API_KEY } from '../config/apifyConfig';
+import { APIFY_ENDPOINTS, APIFY_API_KEY } from '../config/apifyConfig';
 import { ApifyRequestBody } from '../types/InstagramTypes';
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody) {
   console.log('Making Apify request to endpoint');
   const apiEndpoint = `${APIFY_ENDPOINTS.BASE_URL}/${APIFY_ENDPOINTS.INSTAGRAM_SCRAPER}?token=${APIFY_API_KEY}`;
   
-  // Merge performance configurations with request body
-  const optimizedRequestBody = {
-    ...requestBody,
-    ...APIFY_CONFIG,
-  };
-  
   try {
-    console.log('Sending optimized request to Apify:', { ...optimizedRequestBody, token: '[REDACTED]' });
+    console.log('Sending optimized request to Apify:', { ...requestBody, token: '[REDACTED]' });
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(optimizedRequestBody)
+      body: JSON.stringify(requestBody)
     });
 
     if (!response.ok) {
@@ -33,8 +27,30 @@ export async function makeApifyRequest(requestBody: ApifyRequestBody) {
     }
 
     const data = await response.json();
-    console.log('Successfully received data from Apify');
-    return data;
+    
+    // Validate the response data
+    if (!Array.isArray(data)) {
+      console.error('Invalid response format:', data);
+      throw new Error('Invalid response format from Apify API');
+    }
+
+    // Filter out any null or invalid entries
+    const validData = data.filter(item => 
+      item && 
+      typeof item === 'object' &&
+      item.ownerUsername &&
+      item.caption &&
+      (item.videoViewCount !== undefined || item.viewsCount !== undefined) &&
+      (item.videoPlayCount !== undefined || item.playsCount !== undefined)
+    );
+
+    if (validData.length === 0) {
+      console.warn('No valid posts found in the response');
+    } else {
+      console.log(`Successfully received ${validData.length} valid posts from Apify`);
+    }
+
+    return validData;
   } catch (error) {
     console.error('Error in makeApifyRequest:', error);
     throw error;
