@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock } from "lucide-react";
@@ -61,6 +61,15 @@ export const SearchSettings = ({
   };
 
   const maxVideos = getMaxVideos();
+
+  // Update local number of videos when subscription changes
+  useEffect(() => {
+    const maxVideos = getMaxVideos();
+    if (localNumberOfVideos > maxVideos) {
+      setLocalNumberOfVideos(maxVideos);
+      setNumberOfVideos(maxVideos);
+    }
+  }, [subscriptionStatus?.priceId]);
 
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);

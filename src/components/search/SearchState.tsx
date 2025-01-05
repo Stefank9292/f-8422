@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/apifyClient";
@@ -43,6 +43,36 @@ export const useSearchState = () => {
     enabled: !!session?.access_token,
   });
 
+  // Listen for real-time subscription changes
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const channel = supabase
+      .channel('subscription-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_subscriptions',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        () => {
+          // Invalidate subscription status query to trigger a refresh
+          queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+          toast({
+            title: "Subscription Updated",
+            description: "Your plan limitations have been updated.",
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient, toast]);
+
   const { data: requestCount = 0 } = useQuery({
     queryKey: ['request-count'],
     queryFn: async () => {
@@ -67,47 +97,13 @@ export const useSearchState = () => {
   });
 
   const getMaxRequests = () => {
-    if (!subscriptionStatus?.priceId) return 25;
-    if (subscriptionStatus.priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") return 100;
-    if (subscriptionStatus.priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3") return 500;
-    return 25;
+    if (!subscriptionStatus?.priceId) return 3;
+    if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
+    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return Infinity;
+    return 3;
   };
-
-  const hasReachedLimit = requestCount >= getMaxRequests();
-
-  const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
-    queryFn: async () => {
-      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
-      // Save search history after successful fetch
-      if (results.length > 0) {
-        await saveSearchHistory(username, results);
-        // Invalidate search history query to refresh the history page
-        queryClient.invalidateQueries({ queryKey: ['search-history'] });
-      }
-      return results;
-    },
-    enabled: Boolean(username) && shouldSearch,
-    staleTime: Infinity,
-    gcTime: Infinity,
-    retry: 2,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    meta: {
-      onSuccess: () => {
-        setShouldSearch(false);
-      },
-      onError: (error: Error) => {
-        console.error('Search error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to perform search",
-          variant: "destructive",
-        });
-        setShouldSearch(false);
-      }
-    }
-  });
 
   const handleSearch = () => {
     if (isLoading || isBulkSearching) {
@@ -152,11 +148,12 @@ export const useSearchState = () => {
     username,
     isLoading,
     isBulkSearching,
-    hasReachedLimit,
+    hasReachedLimit: requestCount >= getMaxRequests(),
     requestCount,
     maxRequests: getMaxRequests(),
     handleSearch,
     handleBulkSearch,
     displayPosts,
+    subscriptionStatus, // Add this to expose subscription status
   };
 };
