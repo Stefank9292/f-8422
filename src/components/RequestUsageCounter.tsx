@@ -75,15 +75,17 @@ export const RequestUsageCounter = () => {
     };
   }, [session?.user.id, refetchRequestStats]);
 
-  const isUltraPlan = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                      subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-  const isProPlan = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
                     subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
-  const maxRequests = isUltraPlan ? Infinity : (isProPlan ? 25 : 3);
+  
+  // Updated logic for request limits
+  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
   const usedRequests = requestStats || 0;
-  const remainingRequests = isUltraPlan ? Infinity : Math.max(0, maxRequests - usedRequests);
-  const usagePercentage = isUltraPlan ? 0 : ((usedRequests / maxRequests) * 100);
-  const hasReachedLimit = usedRequests >= maxRequests;
+  const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
+  const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);
+  const hasReachedLimit = isSteroidsUser ? false : usedRequests >= maxRequests;
 
   const getPlanName = () => {
     if (!subscriptionStatus?.subscribed) return 'Free';
@@ -98,11 +100,6 @@ export const RequestUsageCounter = () => {
     return 'Free';
   };
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
-
   return (
     <div className="px-2 py-2">
       <UserProfileInfo
@@ -110,7 +107,7 @@ export const RequestUsageCounter = () => {
         planName={getPlanName()}
         isSteroidsUser={isSteroidsUser}
         isProUser={isProUser}
-        isUltraPlan={isUltraPlan}
+        isUltraPlan={isSteroidsUser}
         usagePercentage={usagePercentage}
         usedRequests={usedRequests}
         maxRequests={maxRequests}
