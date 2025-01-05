@@ -92,8 +92,8 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
                   ${(isCreatorPro || isFreeUser) && item.icon === Zap ? 'animate-[ring_3s_ease-in-out_infinite]' : ''}
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : ''}`} 
               />
-              <span className="flex-1">{item.title}</span>
-              {item.lockIcon && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
+              <span className="text-left">{item.title}</span>
+              {item.lockIcon && <Lock className="h-3.5 w-3.5 ml-auto text-muted-foreground" />}
             </button>
           );
 
