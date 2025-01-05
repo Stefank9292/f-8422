@@ -8,13 +8,11 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     
     if (!authHeader) {
@@ -25,7 +23,6 @@ serve(async (req) => {
       );
     }
 
-    // Create Supabase client with service role key for admin access
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -37,7 +34,6 @@ serve(async (req) => {
       }
     );
 
-    // Get user from the JWT token
     const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
@@ -56,7 +52,6 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Get customer by email
     const customers = await stripe.customers.list({
       email: user.email,
       limit: 1
@@ -69,13 +64,12 @@ serve(async (req) => {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxClicks: 3 // Free plan max clicks
+          maxClicks: 3
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    // Get active subscriptions for the customer
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
@@ -89,23 +83,24 @@ serve(async (req) => {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxClicks: 3 // Free plan max clicks
+          maxClicks: 3
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
 
-    // Get the price ID from the subscription
     const subscription = subscriptions.data[0];
     const priceId = subscription.items.data[0].price.id;
     const canceled = subscription.cancel_at_period_end;
 
-    // Determine max clicks based on the plan
+    // Updated price IDs and max clicks
     let maxClicks = 3; // Default free plan
-    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
-      maxClicks = 25; // Premium plan
-    } else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
-      maxClicks = 50; // Ultra plan
+    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
+        priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") { // Pro Annual
+      maxClicks = 25;
+    } else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || // Ultra Monthly
+               priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") { // Ultra Annual
+      maxClicks = Infinity;
     }
 
     console.log('Active subscription found with price ID:', priceId, 'canceled:', canceled, 'maxClicks:', maxClicks);
