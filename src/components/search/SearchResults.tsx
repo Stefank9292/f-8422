@@ -102,9 +102,11 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
       />
       <TablePagination
         currentPage={currentPage}
-        totalPosts={sortedResults.length}
-        postsPerPage={postsPerPage}
+        totalPages={Math.ceil(sortedResults.length / postsPerPage)}
+        pageSize={postsPerPage}
         onPageChange={setCurrentPage}
+        onPageSizeChange={() => {}}
+        totalResults={sortedResults.length}
       />
     </div>
   );

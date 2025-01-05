@@ -115,7 +115,7 @@ export const SearchContainer = ({
             currentPosts={displayPosts}
           />
           <div className="material-card overflow-hidden animate-in fade-in duration-300">
-            <SearchResults posts={displayPosts} filters={filters} />
+            <SearchResults searchResults={displayPosts} />
           </div>
         </div>
       )}
