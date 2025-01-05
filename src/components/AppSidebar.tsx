@@ -21,7 +21,7 @@ import { RequestUsageCounter } from "./RequestUsageCounter";
 
 export function AppSidebar() {
   const location = useLocation();
-  const { state, setOpen } = useSidebar();
+  const { setOpen } = useSidebar();
 
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
