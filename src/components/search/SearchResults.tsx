@@ -27,7 +27,7 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
   const { toast } = useToast();
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: '', direction: null });
   const previousPostsRef = useRef<string>('');
-  const hasTriggeredConfetti = useRef<boolean>(false);
+  const confettiTriggeredRef = useRef(new Set<string>());
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
 
@@ -66,10 +66,11 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
     }
 
     const currentPostsString = JSON.stringify(posts);
+    // Only trigger confetti if we have new posts and haven't shown confetti for this exact set before
     if (
       posts.length > 0 && 
       currentPostsString !== previousPostsRef.current &&
-      !hasTriggeredConfetti.current
+      !confettiTriggeredRef.current.has(currentPostsString)
     ) {
       const rect = document.querySelector('main')?.getBoundingClientRect();
       if (rect) {
@@ -90,12 +91,10 @@ export const SearchResults = ({ posts, filters }: SearchResultsProps) => {
           scalar: 0.8,
           zIndex: 100,
         });
+        // Store this set of posts in our Set to prevent future triggers
+        confettiTriggeredRef.current.add(currentPostsString);
       }
-      hasTriggeredConfetti.current = true;
       previousPostsRef.current = currentPostsString;
-    }
-    if (currentPostsString !== previousPostsRef.current) {
-      hasTriggeredConfetti.current = false;
     }
   }, [posts]);
 
