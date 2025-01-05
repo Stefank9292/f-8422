@@ -1,8 +1,9 @@
-import { X, Instagram, History } from "lucide-react";
+import { X, Instagram, History, Lock } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -12,8 +13,21 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const { subscriptionStatus } = useSubscriptionLimits(session);
+  const isUltraPlan = subscriptionStatus === 'ultra';
+
   // Set up real-time listener for search history changes
   useEffect(() => {
+    if (!isUltraPlan) return;
+
     const channel = supabase
       .channel('search-history-changes')
       .on(
@@ -33,11 +47,13 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient, isUltraPlan]);
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
+      if (!isUltraPlan) return [];
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
 
@@ -55,6 +71,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       return data || [];
     },
+    enabled: isUltraPlan,
   });
 
   const handleRemove = (id: string) => {
@@ -62,6 +79,20 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   };
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
+
+  if (!isUltraPlan) {
+    return (
+      <div className="w-full flex flex-col items-center space-y-4 mt-6">
+        <div className="flex items-center gap-2">
+          <Lock className="w-3.5 h-3.5 text-muted-foreground" />
+          <span className="text-[11px] text-muted-foreground font-medium">Recent Searches Locked</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground text-center">
+          Recent searches are only available on the Ultra plan
+        </p>
+      </div>
+    );
+  }
 
   if (visibleSearches.length === 0) return null;
 
