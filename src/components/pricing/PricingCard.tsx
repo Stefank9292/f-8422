@@ -71,18 +71,24 @@ export const PricingCard = ({
   };
 
   return (
-    <Card className={`p-4 space-y-4 relative max-w-sm mx-auto w-full ${isPopular ? 'border-2 border-primary ring-2 ring-primary/20 shadow-lg' : ''}`}>
+    <Card 
+      className={`p-6 space-y-6 relative max-w-sm mx-auto w-full transition-all duration-300 
+        ${isPopular ? 'border-2 border-primary ring-4 ring-primary/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+    >
       {isPopular && (
-        <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-          <Badge variant="default" className="bg-primary text-primary-foreground px-3 py-0.5 text-[10px]">
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <Badge 
+            variant="default" 
+            className="bg-primary text-primary-foreground px-4 py-1 text-[11px] font-medium shadow-lg animate-pulse"
+          >
             Most Popular
           </Badge>
         </div>
       )}
-      <div className="space-y-2">
-        <h2 className="text-base font-semibold">{name}</h2>
-        <p className="text-[11px] text-muted-foreground">{description}</p>
-        <div className="text-lg font-bold">
+      <div className="space-y-3">
+        <h2 className={`text-lg font-semibold ${isPopular ? 'text-primary' : ''}`}>{name}</h2>
+        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
+        <div className={`text-xl font-bold ${isPopular ? 'text-primary' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
@@ -93,12 +99,12 @@ export const PricingCard = ({
           )}
         </div>
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-3 pt-2">
         {getFeatures().map((feature, index) => (
           <FeatureItem key={index} {...feature} />
         ))}
       </ul>
-      <div className="pt-4">
+      <div className="pt-6">
         <SubscribeButton planId={priceId} planName={name} />
       </div>
     </Card>
