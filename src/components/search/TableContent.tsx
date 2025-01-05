@@ -3,7 +3,7 @@ import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TableContentProps {
   currentPosts: any[];
@@ -22,7 +22,7 @@ export const TableContent = ({
   formatNumber,
   truncateCaption,
 }: TableContentProps) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
 
   if (isMobile) {
     return (
