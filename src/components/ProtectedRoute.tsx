@@ -8,15 +8,40 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    // Initial session check
+    const checkSession = async () => {
+      try {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Session check error:", error);
+          // If there's an error checking the session, clear it and redirect to auth
+          await supabase.auth.signOut({ scope: 'local' });
+          setSession(null);
+          return;
+        }
+        setSession(currentSession);
+      } catch (error) {
+        console.error("Session check error:", error);
+        setSession(null);
+      }
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log("Auth state change:", event);
+      if (event === 'SIGNED_OUT') {
+        // Clear local session data
+        setSession(null);
+      } else {
+        setSession(currentSession);
+      }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (session === undefined) {
