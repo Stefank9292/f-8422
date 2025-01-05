@@ -141,16 +141,14 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
               truncateCaption={truncateCaption}
             />
           </div>
-          {filteredResults.length > 25 && (
-            <TablePagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              pageSize={pageSize}
-              onPageChange={handlePageChange}
-              onPageSizeChange={handlePageSizeChange}
-              totalResults={filteredResults.length}
-            />
-          )}
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+            totalResults={filteredResults.length}
+          />
         </div>
       )}
     </div>

@@ -32,6 +32,11 @@ export const TablePagination = ({
   onPageSizeChange,
   totalResults,
 }: TablePaginationProps) => {
+  // Only show pagination if there are more than 25 results
+  if (totalResults <= 25) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-card rounded-lg border border-border/50">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
