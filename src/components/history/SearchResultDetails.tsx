@@ -47,7 +47,7 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
     <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
       <div className="flex flex-col space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-2.5">
             <Instagram className="w-4 h-4 flex-shrink-0" />
             <a
               href={result.url}
@@ -57,8 +57,6 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
             >
               @{result.ownerUsername}
             </a>
-          </div>
-          <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -67,17 +65,17 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
             >
               <ExternalLink className="h-3.5 w-3.5 text-rose-400" />
             </Button>
-            {result.videoUrl && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 w-7 p-0"
-                onClick={() => handleDownload(result.videoUrl!)}
-              >
-                <Download className="h-3.5 w-3.5 text-blue-400" />
-              </Button>
-            )}
           </div>
+          {result.videoUrl && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={() => handleDownload(result.videoUrl!)}
+            >
+              <Download className="h-3.5 w-3.5 text-blue-400" />
+            </Button>
+          )}
         </div>
         
         <div className="flex items-start gap-2">
