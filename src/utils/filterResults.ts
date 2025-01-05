@@ -27,41 +27,52 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
       }
     }
 
-    // Handle views filter - ensure proper numeric comparison
+    // Handle views filter with proper type checking and validation
     if (filters.minViews && filters.minViews !== "") {
       const minViews = parseInt(filters.minViews);
-      const postViews = post.viewsCount || 0;
-      
-      if (isNaN(minViews) || postViews < minViews) {
-        return false;
+      if (!isNaN(minViews)) {
+        const postViews = typeof post.viewsCount === 'number' ? post.viewsCount : 0;
+        if (postViews < minViews) {
+          return false;
+        }
       }
     }
 
-    // Handle plays filter - ensure proper numeric comparison
+    // Handle plays filter with proper type checking and validation
     if (filters.minPlays && filters.minPlays !== "") {
       const minPlays = parseInt(filters.minPlays);
-      const postPlays = post.playsCount || 0;
-      
-      if (isNaN(minPlays) || postPlays < minPlays) {
-        return false;
+      if (!isNaN(minPlays)) {
+        const postPlays = typeof post.playsCount === 'number' ? post.playsCount : 0;
+        if (postPlays < minPlays) {
+          return false;
+        }
       }
     }
 
     // Handle likes filter
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
-      return false;
+    if (filters.minLikes && filters.minLikes !== "") {
+      const minLikes = parseInt(filters.minLikes);
+      if (!isNaN(minLikes) && post.likesCount < minLikes) {
+        return false;
+      }
     }
 
     // Handle comments filter
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
-      return false;
+    if (filters.minComments && filters.minComments !== "") {
+      const minComments = parseInt(filters.minComments);
+      if (!isNaN(minComments) && post.commentsCount < minComments) {
+        return false;
+      }
     }
 
     // Handle engagement filter (remove % and convert to number)
-    if (filters.minEngagement && post.engagement) {
-      const engagementValue = parseFloat(post.engagement.replace('%', ''));
-      if (engagementValue < parseFloat(filters.minEngagement)) {
-        return false;
+    if (filters.minEngagement && filters.minEngagement !== "") {
+      const minEngagement = parseFloat(filters.minEngagement);
+      if (!isNaN(minEngagement) && post.engagement) {
+        const engagementValue = parseFloat(post.engagement.replace('%', ''));
+        if (isNaN(engagementValue) || engagementValue < minEngagement) {
+          return false;
+        }
       }
     }
 

@@ -38,15 +38,20 @@ export const FilterInput = ({
   };
 
   const handleNumericInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Only allow positive numbers and empty string
+    const value = e.target.value.trim();
+    
+    // Handle empty input
+    if (value === "") {
+      onChange("");
+      return;
+    }
+
+    // Only allow positive numbers for numeric inputs
     if (type === "number") {
-      if (value === "") {
-        onChange("");
+      const num = parseInt(value);
+      if (isNaN(num) || num < 0) {
         return;
       }
-      const num = parseInt(value);
-      if (isNaN(num) || num < 0) return;
       onChange(num.toString());
     } else {
       onChange(value);
