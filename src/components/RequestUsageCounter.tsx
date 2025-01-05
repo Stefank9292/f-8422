@@ -24,15 +24,14 @@ export const RequestUsageCounter = () => {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-      // Get requests that haven't been reset
+      // Get requests for the current billing period
       const { count } = await supabase
         .from('user_requests')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
         .eq('request_type', 'instagram_search')
         .gte('created_at', startOfMonth.toISOString())
-        .lt('created_at', endOfMonth.toISOString())
-        .or(`last_reset_at.is.null,last_reset_at.lt.${startOfMonth.toISOString()}`);
+        .lt('created_at', endOfMonth.toISOString());
 
       return count || 0;
     },
@@ -98,7 +97,6 @@ export const RequestUsageCounter = () => {
   const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
                     subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
   
-  // Updated logic for request limits
   const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
