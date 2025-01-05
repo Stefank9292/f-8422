@@ -34,7 +34,9 @@ export const UsageProgress = ({
         
         <div className="flex flex-col">
           <div className="flex items-center gap-1">
-            <span className="text-[11px] text-sidebar-foreground/70">Monthly Usage</span>
+            {!isUltraPlan && (
+              <span className="text-[11px] text-sidebar-foreground/70">Monthly Usage</span>
+            )}
             {isUltraPlan && (
               <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
                 Unlimited Usage
