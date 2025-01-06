@@ -16,7 +16,7 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     if (filters.postsNewerThan) {
       try {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
-        const postDate = new Date(post.timestamp);
+        const postDate = new Date(post.timestamp || post.date);
         
         // Return false if the post is older than the filter date
         if (!isAfter(postDate, filterDate)) {
@@ -28,28 +28,28 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     }
 
     // Filter by minimum views
-    if (filters.minViews && post.views < parseInt(filters.minViews)) {
+    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) {
       return false;
     }
 
     // Filter by minimum plays
-    if (filters.minPlays && post.plays < parseInt(filters.minPlays)) {
+    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) {
       return false;
     }
 
     // Filter by minimum likes
-    if (filters.minLikes && post.likes < parseInt(filters.minLikes)) {
+    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
       return false;
     }
 
     // Filter by minimum comments
-    if (filters.minComments && post.comments < parseInt(filters.minComments)) {
+    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
       return false;
     }
 
     // Filter by minimum engagement
     if (filters.minEngagement) {
-      const engagement = ((post.likes + post.comments) / post.views) * 100;
+      const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
       if (engagement < parseInt(filters.minEngagement)) {
         return false;
       }
