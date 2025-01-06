@@ -10,6 +10,12 @@ export interface FilterState {
   minEngagement: string;
 }
 
+const parseFormattedNumber = (value: string): number => {
+  if (!value) return 0;
+  // Remove dots (thousand separators) and replace comma with dot for decimal
+  return parseInt(value.replace(/\./g, '').replace(',', '.'));
+};
+
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
   if (!posts || !Array.isArray(posts)) {
     console.warn('No posts provided to filter');
@@ -32,29 +38,42 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     }
 
     // Filter by minimum views
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) {
-      return false;
+    if (filters.minViews) {
+      const minViews = parseFormattedNumber(filters.minViews);
+      if (post.viewsCount < minViews) {
+        return false;
+      }
     }
 
     // Filter by minimum plays
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) {
-      return false;
+    if (filters.minPlays) {
+      const minPlays = parseFormattedNumber(filters.minPlays);
+      if (post.playsCount < minPlays) {
+        return false;
+      }
     }
 
     // Filter by minimum likes
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
-      return false;
+    if (filters.minLikes) {
+      const minLikes = parseFormattedNumber(filters.minLikes);
+      if (post.likesCount < minLikes) {
+        return false;
+      }
     }
 
     // Filter by minimum comments
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
-      return false;
+    if (filters.minComments) {
+      const minComments = parseFormattedNumber(filters.minComments);
+      if (post.commentsCount < minComments) {
+        return false;
+      }
     }
 
     // Filter by minimum engagement
     if (filters.minEngagement) {
+      const minEngagementRate = parseFloat(filters.minEngagement);
       const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
-      if (engagement < parseInt(filters.minEngagement)) {
+      if (engagement < minEngagementRate) {
         return false;
       }
     }
