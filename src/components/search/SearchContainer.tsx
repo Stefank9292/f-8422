@@ -9,7 +9,6 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
-import { SearchFilters } from "./SearchFilters";
 
 interface SearchContainerProps {
   username: string;
@@ -42,9 +41,6 @@ export const SearchContainer = ({
     setNumberOfVideos,
     selectedDate,
     setSelectedDate,
-    filters,
-    setFilters,
-    resetFilters
   } = useSearchStore();
 
   const onSearchClick = () => {
@@ -130,21 +126,11 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <>
-          <SearchFilters
-            filters={filters}
-            onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-            onReset={resetFilters}
-            totalResults={displayPosts.length}
-            filteredResults={displayPosts.length}
-            currentPosts={displayPosts}
-          />
-          <div className="w-full max-w-[90rem] space-y-6 sm:space-y-8">
-            <div className="material-card overflow-hidden animate-in fade-in duration-300">
-              <SearchResults searchResults={displayPosts} />
-            </div>
+        <div className="w-full max-w-[90rem] space-y-6 sm:space-y-8">
+          <div className="material-card overflow-hidden animate-in fade-in duration-300">
+            <SearchResults searchResults={displayPosts} />
           </div>
-        </>
+        </div>
       )}
     </div>
   );

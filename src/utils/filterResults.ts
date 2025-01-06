@@ -1,5 +1,5 @@
 import { InstagramPost } from "@/types/instagram";
-import { parse, isBefore } from "date-fns";
+import { parse, isAfter } from "date-fns";
 
 export interface FilterState {
   postsNewerThan: string;
@@ -16,10 +16,10 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
     if (filters.postsNewerThan) {
       try {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
-        const postDate = new Date(post.date);
+        const postDate = new Date(post.timestamp);
         
-        // Return false if the post is older than (before) the filter date
-        if (isBefore(postDate, filterDate)) {
+        // Return false if the post is older than the filter date
+        if (!isAfter(postDate, filterDate)) {
           return false;
         }
       } catch (error) {
