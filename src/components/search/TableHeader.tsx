@@ -33,7 +33,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('date')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              <Clock className={cn(
+                "h-3.5 w-3.5 text-muted-foreground",
+                sortKey === 'date' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Date</TooltipContent>
           </Tooltip>
@@ -41,7 +44,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('viewsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Eye className="h-3.5 w-3.5 text-green-500" />
+              <Eye className={cn(
+                "h-3.5 w-3.5 text-green-500",
+                sortKey === 'viewsCount' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
@@ -49,7 +55,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('playsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Play className="h-3.5 w-3.5 text-primary" />
+              <Play className={cn(
+                "h-3.5 w-3.5 text-primary",
+                sortKey === 'playsCount' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Plays</TooltipContent>
           </Tooltip>
@@ -57,7 +66,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('likesCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Heart className="h-3.5 w-3.5 text-rose-500" />
+              <Heart className={cn(
+                "h-3.5 w-3.5 text-rose-500",
+                sortKey === 'likesCount' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Likes</TooltipContent>
           </Tooltip>
@@ -65,7 +77,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('commentsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <MessageSquare className="h-3.5 w-3.5 text-blue-400" />
+              <MessageSquare className={cn(
+                "h-3.5 w-3.5 text-blue-400",
+                sortKey === 'commentsCount' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Comments</TooltipContent>
           </Tooltip>
@@ -73,7 +88,10 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('engagement')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Zap className="h-3.5 w-3.5 text-orange-500" />
+              <Zap className={cn(
+                "h-3.5 w-3.5 text-orange-500",
+                sortKey === 'engagement' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Engagement</TooltipContent>
           </Tooltip>
