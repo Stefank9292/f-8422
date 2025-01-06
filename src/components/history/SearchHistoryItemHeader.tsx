@@ -11,6 +11,7 @@ interface SearchHistoryItemHeaderProps {
   onToggleExpand: () => void;
   onDelete: () => void;
   isDeleting: boolean;
+  canDelete?: boolean;
 }
 
 export function SearchHistoryItemHeader({
@@ -20,7 +21,8 @@ export function SearchHistoryItemHeader({
   isExpanded,
   onToggleExpand,
   onDelete,
-  isDeleting
+  isDeleting,
+  canDelete = false
 }: SearchHistoryItemHeaderProps) {
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
@@ -50,15 +52,17 @@ export function SearchHistoryItemHeader({
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            disabled={isDeleting}
-            className="h-8 w-8 p-0"
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onDelete}
+              disabled={isDeleting}
+              className="h-8 w-8 p-0"
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

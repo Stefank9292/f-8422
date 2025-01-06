@@ -43,31 +43,11 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
 
-  if (!isSteroidsUser) {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Lock className="w-12 h-12 text-muted-foreground" />
-        <div className="text-center space-y-2">
-          <h3 className="font-semibold text-lg">Search History Locked</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Search history is only available on the{' '}
-            <span className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse">
-              Creator on Steroids
-            </span>{' '}
-            plan. Upgrade your subscription to access this feature.
-          </p>
-          <Button 
-            variant="secondary"
-            className="mt-4 bg-[#221F26] text-white hover:bg-[#403E43]"
-            onClick={() => navigate('/subscribe')}
-          >
-            View Pricing Plans
-          </Button>
-        </div>
-      </div>
-    );
-  }
+  // Pro users can only view history, not delete
+  const canDelete = isSteroidsUser;
 
   if (searchHistory?.length === 0) {
     return (
@@ -85,6 +65,7 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
           item={item}
           onDelete={onDelete}
           isDeleting={isDeleting}
+          canDelete={canDelete}
         />
       ))}
     </div>
