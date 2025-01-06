@@ -49,21 +49,10 @@ export const FilterInput = ({
     }
   }, [value, isDatePicker]);
 
-  const formatNumberWithSeparators = (value: string): string => {
-    // Remove any non-digit characters
-    const numberOnly = value.replace(/\D/g, '');
-    // Convert to number and format with German locale
-    if (numberOnly) {
-      const number = parseInt(numberOnly, 10);
-      return number.toLocaleString('de-DE');
-    }
-    return '';
-  };
-
   const handleNumericInput = (inputValue: string) => {
-    // Format the number with thousand separators
-    const formattedValue = formatNumberWithSeparators(inputValue);
-    onChange(formattedValue);
+    // Only allow numbers and empty string
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    onChange(numericValue);
   };
 
   const handleResetDate = () => {
