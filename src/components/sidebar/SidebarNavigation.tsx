@@ -1,11 +1,23 @@
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
+import { SidebarSection } from "./SidebarSection";
+import { FileText } from "lucide-react";
 
 export function SidebarNavigation() {
   const { state } = useSidebar();
   const isMobile = useIsMobile();
   const isCollapsed = isMobile && state === "collapsed";
+  const navigate = useNavigate();
+
+  const navigationItems = [
+    {
+      title: "This is a page",
+      url: "/this-is-a-page",
+      icon: FileText,
+    },
+  ];
 
   return (
     <div className="space-y-2 py-2">
@@ -15,7 +27,12 @@ export function SidebarNavigation() {
         </span>
       </div>
       <nav className="space-y-1 px-2">
-        {/* Navigation items can be added here in the future */}
+        <SidebarSection
+          title=""
+          items={navigationItems}
+          onNavigate={(url) => navigate(url)}
+          currentPath={location.pathname}
+        />
       </nav>
     </div>
   );
