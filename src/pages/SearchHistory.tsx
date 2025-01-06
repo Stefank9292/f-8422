@@ -32,6 +32,21 @@ const SearchHistory = () => {
     },
   });
 
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status', session?.access_token],
+    queryFn: async () => {
+      if (!session?.access_token) return null;
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
+
   useEffect(() => {
     const channel = supabase
       .channel('search_history_changes')
@@ -151,8 +166,13 @@ const SearchHistory = () => {
     }
   };
 
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
   const filteredHistory = searchHistory?.filter(item =>
-    item.search_query.toLowerCase().includes(searchQuery.toLowerCase())
+    isSteroidsUser && searchQuery
+      ? item.search_query.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
   );
 
   if (isLoading) {
@@ -171,7 +191,7 @@ const SearchHistory = () => {
         hasHistory={searchHistory && searchHistory.length > 0}
       />
       
-      {searchHistory && searchHistory.length > 0 && (
+      {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
         <div className="relative w-full max-w-md mx-auto mb-6">
           <Input
             type="text"
