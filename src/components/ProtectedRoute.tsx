@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -14,18 +15,22 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     // Initial session check
     const checkSession = async () => {
       try {
+        console.log("Checking session...");
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Session check error:", error);
           // If there's an error checking the session, clear it and redirect to auth
           await supabase.auth.signOut({ scope: 'local' });
           setSession(null);
-          return;
+        } else {
+          console.log("Session check result:", currentSession);
+          setSession(currentSession);
         }
-        setSession(currentSession);
       } catch (error) {
         console.error("Session check error:", error);
         setSession(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -33,7 +38,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log("Auth state change:", event);
+      console.log("Auth state change:", event, currentSession);
       if (event === 'SIGNED_OUT') {
         // Clear local session data and query cache
         setSession(null);
@@ -47,6 +52,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       } else {
         setSession(currentSession);
       }
+      setIsLoading(false);
     });
 
     // Clear query cache when navigating to a new route
@@ -62,8 +68,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     };
   }, [queryClient, navigate, location.state]);
 
-  if (session === undefined) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  if (isLoading || session === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   if (!session) {
