@@ -76,10 +76,16 @@ export const PricingCard = ({
     }
   };
 
+  const isBasicPlan = priceId === 'free' || priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+        ${isPopular 
+          ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' 
+          : isBasicPlan 
+            ? 'bg-[#1A1F2C] text-white border-border/50'
+            : ''}`}
     >
       <div className="space-y-3">
         <div className="flex items-center gap-1.5">
@@ -87,12 +93,16 @@ export const PricingCard = ({
             {name}
           </h2>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
+        <p className={`text-[11px] ${isBasicPlan && !isPopular ? 'text-white/70' : 'text-muted-foreground'} leading-relaxed`}>
+          {description}
+        </p>
         <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : ''}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
-              <span className="text-[11px] text-muted-foreground ml-2">(${price.annual.perMonth}/mo)</span>
+              <span className={`text-[11px] ${isBasicPlan && !isPopular ? 'text-white/70' : 'text-muted-foreground'} ml-2`}>
+                (${price.annual.perMonth}/mo)
+              </span>
             </>
           ) : (
             `$${price.monthly}/mo`
