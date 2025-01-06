@@ -118,6 +118,7 @@ export const SearchContainer = ({
           onBulkSearch={handleBulkSearch}
           isLoading={isLoading || isBulkSearching}
           onUsernameChange={setUsername}
+          isDisabled={isDisabled}
         />
 
         <Button 
