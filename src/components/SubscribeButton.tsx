@@ -65,6 +65,9 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
        (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
 
     if (isMonthlyToAnnualUpgrade) {
+      if (planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+        return "Save 20% with annual";
+      }
       return "Save 20% now by upgrading to annual";
     }
 
@@ -84,15 +87,12 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W");
 
   const getButtonStyle = () => {
-    // Keep gradient only for popular plan
     if (isPopular) {
       return "primary-gradient";
     }
-    // Apply subtle grey for downgrade state, navy blue for other states
     if (isDowngrade) {
       return "bg-gray-500 hover:bg-gray-600 text-white";
     }
-    // Apply solid navy blue for free and pro plans (upgrade state)
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
