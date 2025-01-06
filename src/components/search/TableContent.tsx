@@ -6,40 +6,55 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 
+export type SortDirection = "asc" | "desc";
+
 interface TableContentProps {
   currentPosts: any[];
+  handleSort?: (key: string) => void;
   handleCopyCaption: (caption: string) => void;
   handleDownload: (videoUrl: string) => void;
   formatNumber: (num: number) => string;
   truncateCaption: (caption: string) => string;
+  sortKey?: string;
+  sortDirection?: SortDirection;
 }
-
-export type SortDirection = "asc" | "desc";
 
 export const TableContent = ({
   currentPosts,
+  handleSort: externalHandleSort,
   handleCopyCaption,
   handleDownload,
   formatNumber,
   truncateCaption,
+  sortKey: externalSortKey,
+  sortDirection: externalSortDirection,
 }: TableContentProps) => {
   const isMobile = useIsMobile();
-  const [sortKey, setSortKey] = useState<string>("");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+  const [internalSortKey, setInternalSortKey] = useState<string>("");
+  const [internalSortDirection, setInternalSortDirection] = useState<SortDirection>("desc");
 
-  const handleSort = (key: string) => {
+  // Use external sort state if provided, otherwise use internal state
+  const sortKey = externalSortKey !== undefined ? externalSortKey : internalSortKey;
+  const sortDirection = externalSortDirection !== undefined ? externalSortDirection : internalSortDirection;
+
+  const handleSortInternal = (key: string) => {
+    if (externalHandleSort) {
+      externalHandleSort(key);
+      return;
+    }
+
     // If clicking the same column, toggle direction
-    if (sortKey === key) {
-      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    if (internalSortKey === key) {
+      setInternalSortDirection(prev => prev === "asc" ? "desc" : "asc");
     } else {
       // If clicking a new column, set it as the sort key and default to descending
-      setSortKey(key);
-      setSortDirection("desc");
+      setInternalSortKey(key);
+      setInternalSortDirection("desc");
     }
   };
 
-  // Apply sorting to the posts
-  const sortedPosts = [...currentPosts].sort((a: any, b: any) => {
+  // Apply sorting to the posts if no external sort is provided
+  const sortedPosts = externalHandleSort ? currentPosts : [...currentPosts].sort((a: any, b: any) => {
     if (!sortKey) return 0;
 
     if (sortKey === 'date') {
@@ -87,7 +102,7 @@ export const TableContent = ({
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
           <PostTableHeader 
-            onSort={handleSort}
+            onSort={handleSortInternal}
             sortKey={sortKey}
             sortDirection={sortDirection}
           />

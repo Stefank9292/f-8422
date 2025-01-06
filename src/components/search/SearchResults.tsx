@@ -3,6 +3,7 @@ import { TablePagination } from "./TablePagination";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { filterResults } from "@/utils/filterResults";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -12,6 +13,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
+  const { toast } = useToast();
 
   // Apply filters to search results
   const filteredPosts = filterResults(searchResults, filters);
@@ -25,13 +27,43 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     setCurrentPage(1);
   };
 
+  const handleCopyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      description: "Caption copied to clipboard",
+    });
+  };
+
+  const handleDownload = async (videoUrl: string) => {
+    try {
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `video-${Date.now()}.mp4`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast({
+        description: "Download started",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        variant: "destructive",
+        description: "Failed to download video",
+      });
+    }
+  };
+
   return (
     <div className="w-full">
       <TableContent 
         currentPosts={currentPosts}
-        handleSort={() => {}}
-        handleCopyCaption={() => {}}
-        handleDownload={() => {}}
+        handleCopyCaption={handleCopyCaption}
+        handleDownload={handleDownload}
         formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
         truncateCaption={(caption) => caption}
       />
