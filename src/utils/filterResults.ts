@@ -10,11 +10,10 @@ export interface FilterState {
   minEngagement: string;
 }
 
-const parseGermanNumber = (value: string): number => {
-  if (!value) return 0;
-  // Remove thousand separators (dots) and convert to number
-  const normalizedValue = value.replace(/\./g, '');
-  return parseInt(normalizedValue, 10);
+const parseGermanNumber = (numberString: string): number => {
+  if (!numberString) return 0;
+  // Remove all dots (thousand separators) and replace comma with dot for decimal
+  return parseFloat(numberString.replace(/\./g, '').replace(',', '.'));
 };
 
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
@@ -67,9 +66,9 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
 
     // Filter by minimum engagement
     if (filters.minEngagement) {
-      const minEngagement = parseGermanNumber(filters.minEngagement);
-      const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
-      if (engagement < minEngagement) {
+      const minEngagementPercent = parseGermanNumber(filters.minEngagement);
+      const engagement = parseFloat(post.engagement);
+      if (engagement < minEngagementPercent) {
         return false;
       }
     }

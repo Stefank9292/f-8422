@@ -32,6 +32,7 @@ export const FilterInput = ({
 }: FilterInputProps) => {
   const [date, setDate] = useState<Date | undefined>();
 
+  // Sync date state with external value
   useEffect(() => {
     if (value && isDatePicker) {
       try {
@@ -48,17 +49,10 @@ export const FilterInput = ({
     }
   }, [value, isDatePicker]);
 
-  const formatNumber = (value: string) => {
-    // Remove any non-digit characters
-    const digits = value.replace(/\D/g, '');
-    
-    // Format with dots as thousand separators
-    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  };
-
   const handleNumericInput = (inputValue: string) => {
-    const formattedValue = formatNumber(inputValue);
-    onChange(formattedValue);
+    // Only allow numbers and empty string
+    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    onChange(numericValue);
   };
 
   const handleResetDate = () => {

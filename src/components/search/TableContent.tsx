@@ -1,4 +1,4 @@
-import { Table, TableBody } from "@/components/ui/table";
+import { TableBody } from "@/components/ui/table";
 import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
