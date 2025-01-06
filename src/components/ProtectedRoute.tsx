@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const location = useLocation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -37,6 +38,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         // Clear local session data and query cache
         setSession(null);
         queryClient.clear();
+        navigate('/auth', { replace: true });
+      } else if (event === 'SIGNED_IN') {
+        setSession(currentSession);
+        // If user was trying to access a specific page before signing in, redirect there
+        const intendedPath = location.state?.from?.pathname || '/';
+        navigate(intendedPath, { replace: true });
       } else {
         setSession(currentSession);
       }
@@ -53,13 +60,14 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
       window.removeEventListener('popstate', clearQueryCache);
     };
-  }, [queryClient]);
+  }, [queryClient, navigate, location.state]);
 
   if (session === undefined) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 
   if (!session) {
+    // Save the current location they were trying to go to
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
