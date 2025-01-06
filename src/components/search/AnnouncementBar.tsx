@@ -8,24 +8,28 @@ export const AnnouncementBar = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="flex justify-center w-full bg-primary/5">
-      <Alert 
-        variant="default" 
-        className="border-none shadow-none max-w-3xl w-full py-3 px-4 flex items-center gap-3"
-      >
-        <AlertCircle className="h-4 w-4 text-primary shrink-0" />
-        <AlertDescription className="text-sm text-primary font-medium flex-1">
-          Video Search is currently in Beta – Thank You for Your patience as we continue to improve and perfect it!
-        </AlertDescription>
-        <button 
-          onClick={() => setIsVisible(false)}
-          className="text-primary/60 hover:text-primary transition-colors p-1 -mr-1"
-          aria-label="Close announcement"
+    <div className="flex justify-center w-full">
+      <div className="max-w-lg w-full mx-auto px-4">
+        <Alert 
+          variant="default" 
+          className="bg-background/50 border border-border/40 shadow-sm rounded-lg mb-2"
         >
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </button>
-      </Alert>
+          <div className="flex items-center gap-2 py-1.5">
+            <AlertCircle className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+            <AlertDescription className="text-xs text-muted-foreground font-medium flex-1">
+              Video Search Beta – Thanks for your patience!
+            </AlertDescription>
+            <button 
+              onClick={() => setIsVisible(false)}
+              className="text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-md p-0.5 -mr-1"
+              aria-label="Close announcement"
+            >
+              <X className="h-3.5 w-3.5" />
+              <span className="sr-only">Close</span>
+            </button>
+          </div>
+        </Alert>
+      </div>
     </div>
   );
 };
