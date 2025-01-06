@@ -42,6 +42,9 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
         return "Upgrade to Creator Pro Annual";
       }
+      if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+        return "For Viral Marketing Gods";
+      }
       return `Upgrade to ${planName}`;
     }
 
@@ -116,6 +119,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
         isUpgrade={!isCurrentPlan && planId !== 'free'}
+        showThunderbolt={isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"}
       />
     </Button>
   );
