@@ -4,6 +4,7 @@ import { SearchSettings } from "./SearchSettings";
 import { SearchResults } from "./SearchResults";
 import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
+import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,7 @@ export const SearchContainer = ({
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+      <AnnouncementBar />
       <div className="space-y-4 sm:space-y-6 w-full max-w-md">
         <SearchHeader />
         <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
