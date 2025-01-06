@@ -75,8 +75,17 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const getButtonStyle = () => {
     if (isCurrentPlan) {
-      return "bg-secondary hover:bg-secondary/80";
+      return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
     }
+    
+    const isBasicPlan = planId === 'free' || 
+                       planId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                       planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+                       
+    if (isBasicPlan) {
+      return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
+    }
+    
     return isPopular ? "bg-primary hover:bg-primary/90" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
   };
 
@@ -84,7 +93,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     return (
       <CancelSubscriptionButton 
         isCanceled={subscriptionStatus?.canceled}
-        className="w-full"
+        className="w-full bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white"
       >
         Cancel Subscription
       </CancelSubscriptionButton>
