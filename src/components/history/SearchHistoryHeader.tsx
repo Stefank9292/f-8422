@@ -21,9 +21,15 @@ interface SearchHistoryHeaderProps {
   onDeleteAll: () => void;
   isDeletingAll: boolean;
   hasHistory: boolean;
+  isSteroidsUser?: boolean;
 }
 
-export function SearchHistoryHeader({ onDeleteAll, isDeletingAll, hasHistory }: SearchHistoryHeaderProps) {
+export function SearchHistoryHeader({ 
+  onDeleteAll, 
+  isDeletingAll, 
+  hasHistory,
+  isSteroidsUser = false 
+}: SearchHistoryHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 p-1">
       <div className="space-y-1.5">
@@ -47,7 +53,7 @@ export function SearchHistoryHeader({ onDeleteAll, isDeletingAll, hasHistory }: 
           Your last 10 searches are shown here
         </p>
       </div>
-      {hasHistory && (
+      {hasHistory && isSteroidsUser && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button 

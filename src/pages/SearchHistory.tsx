@@ -189,6 +189,7 @@ const SearchHistory = () => {
         onDeleteAll={handleDeleteAll}
         isDeletingAll={isDeletingAll}
         hasHistory={searchHistory && searchHistory.length > 0}
+        isSteroidsUser={isSteroidsUser}
       />
       
       {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
