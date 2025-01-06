@@ -72,14 +72,15 @@ export const SearchContainer = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+    <>
       <AnnouncementBar />
-      <div className="space-y-4 sm:space-y-6 w-full max-w-md">
-        <SearchHeader />
-        <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
-          Save time finding viral content for social media
-        </p>
-      </div>
+      <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+        <div className="space-y-4 sm:space-y-6 w-full max-w-md">
+          <SearchHeader />
+          <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
+            Save time finding viral content for social media
+          </p>
+        </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         <SearchBar
@@ -150,6 +151,7 @@ export const SearchContainer = ({
           </div>
         </>
       )}
-    </div>
+      </div>
+    </>
   );
 };
