@@ -65,7 +65,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
        (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
 
     if (isMonthlyToAnnualUpgrade) {
-      return "Save 20% now by upgrading to annual";
+      return "Save 20% with annual";
     }
 
     if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
