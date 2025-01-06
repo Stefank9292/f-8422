@@ -12,7 +12,6 @@ const Index = () => {
     handleSearch,
     handleBulkSearch,
     displayPosts,
-    subscriptionStatus,
   } = useSearchState();
 
   return (
@@ -26,7 +25,6 @@ const Index = () => {
       handleSearch={handleSearch}
       handleBulkSearch={handleBulkSearch}
       displayPosts={displayPosts}
-      subscriptionStatus={subscriptionStatus}
     />
   );
 };

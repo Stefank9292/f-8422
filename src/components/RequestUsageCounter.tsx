@@ -96,9 +96,8 @@ export const RequestUsageCounter = () => {
                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
   const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
                     subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
-  const isAnnualProUser = subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
   
-  const maxRequests = isSteroidsUser ? Infinity : (isAnnualProUser ? 300 : (isProUser ? 25 : 3));
+  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);

@@ -23,8 +23,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           return;
         }
         setSession(currentSession);
-        // Pre-populate the query cache with the session
-        queryClient.setQueryData(['session'], currentSession);
       } catch (error) {
         console.error("Session check error:", error);
         setSession(null);
@@ -43,20 +41,24 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         navigate('/auth', { replace: true });
       } else if (event === 'SIGNED_IN') {
         setSession(currentSession);
-        // Update the query cache with the new session
-        queryClient.setQueryData(['session'], currentSession);
         // If user was trying to access a specific page before signing in, redirect there
         const intendedPath = location.state?.from?.pathname || '/';
         navigate(intendedPath, { replace: true });
       } else {
         setSession(currentSession);
-        // Keep the query cache in sync
-        queryClient.setQueryData(['session'], currentSession);
       }
     });
 
+    // Clear query cache when navigating to a new route
+    const clearQueryCache = () => {
+      queryClient.clear();
+    };
+
+    window.addEventListener('popstate', clearQueryCache);
+
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('popstate', clearQueryCache);
     };
   }, [queryClient, navigate, location.state]);
 

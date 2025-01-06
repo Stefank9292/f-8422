@@ -53,19 +53,9 @@ export const PricingCard = ({
         { included: false, text: "Recent Searches" },
         { included: false, text: "Early Access to new Features" }
       ];
-    } else if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
+    } else if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return [
         { included: true, text: "25 Total Searches" },
-        { included: true, text: "Maximum 25 Results per Search" },
-        { included: true, text: "Bulk Search" },
-        { included: true, text: "Contact Support" },
-        { included: false, text: "Search History" },
-        { included: false, text: "Recent Searches" },
-        { included: false, text: "Early Access to new Features" }
-      ];
-    } else if (priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
-      return [
-        { included: true, text: "300 Total Searches" },
         { included: true, text: "Maximum 25 Results per Search" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },

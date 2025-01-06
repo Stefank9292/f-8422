@@ -11,22 +11,11 @@ interface BulkSearchProps {
   onClose: () => void;
   onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<void>;
   isLoading?: boolean;
-  isDisabled?: boolean;
-  requestCount?: number;
-  maxRequests?: number;
 }
 
 const MAX_URLS = 20;
 
-export const BulkSearch = ({ 
-  isOpen, 
-  onClose, 
-  onSearch, 
-  isLoading = false,
-  isDisabled = false,
-  requestCount = 0,
-  maxRequests = 0
-}: BulkSearchProps) => {
+export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: BulkSearchProps) => {
   const [urls, setUrls] = useState<string>("");
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -52,15 +41,6 @@ export const BulkSearch = ({
       toast({
         title: "Error",
         description: `Maximum ${MAX_URLS} URLs allowed. You entered ${urlList.length} URLs.`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (isDisabled) {
-      toast({
-        title: "Pro Plan Limit Reached",
-        description: "You've used all your Pro plan searches for this month. Consider upgrading to our Creator on Steroids plan for unlimited searches.",
         variant: "destructive",
       });
       return;
@@ -102,7 +82,7 @@ export const BulkSearch = ({
               className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20 rounded-xl w-full"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
-              disabled={isLoading || isDisabled}
+              disabled={isLoading}
             />
             <p className={`text-[10px] sm:text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
@@ -116,13 +96,13 @@ export const BulkSearch = ({
             setNumberOfVideos={setNumberOfVideos}
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
-            disabled={isLoading || isDisabled}
+            disabled={isLoading}
           />
 
           <div className="flex justify-center w-full">
             <Button 
               onClick={handleSearch}
-              disabled={isLoading || !urls || isDisabled}
+              disabled={isLoading || !urls}
               className={`w-full h-10 text-[11px] font-medium transition-all duration-300 ${
                 urls ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
               } text-white dark:text-gray-100 shadow-sm hover:shadow-md`}
@@ -131,11 +111,6 @@ export const BulkSearch = ({
                 <>
                   <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   Searching...
-                </>
-              ) : isDisabled ? (
-                <>
-                  <Search className="mr-2 h-3.5 w-3.5" />
-                  Pro Plan Limit Reached ({requestCount}/{maxRequests})
                 </>
               ) : (
                 <>

@@ -1,10 +1,8 @@
 import { useLocation } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import {
   Sidebar,
   SidebarContent,
@@ -23,11 +21,8 @@ import { LogOut } from "lucide-react";
 
 export function AppSidebar() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { setOpen } = useSidebar();
-  const queryClient = useQueryClient();
 
-  // Use React Query to handle session state
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -40,26 +35,6 @@ export function AppSidebar() {
     },
   });
 
-  // Subscribe to auth state changes
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state change:", event);
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
-        // Invalidate and refetch session data
-        await queryClient.invalidateQueries({ queryKey: ['session'] });
-        
-        // Redirect to home page on sign out
-        if (event === 'SIGNED_OUT') {
-          navigate('/');
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [queryClient, navigate]);
-
   // Always keep sidebar open on desktop when there's a session
   useEffect(() => {
     if (session) {
@@ -68,19 +43,6 @@ export function AppSidebar() {
   }, [session, setOpen]);
 
   const { data: subscriptionStatus } = useSubscription(session);
-
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        throw error;
-      }
-      toast.success("Successfully signed out");
-    } catch (error) {
-      console.error('Error signing out:', error);
-      toast.error("Failed to sign out. Please try again.");
-    }
-  };
 
   // Handle loading state
   if (isSessionLoading) {
@@ -125,7 +87,9 @@ export function AppSidebar() {
                 <SidebarMenuItem>
                   <div className="px-2 py-2">
                     <button
-                      onClick={handleSignOut}
+                      onClick={async () => {
+                        await supabase.auth.signOut();
+                      }}
                       className="w-full px-2 py-1 rounded-full flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
                     >
                       <LogOut className="h-3 w-3" />
