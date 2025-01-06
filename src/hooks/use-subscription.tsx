@@ -16,9 +16,18 @@ export function useSubscription(session: Session | null) {
       }
 
       try {
+        // Check if session is still valid
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !currentSession?.access_token) {
+          console.error('Session error:', sessionError);
+          throw new Error('Invalid session');
+        }
+
+        // Use the current session token
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${currentSession.access_token}`
           }
         });
 
