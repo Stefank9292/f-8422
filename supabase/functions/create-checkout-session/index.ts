@@ -84,19 +84,18 @@ serve(async (req) => {
     }
 
     // Get the origin from the request headers and ensure it's properly formatted
-    const origin = req.headers.get('origin')
-    if (!origin) {
-      throw new Error('No origin header found')
-    }
+    const origin = req.headers.get('origin') || ''
+    const baseUrl = origin.replace(/\/$/, '') // Remove trailing slash if present
 
     // Create the checkout session with properly formatted URLs
-    console.log('Creating checkout session with return URL:', origin)
+    console.log('Creating checkout session with return URL:', baseUrl)
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
-      mode: 'subscription',
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${origin}/success`,
-      cancel_url: `${origin}/subscribe?canceled=true`
+      mode: 'subscription',
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/subscribe?canceled=true`,
+      allow_promotion_codes: true,
     })
 
     return new Response(
