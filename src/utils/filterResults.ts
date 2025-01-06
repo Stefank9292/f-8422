@@ -10,6 +10,11 @@ export interface FilterState {
   minEngagement: string;
 }
 
+const parseGermanNumber = (numberString: string): number => {
+  // Remove all dots (thousand separators) and replace comma with dot for decimal
+  return parseFloat(numberString.replace(/\./g, '').replace(',', '.'));
+};
+
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
   return posts.filter(post => {
     // Filter by date
@@ -27,23 +32,35 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     }
 
     // Filter by minimum views
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) {
-      return false;
+    if (filters.minViews) {
+      const minViews = parseGermanNumber(filters.minViews);
+      if (post.viewsCount < minViews) {
+        return false;
+      }
     }
 
     // Filter by minimum plays
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) {
-      return false;
+    if (filters.minPlays) {
+      const minPlays = parseGermanNumber(filters.minPlays);
+      if (post.playsCount < minPlays) {
+        return false;
+      }
     }
 
     // Filter by minimum likes
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
-      return false;
+    if (filters.minLikes) {
+      const minLikes = parseGermanNumber(filters.minLikes);
+      if (post.likesCount < minLikes) {
+        return false;
+      }
     }
 
     // Filter by minimum comments
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
-      return false;
+    if (filters.minComments) {
+      const minComments = parseGermanNumber(filters.minComments);
+      if (post.commentsCount < minComments) {
+        return false;
+      }
     }
 
     // Filter by minimum engagement
