@@ -10,9 +10,9 @@ export interface FilterState {
   minEngagement: string;
 }
 
-export const filterResults = (results: InstagramPost[], filters: FilterState) => {
-  return results.filter(post => {
-    // Handle date filtering - show posts NEWER than the selected date
+export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
+  return posts.filter(post => {
+    // Filter by date
     if (filters.postsNewerThan) {
       try {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
@@ -23,65 +23,35 @@ export const filterResults = (results: InstagramPost[], filters: FilterState) =>
           return false;
         }
       } catch (error) {
-        console.error('Date parsing error:', error);
+        console.error('Error parsing date:', error);
+      }
+    }
+
+    // Filter by minimum views
+    if (filters.minViews && post.views < parseInt(filters.minViews)) {
+      return false;
+    }
+
+    // Filter by minimum plays
+    if (filters.minPlays && post.plays < parseInt(filters.minPlays)) {
+      return false;
+    }
+
+    // Filter by minimum likes
+    if (filters.minLikes && post.likes < parseInt(filters.minLikes)) {
+      return false;
+    }
+
+    // Filter by minimum comments
+    if (filters.minComments && post.comments < parseInt(filters.minComments)) {
+      return false;
+    }
+
+    // Filter by minimum engagement
+    if (filters.minEngagement) {
+      const engagement = ((post.likes + post.comments) / post.views) * 100;
+      if (engagement < parseInt(filters.minEngagement)) {
         return false;
-      }
-    }
-
-    // Handle plays filter (GREEN column - playsCount)
-    if (filters.minPlays && filters.minPlays !== "") {
-      const minPlays = parseInt(filters.minPlays);
-      if (!isNaN(minPlays)) {
-        // We use playsCount for the GREEN column
-        const playsCount = post.viewsCount; // Changed to viewsCount as per request
-        if (typeof playsCount !== 'number' || playsCount < minPlays) {
-          return false;
-        }
-      }
-    }
-
-    // Handle views filter (PINK column - viewsCount)
-    if (filters.minViews && filters.minViews !== "") {
-      const minViews = parseInt(filters.minViews);
-      if (!isNaN(minViews)) {
-        // We use viewsCount for the PINK column
-        const viewsCount = post.playsCount; // Changed to playsCount as per request
-        if (typeof viewsCount !== 'number' || viewsCount < minViews) {
-          return false;
-        }
-      }
-    }
-
-    // Handle likes filter
-    if (filters.minLikes && filters.minLikes !== "") {
-      const minLikes = parseInt(filters.minLikes);
-      if (!isNaN(minLikes)) {
-        const likesCount = post.likesCount;
-        if (typeof likesCount !== 'number' || likesCount < minLikes) {
-          return false;
-        }
-      }
-    }
-
-    // Handle comments filter
-    if (filters.minComments && filters.minComments !== "") {
-      const minComments = parseInt(filters.minComments);
-      if (!isNaN(minComments)) {
-        const commentsCount = post.commentsCount;
-        if (typeof commentsCount !== 'number' || commentsCount < minComments) {
-          return false;
-        }
-      }
-    }
-
-    // Handle engagement filter
-    if (filters.minEngagement && filters.minEngagement !== "") {
-      const minEngagement = parseFloat(filters.minEngagement);
-      if (!isNaN(minEngagement) && post.engagement) {
-        const engagementValue = parseFloat(post.engagement.replace('%', ''));
-        if (isNaN(engagementValue) || engagementValue < minEngagement) {
-          return false;
-        }
       }
     }
 
