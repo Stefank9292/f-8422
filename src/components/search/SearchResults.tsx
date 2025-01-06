@@ -13,6 +13,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
 
+  // Apply filters to search results
   const filteredPosts = filterResults(searchResults, filters);
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const indexOfLastPost = currentPage * pageSize;
@@ -21,21 +22,17 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value));
-    setCurrentPage(1); // Reset to first page when changing page size
-  };
-
-  const handleSort = () => {
-    // Implement sorting logic here if needed
+    setCurrentPage(1);
   };
 
   return (
     <div className="w-full">
       <TableContent 
         currentPosts={currentPosts}
-        handleSort={handleSort}
+        handleSort={() => {}}
         handleCopyCaption={() => {}}
         handleDownload={() => {}}
-        formatNumber={(num) => num.toString()}
+        formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
         truncateCaption={(caption) => caption}
       />
       <TablePagination

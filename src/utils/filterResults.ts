@@ -11,6 +11,11 @@ export interface FilterState {
 }
 
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
+  if (!posts || !Array.isArray(posts)) {
+    console.warn('No posts provided to filter');
+    return [];
+  }
+
   return posts.filter(post => {
     // Filter by date
     if (filters.postsNewerThan) {
@@ -18,7 +23,6 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
         const postDate = new Date(post.timestamp || post.date);
         
-        // Return false if the post is older than the filter date
         if (!isAfter(postDate, filterDate)) {
           return false;
         }
