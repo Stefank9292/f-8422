@@ -23,6 +23,14 @@ export const PostTableRow = ({
     ? `${parseFloat(post.engagement).toFixed(2)}%`
     : `${post.engagement.toFixed(2)}%`;
 
+  // Format numbers with proper thousand separators
+  const formatLargeNumber = (num: number) => {
+    return new Intl.NumberFormat('en-US', {
+      notation: 'standard',
+      maximumFractionDigits: 0
+    }).format(num);
+  };
+
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
@@ -54,16 +62,16 @@ export const PostTableRow = ({
         {post.date}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
-        {formatNumber(post.playsCount)}
+        {formatLargeNumber(post.playsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
-        {formatNumber(post.viewsCount)}
+        {formatLargeNumber(post.viewsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
-        {formatNumber(post.likesCount)}
+        {formatLargeNumber(post.likesCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
-        {formatNumber(post.commentsCount)}
+        {formatLargeNumber(post.commentsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
         {formattedEngagement}

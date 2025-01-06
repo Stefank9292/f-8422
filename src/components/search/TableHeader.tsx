@@ -38,7 +38,7 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
             <TooltipContent>Date</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('playsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('viewsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Eye className="h-3.5 w-3.5 text-green-500" />
@@ -46,7 +46,7 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('viewsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('playsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Play className="h-3.5 w-3.5 text-primary" />
