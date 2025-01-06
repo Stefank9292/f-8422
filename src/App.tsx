@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ResetPassword } from "@/components/auth/ResetPassword";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
@@ -29,73 +30,75 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <SidebarProvider defaultOpen>
-          <div className="min-h-screen flex w-full animate-in fade-in duration-200">
-            <AppSidebar />
-            <SidebarTrigger />
-            <main className="flex-1 overflow-y-auto">
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/auth/reset-password" element={<ResetPassword />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Index />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/subscribe"
-                  element={
-                    <ProtectedRoute>
-                      <Subscribe />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/success"
-                  element={
-                    <ProtectedRoute>
-                      <Success />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/faq"
-                  element={
-                    <ProtectedRoute>
-                      <FAQ />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/help"
-                  element={
-                    <ProtectedRoute>
-                      <HelpCenter />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/history"
-                  element={
-                    <ProtectedRoute>
-                      <SearchHistory />
-                    </ProtectedRoute>
-                  }
-                />
-                {/* Catch all route - redirect to home */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-          </div>
-        </SidebarProvider>
-        <Toaster />
-      </Router>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <SidebarProvider defaultOpen>
+            <div className="min-h-screen flex w-full animate-in fade-in duration-200">
+              <AppSidebar />
+              <SidebarTrigger />
+              <main className="flex-1 overflow-y-auto">
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/auth/reset-password" element={<ResetPassword />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/subscribe"
+                    element={
+                      <ProtectedRoute>
+                        <Subscribe />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/success"
+                    element={
+                      <ProtectedRoute>
+                        <Success />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/faq"
+                    element={
+                      <ProtectedRoute>
+                        <FAQ />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/help"
+                    element={
+                      <ProtectedRoute>
+                        <HelpCenter />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/history"
+                    element={
+                      <ProtectedRoute>
+                        <SearchHistory />
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Catch all route - redirect to home */}
+                  <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </main>
+            </div>
+          </SidebarProvider>
+          <Toaster />
+        </Router>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
