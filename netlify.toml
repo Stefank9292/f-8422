@@ -22,7 +22,6 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000"
 
-# Enable brotli compression for better performance
 [build.processing]
   skip_processing = false
 [build.processing.css]
@@ -35,3 +34,8 @@
   pretty_urls = true
 [build.processing.images]
   compress = true
+
+# Git settings
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
