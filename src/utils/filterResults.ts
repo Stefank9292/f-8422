@@ -12,9 +12,9 @@ export interface FilterState {
 
 const parseGermanNumber = (value: string): number => {
   if (!value) return 0;
-  // Remove thousand separators (dots) and replace comma with dot for decimals
-  const normalizedValue = value.replace(/\./g, '').replace(',', '.');
-  return parseFloat(normalizedValue);
+  // Remove thousand separators (dots) and convert to number
+  const normalizedValue = value.replace(/\./g, '');
+  return parseInt(normalizedValue, 10);
 };
 
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {

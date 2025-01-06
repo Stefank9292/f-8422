@@ -52,7 +52,7 @@ export const FilterInput = ({
     // Remove any non-digit characters
     const digits = value.replace(/\D/g, '');
     
-    // Format with thousand separators
+    // Format with dots as thousand separators
     return digits.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
 

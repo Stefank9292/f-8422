@@ -37,7 +37,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
             handleSort={() => {}}
             handleCopyCaption={() => {}}
             handleDownload={() => {}}
-            formatNumber={(num) => new Intl.NumberFormat('de-DE').format(num)}
+            formatNumber={(num) => num.toLocaleString('de-DE')}
             truncateCaption={(caption) => caption}
           />
         </Table>
