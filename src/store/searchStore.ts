@@ -21,23 +21,30 @@ interface SearchState {
   resetFilters: () => void;
 }
 
-const initialFilters: SearchFilters = {
-  minViews: "",
-  minPlays: "",
-  minLikes: "",
-  minComments: "",
-  minEngagement: "",
-  postsNewerThan: ""
-};
-
 export const useSearchStore = create<SearchState>((set) => ({
   username: "",
   numberOfVideos: 3,
   selectedDate: undefined,
-  filters: initialFilters,
+  filters: {
+    minViews: "",
+    minPlays: "",
+    minLikes: "",
+    minComments: "",
+    minEngagement: "",
+    postsNewerThan: ""
+  },
   setUsername: (username) => set({ username }),
   setNumberOfVideos: (numberOfVideos) => set({ numberOfVideos }),
   setSelectedDate: (selectedDate) => set({ selectedDate }),
   setFilters: (filters) => set({ filters }),
-  resetFilters: () => set({ filters: initialFilters })
+  resetFilters: () => set({
+    filters: {
+      minViews: "",
+      minPlays: "",
+      minLikes: "",
+      minComments: "",
+      minEngagement: "",
+      postsNewerThan: ""
+    }
+  })
 }));
