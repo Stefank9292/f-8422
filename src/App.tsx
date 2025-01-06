@@ -13,7 +13,6 @@ import Success from "@/pages/Success";
 import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
 import SearchHistory from "@/pages/SearchHistory";
-import ThisIsAPage from "@/pages/ThisIsAPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,14 +44,6 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Index />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/this-is-a-page"
-                  element={
-                    <ProtectedRoute>
-                      <ThisIsAPage />
                     </ProtectedRoute>
                   }
                 />
@@ -96,6 +87,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                {/* Catch all route - redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
