@@ -50,8 +50,14 @@ export const SearchContainer = ({
     resetFilters
   } = useSearchStore();
 
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                   subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
   const isDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || 
-                    (!subscriptionStatus?.subscribed && requestCount === 0);
+                    (!subscriptionStatus?.subscribed && requestCount === 0) ||
+                    (isProUser && requestCount >= maxRequests);
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -77,6 +83,15 @@ export const SearchContainer = ({
         toast({
           title: "No Searches Left",
           description: "You've used all your free searches. They will reset in 30 days from your first search or you can upgrade your plan for more searches.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (isProUser && requestCount >= maxRequests) {
+        toast({
+          title: "Pro Plan Limit Reached",
+          description: "You've used all your Pro plan searches for this month. Consider upgrading to our Creator on Steroids plan for unlimited searches.",
           variant: "destructive",
         });
         return;
@@ -129,6 +144,11 @@ export const SearchContainer = ({
             <>
               <Search className="mr-2 h-3.5 w-3.5" />
               No Searches Left (Resets in 30 days)
+            </>
+          ) : isProUser && requestCount >= maxRequests ? (
+            <>
+              <Search className="mr-2 h-3.5 w-3.5" />
+              Pro Plan Limit Reached (Upgrade for Unlimited)
             </>
           ) : (
             <>
