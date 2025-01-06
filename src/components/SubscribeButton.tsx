@@ -1,18 +1,21 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
-import { PlanButtonText } from "./subscription/PlanButtonText";
-import { useSubscriptionAction } from "@/hooks/useSubscriptionAction";
+import { supabase } from "@/integrations/supabase/client";
+import { Loader2, Zap } from "lucide-react";
+import { getButtonText, getButtonVariant } from "./subscription/ButtonTextHelper";
+import { isCurrentPlan, isSubscriptionCanceled, canUpgradeOrDowngrade } from "./subscription/SubscriptionHelper";
 
 interface SubscribeButtonProps {
   planId: string;
-  planName: string;
-  isPopular?: boolean;
-  isAnnual: boolean;
+  isAnnual?: boolean;
 }
 
-export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: SubscribeButtonProps) => {
+export const SubscribeButton = ({ planId, isAnnual = false }: SubscribeButtonProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -22,11 +25,12 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   });
 
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
+      if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
@@ -35,92 +39,60 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     enabled: !!session?.access_token,
   });
 
-  const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
-
-  const getButtonText = () => {
-    if (!subscriptionStatus?.subscribed && planId !== 'free') {
-      if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
-        return "Upgrade to Creator Pro Annual";
-      }
-      if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
-        return "For Viral Marketing Gods";
-      }
-      return `Upgrade to ${planName}`;
+  const handleSubscribe = async () => {
+    if (!session) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to subscribe",
+        variant: "destructive",
+      });
+      return;
     }
 
-    if (planId === 'free') {
-      if (!subscriptionStatus?.subscribed) {
-        return "Current Plan";
-      }
-      return "Downgrade to Free";
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { priceId: planId },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+
+      if (error) throw error;
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to initiate subscription",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
-
-    const isCurrentPlan = subscriptionStatus?.priceId === planId;
-    if (isCurrentPlan) {
-      return "Current Plan";
-    }
-
-    const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") || 
-       (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
-
-    if (isMonthlyToAnnualUpgrade) {
-      return "Save 20% with annual";
-    }
-
-    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
-      return "Downgrade to Creator Pro";
-    }
-
-    return `Upgrade to ${planName}`;
   };
 
-  const isCurrentPlan = 
-    (planId === 'free' && !subscriptionStatus?.subscribed) || 
-    (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
+  const buttonText = getButtonText(planId, subscriptionStatus, isLoading);
+  const buttonVariant = getButtonVariant(planId, subscriptionStatus);
+  const showButton = !isCurrentPlan(planId, subscriptionStatus) || 
+                    isSubscriptionCanceled(subscriptionStatus) ||
+                    canUpgradeOrDowngrade(planId, subscriptionStatus);
 
-  const isDowngrade = 
-    (planId === 'free' && subscriptionStatus?.subscribed) || 
-    (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W");
-
-  const getButtonStyle = () => {
-    // Keep gradient only for popular plan
-    if (isPopular) {
-      return "primary-gradient";
-    }
-    // Apply subtle grey for downgrade state, navy blue for other states
-    if (isDowngrade) {
-      return "bg-gray-500 hover:bg-gray-600 text-white";
-    }
-    // Apply solid navy blue for free and pro plans (upgrade state)
-    return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
-  };
-
-  if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
-    return (
-      <CancelSubscriptionButton 
-        isCanceled={subscriptionStatus?.canceled}
-        className="w-full"
-      >
-        Cancel Subscription
-      </CancelSubscriptionButton>
-    );
-  }
-
-  const handleClick = () => handleSubscriptionAction(planId, planName, subscriptionStatus);
+  if (!showButton) return null;
 
   return (
-    <Button 
-      onClick={handleClick} 
-      disabled={loading || (isCurrentPlan && planId === 'free')}
-      className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
-      variant={isPopular ? "default" : "secondary"}
+    <Button
+      onClick={handleSubscribe}
+      disabled={isLoading}
+      variant={buttonVariant}
+      className="w-full h-10 text-[11px] font-medium"
     >
-      <PlanButtonText 
-        text={loading ? "Loading..." : getButtonText()}
-        isUpgrade={!isCurrentPlan && planId !== 'free'}
-        showThunderbolt={isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"}
-      />
+      {isLoading ? (
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+      ) : isAnnual ? (
+        <Zap className="mr-2 h-4 w-4" />
+      ) : null}
+      {buttonText}
     </Button>
   );
 };
