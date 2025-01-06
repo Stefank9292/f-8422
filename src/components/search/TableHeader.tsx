@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, PenLine, Clock, Play, Eye, Heart, MessageSquare, Zap, Link, File } from "lucide-react";
+import { User, PenLine, Clock, Eye, Play, Heart, MessageSquare, Zap, Link, File } from "lucide-react";
 import { SortDirection } from "./TableContent";
 import { cn } from "@/lib/utils";
 
@@ -41,17 +41,17 @@ export const PostTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderP
         <TableHead onClick={() => onSort('playsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Eye className="h-3.5 w-3.5 text-green-500" />
+              <Play className="h-3.5 w-3.5 text-primary" />
             </TooltipTrigger>
-            <TooltipContent>Views</TooltipContent>
+            <TooltipContent>Plays</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('viewsCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Play className="h-3.5 w-3.5 text-primary" />
+              <Eye className="h-3.5 w-3.5 text-green-500" />
             </TooltipTrigger>
-            <TooltipContent>Plays</TooltipContent>
+            <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('likesCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
