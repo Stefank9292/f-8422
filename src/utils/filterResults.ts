@@ -16,6 +16,11 @@ const parseFormattedNumber = (value: string): number => {
   return parseInt(value.replace(/\./g, '').replace(',', '.'));
 };
 
+const parseEngagement = (engagement: string): number => {
+  // Remove the '%' symbol and convert to number
+  return parseFloat(engagement.replace('%', ''));
+};
+
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
   if (!posts || !Array.isArray(posts)) {
     console.warn('No posts provided to filter');
@@ -72,8 +77,8 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     // Filter by minimum engagement
     if (filters.minEngagement) {
       const minEngagementRate = parseFloat(filters.minEngagement);
-      const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
-      if (engagement < minEngagementRate) {
+      const postEngagement = parseEngagement(post.engagement);
+      if (postEngagement < minEngagementRate) {
         return false;
       }
     }
