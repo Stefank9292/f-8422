@@ -15,6 +15,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
 
+  // Apply filters to search results
   const filteredPosts = filterResults(searchResults, filters);
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const indexOfLastPost = currentPage * pageSize;
@@ -26,21 +27,17 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     setCurrentPage(1);
   };
 
-  const handleSort = () => {
-    // Implement sorting logic here if needed
-  };
-
   return (
     <div className="w-full">
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
-          <PostTableHeader onSort={handleSort} />
+          <PostTableHeader onSort={() => {}} />
           <TableContent 
             currentPosts={currentPosts}
             handleSort={() => {}}
             handleCopyCaption={() => {}}
             handleDownload={() => {}}
-            formatNumber={(num) => num.toString()}
+            formatNumber={(num) => new Intl.NumberFormat('de-DE').format(num)}
             truncateCaption={(caption) => caption}
           />
         </Table>

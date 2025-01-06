@@ -10,6 +10,13 @@ export interface FilterState {
   minEngagement: string;
 }
 
+const parseGermanNumber = (value: string): number => {
+  if (!value) return 0;
+  // Remove thousand separators (dots) and replace comma with dot for decimals
+  const normalizedValue = value.replace(/\./g, '').replace(',', '.');
+  return parseFloat(normalizedValue);
+};
+
 export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
   return posts.filter(post => {
     // Filter by date
@@ -18,7 +25,6 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
         const postDate = new Date(post.timestamp || post.date);
         
-        // Return false if the post is older than the filter date
         if (!isAfter(postDate, filterDate)) {
           return false;
         }
@@ -28,29 +34,42 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
     }
 
     // Filter by minimum views
-    if (filters.minViews && post.viewsCount < parseInt(filters.minViews)) {
-      return false;
+    if (filters.minViews) {
+      const minViews = parseGermanNumber(filters.minViews);
+      if (post.viewsCount < minViews) {
+        return false;
+      }
     }
 
     // Filter by minimum plays
-    if (filters.minPlays && post.playsCount < parseInt(filters.minPlays)) {
-      return false;
+    if (filters.minPlays) {
+      const minPlays = parseGermanNumber(filters.minPlays);
+      if (post.playsCount < minPlays) {
+        return false;
+      }
     }
 
     // Filter by minimum likes
-    if (filters.minLikes && post.likesCount < parseInt(filters.minLikes)) {
-      return false;
+    if (filters.minLikes) {
+      const minLikes = parseGermanNumber(filters.minLikes);
+      if (post.likesCount < minLikes) {
+        return false;
+      }
     }
 
     // Filter by minimum comments
-    if (filters.minComments && post.commentsCount < parseInt(filters.minComments)) {
-      return false;
+    if (filters.minComments) {
+      const minComments = parseGermanNumber(filters.minComments);
+      if (post.commentsCount < minComments) {
+        return false;
+      }
     }
 
     // Filter by minimum engagement
     if (filters.minEngagement) {
+      const minEngagement = parseGermanNumber(filters.minEngagement);
       const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
-      if (engagement < parseInt(filters.minEngagement)) {
+      if (engagement < minEngagement) {
         return false;
       }
     }
