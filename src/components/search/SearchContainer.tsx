@@ -5,12 +5,10 @@ import { SearchResults } from "./SearchResults";
 import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
-import { Button } from "@/components/ui/button";
-import { Loader2, Search } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { SearchButton } from "./SearchButton";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 interface SearchContainerProps {
   username: string;
@@ -54,72 +52,6 @@ export const SearchContainer = ({
                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-
-  const isDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || 
-                    (!subscriptionStatus?.subscribed && requestCount === 0) ||
-                    (isProUser && requestCount >= maxRequests);
-
-  const getButtonText = () => {
-    if (isLoading) {
-      return (
-        <>
-          <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-          <span>This can take up to a minute...</span>
-        </>
-      );
-    }
-
-    if (hasReachedLimit) {
-      return (
-        <>
-          <Search className="mr-2 h-3.5 w-3.5" />
-          Monthly Limit Reached ({requestCount}/{maxRequests})
-        </>
-      );
-    }
-
-    if (!subscriptionStatus?.subscribed) {
-      if (requestCount === 0) {
-        return (
-          <>
-            <Search className="mr-2 h-3.5 w-3.5" />
-            No Searches Left (Resets in 30 days)
-          </>
-        );
-      }
-      return (
-        <>
-          <Search className="mr-2 h-3.5 w-3.5" />
-          Search Viral Videos ({maxRequests - requestCount} free searches left)
-        </>
-      );
-    }
-
-    if (isProUser && requestCount >= maxRequests) {
-      return (
-        <>
-          <Search className="mr-2 h-3.5 w-3.5" />
-          Pro Plan Limit Reached (Upgrade for Unlimited)
-        </>
-      );
-    }
-
-    if (isSteroidsUser) {
-      return (
-        <>
-          <Search className="mr-2 h-3.5 w-3.5" />
-          Search Viral Videos
-        </>
-      );
-    }
-
-    return (
-      <>
-        <Search className="mr-2 h-3.5 w-3.5" />
-        Search Viral Videos ({maxRequests - requestCount} searches left)
-      </>
-    );
-  };
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -180,21 +112,24 @@ export const SearchContainer = ({
           onBulkSearch={handleBulkSearch}
           isLoading={isLoading || isBulkSearching}
           onUsernameChange={setUsername}
-          isDisabled={isDisabled}
+          isDisabled={hasReachedLimit || (!subscriptionStatus?.subscribed && requestCount === 0) || (isProUser && requestCount >= maxRequests)}
+          requestCount={requestCount}
+          maxRequests={maxRequests}
+          subscriptionStatus={subscriptionStatus}
         />
 
-        <Button 
+        <SearchButton
+          username={username}
+          isLoading={isLoading}
+          isBulkSearching={isBulkSearching}
+          hasReachedLimit={hasReachedLimit}
+          requestCount={requestCount}
+          maxRequests={maxRequests}
+          isProUser={isProUser}
+          isSteroidsUser={isSteroidsUser}
+          subscriptionStatus={subscriptionStatus}
           onClick={onSearchClick}
-          disabled={isDisabled}
-          className={cn(
-            "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-            "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
-            isDisabled && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          {getButtonText()}
-        </Button>
+        />
 
         <SearchSettings
           isSettingsOpen={isSettingsOpen}

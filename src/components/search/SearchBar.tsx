@@ -12,6 +12,7 @@ interface SearchBarProps {
   isDisabled?: boolean;
   requestCount?: number;
   maxRequests?: number;
+  subscriptionStatus?: any;
 }
 
 export const SearchBar = ({ 
@@ -22,7 +23,8 @@ export const SearchBar = ({
   onUsernameChange,
   isDisabled = false,
   requestCount = 0,
-  maxRequests = 0
+  maxRequests = 0,
+  subscriptionStatus
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
 
@@ -56,6 +58,7 @@ export const SearchBar = ({
         isDisabled={isDisabled}
         requestCount={requestCount}
         maxRequests={maxRequests}
+        subscriptionStatus={subscriptionStatus}
       />
     </div>
   );
