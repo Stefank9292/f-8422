@@ -23,9 +23,9 @@ export const PostTableRow = ({
     ? `${parseFloat(post.engagement).toFixed(2)}%`
     : `${post.engagement.toFixed(2)}%`;
 
-  // Format numbers with proper thousand separators
+  // Format numbers with proper thousand separators using dots
   const formatLargeNumber = (num: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('de-DE', {
       notation: 'standard',
       maximumFractionDigits: 0
     }).format(num);
