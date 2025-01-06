@@ -122,32 +122,19 @@ export const FilterInput = ({
         <Icon className="h-4 w-4" />
         <span>{label}</span>
       </Label>
-      <div className="relative">
-        <Input
-          type={type}
-          value={value}
-          onChange={(e) => {
-            if (type === "number") {
-              handleNumericInput(e.target.value);
-            } else {
-              onChange(e.target.value);
-            }
-          }}
-          placeholder={placeholder}
-          className="h-10"
-        />
-        {value && type === "number" && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6"
-            onClick={() => onChange('')}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Reset value</span>
-          </Button>
-        )}
-      </div>
+      <Input
+        type={type}
+        value={value}
+        onChange={(e) => {
+          if (type === "number") {
+            handleNumericInput(e.target.value);
+          } else {
+            onChange(e.target.value);
+          }
+        }}
+        placeholder={placeholder}
+        className="h-10"
+      />
       {helpText && (
         <p className="text-xs text-muted-foreground">{helpText}</p>
       )}
