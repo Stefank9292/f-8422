@@ -1,9 +1,21 @@
 import { AlertCircle, X } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const AnnouncementBar = () => {
   const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const announcementHidden = localStorage.getItem('hideAnnouncement');
+    if (announcementHidden) {
+      setIsVisible(false);
+    }
+  }, []);
+
+  const handleClose = () => {
+    localStorage.setItem('hideAnnouncement', 'true');
+    setIsVisible(false);
+  };
 
   if (!isVisible) return null;
 
@@ -20,7 +32,7 @@ export const AnnouncementBar = () => {
               Video Search Beta – Thanks for your patience!
             </AlertDescription>
             <button 
-              onClick={() => setIsVisible(false)}
+              onClick={handleClose}
               className="text-muted-foreground/60 hover:text-muted-foreground transition-colors rounded-md p-0.5 -mr-1"
               aria-label="Close announcement"
             >
