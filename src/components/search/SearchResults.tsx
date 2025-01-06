@@ -2,6 +2,8 @@ import { useState } from "react";
 import { TableContent } from "./TableContent";
 import { TablePagination } from "./TablePagination";
 import { useToast } from "@/hooks/use-toast";
+import { SearchFilters } from "./SearchFilters";
+import { filterResults, FilterState } from "@/utils/filterResults";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -9,6 +11,16 @@ interface SearchResultsProps {
 
 export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+  const [filters, setFilters] = useState<FilterState>({
+    postsNewerThan: "",
+    minViews: "",
+    minPlays: "",
+    minLikes: "",
+    minComments: "",
+    minEngagement: "",
+  });
+  
   // Filter out results with 0 views or plays before setting initial state
   const validResults = searchResults.filter(post => 
     post.playsCount > 0 && post.viewsCount > 0
@@ -17,11 +29,23 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentSortKey, setCurrentSortKey] = useState<string>("");
   const { toast } = useToast();
-  
-  const postsPerPage = 10;
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = sortedResults.slice(indexOfFirstPost, indexOfLastPost);
+
+  const handleFilterChange = (key: keyof FilterState, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      postsNewerThan: "",
+      minViews: "",
+      minPlays: "",
+      minLikes: "",
+      minComments: "",
+      minEngagement: "",
+    });
+    setCurrentPage(1);
+  };
 
   const handleSort = (key: string) => {
     const newDirection = currentSortKey === key && sortDirection === "asc" ? "desc" : "asc";
@@ -94,8 +118,24 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     return caption.length > 100 ? `${caption.substring(0, 100)}...` : caption;
   };
 
+  // Apply filters to the sorted results
+  const filteredResults = filterResults(sortedResults, filters);
+  
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPosts = filteredResults.slice(startIndex, endIndex);
+
   return (
     <div className="space-y-4">
+      <SearchFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onReset={handleResetFilters}
+        totalResults={validResults.length}
+        filteredResults={filteredResults.length}
+        currentPosts={currentPosts}
+      />
       <TableContent
         currentPosts={currentPosts}
         handleSort={handleSort}
@@ -103,14 +143,16 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
         handleDownload={handleDownload}
         formatNumber={formatNumber}
         truncateCaption={truncateCaption}
+        sortKey={currentSortKey}
+        sortDirection={sortDirection}
       />
       <TablePagination
         currentPage={currentPage}
-        totalPages={Math.ceil(sortedResults.length / postsPerPage)}
-        pageSize={postsPerPage}
+        totalPages={Math.ceil(filteredResults.length / pageSize)}
+        pageSize={pageSize}
         onPageChange={setCurrentPage}
-        onPageSizeChange={() => {}}
-        totalResults={sortedResults.length}
+        onPageSizeChange={setPageSize}
+        totalResults={filteredResults.length}
       />
     </div>
   );
