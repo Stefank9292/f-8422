@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/use-subscription";
 import { useEffect } from "react";
@@ -22,7 +22,9 @@ import { LogOut } from "lucide-react";
 export function AppSidebar() {
   const location = useLocation();
   const { setOpen } = useSidebar();
+  const queryClient = useQueryClient();
 
+  // Use React Query to handle session state
   const { data: session, isLoading: isSessionLoading } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -34,6 +36,22 @@ export function AppSidebar() {
       return session;
     },
   });
+
+  // Subscribe to auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event);
+      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+        // Invalidate and refetch session data
+        // This will trigger a re-render of the sidebar
+        await queryClient.invalidateQueries({ queryKey: ['session'] });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [queryClient]);
 
   // Always keep sidebar open on desktop when there's a session
   useEffect(() => {
