@@ -59,10 +59,10 @@ export const PostTableRow = ({
         {post.date}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
-        {formatNumberWithDots(post.viewsCount)}
+        {formatNumberWithDots(post.playsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
-        {formatNumberWithDots(post.playsCount)}
+        {formatNumberWithDots(post.viewsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
         {formatNumberWithDots(post.likesCount)}
