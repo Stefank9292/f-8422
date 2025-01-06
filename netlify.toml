@@ -16,6 +16,7 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  base = "/"
   
 [[headers]]
   for = "/favicon.ico"
