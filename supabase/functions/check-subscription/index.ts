@@ -103,7 +103,7 @@ serve(async (req) => {
     let maxClicks = 3; // Default free plan
     if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
         priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") { // Pro Annual
-      maxClicks = 20;
+      maxClicks = 25;
     } else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || // Ultra Monthly
                priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") { // Ultra Annual
       maxClicks = Infinity;
