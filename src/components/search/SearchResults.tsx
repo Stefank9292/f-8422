@@ -25,9 +25,13 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     setCurrentPage(1); // Reset to first page when changing page size
   };
 
+  const handleSort = () => {
+    // Implement sorting logic here if needed
+  };
+
   return (
     <div className="w-full">
-      <PostTableHeader />
+      <PostTableHeader onSort={handleSort} />
       <TableContent 
         currentPosts={currentPosts}
         handleSort={() => {}}
