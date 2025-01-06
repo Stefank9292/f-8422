@@ -37,8 +37,11 @@ function App() {
             <SidebarTrigger />
             <main className="flex-1 overflow-y-auto">
               <Routes>
+                {/* Public routes */}
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/auth/reset-password" element={<ResetPassword />} />
+                
+                {/* Protected routes */}
                 <Route
                   path="/"
                   element={
@@ -87,7 +90,8 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                {/* Catch all route - redirect to home */}
+                
+                {/* Fallback route - redirect to home */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
