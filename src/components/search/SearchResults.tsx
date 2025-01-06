@@ -126,6 +126,11 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const endIndex = startIndex + pageSize;
   const currentPosts = filteredResults.slice(startIndex, endIndex);
 
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value));
+    setCurrentPage(1); // Reset to first page when changing page size
+  };
+
   return (
     <div className="space-y-4">
       <SearchFilters
@@ -151,7 +156,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
         totalPages={Math.ceil(filteredResults.length / pageSize)}
         pageSize={pageSize}
         onPageChange={setCurrentPage}
-        onPageSizeChange={setPageSize}
+        onPageSizeChange={handlePageSizeChange}
         totalResults={filteredResults.length}
       />
     </div>
