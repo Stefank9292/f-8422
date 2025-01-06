@@ -16,9 +16,10 @@ interface SearchHistoryItemProps {
   };
   onDelete: (id: string) => void;
   isDeleting: boolean;
+  canDelete?: boolean;
 }
 
-export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
+export function SearchHistoryItem({ item, onDelete, isDeleting, canDelete = false }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
   const [sortKey, setSortKey] = useState<string>("");
@@ -175,6 +176,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
         onToggleExpand={() => setIsExpanded(!isExpanded)}
         onDelete={() => onDelete(item.id)}
         isDeleting={isDeleting}
+        canDelete={canDelete}
       />
       
       {isExpanded && results.length > 0 && (
