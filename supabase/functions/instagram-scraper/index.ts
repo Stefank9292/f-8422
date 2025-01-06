@@ -18,32 +18,8 @@ serve(async (req) => {
     }
 
     // Get request body
-    const requestData = await req.json()
-    const { username, numberOfVideos, postsNewerThan } = requestData
-
-    console.log('Processing request for:', { username, numberOfVideos, postsNewerThan })
-
-    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}/`
-    const requestBody = {
-      "addParentData": false,
-      "directUrls": [instagramUrl],
-      "enhanceUserSearchWithFacebookPage": false,
-      "isUserReelFeedURL": false,
-      "isUserTaggedFeedURL": false,
-      "resultsLimit": numberOfVideos,
-      "resultsType": "posts",
-      "searchLimit": 1,
-      "searchType": "user",
-      "memoryMbytes": 512,
-      "maxPosts": numberOfVideos,
-      "mediaTypes": ["VIDEO"],
-      "expandVideo": true,
-      "includeVideoMetadata": true
-    }
-
-    if (postsNewerThan) {
-      requestBody.onlyPostsNewerThan = new Date(postsNewerThan).toISOString().split('T')[0]
-    }
+    const requestBody = await req.json()
+    console.log('Processing request:', requestBody)
 
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=${apiKey}`
     

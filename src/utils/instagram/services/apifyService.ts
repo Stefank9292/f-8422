@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { APIFY_CONFIG, APIFY_BASE_ENDPOINT } from '../config/apifyConfig';
 import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
@@ -25,51 +24,27 @@ export async function checkSubscriptionAndLimits(userId: string) {
 }
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
-  console.log('Making Apify request with config:', { ...APIFY_CONFIG, requestBody });
+  console.log('Making Apify request with body:', requestBody);
   
   try {
-    // Get the API key from Supabase Functions
-    const { data: apifyKeyData, error: keyError } = await supabase.functions.invoke('get-apify-key');
-    
-    if (keyError) {
-      console.error('Failed to invoke get-apify-key function:', keyError);
-      throw new Error('Failed to get Apify API key: ' + keyError.message);
-    }
-    
-    if (!apifyKeyData?.key) {
-      console.error('No API key returned from get-apify-key function');
-      throw new Error('No Apify API key available');
-    }
-
-    const response = await fetch(`${APIFY_BASE_ENDPOINT}?token=${apifyKeyData.key}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...requestBody,
-        ...APIFY_CONFIG
-      })
+    const { data, error } = await supabase.functions.invoke('instagram-scraper', {
+      body: requestBody
     });
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      console.error('API Error Response:', errorBody);
-      
-      if (response.status === 402) {
-        throw new Error('Instagram data fetch failed: Usage quota exceeded. Please try again later or reduce the number of requested posts.');
-      }
-      
-      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`);
+    if (error) {
+      console.error('Error from Edge Function:', error);
+      throw new Error(`Edge Function error: ${error.message}`);
     }
 
-    const responseData = await response.json();
-    console.log('Received response from Apify:', responseData);
+    if (!data || !Array.isArray(data)) {
+      console.error('Invalid response from Edge Function:', data);
+      throw new Error('Invalid response from Instagram scraper');
+    }
+
+    console.log('Received response from Edge Function:', data);
     
-    return Array.isArray(responseData) 
-      ? responseData.map(post => transformToInstagramPost(post))
-           .filter((post): post is InstagramPost => post !== null)
-      : [];
+    return data.map(post => transformToInstagramPost(post))
+               .filter((post): post is InstagramPost => post !== null);
   } catch (error) {
     console.error('Error in makeApifyRequest:', error);
     throw error;
@@ -103,7 +78,7 @@ export async function fetchInstagramPosts(
       mediaTypes: ["VIDEO"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: APIFY_CONFIG.memoryMbytes
+      memoryMbytes: 512
     };
 
     if (postsNewerThan instanceof Date) {
@@ -153,7 +128,7 @@ export async function fetchBulkInstagramPosts(
       mediaTypes: ["VIDEO"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: APIFY_CONFIG.memoryMbytes
+      memoryMbytes: 512
     };
 
     if (postsNewerThan instanceof Date) {
