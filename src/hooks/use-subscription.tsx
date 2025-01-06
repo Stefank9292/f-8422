@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Session } from "@supabase/supabase-js";
 
-export function useSubscription(session: any) {
+export function useSubscription(session: Session | null) {
   return useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
-        console.log('No session token available');
         return {
           subscribed: false,
           priceId: null,
@@ -40,7 +40,13 @@ export function useSubscription(session: any) {
       }
     },
     enabled: !!session?.access_token,
-    retry: 1,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    retry: (failureCount, error) => {
+      // Only retry if it's not an auth error
+      if (error instanceof Error && error.message.includes('Invalid user session')) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    retryDelay: 1000,
   });
 }
