@@ -22,6 +22,7 @@ interface SearchContainerProps {
   handleSearch: () => void;
   handleBulkSearch: (urls: string[], numVideos: number, date: Date | undefined) => Promise<any>;
   displayPosts: any[];
+  subscriptionStatus?: any;
 }
 
 export const SearchContainer = ({
@@ -33,7 +34,8 @@ export const SearchContainer = ({
   maxRequests,
   handleSearch,
   handleBulkSearch,
-  displayPosts
+  displayPosts,
+  subscriptionStatus
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
@@ -47,6 +49,9 @@ export const SearchContainer = ({
     setFilters,
     resetFilters
   } = useSearchStore();
+
+  const isDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || 
+                    (!subscriptionStatus?.subscribed && requestCount === 0);
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -67,6 +72,16 @@ export const SearchContainer = ({
         });
         return;
       }
+
+      if (!subscriptionStatus?.subscribed && requestCount === 0) {
+        toast({
+          title: "No Searches Left",
+          description: "You've used all your free searches. They will reset in 30 days from your first search or you can upgrade your plan for more searches.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       handleSearch();
     }
   };
@@ -92,12 +107,12 @@ export const SearchContainer = ({
 
         <Button 
           onClick={onSearchClick}
-          disabled={isLoading || isBulkSearching || !username.trim() || hasReachedLimit}
+          disabled={isDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
             username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
-            hasReachedLimit && "opacity-50 cursor-not-allowed"
+            isDisabled && "opacity-50 cursor-not-allowed"
           )}
         >
           {isLoading ? (
@@ -109,6 +124,11 @@ export const SearchContainer = ({
             <>
               <Search className="mr-2 h-3.5 w-3.5" />
               Monthly Limit Reached ({requestCount}/{maxRequests})
+            </>
+          ) : !subscriptionStatus?.subscribed && requestCount === 0 ? (
+            <>
+              <Search className="mr-2 h-3.5 w-3.5" />
+              No Searches Left (Resets in 30 days)
             </>
           ) : (
             <>
