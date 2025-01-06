@@ -73,12 +73,20 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (planId === 'free' && !subscriptionStatus?.subscribed) || 
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
+  const isDowngrade = 
+    (planId === 'free' && subscriptionStatus?.subscribed) || 
+    (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W");
+
   const getButtonStyle = () => {
     // Keep gradient only for popular plan
     if (isPopular) {
       return "primary-gradient";
     }
-    // Apply solid navy blue for free and pro plans
+    // Apply subtle grey for downgrade state, navy blue for other states
+    if (isDowngrade) {
+      return "bg-gray-500 hover:bg-gray-600 text-white";
+    }
+    // Apply solid navy blue for free and pro plans (upgrade state)
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
