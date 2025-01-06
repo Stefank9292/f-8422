@@ -1,5 +1,4 @@
 import { Table, TableBody } from "@/components/ui/table";
-import { PostTableHeader } from "./TableHeader";
 import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,27 +48,18 @@ export const TableContent = ({
 
   return (
     <TooltipProvider>
-      <div className="rounded-xl overflow-hidden border border-border">
-        <Table>
-          <PostTableHeader 
-            onSort={handleSort} 
-            sortKey={sortKey}
-            sortDirection={sortDirection}
+      <TableBody>
+        {currentPosts.map((post, index) => (
+          <PostTableRow
+            key={index}
+            post={post}
+            onCopyCaption={handleCopyCaption}
+            onDownload={handleDownload}
+            formatNumber={formatNumber}
+            truncateCaption={truncateCaption}
           />
-          <TableBody>
-            {currentPosts.map((post, index) => (
-              <PostTableRow
-                key={index}
-                post={post}
-                onCopyCaption={handleCopyCaption}
-                onDownload={handleDownload}
-                formatNumber={formatNumber}
-                truncateCaption={truncateCaption}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+        ))}
+      </TableBody>
     </TooltipProvider>
   );
 };

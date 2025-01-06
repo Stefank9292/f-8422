@@ -4,6 +4,7 @@ import { TablePagination } from "./TablePagination";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { filterResults } from "@/utils/filterResults";
+import { Table } from "@/components/ui/table";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -22,7 +23,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value));
-    setCurrentPage(1); // Reset to first page when changing page size
+    setCurrentPage(1);
   };
 
   const handleSort = () => {
@@ -31,15 +32,19 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   return (
     <div className="w-full">
-      <PostTableHeader onSort={handleSort} />
-      <TableContent 
-        currentPosts={currentPosts}
-        handleSort={() => {}}
-        handleCopyCaption={() => {}}
-        handleDownload={() => {}}
-        formatNumber={(num) => num.toString()}
-        truncateCaption={(caption) => caption}
-      />
+      <div className="rounded-xl overflow-hidden border border-border">
+        <Table>
+          <PostTableHeader onSort={handleSort} />
+          <TableContent 
+            currentPosts={currentPosts}
+            handleSort={() => {}}
+            handleCopyCaption={() => {}}
+            handleDownload={() => {}}
+            formatNumber={(num) => num.toString()}
+            truncateCaption={(caption) => caption}
+          />
+        </Table>
+      </div>
       <TablePagination
         currentPage={currentPage}
         totalPages={totalPages}
