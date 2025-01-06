@@ -18,6 +18,11 @@ export const PostTableRow = ({
   formatNumber,
   truncateCaption 
 }: PostTableRowProps) => {
+  // Format numbers with dots as thousand separators
+  const formatNumberWithDots = (num: number) => {
+    return num.toLocaleString('de-DE').replace(/,/g, '.');
+  };
+
   // Format engagement rate to always show 2 decimal places
   const formattedEngagement = typeof post.engagement === 'string' 
     ? `${parseFloat(post.engagement).toFixed(2)}%`
@@ -53,17 +58,17 @@ export const PostTableRow = ({
       <TableCell className="text-center py-4 text-xs text-muted-foreground align-middle" title={post.timestamp}>
         {post.date}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
-        {formatNumber(post.playsCount)}
-      </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
-        {formatNumber(post.viewsCount)}
+        {formatNumberWithDots(post.playsCount)}
+      </TableCell>
+      <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
+        {formatNumberWithDots(post.viewsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
-        {formatNumber(post.likesCount)}
+        {formatNumberWithDots(post.likesCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
-        {formatNumber(post.commentsCount)}
+        {formatNumberWithDots(post.commentsCount)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
         {formattedEngagement}
