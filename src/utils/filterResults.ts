@@ -37,18 +37,18 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
       }
     }
 
-    // Filter by minimum views
+    // Filter by minimum views (now checking against playsCount)
     if (filters.minViews) {
       const minViews = parseFormattedNumber(filters.minViews);
-      if (post.viewsCount < minViews) {
+      if (post.playsCount < minViews) {
         return false;
       }
     }
 
-    // Filter by minimum plays
+    // Filter by minimum plays (now checking against viewsCount)
     if (filters.minPlays) {
       const minPlays = parseFormattedNumber(filters.minPlays);
-      if (post.playsCount < minPlays) {
+      if (post.viewsCount < minPlays) {
         return false;
       }
     }
