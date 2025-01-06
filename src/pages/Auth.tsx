@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { AlertCircle } from "lucide-react";
 
 const INVITE_CODE = "Vyral2025";
 
@@ -19,7 +17,6 @@ const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(0);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -41,43 +38,12 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast]);
 
-  const calculatePasswordStrength = (pass: string) => {
-    let strength = 0;
-    if (pass.length >= 8) strength += 25;
-    if (/[A-Z]/.test(pass)) strength += 25;
-    if (/[0-9]/.test(pass)) strength += 25;
-    if (/[^A-Za-z0-9]/.test(pass)) strength += 25;
-    return strength;
-  };
-
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    setPasswordStrength(calculatePasswordStrength(newPassword));
-  };
-
-  const getPasswordStrengthColor = () => {
-    if (passwordStrength <= 25) return "bg-red-500";
-    if (passwordStrength <= 50) return "bg-orange-500";
-    if (passwordStrength <= 75) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inviteCode !== INVITE_CODE) {
       toast({
         title: "Invalid Invite Code",
         description: "Please enter a valid invite code to sign up.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (passwordStrength < 100) {
-      toast({
-        title: "Weak Password",
-        description: "Please ensure your password meets all requirements.",
         variant: "destructive",
       });
       return;
@@ -183,35 +149,9 @@ const AuthPage = () => {
                   type="password"
                   placeholder="Password"
                   value={password}
-                  onChange={handlePasswordChange}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                 />
-                <div className="space-y-2">
-                  <Progress 
-                    value={passwordStrength} 
-                    className={`h-2 ${getPasswordStrengthColor()}`}
-                  />
-                  <div className="text-sm space-y-1 text-muted-foreground">
-                    <p className="flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      Password requirements:
-                    </p>
-                    <ul className="list-disc pl-5 space-y-1">
-                      <li className={password.length >= 8 ? "text-green-500" : ""}>
-                        At least 8 characters
-                      </li>
-                      <li className={/[A-Z]/.test(password) ? "text-green-500" : ""}>
-                        One uppercase letter
-                      </li>
-                      <li className={/[0-9]/.test(password) ? "text-green-500" : ""}>
-                        One number
-                      </li>
-                      <li className={/[^A-Za-z0-9]/.test(password) ? "text-green-500" : ""}>
-                        One special character
-                      </li>
-                    </ul>
-                  </div>
-                </div>
               </div>
               <div className="space-y-2">
                 <Input

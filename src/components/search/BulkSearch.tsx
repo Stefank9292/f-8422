@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { BulkSearchSettings } from "./BulkSearchSettings";
-import { Search, Loader2, Lock } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface BulkSearchProps {
@@ -14,7 +14,6 @@ interface BulkSearchProps {
   isDisabled?: boolean;
   requestCount?: number;
   maxRequests?: number;
-  subscriptionStatus?: any;
 }
 
 const MAX_URLS = 20;
@@ -26,16 +25,13 @@ export const BulkSearch = ({
   isLoading = false,
   isDisabled = false,
   requestCount = 0,
-  maxRequests = 0,
-  subscriptionStatus
+  maxRequests = 0
 }: BulkSearchProps) => {
   const [urls, setUrls] = useState<string>("");
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
-
-  const isFreeUser = !subscriptionStatus?.subscribed;
 
   const handleSearch = async () => {
     const urlList = urls
@@ -91,14 +87,7 @@ export const BulkSearch = ({
             Bulk Search
           </DialogTitle>
           <DialogDescription className="text-xs sm:text-sm text-muted-foreground">
-            {isFreeUser ? (
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4" />
-                <span>Bulk search is available for Pro and Creator on Steroids plans</span>
-              </div>
-            ) : (
-              "Enter Instagram URLs (one per line) to search multiple profiles at once."
-            )}
+            Enter Instagram URLs (one per line) to search multiple profiles at once.
           </DialogDescription>
         </DialogHeader>
 
@@ -109,11 +98,11 @@ export const BulkSearch = ({
               <span className="text-[10px] text-muted-foreground">(max {MAX_URLS})</span>
             </label>
             <Textarea
-              placeholder={isFreeUser ? "Upgrade to Pro or Creator on Steroids plan to use bulk search" : `Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
+              placeholder={`Enter Instagram URLs (one per line, maximum ${MAX_URLS} URLs)`}
               className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20 rounded-xl w-full"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
-              disabled={isLoading || isDisabled || isFreeUser}
+              disabled={isLoading || isDisabled}
             />
             <p className={`text-[10px] sm:text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
@@ -127,26 +116,21 @@ export const BulkSearch = ({
             setNumberOfVideos={setNumberOfVideos}
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
-            disabled={isLoading || isDisabled || isFreeUser}
+            disabled={isLoading || isDisabled}
           />
 
           <div className="flex justify-center w-full">
             <Button 
               onClick={handleSearch}
-              disabled={isLoading || !urls || isDisabled || isFreeUser}
+              disabled={isLoading || !urls || isDisabled}
               className={`w-full h-10 text-[11px] font-medium transition-all duration-300 ${
-                urls && !isFreeUser ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
+                urls ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
               } text-white dark:text-gray-100 shadow-sm hover:shadow-md`}
             >
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   Searching...
-                </>
-              ) : isFreeUser ? (
-                <>
-                  <Lock className="mr-2 h-3.5 w-3.5" />
-                  Upgrade to Use Bulk Search
                 </>
               ) : isDisabled ? (
                 <>
