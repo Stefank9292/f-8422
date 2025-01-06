@@ -59,6 +59,68 @@ export const SearchContainer = ({
                     (!subscriptionStatus?.subscribed && requestCount === 0) ||
                     (isProUser && requestCount >= maxRequests);
 
+  const getButtonText = () => {
+    if (isLoading) {
+      return (
+        <>
+          <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+          <span>This can take up to a minute...</span>
+        </>
+      );
+    }
+
+    if (hasReachedLimit) {
+      return (
+        <>
+          <Search className="mr-2 h-3.5 w-3.5" />
+          Monthly Limit Reached ({requestCount}/{maxRequests})
+        </>
+      );
+    }
+
+    if (!subscriptionStatus?.subscribed) {
+      if (requestCount === 0) {
+        return (
+          <>
+            <Search className="mr-2 h-3.5 w-3.5" />
+            No Searches Left (Resets in 30 days)
+          </>
+        );
+      }
+      return (
+        <>
+          <Search className="mr-2 h-3.5 w-3.5" />
+          Search Viral Videos ({maxRequests - requestCount} free searches left)
+        </>
+      );
+    }
+
+    if (isProUser && requestCount >= maxRequests) {
+      return (
+        <>
+          <Search className="mr-2 h-3.5 w-3.5" />
+          Pro Plan Limit Reached (Upgrade for Unlimited)
+        </>
+      );
+    }
+
+    if (isSteroidsUser) {
+      return (
+        <>
+          <Search className="mr-2 h-3.5 w-3.5" />
+          Search Viral Videos
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Search className="mr-2 h-3.5 w-3.5" />
+        Search Viral Videos ({maxRequests - requestCount} searches left)
+      </>
+    );
+  };
+
   const onSearchClick = () => {
     if (!username.trim()) {
       toast({
@@ -131,32 +193,7 @@ export const SearchContainer = ({
             isDisabled && "opacity-50 cursor-not-allowed"
           )}
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-              <span>This can take up to a minute...</span>
-            </>
-          ) : hasReachedLimit ? (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Monthly Limit Reached ({requestCount}/{maxRequests})
-            </>
-          ) : !subscriptionStatus?.subscribed && requestCount === 0 ? (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              No Searches Left (Resets in 30 days)
-            </>
-          ) : isProUser && requestCount >= maxRequests ? (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Pro Plan Limit Reached (Upgrade for Unlimited)
-            </>
-          ) : (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Search Viral Videos
-            </>
-          )}
+          {getButtonText()}
         </Button>
 
         <SearchSettings
