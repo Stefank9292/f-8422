@@ -74,13 +74,12 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
   const getButtonStyle = () => {
+    // Keep gradient only for popular plan
     if (isPopular) {
-      return "bg-primary hover:bg-primary/90";
+      return "primary-gradient";
     }
-    // Apply navy blue style for non-popular plans (free and pro)
-    return isCurrentPlan 
-      ? "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" 
-      : "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
+    // Apply solid navy blue for free and pro plans
+    return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
@@ -101,7 +100,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       onClick={handleClick} 
       disabled={loading || (isCurrentPlan && planId === 'free')}
       className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
-      variant={isCurrentPlan ? "secondary" : "default"}
+      variant={isPopular ? "default" : "secondary"}
     >
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
