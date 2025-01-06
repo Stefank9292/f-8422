@@ -5,7 +5,7 @@ import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
 import { PlanButtonText } from "./subscription/PlanButtonText";
 import { useSubscriptionAction } from "@/hooks/useSubscriptionAction";
 
-interface SubscribeButtonProps {
+export interface SubscribeButtonProps {
   planId: string;
   planName: string;
   isPopular?: boolean;
@@ -22,11 +22,12 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   });
 
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
+      if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
@@ -43,7 +44,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
         return "Upgrade to Creator Pro Annual";
       }
       if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
-        return "For Viral Marketing Gods";
+        return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
     }
@@ -84,15 +85,12 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W");
 
   const getButtonStyle = () => {
-    // Keep gradient only for popular plan
     if (isPopular) {
       return "primary-gradient";
     }
-    // Apply subtle grey for downgrade state, navy blue for other states
     if (isDowngrade) {
       return "bg-gray-500 hover:bg-gray-600 text-white";
     }
-    // Apply solid navy blue for free and pro plans (upgrade state)
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
