@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, X } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface FilterInputProps {
   icon: LucideIcon;
@@ -30,7 +30,24 @@ export const FilterInput = ({
   isDatePicker,
   helpText,
 }: FilterInputProps) => {
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date | undefined>();
+
+  // Sync date state with external value
+  useEffect(() => {
+    if (value && isDatePicker) {
+      try {
+        const [day, month, year] = value.split('.');
+        const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+        if (!isNaN(parsedDate.getTime())) {
+          setDate(parsedDate);
+        }
+      } catch (error) {
+        console.error('Error parsing date:', error);
+      }
+    } else if (!value) {
+      setDate(undefined);
+    }
+  }, [value, isDatePicker]);
 
   const handleNumericInput = (inputValue: string) => {
     // Only allow numbers and empty string
@@ -41,6 +58,13 @@ export const FilterInput = ({
   const handleResetDate = () => {
     setDate(undefined);
     onChange('');
+  };
+
+  const handleDateSelect = (newDate: Date | undefined) => {
+    setDate(newDate);
+    if (newDate) {
+      onChange(format(newDate, "dd.MM.yyyy"));
+    }
   };
 
   if (isDatePicker) {
@@ -68,12 +92,7 @@ export const FilterInput = ({
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={(newDate) => {
-                  setDate(newDate);
-                  if (newDate) {
-                    onChange(format(newDate, "dd.MM.yyyy"));
-                  }
-                }}
+                onSelect={handleDateSelect}
                 initialFocus
               />
             </PopoverContent>
@@ -103,19 +122,32 @@ export const FilterInput = ({
         <Icon className="h-4 w-4" />
         <span>{label}</span>
       </Label>
-      <Input
-        type={type}
-        value={value}
-        onChange={(e) => {
-          if (type === "number") {
-            handleNumericInput(e.target.value);
-          } else {
-            onChange(e.target.value);
-          }
-        }}
-        placeholder={placeholder}
-        className="h-10"
-      />
+      <div className="relative">
+        <Input
+          type={type}
+          value={value}
+          onChange={(e) => {
+            if (type === "number") {
+              handleNumericInput(e.target.value);
+            } else {
+              onChange(e.target.value);
+            }
+          }}
+          placeholder={placeholder}
+          className="h-10"
+        />
+        {value && type === "number" && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6"
+            onClick={() => onChange('')}
+          >
+            <X className="h-4 w-4" />
+            <span className="sr-only">Reset value</span>
+          </Button>
+        )}
+      </div>
       {helpText && (
         <p className="text-xs text-muted-foreground">{helpText}</p>
       )}
