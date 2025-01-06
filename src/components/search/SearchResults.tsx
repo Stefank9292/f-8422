@@ -1,4 +1,3 @@
-import { PostTableHeader } from "./TableHeader";
 import { TableContent } from "./TableContent";
 import { TablePagination } from "./TablePagination";
 import { useState } from "react";
@@ -31,10 +30,9 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   return (
     <div className="w-full">
-      <PostTableHeader onSort={handleSort} />
       <TableContent 
         currentPosts={currentPosts}
-        handleSort={() => {}}
+        handleSort={handleSort}
         handleCopyCaption={() => {}}
         handleDownload={() => {}}
         formatNumber={(num) => num.toString()}
