@@ -1,7 +1,13 @@
-import { SearchHeaderSection } from "./sections/SearchHeaderSection";
-import { SearchInputSection } from "./sections/SearchInputSection";
-import { SearchResultsSection } from "./sections/SearchResultsSection";
+import { SearchHeader } from "./SearchHeader";
+import { SearchBar } from "./SearchBar";
+import { SearchSettings } from "./SearchSettings";
+import { SearchResults } from "./SearchResults";
+import { SearchFilters } from "./SearchFilters";
+import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
+import { Button } from "@/components/ui/button";
+import { Loader2, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
@@ -68,30 +74,82 @@ export const SearchContainer = ({
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <AnnouncementBar />
-      <SearchHeaderSection />
-      <SearchInputSection
-        username={username}
-        isLoading={isLoading}
-        isBulkSearching={isBulkSearching}
-        hasReachedLimit={hasReachedLimit}
-        requestCount={requestCount}
-        maxRequests={maxRequests}
-        onSearch={onSearchClick}
-        onBulkSearch={handleBulkSearch}
-        setUsername={setUsername}
-        isSettingsOpen={isSettingsOpen}
-        setIsSettingsOpen={setIsSettingsOpen}
-        numberOfVideos={numberOfVideos}
-        setNumberOfVideos={setNumberOfVideos}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-      />
-      <SearchResultsSection
-        displayPosts={displayPosts}
-        filters={filters}
-        setFilters={setFilters}
-        resetFilters={resetFilters}
-      />
+      <div className="space-y-4 sm:space-y-6 w-full max-w-md">
+        <SearchHeader />
+        <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
+          Save time finding viral content for social media
+        </p>
+      </div>
+
+      <div className="w-full max-w-md space-y-4 sm:space-y-6">
+        <SearchBar
+          username={username}
+          onSearch={onSearchClick}
+          onBulkSearch={handleBulkSearch}
+          isLoading={isLoading || isBulkSearching}
+          onUsernameChange={setUsername}
+        />
+
+        <Button 
+          onClick={onSearchClick}
+          disabled={isLoading || isBulkSearching || !username.trim() || hasReachedLimit}
+          className={cn(
+            "w-full h-10 text-[11px] font-medium transition-all duration-300",
+            username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
+            hasReachedLimit && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+              <span>This can take up to a minute...</span>
+            </>
+          ) : hasReachedLimit ? (
+            <>
+              <Search className="mr-2 h-3.5 w-3.5" />
+              Monthly Limit Reached ({requestCount}/{maxRequests})
+            </>
+          ) : (
+            <>
+              <Search className="mr-2 h-3.5 w-3.5" />
+              Search Viral Videos
+            </>
+          )}
+        </Button>
+
+        <SearchSettings
+          isSettingsOpen={isSettingsOpen}
+          setIsSettingsOpen={setIsSettingsOpen}
+          numberOfVideos={numberOfVideos}
+          setNumberOfVideos={setNumberOfVideos}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          disabled={isLoading || isBulkSearching}
+        />
+
+        <RecentSearches onSelect={setUsername} />
+      </div>
+
+      {displayPosts.length > 0 && (
+        <>
+          <div className="w-full max-w-[90rem]">
+            <SearchFilters
+              filters={filters}
+              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+              onReset={resetFilters}
+              totalResults={displayPosts.length}
+              filteredResults={displayPosts.length}
+              currentPosts={displayPosts}
+            />
+          </div>
+          <div className="w-full max-w-[90rem] space-y-6 sm:space-y-8">
+            <div className="material-card overflow-hidden animate-in fade-in duration-300">
+              <SearchResults searchResults={displayPosts} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
