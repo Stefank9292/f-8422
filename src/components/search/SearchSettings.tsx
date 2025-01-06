@@ -54,7 +54,7 @@ export const SearchSettings = ({
   const getMaxVideos = () => {
     if (!subscriptionStatus?.priceId) return 5;
     if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 20;
+        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
     if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
         subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return 50;
     return 5;
