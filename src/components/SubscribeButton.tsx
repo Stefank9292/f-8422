@@ -74,10 +74,13 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
 
   const getButtonStyle = () => {
-    if (isCurrentPlan) {
-      return "bg-secondary hover:bg-secondary/80";
+    if (isPopular) {
+      return "bg-primary hover:bg-primary/90";
     }
-    return isPopular ? "bg-primary hover:bg-primary/90" : "bg-zinc-900 hover:bg-zinc-900/90 text-white";
+    // Apply navy blue style for non-popular plans (free and pro)
+    return isCurrentPlan 
+      ? "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white" 
+      : "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
   if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
