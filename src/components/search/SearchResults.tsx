@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { filterResults } from "@/utils/filterResults";
 import { Table } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -14,6 +15,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
+  const { toast } = useToast();
 
   const filteredPosts = filterResults(searchResults, filters);
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
@@ -26,22 +28,38 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     setCurrentPage(1);
   };
 
-  const handleSort = () => {
-    // Implement sorting logic here if needed
+  const handleCopyCaption = (caption: string) => {
+    navigator.clipboard.writeText(caption);
+    toast({
+      title: "Caption copied",
+      description: "The caption has been copied to your clipboard.",
+    });
+  };
+
+  const handleDownload = (videoUrl: string) => {
+    window.open(videoUrl, '_blank');
+  };
+
+  const formatNumber = (num: number) => {
+    return new Intl.NumberFormat('de-DE').format(num);
+  };
+
+  const truncateCaption = (caption: string) => {
+    return caption.length > 100 ? `${caption.substring(0, 100)}...` : caption;
   };
 
   return (
     <div className="w-full">
       <div className="rounded-xl overflow-hidden border border-border">
         <Table>
-          <PostTableHeader onSort={handleSort} />
+          <PostTableHeader onSort={() => {}} />
           <TableContent 
             currentPosts={currentPosts}
             handleSort={() => {}}
-            handleCopyCaption={() => {}}
-            handleDownload={() => {}}
-            formatNumber={(num) => num.toString()}
-            truncateCaption={(caption) => caption}
+            handleCopyCaption={handleCopyCaption}
+            handleDownload={handleDownload}
+            formatNumber={formatNumber}
+            truncateCaption={truncateCaption}
           />
         </Table>
       </div>

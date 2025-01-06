@@ -18,7 +18,6 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
         const filterDate = parse(filters.postsNewerThan, 'dd.MM.yyyy', new Date());
         const postDate = new Date(post.timestamp || post.date);
         
-        // Return false if the post is older than the filter date
         if (!isAfter(postDate, filterDate)) {
           return false;
         }
@@ -49,8 +48,8 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
 
     // Filter by minimum engagement
     if (filters.minEngagement) {
-      const engagement = ((post.likesCount + post.commentsCount) / post.viewsCount) * 100;
-      if (engagement < parseInt(filters.minEngagement)) {
+      const engagement = parseFloat(post.engagement);
+      if (engagement < parseFloat(filters.minEngagement)) {
         return false;
       }
     }
