@@ -76,6 +76,8 @@ export function AppSidebar() {
         throw error;
       }
       toast.success("Successfully signed out");
+      // Navigate to home page after successful sign out
+      navigate('/');
     } catch (error) {
       console.error('Error signing out:', error);
       toast.error("Failed to sign out. Please try again.");
