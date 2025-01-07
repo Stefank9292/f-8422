@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
+import { InstagramPost, ApifyRequestBody } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
 const MAX_RETRIES = 3;
@@ -33,8 +33,11 @@ async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0):
       throw new Error('Invalid response from Instagram scraper');
     }
 
-    return data.map(post => transformToInstagramPost(post))
-               .filter((post): post is InstagramPost => post !== null);
+    // Filter for CLIPS only and transform posts
+    return data
+      .filter(post => post.productType === 'CLIPS' || post.type === 'CLIPS')
+      .map(post => transformToInstagramPost(post))
+      .filter((post): post is InstagramPost => post !== null);
   } catch (error) {
     console.error(`Attempt ${retries + 1} failed:`, error);
 
@@ -97,10 +100,12 @@ export async function fetchInstagramPosts(
       searchLimit: 1,
       searchType: "user",
       maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
+      mediaTypes: ["VIDEO", "CLIPS"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: 512
+      memoryMbytes: 512,
+      productType: "CLIPS",
+      onlyClips: true
     };
 
     if (postsNewerThan instanceof Date) {
@@ -147,10 +152,12 @@ export async function fetchBulkInstagramPosts(
       searchLimit: 1,
       searchType: "user",
       maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
+      mediaTypes: ["VIDEO", "CLIPS"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: 512
+      memoryMbytes: 512,
+      productType: "CLIPS",
+      onlyClips: true
     };
 
     if (postsNewerThan instanceof Date) {

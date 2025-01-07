@@ -16,6 +16,7 @@ export interface InstagramPost {
   ownerId: string;
   locationName?: string;
   videoUrl?: string;
+  productType?: string;
 }
 
 export interface ApifyRequestBody {
@@ -34,4 +35,6 @@ export interface ApifyRequestBody {
   expandVideo: boolean;
   includeVideoMetadata: boolean;
   onlyPostsNewerThan?: string;
+  productType?: string;
+  onlyClips?: boolean;
 }

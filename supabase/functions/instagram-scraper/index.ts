@@ -76,7 +76,7 @@ serve(async (req) => {
       )
     }
 
-    // Add user context and concurrency settings to request
+    // Add user context, concurrency settings, and CLIPS filter to request
     const enhancedRequestBody = {
       ...requestBody,
       userId, // Add user ID to track requests
@@ -88,7 +88,10 @@ serve(async (req) => {
       proxyConfiguration: {
         useApifyProxy: true,
         apifyProxyGroups: ['RESIDENTIAL']
-      }
+      },
+      productType: 'CLIPS', // Filter for CLIPS product type only
+      mediaTypes: ["VIDEO", "CLIPS"], // Include CLIPS in media types
+      onlyClips: true // Additional filter to ensure only CLIPS are returned
     }
 
     console.log('Processing request for user:', userId)
@@ -119,13 +122,13 @@ serve(async (req) => {
     const data = await response.json()
     console.log('Successfully fetched data from Apify for user:', userId)
 
-    // Validate response data
-    if (!Array.isArray(data)) {
-      throw new Error('Invalid response format from Apify')
-    }
+    // Additional filter to ensure only CLIPS are returned
+    const filteredData = Array.isArray(data) 
+      ? data.filter(item => item.productType === 'CLIPS' || item.type === 'CLIPS')
+      : [];
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(filteredData),
       { 
         headers: { 
           ...corsHeaders,
