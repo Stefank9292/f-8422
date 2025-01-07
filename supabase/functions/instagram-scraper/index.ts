@@ -1,4 +1,4 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,19 +25,23 @@ serve(async (req) => {
       throw new Error('APIFY_API_KEY is not set')
     }
 
-    // Get request body
-    const requestBody = await req.json()
-    console.log('Processing request:', requestBody)
-
-    const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=${apiKey}`
+    const { directUrls, ...otherParams } = await req.json()
     
-    console.log('Sending request to Apify...')
-    const response = await fetch(apiEndpoint, {
+    // Set timeout to 10 minutes for bulk requests with more than 10 URLs
+    const timeout = directUrls.length > 10 ? 600000 : 120000; // 600000ms = 10 minutes, 120000ms = 2 minutes
+    console.log(`Setting timeout to ${timeout}ms for ${directUrls.length} URLs`);
+
+    const response = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        ...otherParams,
+        directUrls,
+      }),
+      signal: AbortSignal.timeout(timeout), // Set the timeout
     })
 
     if (!response.ok) {
@@ -61,19 +65,39 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log('Successfully fetched data from Apify')
-
+    
     return new Response(
       JSON.stringify(data),
       { 
-        headers: { 
+        status: 200,
+        headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
-        } 
+        }
       }
     )
+
   } catch (error) {
     console.error('Error in instagram-scraper function:', error)
+    
+    // Check if it's a timeout error
+    if (error.name === 'TimeoutError' || error.message.includes('timeout')) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Request timed out. This may happen with large bulk requests. Please try with fewer URLs.',
+          timestamp: new Date().toISOString(),
+          requestId: crypto.randomUUID()
+        }),
+        { 
+          status: 408, // Request Timeout status
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+    }
+
     return new Response(
       JSON.stringify({ 
         error: error.message,
@@ -82,7 +106,7 @@ serve(async (req) => {
       }),
       { 
         status: 500,
-        headers: { 
+        headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
         }
