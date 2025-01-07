@@ -2,28 +2,14 @@ import { NavLink } from "react-router-dom";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Search, History } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { NAV_ITEMS } from "@/config/navigation";
 
 export function SidebarNavigation() {
   const { state } = useSidebar();
   const isMobile = useIsMobile();
   const isCollapsed = isMobile && state === "collapsed";
-
-  const navigationItems = [
-    {
-      title: "Viral Video Search",
-      path: "/",
-      icon: Search,
-      badge: "BETA"
-    },
-    {
-      title: "Search History",
-      path: "/history",
-      icon: History
-    }
-  ];
 
   return (
     <div className="space-y-2 py-2">
@@ -33,7 +19,7 @@ export function SidebarNavigation() {
         </span>
       </div>
       <nav className="space-y-1 px-2">
-        {navigationItems.map((item) => (
+        {NAV_ITEMS.map((item) => (
           <TooltipProvider key={item.path} delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
