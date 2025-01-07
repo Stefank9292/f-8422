@@ -4,7 +4,6 @@ import { transformToInstagramPost } from '../validation/postValidator';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
-const MAX_TIMEOUT = 120000; // 2 minutes
 
 async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -12,11 +11,10 @@ async function delay(ms: number) {
 
 async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0): Promise<InstagramPost[]> {
   try {
-    console.log('Making request attempt', retries + 1);
+    console.log('Making request attempt', retries + 1, 'with body:', requestBody);
     
     const { data, error } = await supabase.functions.invoke('instagram-scraper', {
-      body: requestBody,
-      timeout: MAX_TIMEOUT
+      body: requestBody
     });
 
     if (error) {
@@ -37,11 +35,16 @@ async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0):
       throw new Error('Invalid response from Instagram scraper');
     }
 
+    console.log('Received data from Edge Function:', data);
+
     // Filter for CLIPS only and transform posts
-    return data
+    const transformedPosts = data
       .filter(post => post.productType === 'CLIPS' || post.type === 'CLIPS')
       .map(post => transformToInstagramPost(post))
       .filter((post): post is InstagramPost => post !== null);
+
+    console.log('Transformed posts:', transformedPosts);
+    return transformedPosts;
   } catch (error) {
     console.error(`Attempt ${retries + 1} failed:`, error);
 
