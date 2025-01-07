@@ -14,6 +14,7 @@ serve(async (req) => {
   }
 
   try {
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     
     if (!authHeader) {
