@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { BulkSearchInfo } from "./BulkSearchInfo";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -11,6 +12,7 @@ interface SearchHistoryItemHeaderProps {
   onToggleExpand: () => void;
   onDelete: () => void;
   isDeleting: boolean;
+  bulkSearchUrls?: string[];
 }
 
 export function SearchHistoryItemHeader({
@@ -20,7 +22,8 @@ export function SearchHistoryItemHeader({
   isExpanded,
   onToggleExpand,
   onDelete,
-  isDeleting
+  isDeleting,
+  bulkSearchUrls
 }: SearchHistoryItemHeaderProps) {
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
@@ -33,6 +36,7 @@ export function SearchHistoryItemHeader({
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             ({resultsCount})
           </span>
+          <BulkSearchInfo urls={bulkSearchUrls || []} />
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <Button
