@@ -27,8 +27,8 @@ serve(async (req) => {
 
     const { directUrls, ...otherParams } = await req.json()
     
-    // Set timeout to 10 minutes for bulk requests with more than 10 URLs
-    const timeout = directUrls.length > 10 ? 600000 : 120000; // 600000ms = 10 minutes, 120000ms = 2 minutes
+    // Set timeout to 20 minutes for bulk requests with more than 10 URLs
+    const timeout = directUrls.length > 10 ? 1200000 : 120000; // 1200000ms = 20 minutes, 120000ms = 2 minutes
     console.log(`Setting timeout to ${timeout}ms for ${directUrls.length} URLs`);
 
     const response = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
