@@ -24,6 +24,15 @@ export function useSubscription(session: Session | null) {
 
         if (error) {
           console.error('Subscription check error:', error);
+          // If we get an auth error, we'll return the free tier values
+          if (error.message.includes('Invalid user session')) {
+            return {
+              subscribed: false,
+              priceId: null,
+              canceled: false,
+              maxClicks: 3
+            };
+          }
           throw error;
         }
 
