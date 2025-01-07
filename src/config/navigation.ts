@@ -4,13 +4,13 @@ import { NavItem } from "@/types/navigation";
 export const NAV_ITEMS: NavItem[] = [
   {
     title: "Viral Video Search",
-    path: "/",
+    url: "/",
     icon: Search,
     badge: "BETA"
   },
   {
     title: "Search History",
-    path: "/history",
+    url: "/history",
     icon: History
   }
 ];
