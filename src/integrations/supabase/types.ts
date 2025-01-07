@@ -32,6 +32,7 @@ export type Database = {
       }
       search_history: {
         Row: {
+          bulk_search_urls: string[] | null
           created_at: string
           id: string
           search_query: string
@@ -39,6 +40,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          bulk_search_urls?: string[] | null
           created_at?: string
           id?: string
           search_query: string
@@ -46,6 +48,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          bulk_search_urls?: string[] | null
           created_at?: string
           id?: string
           search_query?: string
