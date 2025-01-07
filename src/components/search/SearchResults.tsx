@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { filterResults } from "@/utils/filterResults";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -14,9 +15,11 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     console.log('SearchResults received:', searchResults);
+    setIsLoading(false);
   }, [searchResults]);
 
   // Apply filters to search results
@@ -65,13 +68,25 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="w-full flex justify-center items-center py-8">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   if (!searchResults || searchResults.length === 0) {
     console.log('No search results to display');
-    return null;
+    return (
+      <div className="w-full text-center py-8 text-muted-foreground">
+        No results found
+      </div>
+    );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full animate-in fade-in duration-300">
       <TableContent 
         currentPosts={currentPosts}
         handleCopyCaption={handleCopyCaption}

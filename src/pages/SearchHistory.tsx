@@ -35,7 +35,8 @@ const SearchHistory = () => {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    const channel = supabase
+    // Subscribe to search history changes
+    const historyChannel = supabase
       .channel('search-history-changes')
       .on(
         'postgres_changes',
@@ -45,14 +46,14 @@ const SearchHistory = () => {
           table: 'search_history',
           filter: `user_id=eq.${session.user.id}`
         },
-        () => {
-          // Invalidate and refetch search history when changes occur
+        (payload) => {
+          console.log('Search history change:', payload);
           queryClient.invalidateQueries({ queryKey: ['search-history'] });
         }
       )
       .subscribe();
 
-    // Also listen for search results changes
+    // Subscribe to search results changes
     const resultsChannel = supabase
       .channel('search-results-changes')
       .on(
@@ -62,15 +63,15 @@ const SearchHistory = () => {
           schema: 'public',
           table: 'search_results'
         },
-        () => {
-          // Invalidate and refetch search history when results change
+        (payload) => {
+          console.log('Search results change:', payload);
           queryClient.invalidateQueries({ queryKey: ['search-history'] });
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(historyChannel);
       supabase.removeChannel(resultsChannel);
     };
   }, [session?.user?.id, queryClient]);
@@ -89,27 +90,6 @@ const SearchHistory = () => {
     },
     enabled: !!session?.access_token,
   });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel('search_history_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_history'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['search-history'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
@@ -135,7 +115,6 @@ const SearchHistory = () => {
         throw historyError;
       }
 
-      // Transform the raw data to match our expected types
       return historyData?.map(item => ({
         id: item.id,
         search_query: item.search_query,
