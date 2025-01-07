@@ -31,16 +31,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        // Verify the session is still valid
-        const { data: { user }, error: userError } = await supabase.auth.getUser(currentSession.access_token);
-        if (userError || !user) {
-          console.error("User verification error:", userError);
-          await supabase.auth.signOut();
-          queryClient.clear();
-          setSession(null);
-          return;
-        }
-
         setSession(currentSession);
       } catch (error) {
         console.error("Session check error:", error);
