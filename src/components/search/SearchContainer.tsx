@@ -67,6 +67,10 @@ export const SearchContainer = ({
         });
         return;
       }
+      // Close settings if they are open before performing the search
+      if (isSettingsOpen) {
+        setIsSettingsOpen(false);
+      }
       handleSearch();
     }
   };
