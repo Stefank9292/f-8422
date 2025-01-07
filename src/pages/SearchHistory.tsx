@@ -35,8 +35,9 @@ const SearchHistory = () => {
   useEffect(() => {
     if (!session?.user?.id) return;
 
-    // Subscribe to search history changes
-    const historyChannel = supabase
+    console.log('Setting up real-time subscription for search history');
+
+    const channel = supabase
       .channel('search-history-changes')
       .on(
         'postgres_changes',
@@ -47,7 +48,7 @@ const SearchHistory = () => {
           filter: `user_id=eq.${session.user.id}`
         },
         (payload) => {
-          console.log('Search history change:', payload);
+          console.log('Search history change detected:', payload);
           queryClient.invalidateQueries({ queryKey: ['search-history'] });
         }
       )
@@ -64,14 +65,15 @@ const SearchHistory = () => {
           table: 'search_results'
         },
         (payload) => {
-          console.log('Search results change:', payload);
+          console.log('Search results change detected:', payload);
           queryClient.invalidateQueries({ queryKey: ['search-history'] });
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(historyChannel);
+      console.log('Cleaning up real-time subscriptions');
+      supabase.removeChannel(channel);
       supabase.removeChannel(resultsChannel);
     };
   }, [session?.user?.id, queryClient]);
@@ -96,6 +98,7 @@ const SearchHistory = () => {
     queryFn: async () => {
       if (!session?.user?.id) return null;
 
+      console.log('Fetching search history');
       const { data: historyData, error: historyError } = await supabase
         .from('search_history')
         .select(`
