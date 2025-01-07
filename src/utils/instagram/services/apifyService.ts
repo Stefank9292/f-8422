@@ -2,51 +2,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-
-async function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0): Promise<InstagramPost[]> {
-  try {
-    const { data, error } = await supabase.functions.invoke('instagram-scraper', {
-      body: requestBody
-    });
-
-    if (error) {
-      console.error('Error from Edge Function:', error);
-      
-      // Handle rate limiting
-      if (error.message.includes('Rate limit exceeded')) {
-        const retryAfter = parseInt(error.message.match(/\d+/)?.[0] || '60');
-        await delay(retryAfter * 1000);
-        return makeRequestWithRetry(requestBody, retries);
-      }
-
-      throw error;
-    }
-
-    if (!data || !Array.isArray(data)) {
-      console.error('Invalid response from Edge Function:', data);
-      throw new Error('Invalid response from Instagram scraper');
-    }
-
-    return data.map(post => transformToInstagramPost(post))
-               .filter((post): post is InstagramPost => post !== null);
-  } catch (error) {
-    console.error(`Attempt ${retries + 1} failed:`, error);
-
-    if (retries < MAX_RETRIES) {
-      await delay(RETRY_DELAY * Math.pow(2, retries)); // Exponential backoff
-      return makeRequestWithRetry(requestBody, retries + 1);
-    }
-
-    throw error;
-  }
-}
-
 export async function checkSubscriptionAndLimits(userId: string) {
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -70,7 +25,30 @@ export async function checkSubscriptionAndLimits(userId: string) {
 
 export async function makeApifyRequest(requestBody: ApifyRequestBody): Promise<InstagramPost[]> {
   console.log('Making Apify request with body:', requestBody);
-  return makeRequestWithRetry(requestBody);
+  
+  try {
+    const { data, error } = await supabase.functions.invoke('instagram-scraper', {
+      body: requestBody
+    });
+
+    if (error) {
+      console.error('Error from Edge Function:', error);
+      throw new Error(`Edge Function error: ${error.message}`);
+    }
+
+    if (!data || !Array.isArray(data)) {
+      console.error('Invalid response from Edge Function:', data);
+      throw new Error('Invalid response from Instagram scraper');
+    }
+
+    console.log('Received response from Edge Function:', data);
+    
+    return data.map(post => transformToInstagramPost(post))
+               .filter((post): post is InstagramPost => post !== null);
+  } catch (error) {
+    console.error('Error in makeApifyRequest:', error);
+    throw error;
+  }
 }
 
 export async function fetchInstagramPosts(
