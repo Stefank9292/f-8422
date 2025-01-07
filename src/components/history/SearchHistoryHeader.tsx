@@ -22,13 +22,15 @@ interface SearchHistoryHeaderProps {
   isDeletingAll: boolean;
   hasHistory: boolean;
   isSteroidsUser?: boolean;
+  totalSearches?: number;
 }
 
 export function SearchHistoryHeader({ 
   onDeleteAll, 
   isDeletingAll, 
   hasHistory,
-  isSteroidsUser = false 
+  isSteroidsUser = false,
+  totalSearches = 0
 }: SearchHistoryHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 p-1">
@@ -50,7 +52,7 @@ export function SearchHistoryHeader({
           </HoverCard>
         </div>
         <p className="text-sm text-muted-foreground">
-          Your last 10 searches are shown here
+          Showing {totalSearches} of 10 maximum searches
         </p>
       </div>
       {hasHistory && isSteroidsUser && (

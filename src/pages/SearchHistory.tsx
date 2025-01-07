@@ -190,6 +190,7 @@ const SearchHistory = () => {
         isDeletingAll={isDeletingAll}
         hasHistory={searchHistory && searchHistory.length > 0}
         isSteroidsUser={isSteroidsUser}
+        totalSearches={searchHistory?.length || 0}
       />
       
       {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
