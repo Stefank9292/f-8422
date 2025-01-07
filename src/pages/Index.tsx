@@ -1,11 +1,31 @@
 import { SearchContainer } from "@/components/search/SearchContainer";
-import { SearchState } from "@/components/search/SearchState";
+import { useSearchState } from "@/components/search/SearchState";
 
 const Index = () => {
+  const {
+    username,
+    isLoading,
+    isBulkSearching,
+    hasReachedLimit,
+    requestCount,
+    maxRequests,
+    handleSearch,
+    handleBulkSearch,
+    displayPosts,
+  } = useSearchState();
+
   return (
-    <SearchContainer>
-      <SearchState />
-    </SearchContainer>
+    <SearchContainer
+      username={username}
+      isLoading={isLoading}
+      isBulkSearching={isBulkSearching}
+      hasReachedLimit={hasReachedLimit}
+      requestCount={requestCount}
+      maxRequests={maxRequests}
+      handleSearch={handleSearch}
+      handleBulkSearch={handleBulkSearch}
+      displayPosts={displayPosts}
+    />
   );
 };
 

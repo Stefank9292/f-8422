@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost } from "@/types/instagram";
 import { Json } from "@/integrations/supabase/types";
 
-export async function saveSearchHistory(username: string, results: InstagramPost[], bulkSearchUrls?: string[]) {
+export async function saveSearchHistory(username: string, results: InstagramPost[]) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.user?.id) {
@@ -25,8 +25,7 @@ export async function saveSearchHistory(username: string, results: InstagramPost
         .insert({
           search_query: username,
           search_type: 'instagram_search',
-          user_id: session.user.id,
-          bulk_search_urls: bulkSearchUrls // Add bulk search URLs if present
+          user_id: session.user.id
         })
         .select()
         .single();

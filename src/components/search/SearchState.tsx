@@ -1,119 +1,148 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { InstagramPost } from "@/types/instagram";
-import { searchInstagram } from "@/utils/searchInstagram";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
+import { supabase } from "@/integrations/supabase/client";
+import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
-import { extractUsernameFromUrl } from "@/utils/extractUsername";
-import { SearchInput } from "./SearchInput";
-import { SearchResults } from "./SearchResults";
-import { BulkSearch } from "./BulkSearch";
+import { InstagramPost } from "@/utils/instagram/types/InstagramTypes";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
+import { useRequestCount } from "@/hooks/useRequestCount";
 
-interface SearchStateProps {
-  onSearchComplete?: (results: InstagramPost[]) => void;
-}
-
-export function SearchState({ onSearchComplete }: SearchStateProps) {
-  const [searchResults, setSearchResults] = useState<InstagramPost[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
+export const useSearchState = () => {
+  const {
+    username,
+    numberOfVideos,
+    selectedDate,
+  } = useSearchStore();
+  
+  const [isBulkSearching, setIsBulkSearching] = useState(false);
+  const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
+  const [shouldFetch, setShouldFetch] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const handleSearch = async (username: string, numberOfVideos: number, selectedDate: Date | undefined) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
 
-      const response = await searchInstagram(username, numberOfVideos, selectedDate);
+  const { maxRequests, subscriptionStatus } = useSubscriptionLimits(session);
+  const requestCount = useRequestCount(session);
+
+  const { data: posts = [], isLoading, error } = useQuery({
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryFn: async () => {
+      console.log('Fetching Instagram posts for:', username);
+      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
       
-      if (response?.results) {
-        await saveSearchHistory(username, response.results);
-        setSearchResults(response.results);
-        setHasSearched(true);
-        onSearchComplete?.(response.results);
+      if (results.length > 0) {
+        await saveSearchHistory(username, results);
       }
-    } catch (error) {
-      console.error('Search error:', error);
-      setError('Failed to perform search');
+      
+      return results;
+    },
+    enabled: shouldFetch && !!username && !isBulkSearching,
+    retry: false,
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    meta: {
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Search Failed",
+          description: error.message || "Failed to fetch Instagram posts",
+          variant: "destructive",
+        });
+        setShouldFetch(false);
+      }
+    },
+  });
+
+  const handleSearch = () => {
+    if (isLoading || isBulkSearching) {
+      return;
+    }
+
+    if (!username) {
       toast({
         title: "Error",
-        description: "Failed to perform search",
+        description: "Please enter an Instagram username",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
     }
+
+    if (requestCount >= maxRequests) {
+      toast({
+        title: "Monthly Limit Reached",
+        description: `You've reached your monthly limit of ${maxRequests} searches.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Reset any existing results before new search
+    queryClient.removeQueries({ queryKey: ['instagram-posts'] });
+    setBulkSearchResults([]);
+    setShouldFetch(true);
   };
 
-  const handleBulkSearch = async (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => {
+  const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
+    if (isLoading || isBulkSearching) {
+      return;
+    }
+
+    setIsBulkSearching(true);
     try {
-      setIsLoading(true);
-      setError(null);
-
-      const allResults: InstagramPost[] = [];
-      const processedUsernames = new Set<string>();
-      let mainUsername = '';
-
-      for (const url of urls) {
-        const username = extractUsernameFromUrl(url);
-        if (!username) continue;
-
-        if (!mainUsername) mainUsername = username;
-
-        if (!processedUsernames.has(username)) {
-          const response = await searchInstagram(username, numberOfVideos, selectedDate);
-          if (response?.results) {
-            allResults.push(...response.results);
-          }
-          processedUsernames.add(username);
+      const results = await fetchBulkInstagramPosts(urls, numVideos, date);
+      
+      // Group results by username and save to search history
+      const resultsByUsername = new Map<string, InstagramPost[]>();
+      
+      results.forEach(post => {
+        const username = post.ownerUsername;
+        if (!resultsByUsername.has(username)) {
+          resultsByUsername.set(username, []);
+        }
+        resultsByUsername.get(username)?.push(post);
+      });
+      
+      // Save search history for each username
+      for (const [username, posts] of resultsByUsername) {
+        if (posts.length > 0) {
+          console.log(`Saving search history for ${username} with ${posts.length} posts`);
+          await saveSearchHistory(username, posts);
         }
       }
-
-      if (allResults.length > 0) {
-        await saveSearchHistory(mainUsername, allResults, urls);
-        setSearchResults(allResults);
-        setHasSearched(true);
-        onSearchComplete?.(allResults);
-      }
+      
+      setBulkSearchResults(results);
+      return results;
     } catch (error) {
       console.error('Bulk search error:', error);
-      setError('Failed to perform bulk search');
+      throw error;
     } finally {
-      setIsLoading(false);
+      setIsBulkSearching(false);
     }
   };
 
-  return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
-      <SearchInput
-        onSearch={handleSearch}
-        onBulkSearch={() => setIsBulkSearchOpen(true)}
-        isLoading={isLoading}
-      />
-      
-      <BulkSearch
-        isOpen={isBulkSearchOpen}
-        onClose={() => setIsBulkSearchOpen(false)}
-        onSearch={handleBulkSearch}
-        isLoading={isLoading}
-      />
+  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
-      {error && (
-        <div className="text-sm text-red-500 text-center">
-          {error}
-        </div>
-      )}
-
-      {hasSearched && !isLoading && searchResults.length === 0 && (
-        <div className="text-center text-muted-foreground">
-          No results found
-        </div>
-      )}
-
-      {searchResults.length > 0 && (
-        <SearchResults searchResults={searchResults} />
-      )}
-    </div>
-  );
-}
+  return {
+    username,
+    isLoading,
+    isBulkSearching,
+    hasReachedLimit: requestCount >= maxRequests,
+    requestCount,
+    maxRequests,
+    handleSearch,
+    handleBulkSearch,
+    displayPosts,
+    subscriptionStatus,
+  };
+};

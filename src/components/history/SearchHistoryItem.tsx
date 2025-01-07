@@ -13,7 +13,6 @@ interface SearchHistoryItemProps {
     search_query: string;
     created_at: string;
     search_results?: Array<{ results: InstagramPost[] }>;
-    bulk_search_urls?: string[];
   };
   onDelete: (id: string) => void;
   isDeleting: boolean;
@@ -55,7 +54,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when filters change
   };
 
   const handleResetFilters = () => {
@@ -176,7 +175,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
         onToggleExpand={() => setIsExpanded(!isExpanded)}
         onDelete={() => onDelete(item.id)}
         isDeleting={isDeleting}
-        bulkSearchUrls={item.bulk_search_urls}
       />
       
       {isExpanded && results.length > 0 && (
