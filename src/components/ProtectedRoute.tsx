@@ -28,6 +28,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         }
         
         if (!currentSession) {
+          console.log("No current session found");
           setSession(null);
           return;
         }
@@ -36,7 +37,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         const expiresAt = currentSession.expires_at;
         if (expiresAt) {
           const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
+          console.log("Session expires in:", expiresIn, "seconds");
+          
           if (expiresIn < 600) { // Less than 10 minutes until expiration
+            console.log("Session needs refresh");
             const { data: { session: refreshedSession }, error: refreshError } = 
               await supabase.auth.refreshSession();
               
@@ -54,6 +58,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           }
         }
 
+        console.log("Setting valid session");
         setSession(currentSession);
       } catch (error) {
         console.error("Unexpected session error:", error);
