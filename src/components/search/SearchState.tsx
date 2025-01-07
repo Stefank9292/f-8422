@@ -71,9 +71,7 @@ export function SearchState({ onSearchComplete }: SearchStateProps) {
       }
 
       if (allResults.length > 0) {
-        // Save all results under one history entry with the first username
         await saveSearchHistory(mainUsername, allResults, urls);
-        
         setSearchResults(allResults);
         setHasSearched(true);
         onSearchComplete?.(allResults);
@@ -114,7 +112,7 @@ export function SearchState({ onSearchComplete }: SearchStateProps) {
       )}
 
       {searchResults.length > 0 && (
-        <SearchResults results={searchResults} />
+        <SearchResults searchResults={searchResults} />
       )}
     </div>
   );
