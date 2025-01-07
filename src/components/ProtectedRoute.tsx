@@ -36,32 +36,57 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        // Check token expiration
-        const expiresAt = currentSession.expires_at;
-        if (expiresAt) {
-          const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
-          console.log("Session expires in:", expiresIn, "seconds");
+        // Validate session token
+        try {
+          const { data: { user }, error: userError } = await supabase.auth.getUser(
+            currentSession.access_token
+          );
           
-          if (expiresIn < 600) { // Less than 10 minutes until expiration
-            console.log("Refreshing session...");
-            const { data: { session: refreshedSession }, error: refreshError } = 
-              await supabase.auth.refreshSession();
-              
-            if (refreshError) {
-              console.error("Session refresh error:", refreshError);
-              throw refreshError;
-            }
+          if (userError || !user) {
+            console.error("Invalid session token");
+            throw new Error("Invalid session token");
+          }
+
+          // Check token expiration
+          const expiresAt = currentSession.expires_at;
+          if (expiresAt) {
+            const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
+            console.log("Session expires in:", expiresIn, "seconds");
             
-            if (refreshedSession) {
-              console.log("Session refreshed successfully");
-              setSession(refreshedSession);
-              return;
+            if (expiresIn < 600) { // Less than 10 minutes until expiration
+              console.log("Refreshing session...");
+              const { data: { session: refreshedSession }, error: refreshError } = 
+                await supabase.auth.refreshSession();
+                
+              if (refreshError) {
+                if (refreshError.message.includes('refresh_token_not_found')) {
+                  console.error("Refresh token not found, signing out");
+                  await handleSignOut();
+                  return;
+                }
+                throw refreshError;
+              }
+              
+              if (refreshedSession) {
+                console.log("Session refreshed successfully");
+                setSession(refreshedSession);
+                return;
+              }
             }
           }
-        }
 
-        console.log("Setting valid session");
-        setSession(currentSession);
+          console.log("Setting valid session");
+          setSession(currentSession);
+        } catch (error) {
+          if (error instanceof Error && 
+              (error.message.includes('session_not_found') || 
+               error.message.includes('Invalid session token'))) {
+            console.error("Session validation failed, signing out");
+            await handleSignOut();
+            return;
+          }
+          throw error;
+        }
       } catch (error) {
         console.error("Session error:", error);
         const errorMessage = error instanceof Error ? error.message : "Session validation failed";
@@ -107,31 +132,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (currentSession) {
-          try {
-            // Validate session token
-            const { data: { user }, error: userError } = await supabase.auth.getUser(
-              currentSession.access_token
-            );
-            
-            if (userError || !user) {
-              console.error("Invalid session token");
-              throw new Error("Invalid session token");
-            }
-            
-            setSession(currentSession);
-            setError(null);
-            
-            if (event === 'SIGNED_IN') {
-              const intendedPath = location.state?.from?.pathname || '/';
-              navigate(intendedPath, { replace: true });
-            }
-            
-            if (event === 'TOKEN_REFRESHED') {
-              queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-            }
-          } catch (error) {
-            console.error("Session validation error:", error);
-            await handleSignOut();
+          setSession(currentSession);
+          setError(null);
+          
+          if (event === 'SIGNED_IN') {
+            const intendedPath = location.state?.from?.pathname || '/';
+            navigate(intendedPath, { replace: true });
           }
         }
         return;
@@ -145,7 +151,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     };
   }, [queryClient, navigate, location, toast]);
 
-  // Show loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -157,7 +162,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Show error state
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -177,7 +181,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Show error state for unexpected session issues
   if (session === undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -198,11 +201,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  // Redirect to auth page if no session
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Render protected content
   return <>{children}</>;
 };
