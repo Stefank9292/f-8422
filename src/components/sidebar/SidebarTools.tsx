@@ -1,12 +1,22 @@
+import { useNavigate } from "react-router-dom";
+import { SidebarSection } from "./SidebarSection";
+import { NAV_ITEMS } from "@/config/navigation";
+
 interface SidebarToolsProps {
   currentPath: string;
   subscriptionStatus?: any;
 }
 
 export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsProps) {
+  const navigate = useNavigate();
+
   return (
-    <div className="px-2 py-2">
-      <span className="text-[11px] text-sidebar-foreground/70 px-2">Tools</span>
-    </div>
+    <SidebarSection
+      title="Tools"
+      items={NAV_ITEMS}
+      subscriptionStatus={subscriptionStatus}
+      onNavigate={(url) => navigate(url)}
+      currentPath={currentPath}
+    />
   );
 }
