@@ -4,6 +4,7 @@ import { transformToInstagramPost } from '../validation/postValidator';
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000; // 1 second
+const MAX_TIMEOUT = 120000; // 2 minutes
 
 async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -11,8 +12,11 @@ async function delay(ms: number) {
 
 async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0): Promise<InstagramPost[]> {
   try {
+    console.log('Making request attempt', retries + 1);
+    
     const { data, error } = await supabase.functions.invoke('instagram-scraper', {
-      body: requestBody
+      body: requestBody,
+      timeout: MAX_TIMEOUT
     });
 
     if (error) {
