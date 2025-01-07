@@ -49,11 +49,11 @@ export async function fetchInstagramPosts(
       resultsType: "posts",
       searchLimit: 1,
       searchType: "user",
-      memoryMbytes: 512,
       maxPosts: numberOfVideos,
       mediaTypes: ["VIDEO"],
       expandVideo: true,
-      includeVideoMetadata: true
+      includeVideoMetadata: true,
+      memoryMbytes: 512
     };
 
     if (postsNewerThan) {
@@ -112,11 +112,11 @@ export async function fetchBulkInstagramPosts(
       resultsType: "posts",
       searchLimit: 1,
       searchType: "user",
-      memoryMbytes: 512,
       maxPosts: numberOfVideos,
       mediaTypes: ["VIDEO"],
       expandVideo: true,
-      includeVideoMetadata: true
+      includeVideoMetadata: true,
+      memoryMbytes: 512
     };
 
     if (postsNewerThan) {
