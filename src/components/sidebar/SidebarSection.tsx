@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { LucideIcon } from "lucide-react";
 
@@ -9,7 +8,6 @@ interface MenuItemType {
   onClick?: () => void;
   className?: string;
   showWhen?: (status: any) => boolean;
-  badge?: string;
 }
 
 interface SidebarSectionProps {
@@ -49,14 +47,6 @@ export function SidebarSection({
             >
               <item.icon className="h-4 w-4" />
               <span>{item.title}</span>
-              {item.badge && (
-                <Badge 
-                  variant="secondary" 
-                  className="ml-1 text-[8px] text-primary font-medium bg-transparent border-0 p-0"
-                >
-                  {item.badge}
-                </Badge>
-              )}
             </SidebarMenuButton>
           </SidebarMenuItem>
         );

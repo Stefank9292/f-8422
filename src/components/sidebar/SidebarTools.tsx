@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { SidebarSection } from "./SidebarSection";
 import { NAV_ITEMS } from "@/config/navigation";
 
@@ -8,19 +7,16 @@ interface SidebarToolsProps {
 }
 
 export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsProps) {
-  const navigate = useNavigate();
+  const handleNavigate = (url: string) => {
+    window.location.href = url;
+  };
 
   return (
     <SidebarSection
-      title="Tools"
-      items={NAV_ITEMS.map(item => ({
-        title: item.title,
-        url: item.path,
-        icon: item.icon,
-        badge: item.badge
-      }))}
+      title="TOOLS"
+      items={NAV_ITEMS}
       subscriptionStatus={subscriptionStatus}
-      onNavigate={navigate}
+      onNavigate={handleNavigate}
       currentPath={currentPath}
     />
   );
