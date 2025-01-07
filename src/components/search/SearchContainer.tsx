@@ -8,7 +8,7 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
 
@@ -36,7 +36,10 @@ export const SearchContainer = ({
   displayPosts
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [showVideoImage, setShowVideoImage] = useState(true);
   const { toast } = useToast();
+  const videoImageRef = useRef<HTMLDivElement>(null);
+  const resultsAnchorRef = useRef<HTMLDivElement>(null);
   const { 
     setUsername,
     numberOfVideos,
@@ -47,6 +50,25 @@ export const SearchContainer = ({
     setFilters,
     resetFilters
   } = useSearchStore();
+
+  // Effect to handle video image animation when results are loaded
+  useEffect(() => {
+    if (displayPosts.length > 0 && videoImageRef.current && resultsAnchorRef.current && showVideoImage) {
+      const videoRect = videoImageRef.current.getBoundingClientRect();
+      const resultsRect = resultsAnchorRef.current.getBoundingClientRect();
+      
+      const translateX = resultsRect.left - videoRect.left;
+      const translateY = resultsRect.top - videoRect.top;
+      
+      videoImageRef.current.style.transform = `translate(${translateX}px, ${translateY}px)`;
+      videoImageRef.current.style.opacity = '0';
+      
+      // Hide the video image after animation
+      setTimeout(() => {
+        setShowVideoImage(false);
+      }, 500); // Match this with the CSS transition duration
+    }
+  }, [displayPosts.length, showVideoImage]);
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -80,6 +102,20 @@ export const SearchContainer = ({
           Save time finding viral content for social media
         </p>
       </div>
+
+      {showVideoImage && (
+        <div 
+          ref={videoImageRef}
+          className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ease-in-out"
+          style={{ zIndex: 50 }}
+        >
+          <img 
+            src="/lovable-uploads/9fcce97c-63d7-4cfe-ada4-5e5d7ee749c2.png" 
+            alt="Video Search"
+            className="w-32 h-32 object-contain"
+          />
+        </div>
+      )}
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         <SearchBar
@@ -133,7 +169,7 @@ export const SearchContainer = ({
 
       {displayPosts.length > 0 && (
         <>
-          <div className="w-full max-w-[90rem]">
+          <div ref={resultsAnchorRef} className="w-full max-w-[90rem]">
             <SearchFilters
               filters={filters}
               onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
