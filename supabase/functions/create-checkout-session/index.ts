@@ -31,6 +31,8 @@ serve(async (req) => {
       throw new Error('No price ID provided')
     }
 
+    console.log('Creating checkout session for:', { email: user.email, priceId });
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
@@ -48,8 +50,10 @@ serve(async (req) => {
         email: user.email,
       })
       customer_id = customer.id
+      console.log('Created new customer:', customer_id);
     } else {
       customer_id = customers.data[0].id
+      console.log('Found existing customer:', customer_id);
 
       // Check for existing subscriptions
       const subscriptions = await stripe.subscriptions.list({
@@ -74,12 +78,10 @@ serve(async (req) => {
         }
 
         // Cancel current subscription immediately for both upgrade to Ultra and downgrade to Premium
-        if (priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" || priceId === "price_1QdBd2DoPDXfOSZFnG8aWuIq") {
-          console.log(`Canceling existing subscription for ${priceId === "price_1QdC54DoPDXfOSZFXHBO4yB3" ? 'upgrade to Ultra' : 'downgrade to Premium'}`)
-          await stripe.subscriptions.cancel(currentSubscription.id, {
-            prorate: true
-          })
-        }
+        console.log('Canceling existing subscription for upgrade/downgrade');
+        await stripe.subscriptions.cancel(currentSubscription.id, {
+          prorate: true
+        })
       }
     }
 
@@ -87,8 +89,9 @@ serve(async (req) => {
     const origin = req.headers.get('origin') || ''
     const baseUrl = origin.replace(/\/$/, '') // Remove trailing slash if present
 
-    // Create the checkout session with properly formatted URLs
-    console.log('Creating checkout session with return URL:', baseUrl)
+    console.log('Creating checkout session with return URL:', baseUrl);
+    
+    // Create the checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -97,6 +100,8 @@ serve(async (req) => {
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
       allow_promotion_codes: true,
     })
+
+    console.log('Checkout session created:', session.id);
 
     return new Response(
       JSON.stringify({ url: session.url }),

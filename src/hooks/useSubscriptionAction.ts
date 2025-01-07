@@ -76,24 +76,32 @@ export const useSubscriptionAction = (session: any) => {
         });
       }
       else {
+        console.log('Creating checkout session for plan:', planId);
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
           body: { priceId: planId },
           headers: { Authorization: `Bearer ${session?.access_token}` }
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('Checkout session error:', error);
+          throw error;
+        }
+
+        console.log('Checkout session created:', data);
         if (data?.url) {
           window.location.href = data.url;
           return;
+        } else {
+          throw new Error('No checkout URL returned');
         }
       }
 
       queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('Subscription action error:', error);
       toast({
         title: "Error",
-        description: "Failed to update subscription. Please try again.",
+        description: error.message || "Failed to update subscription. Please try again.",
         variant: "destructive",
       });
     } finally {
