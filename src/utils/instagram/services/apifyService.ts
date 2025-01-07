@@ -63,7 +63,7 @@ export async function fetchInstagramPosts(
     console.log('Number of videos requested:', numberOfVideos);
     console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
     
-    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}/`;
+    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}`;
     const requestBody: ApifyRequestBody = {
       addParentData: false,
       directUrls: [instagramUrl],
@@ -71,14 +71,9 @@ export async function fetchInstagramPosts(
       isUserReelFeedURL: false,
       isUserTaggedFeedURL: false,
       resultsLimit: numberOfVideos,
-      resultsType: "posts",
+      resultsType: "stories",
       searchLimit: 1,
-      searchType: "user",
-      maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
-      expandVideo: true,
-      includeVideoMetadata: true,
-      memoryMbytes: 512
+      searchType: "hashtag"
     };
 
     if (postsNewerThan instanceof Date) {
@@ -109,7 +104,7 @@ export async function fetchBulkInstagramPosts(
     const cleanUrls = urls.map(url => {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('https://')) {
-        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}/`;
+        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}`;
       }
       return cleanUrl;
     });
@@ -121,14 +116,9 @@ export async function fetchBulkInstagramPosts(
       isUserReelFeedURL: false,
       isUserTaggedFeedURL: false,
       resultsLimit: numberOfVideos,
-      resultsType: "posts",
+      resultsType: "stories",
       searchLimit: 1,
-      searchType: "user",
-      maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
-      expandVideo: true,
-      includeVideoMetadata: true,
-      memoryMbytes: 512
+      searchType: "hashtag"
     };
 
     if (postsNewerThan instanceof Date) {
