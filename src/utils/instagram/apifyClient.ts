@@ -41,19 +41,14 @@ export async function fetchInstagramPosts(
 
     const requestBody: ApifyRequestBody = {
       addParentData: false,
-      directUrls: [`https://www.instagram.com/${username.replace('@', '')}/`],
+      directUrls: [`https://www.instagram.com/${username.replace('@', '')}`],
       enhanceUserSearchWithFacebookPage: false,
       isUserReelFeedURL: false,
       isUserTaggedFeedURL: false,
       resultsLimit: numberOfVideos,
       resultsType: "stories",
       searchLimit: 1,
-      searchType: "hashtag",
-      maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
-      expandVideo: true,
-      includeVideoMetadata: true,
-      memoryMbytes: 512
+      searchType: "hashtag"
     };
 
     if (postsNewerThan) {
@@ -97,7 +92,7 @@ export async function fetchBulkInstagramPosts(
     const cleanUrls = urls.map(url => {
       let cleanUrl = url.trim();
       if (!cleanUrl.startsWith('https://')) {
-        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}/`;
+        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}`;
       }
       return cleanUrl;
     });
@@ -111,12 +106,7 @@ export async function fetchBulkInstagramPosts(
       resultsLimit: numberOfVideos,
       resultsType: "stories",
       searchLimit: 1,
-      searchType: "hashtag",
-      maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO"],
-      expandVideo: true,
-      includeVideoMetadata: true,
-      memoryMbytes: 512
+      searchType: "hashtag"
     };
 
     if (postsNewerThan) {
