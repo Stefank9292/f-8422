@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { InstagramPost, ApifyRequestBody } from '../types/InstagramTypes';
+import { ApifyRequestBody, InstagramPost } from '../types/InstagramTypes';
 import { transformToInstagramPost } from '../validation/postValidator';
 
 const MAX_RETRIES = 3;
@@ -11,8 +11,6 @@ async function delay(ms: number) {
 
 async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0): Promise<InstagramPost[]> {
   try {
-    console.log('Making request attempt', retries + 1, 'with body:', requestBody);
-    
     const { data, error } = await supabase.functions.invoke('instagram-scraper', {
       body: requestBody
     });
@@ -35,16 +33,8 @@ async function makeRequestWithRetry(requestBody: ApifyRequestBody, retries = 0):
       throw new Error('Invalid response from Instagram scraper');
     }
 
-    console.log('Received data from Edge Function:', data);
-
-    // Filter for CLIPS only and transform posts
-    const transformedPosts = data
-      .filter(post => post.productType === 'CLIPS' || post.type === 'CLIPS')
-      .map(post => transformToInstagramPost(post))
-      .filter((post): post is InstagramPost => post !== null);
-
-    console.log('Transformed posts:', transformedPosts);
-    return transformedPosts;
+    return data.map(post => transformToInstagramPost(post))
+               .filter((post): post is InstagramPost => post !== null);
   } catch (error) {
     console.error(`Attempt ${retries + 1} failed:`, error);
 
@@ -107,12 +97,10 @@ export async function fetchInstagramPosts(
       searchLimit: 1,
       searchType: "user",
       maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO", "CLIPS"],
+      mediaTypes: ["VIDEO"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: 512,
-      productType: "CLIPS",
-      onlyClips: true
+      memoryMbytes: 512
     };
 
     if (postsNewerThan instanceof Date) {
@@ -159,12 +147,10 @@ export async function fetchBulkInstagramPosts(
       searchLimit: 1,
       searchType: "user",
       maxPosts: numberOfVideos,
-      mediaTypes: ["VIDEO", "CLIPS"],
+      mediaTypes: ["VIDEO"],
       expandVideo: true,
       includeVideoMetadata: true,
-      memoryMbytes: 512,
-      productType: "CLIPS",
-      onlyClips: true
+      memoryMbytes: 512
     };
 
     if (postsNewerThan instanceof Date) {

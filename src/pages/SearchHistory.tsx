@@ -23,6 +23,7 @@ const SearchHistory = () => {
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // First, get the session
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -30,53 +31,6 @@ const SearchHistory = () => {
       return data.session;
     },
   });
-
-  // Set up real-time listener for search history changes
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    console.log('Setting up real-time subscription for search history');
-
-    const channel = supabase
-      .channel('search-history-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_history',
-          filter: `user_id=eq.${session.user.id}`
-        },
-        (payload) => {
-          console.log('Search history change detected:', payload);
-          queryClient.invalidateQueries({ queryKey: ['search-history'] });
-        }
-      )
-      .subscribe();
-
-    // Subscribe to search results changes
-    const resultsChannel = supabase
-      .channel('search-results-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_results'
-        },
-        (payload) => {
-          console.log('Search results change detected:', payload);
-          queryClient.invalidateQueries({ queryKey: ['search-history'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log('Cleaning up real-time subscriptions');
-      supabase.removeChannel(channel);
-      supabase.removeChannel(resultsChannel);
-    };
-  }, [session?.user?.id, queryClient]);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
@@ -93,12 +47,32 @@ const SearchHistory = () => {
     enabled: !!session?.access_token,
   });
 
+  useEffect(() => {
+    const channel = supabase
+      .channel('search_history_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['search-history'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
       if (!session?.user?.id) return null;
 
-      console.log('Fetching search history');
       const { data: historyData, error: historyError } = await supabase
         .from('search_history')
         .select(`
@@ -118,6 +92,7 @@ const SearchHistory = () => {
         throw historyError;
       }
 
+      // Transform the raw data to match our expected types
       return historyData?.map(item => ({
         id: item.id,
         search_query: item.search_query,

@@ -42,21 +42,18 @@ serve(async (req) => {
   try {
     const apiKey = Deno.env.get('APIFY_API_KEY')
     if (!apiKey) {
-      console.error('APIFY_API_KEY is not set');
       throw new Error('APIFY_API_KEY is not set')
     }
 
     // Get request body and validate
     const requestBody = await req.json()
     if (!requestBody || !requestBody.directUrls || !Array.isArray(requestBody.directUrls)) {
-      console.error('Invalid request body:', requestBody);
       throw new Error('Invalid request body: directUrls array is required')
     }
 
     // Extract user ID from authorization header
     const authHeader = req.headers.get('authorization')
     if (!authHeader) {
-      console.error('Missing authorization header');
       throw new Error('Authorization header is required')
     }
     const userId = authHeader.split(' ')[1] // Basic validation, you might want to decode JWT
@@ -79,22 +76,19 @@ serve(async (req) => {
       )
     }
 
-    // Add user context, concurrency settings, and CLIPS filter to request
+    // Add user context and concurrency settings to request
     const enhancedRequestBody = {
       ...requestBody,
       userId, // Add user ID to track requests
-      maxConcurrency: 1, // Reduced concurrency to prevent timeouts
-      handlePageTimeoutSecs: 60, // Increased timeout
+      maxConcurrency: 2, // Limit concurrent requests per user
+      handlePageTimeoutSecs: 30, // Timeout for each page
       maxRequestRetries: 3, // Retry failed requests
       minConcurrency: 1,
       maxRequestsPerCrawl: 50, // Limit total requests
       proxyConfiguration: {
         useApifyProxy: true,
         apifyProxyGroups: ['RESIDENTIAL']
-      },
-      productType: 'CLIPS', // Filter for CLIPS product type only
-      mediaTypes: ["VIDEO", "CLIPS"], // Include CLIPS in media types
-      onlyClips: true // Additional filter to ensure only CLIPS are returned
+      }
     }
 
     console.log('Processing request for user:', userId)
@@ -102,54 +96,43 @@ serve(async (req) => {
 
     const apiEndpoint = `https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items?token=${apiKey}`
     
-    // Make request to Apify with enhanced configuration and timeout
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
+    // Make request to Apify with enhanced configuration
+    const response = await fetch(apiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(enhancedRequestBody)
+    })
 
-    try {
-      const response = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(enhancedRequestBody),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      if (!response.ok) {
-        const errorBody = await response.text()
-        console.error('API Error Response:', errorBody)
-        
-        if (response.status === 402) {
-          throw new Error('Instagram data fetch failed: Usage quota exceeded')
-        }
-        
-        throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`)
+    if (!response.ok) {
+      const errorBody = await response.text()
+      console.error('API Error Response:', errorBody)
+      
+      if (response.status === 402) {
+        throw new Error('Instagram data fetch failed: Usage quota exceeded')
       }
-
-      const data = await response.json()
-      console.log('Successfully fetched data from Apify for user:', userId)
-
-      // Additional filter to ensure only CLIPS are returned
-      const filteredData = Array.isArray(data) 
-        ? data.filter(item => item.productType === 'CLIPS' || item.type === 'CLIPS')
-        : [];
-
-      return new Response(
-        JSON.stringify(filteredData),
-        { 
-          headers: { 
-            ...corsHeaders,
-            'Content-Type': 'application/json'
-          } 
-        }
-      )
-    } catch (error) {
-      clearTimeout(timeout);
-      throw error;
+      
+      throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorBody}`)
     }
+
+    const data = await response.json()
+    console.log('Successfully fetched data from Apify for user:', userId)
+
+    // Validate response data
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid response format from Apify')
+    }
+
+    return new Response(
+      JSON.stringify(data),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        } 
+      }
+    )
   } catch (error) {
     console.error('Error in instagram-scraper function:', error)
     
@@ -161,9 +144,6 @@ serve(async (req) => {
       statusCode = 401
     } else if (error.message.includes('Invalid request')) {
       statusCode = 400
-    } else if (error.name === 'AbortError') {
-      statusCode = 504
-      error.message = 'Request timeout exceeded'
     }
 
     return new Response(

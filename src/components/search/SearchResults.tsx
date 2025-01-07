@@ -1,10 +1,9 @@
 import { TableContent } from "./TableContent";
 import { TablePagination } from "./TablePagination";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { filterResults } from "@/utils/filterResults";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
 
 interface SearchResultsProps {
   searchResults: any[];
@@ -15,22 +14,13 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const [pageSize, setPageSize] = useState(25);
   const { filters } = useSearchStore();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    console.log('SearchResults received:', searchResults);
-    setIsLoading(false);
-  }, [searchResults]);
 
   // Apply filters to search results
   const filteredPosts = filterResults(searchResults, filters);
-  console.log('Filtered posts:', filteredPosts);
-
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const indexOfLastPost = currentPage * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;
   const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-  console.log('Current posts to display:', currentPosts);
 
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value));
@@ -68,25 +58,8 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="w-full flex justify-center items-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!searchResults || searchResults.length === 0) {
-    console.log('No search results to display');
-    return (
-      <div className="w-full text-center py-8 text-muted-foreground">
-        No results found
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full animate-in fade-in duration-300">
+    <div className="w-full">
       <TableContent 
         currentPosts={currentPosts}
         handleCopyCaption={handleCopyCaption}

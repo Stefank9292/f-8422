@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserProfileInfo } from "./profile/UserProfileInfo";
 
 export const RequestUsageCounter = () => {
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -15,32 +14,6 @@ export const RequestUsageCounter = () => {
       return data.session;
     },
   });
-
-  // Set up real-time listener for user requests
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const channel = supabase
-      .channel('user-requests-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_requests',
-          filter: `user_id=eq.${session.user.id}`
-        },
-        () => {
-          // Invalidate and refetch request stats when changes occur
-          queryClient.invalidateQueries({ queryKey: ['request-stats'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [session?.user?.id, queryClient]);
 
   const { data: requestStats, refetch: refetchRequestStats } = useQuery({
     queryKey: ['request-stats'],
