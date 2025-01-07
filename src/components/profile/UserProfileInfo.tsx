@@ -36,7 +36,7 @@ export const UserProfileInfo = ({
           <div className="flex flex-col">
             <span className={`text-[10px] ${
               isSteroidsUser 
-                ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text animate-pulse font-medium'
+                ? 'bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#F97316] text-transparent bg-clip-text font-medium'
                 : 'text-sidebar-foreground/50'
             }`}>
               {planName}
@@ -57,7 +57,7 @@ export const UserProfileInfo = ({
               <Infinity className="h-4 w-4 text-foreground" />
             </UserAvatar>
             <div className="flex flex-col">
-              <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text animate-pulse font-medium">
+              <span className="text-[10px] bg-gradient-to-r from-[#D946EF] via-[#E1306C] to-[#8B5CF6] text-transparent bg-clip-text font-medium">
                 Unlimited Usage
               </span>
               {isSteroidsUser && (
