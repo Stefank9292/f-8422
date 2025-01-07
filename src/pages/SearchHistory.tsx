@@ -23,7 +23,6 @@ const SearchHistory = () => {
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // First, get the session
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -31,6 +30,50 @@ const SearchHistory = () => {
       return data.session;
     },
   });
+
+  // Set up real-time listener for search history changes
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const channel = supabase
+      .channel('search-history-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        () => {
+          // Invalidate and refetch search history when changes occur
+          queryClient.invalidateQueries({ queryKey: ['search-history'] });
+        }
+      )
+      .subscribe();
+
+    // Also listen for search results changes
+    const resultsChannel = supabase
+      .channel('search-results-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_results'
+        },
+        () => {
+          // Invalidate and refetch search history when results change
+          queryClient.invalidateQueries({ queryKey: ['search-history'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      supabase.removeChannel(resultsChannel);
+    };
+  }, [session?.user?.id, queryClient]);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
