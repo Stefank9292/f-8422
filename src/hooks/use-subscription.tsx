@@ -7,6 +7,7 @@ export function useSubscription(session: Session | null) {
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
+        console.log("No session available, returning free tier values");
         return {
           subscribed: false,
           priceId: null,
@@ -16,6 +17,7 @@ export function useSubscription(session: Session | null) {
       }
 
       try {
+        console.log("Checking subscription with token:", session.access_token.slice(0, 10) + "...");
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -36,6 +38,7 @@ export function useSubscription(session: Session | null) {
           throw error;
         }
 
+        console.log("Subscription check response:", data);
         return data;
       } catch (error) {
         console.error('Subscription check error:', error);

@@ -76,7 +76,8 @@ serve(async (req) => {
         JSON.stringify({
           subscribed: false,
           priceId: null,
-          canceled: false
+          canceled: false,
+          maxClicks: 3
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
@@ -93,6 +94,7 @@ serve(async (req) => {
         subscribed: subscription.status === 'active',
         priceId: subscription.items.data[0].price.id,
         canceled: subscription.cancel_at_period_end,
+        maxClicks: subscription.status === 'active' ? 1000 : 3,
         status: subscription.status
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

@@ -19,7 +19,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         const { data: { session: currentSession }, error } = await supabase.auth.getSession();
         if (error) {
           console.error("Session check error:", error);
-          // If there's an error checking the session, clear it and redirect to auth
           await supabase.auth.signOut();
           queryClient.clear();
           setSession(null);
@@ -29,6 +28,21 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         if (!currentSession) {
           setSession(null);
           return;
+        }
+
+        // Refresh session if access token is close to expiring
+        const expiresAt = currentSession.expires_at;
+        if (expiresAt) {
+          const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
+          if (expiresIn < 600) { // Less than 10 minutes until expiration
+            const { data: { session: refreshedSession }, error: refreshError } = 
+              await supabase.auth.refreshSession();
+            if (!refreshError && refreshedSession) {
+              console.log("Session refreshed successfully");
+              setSession(refreshedSession);
+              return;
+            }
+          }
         }
 
         setSession(currentSession);
@@ -47,7 +61,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       console.log("Auth state change:", event);
       
       if (event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
-        // Clear local session data and query cache
         setSession(null);
         queryClient.clear();
         navigate('/auth', { replace: true });
@@ -56,8 +69,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       
       if (event === 'SIGNED_IN') {
         if (currentSession) {
+          console.log("New session established:", currentSession.access_token);
           setSession(currentSession);
-          // If user was trying to access a specific page before signing in, redirect there
           const intendedPath = location.state?.from?.pathname || '/';
           navigate(intendedPath, { replace: true });
         }
@@ -66,14 +79,13 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
       if (event === 'TOKEN_REFRESHED') {
         if (currentSession) {
+          console.log("Token refreshed:", currentSession.access_token);
           setSession(currentSession);
-          // Invalidate queries that depend on the session
           queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
         }
         return;
       }
 
-      // For any other event, just update the session if we have one
       setSession(currentSession);
     });
 
