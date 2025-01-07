@@ -1,12 +1,23 @@
+import { SidebarSection } from "./SidebarSection";
+import { NAV_ITEMS } from "@/config/navigation";
+
 interface SidebarToolsProps {
   currentPath: string;
   subscriptionStatus?: any;
 }
 
 export function SidebarTools({ currentPath, subscriptionStatus }: SidebarToolsProps) {
+  const handleNavigate = (url: string) => {
+    window.location.href = url;
+  };
+
   return (
-    <div className="px-2 py-2">
-      <span className="text-[11px] text-sidebar-foreground/70 px-2">Tools</span>
-    </div>
+    <SidebarSection
+      title="TOOLS"
+      items={NAV_ITEMS}
+      subscriptionStatus={subscriptionStatus}
+      onNavigate={handleNavigate}
+      currentPath={currentPath}
+    />
   );
 }
