@@ -53,25 +53,25 @@ serve(async (req) => {
 
     console.log('Verified user:', user.id);
 
-    // Check if user has an active subscription
-    const { data: subscriptionData, error: subscriptionError } = await supabaseClient
-      .from('subscriptions')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('status', 'active')
-      .single()
-
-    if (subscriptionError) {
-      console.error('Subscription check error:', subscriptionError);
+    // Get user's email
+    const userEmail = user.email;
+    if (!userEmail) {
+      console.error('No email found for user');
       return new Response(
-        JSON.stringify({ error: 'Failed to check subscription status' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'User email not found' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // If no subscription found, return free tier status
-    if (!subscriptionData) {
-      console.log('No active subscription found for user:', user.id);
+    // Get customer by email
+    const customers = await stripe.customers.list({
+      email: userEmail,
+      limit: 1
+    });
+
+    // If no customer found, return free tier status
+    if (customers.data.length === 0) {
+      console.log('No Stripe customer found for email:', userEmail);
       return new Response(
         JSON.stringify({
           subscribed: false,
@@ -83,18 +83,47 @@ serve(async (req) => {
       )
     }
 
-    // Get subscription details from Stripe
-    const subscription = await stripe.subscriptions.retrieve(subscriptionData.stripe_subscription_id);
-    
-    console.log('Found subscription for user:', user.id, 'Status:', subscription.status);
+    const customer = customers.data[0];
+    console.log('Found Stripe customer:', customer.id);
+
+    // Get all active subscriptions for the customer
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: 'active',
+      expand: ['data.items.data.price']
+    });
+
+    // If no active subscriptions, return free tier status
+    if (subscriptions.data.length === 0) {
+      console.log('No active subscriptions found for customer:', customer.id);
+      return new Response(
+        JSON.stringify({
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get the most recent active subscription
+    const subscription = subscriptions.data[0];
+    const priceId = subscription.items.data[0].price.id;
+
+    console.log('Found active subscription:', {
+      id: subscription.id,
+      priceId: priceId,
+      status: subscription.status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end
+    });
 
     // Return subscription status
     return new Response(
       JSON.stringify({
-        subscribed: subscription.status === 'active',
-        priceId: subscription.items.data[0].price.id,
+        subscribed: true,
+        priceId: priceId,
         canceled: subscription.cancel_at_period_end,
-        maxClicks: subscription.status === 'active' ? 1000 : 3,
         status: subscription.status
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -103,7 +132,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
