@@ -102,10 +102,22 @@ export const useSearchState = () => {
     try {
       const results = await fetchBulkInstagramPosts(urls, numVideos, date);
       
-      for (const url of urls) {
-        const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
-        if (urlResults.length > 0) {
-          await saveSearchHistory(url, urlResults);
+      // Group results by username and save to search history
+      const resultsByUsername = new Map<string, InstagramPost[]>();
+      
+      results.forEach(post => {
+        const username = post.ownerUsername;
+        if (!resultsByUsername.has(username)) {
+          resultsByUsername.set(username, []);
+        }
+        resultsByUsername.get(username)?.push(post);
+      });
+      
+      // Save search history for each username
+      for (const [username, posts] of resultsByUsername) {
+        if (posts.length > 0) {
+          console.log(`Saving search history for ${username} with ${posts.length} posts`);
+          await saveSearchHistory(username, posts);
         }
       }
       
