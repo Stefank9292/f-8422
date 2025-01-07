@@ -7,6 +7,9 @@ import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { ResetPassword } from "@/components/auth/ResetPassword";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Subscribe from "@/pages/Subscribe";
@@ -29,6 +32,36 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const { toast } = useToast();
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN') {
+        console.log('User signed in:', session?.user?.id);
+        queryClient.invalidateQueries();
+        toast({
+          description: "Successfully signed in",
+        });
+      }
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
+        queryClient.clear();
+        toast({
+          description: "Successfully signed out",
+        });
+      }
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed');
+        queryClient.invalidateQueries();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast, queryClient]);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
