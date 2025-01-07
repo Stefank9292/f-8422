@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/sidebar";
 import { SidebarTools } from "./sidebar/SidebarTools";
 import { SidebarSettings } from "./sidebar/SidebarSettings";
-import { SidebarNavigation } from "./sidebar/SidebarNavigation";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { RequestUsageCounter } from "./RequestUsageCounter";
 import { LogOut } from "lucide-react";
@@ -61,10 +60,6 @@ export function AppSidebar() {
           <SidebarGroupContent className="flex flex-col h-full">
             <div className="space-y-2">
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarNavigation />
-                </SidebarMenuItem>
-
                 <SidebarMenuItem>
                   <SidebarTools currentPath={location.pathname} />
                 </SidebarMenuItem>
