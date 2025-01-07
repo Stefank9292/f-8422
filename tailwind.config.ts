@@ -90,24 +90,13 @@ export default {
         "scale-in": {
           "0%": { transform: "scale(0.95)", opacity: "0" },
           "100%": { transform: "scale(1)", opacity: "1" },
-        },
-        "ring": {
-          "0%": { transform: "scale(1)", opacity: "1" },
-          "70%": { transform: "scale(1.1)", opacity: "0.7" },
-          "100%": { transform: "scale(1)", opacity: "1" }
-        },
-        "synchronized-pulse": {
-          "0%, 100%": { opacity: "1" },
-          "50%": { opacity: ".5" }
         }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-in": "fade-in 0.3s ease-out",
-        "scale-in": "scale-in 0.2s ease-out",
-        "ring": "ring 3s ease-in-out infinite",
-        "synchronized-pulse": "synchronized-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+        "scale-in": "scale-in 0.2s ease-out"
       },
       transitionTimingFunction: {
         'spring': 'cubic-bezier(0.37, 0, 0.63, 1)',
