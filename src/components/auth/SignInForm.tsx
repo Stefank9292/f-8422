@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useRecaptchaSiteKey } from "@/hooks/useRecaptchaSiteKey";
+import { RecaptchaVerification } from "./RecaptchaVerification";
+import { useRateLimit } from "@/hooks/useRateLimit";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -12,68 +13,19 @@ interface SignInFormProps {
   setLoading: (loading: boolean) => void;
 }
 
-const RATE_LIMIT_KEY = 'signin_attempts';
-const MAX_ATTEMPTS = 5;
-const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
-
 export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
-  const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLocked, setIsLocked] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(0);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const { data: siteKey, isLoading: isLoadingSiteKey, error: siteKeyError } = useRecaptchaSiteKey();
-
-  useEffect(() => {
-    checkRateLimit();
-    const interval = setInterval(checkRateLimit, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const checkRateLimit = () => {
-    const rateLimitData = localStorage.getItem(RATE_LIMIT_KEY);
-    if (rateLimitData) {
-      const { attempts, timestamp } = JSON.parse(rateLimitData);
-      const timeElapsed = Date.now() - timestamp;
-      
-      if (attempts >= MAX_ATTEMPTS && timeElapsed < LOCKOUT_DURATION) {
-        setIsLocked(true);
-        setRemainingTime(Math.ceil((LOCKOUT_DURATION - timeElapsed) / 1000));
-      } else if (timeElapsed >= LOCKOUT_DURATION) {
-        localStorage.removeItem(RATE_LIMIT_KEY);
-        setIsLocked(false);
-        setRemainingTime(0);
-      }
-    }
-  };
-
-  const updateRateLimit = () => {
-    const rateLimitData = localStorage.getItem(RATE_LIMIT_KEY);
-    const now = Date.now();
-    
-    if (rateLimitData) {
-      const { attempts, timestamp } = JSON.parse(rateLimitData);
-      const timeElapsed = now - timestamp;
-      
-      if (timeElapsed < LOCKOUT_DURATION) {
-        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
-          attempts: attempts + 1,
-          timestamp: now
-        }));
-      } else {
-        localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
-          attempts: 1,
-          timestamp: now
-        }));
-      }
-    } else {
-      localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify({
-        attempts: 1,
-        timestamp: now
-      }));
-    }
-  };
+  const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
+    key: 'signin_attempts',
+    maxAttempts: 5,
+    lockoutDuration: 15 * 60 * 1000 // 15 minutes
+  });
+  const { handleAuthError, handleAuthSuccess } = useAuthForm({
+    mode: 'sign_in',
+    updateRateLimit
+  });
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,72 +63,17 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       });
 
       if (error) {
-        console.error("Sign in error:", error);
-        updateRateLimit();
-        checkRateLimit();
-        
-        if (error.message.includes('Invalid login credentials')) {
-          toast({
-            title: "Error",
-            description: "Invalid email or password",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "An error occurred during sign in",
-            variant: "destructive",
-          });
-        }
+        handleAuthError(error);
         return;
       }
 
-      if (!data.session) {
-        throw new Error("No session created after sign in");
-      }
-
-      // Verify the session is valid
-      const { data: { user }, error: userError } = await supabase.auth.getUser(
-        data.session.access_token
-      );
-
-      if (userError || !user) {
-        throw new Error("Failed to verify user session");
-      }
-
-      toast({
-        title: "Success",
-        description: "Successfully signed in",
-      });
-      
+      await handleAuthSuccess(data.session);
     } catch (error) {
-      console.error("Sign in process error:", error);
-      toast({
-        title: "Error",
-        description: "Failed to complete sign in process",
-        variant: "destructive",
-      });
+      handleAuthError(error as Error);
     } finally {
       setLoading(false);
     }
   };
-
-  const handleCaptchaChange = (token: string | null) => {
-    setCaptchaToken(token);
-  };
-
-  if (isLoadingSiteKey) {
-    return <div>Loading...</div>;
-  }
-
-  if (siteKeyError || !siteKey) {
-    console.error('ReCAPTCHA site key error:', siteKeyError);
-    return (
-      <div className="text-red-500">
-        Error: ReCAPTCHA configuration is missing. Please contact support.
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
@@ -202,13 +99,9 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           disabled={isLocked}
         />
       </div>
-      <div className="flex justify-center my-4">
-        <ReCAPTCHA
-          sitekey={siteKey}
-          onChange={handleCaptchaChange}
-          theme="dark"
-        />
-      </div>
+      
+      <RecaptchaVerification onVerify={setCaptchaToken} />
+      
       <Button 
         type="submit" 
         className="w-full material-button-primary" 
@@ -221,9 +114,11 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
             : "Sign In"
         }
       </Button>
+
       <p className="text-xs text-center text-muted-foreground mt-4">
         By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
       </p>
+      
       <p className="text-sm text-center text-muted-foreground">
         Don't have an account?{" "}
         <button

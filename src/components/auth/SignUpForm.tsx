@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
-import ReCAPTCHA from "react-google-recaptcha";
-import { useRecaptchaSiteKey } from "@/hooks/useRecaptchaSiteKey";
+import { RecaptchaVerification } from "./RecaptchaVerification";
+import { validatePassword, checkPasswordStrength } from "@/utils/auth/validation";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -27,61 +28,11 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     message: "",
     color: "bg-red-500/20"
   });
-  const { data: siteKey, isLoading: isLoadingSiteKey, error: siteKeyError } = useRecaptchaSiteKey();
-
-  const checkPasswordStrength = (password: string) => {
-    const minLength = 8;
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
-
-    let score = 0;
-    if (password.length >= minLength) score++;
-    if (hasUppercase) score++;
-    if (hasLowercase) score++;
-    if (hasNumber) score++;
-    if (hasSpecialChar) score++;
-
-    if (score < 3) {
-      return {
-        score: (score / 5) * 100,
-        message: "Weak – Password must include uppercase, lowercase, numbers, and special characters",
-        color: "bg-red-500/80" // Bright red for weak
-      };
-    } else if (score < 5) {
-      return {
-        score: (score / 5) * 100,
-        message: "Medium – Password could be stronger",
-        color: "bg-yellow-500/80" // Bright yellow for medium
-      };
-    } else {
-      return {
-        score: 100,
-        message: "Strong – Password meets all requirements",
-        color: "bg-green-500/80" // Bright green for strong
-      };
-    }
-  };
-
-  const validatePassword = (password: string): string | null => {
-    if (password.length < 8) {
-      return "Password must be at least 8 characters long";
-    }
-    if (!/[A-Z]/.test(password)) {
-      return "Password must include at least one uppercase letter";
-    }
-    if (!/[a-z]/.test(password)) {
-      return "Password must include at least one lowercase letter";
-    }
-    if (!/[0-9]/.test(password)) {
-      return "Password must include at least one number";
-    }
-    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
-      return "Password must include at least one special character";
-    }
-    return null;
-  };
+  
+  const { handleAuthError, handleAuthSuccess } = useAuthForm({
+    mode: 'sign_up',
+    onSuccess: () => navigate("/auth/confirm-email", { state: { email } })
+  });
 
   const handlePasswordChange = (newPassword: string) => {
     setPassword(newPassword);
@@ -128,43 +79,28 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return;
     }
 
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        captchaToken
-      }
-    });
-
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          captchaToken
+        }
       });
-    } else {
-      navigate("/auth/confirm-email", { state: { email } });
+
+      if (error) {
+        handleAuthError(error);
+        return;
+      }
+
+      await handleAuthSuccess(data.session);
+    } catch (error) {
+      handleAuthError(error as Error);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-
-  const handleCaptchaChange = (token: string | null) => {
-    setCaptchaToken(token);
-  };
-
-  if (isLoadingSiteKey) {
-    return <div>Loading...</div>;
-  }
-
-  if (siteKeyError || !siteKey) {
-    console.error('ReCAPTCHA site key error:', siteKeyError);
-    return (
-      <div className="text-red-500">
-        Error: ReCAPTCHA configuration is missing. Please contact support.
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
@@ -212,19 +148,17 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           className="material-input"
         />
       </div>
-      <div className="flex justify-center my-4">
-        <ReCAPTCHA
-          sitekey={siteKey}
-          onChange={handleCaptchaChange}
-          theme="dark"
-        />
-      </div>
+      
+      <RecaptchaVerification onVerify={setCaptchaToken} />
+      
       <Button type="submit" className="w-full material-button-primary" disabled={loading}>
         {loading ? "Loading..." : "Sign Up"}
       </Button>
+
       <p className="text-xs text-center text-muted-foreground mt-4">
         By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
       </p>
+      
       <p className="text-sm text-center text-muted-foreground">
         Already have an account?{" "}
         <button
