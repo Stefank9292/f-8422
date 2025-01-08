@@ -128,20 +128,19 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   return (
     <div className="w-full flex flex-col items-center space-y-4 mt-6">
-      <Button
-        variant="ghost"
-        size="sm"
+      <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="flex items-center gap-2 px-3 py-1.5 h-auto"
+        className="inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-200 
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg"
       >
-        <History className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-[11px] text-muted-foreground font-medium">Recent Searches</span>
+        <History className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+        <span className="font-medium">Recent Searches</span>
         {isCollapsed ? (
-          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+          <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         ) : (
-          <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+          <ChevronUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
         )}
-      </Button>
+      </button>
       
       <div
         className={cn(
