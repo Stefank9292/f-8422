@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
@@ -11,6 +11,40 @@ const ConfirmEmail = () => {
   const { toast } = useToast();
   const [isResending, setIsResending] = useState(false);
   const email = location.state?.email;
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN') {
+        // Check if user has an active subscription
+        const { data: subscriptionStatus, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session?.access_token}`
+          }
+        });
+
+        if (error) {
+          console.error('Error checking subscription:', error);
+          return;
+        }
+
+        // If no active subscription, redirect to pricing page
+        if (!subscriptionStatus?.subscribed) {
+          navigate("/subscribe");
+          toast({
+            title: "Welcome!",
+            description: "Please select a plan to continue.",
+          });
+        } else {
+          // If they have a subscription, redirect to home
+          navigate("/");
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate, toast]);
 
   const handleResendEmail = async () => {
     if (!email) {
@@ -72,7 +106,7 @@ const ConfirmEmail = () => {
                 <li>Open your email inbox</li>
                 <li>Look for an email from VyralSearch</li>
                 <li>Click the "Confirm Email" button in the email</li>
-                <li>If you can't find the email, check your spam folder</li>
+                <li>Select a plan to start using VyralSearch</li>
               </ol>
             </div>
           </div>
