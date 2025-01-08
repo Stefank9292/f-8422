@@ -150,7 +150,7 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div ref={resultsRef}>
+        <div ref={resultsRef} className="space-y-8">
           <div className="w-full max-w-[90rem]">
             <SearchFilters
               filters={filters}
@@ -161,7 +161,7 @@ export const SearchContainer = ({
               currentPosts={displayPosts}
             />
           </div>
-          <div className="w-full max-w-[90rem] space-y-6 sm:space-y-8">
+          <div className="w-full max-w-[90rem]">
             <div className="material-card overflow-hidden animate-in fade-in duration-300">
               <SearchResults searchResults={displayPosts} />
             </div>
