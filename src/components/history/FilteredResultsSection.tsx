@@ -59,7 +59,7 @@ export function FilteredResultsSection({
 
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
-      <div className="rounded-xl overflow-hidden border border-border/50">
+      <div className="material-card border border-border/50">
         <SearchFilters
           filters={filters}
           onFilterChange={onFilterChange}
