@@ -32,7 +32,6 @@ export const FilterInput = ({
 }: FilterInputProps) => {
   const [date, setDate] = useState<Date | undefined>();
 
-  // Sync date state with external value
   useEffect(() => {
     if (value && isDatePicker) {
       try {
@@ -50,7 +49,6 @@ export const FilterInput = ({
   }, [value, isDatePicker]);
 
   const handleNumericInput = (inputValue: string) => {
-    // Only allow numbers and empty string
     const numericValue = inputValue.replace(/[^0-9]/g, '');
     onChange(numericValue);
   };
@@ -80,7 +78,7 @@ export const FilterInput = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal h-10",
+                  "w-full justify-start text-left font-normal h-10 border border-border/50",
                   !date && "text-muted-foreground"
                 )}
               >
@@ -101,7 +99,7 @@ export const FilterInput = ({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 border border-border/50"
               onClick={handleResetDate}
             >
               <X className="h-4 w-4" />
@@ -133,7 +131,7 @@ export const FilterInput = ({
           }
         }}
         placeholder={placeholder}
-        className="h-10"
+        className="h-10 border border-border/50"
       />
       {helpText && (
         <p className="text-xs text-muted-foreground">{helpText}</p>

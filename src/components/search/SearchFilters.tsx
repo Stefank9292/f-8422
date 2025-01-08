@@ -102,7 +102,7 @@ export const SearchFilters = ({
           <CollapsibleTrigger asChild>
             <Button 
               variant="outline" 
-              className="w-full flex items-center justify-between p-4"
+              className="w-full flex items-center justify-between p-4 border border-border/50"
             >
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
@@ -117,7 +117,7 @@ export const SearchFilters = ({
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-4">
-            <div className="space-y-6 bg-card/50 rounded-lg p-4">
+            <div className="space-y-6 bg-card/50 rounded-lg p-4 border border-border/50">
               {filterInputs.map((input, index) => (
                 <FilterInput
                   key={index}
@@ -129,7 +129,7 @@ export const SearchFilters = ({
                   variant="outline" 
                   size="sm" 
                   onClick={onReset}
-                  className="w-full h-10 text-xs font-medium"
+                  className="w-full h-10 text-xs font-medium border border-border/50"
                 >
                   <X className="w-3.5 h-3.5 mr-2" />
                   Reset Filters
@@ -142,7 +142,7 @@ export const SearchFilters = ({
       </div>
 
       <div className="hidden md:block">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-card/50 p-6 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-card/50 p-6 rounded-lg border border-border/50">
           {filterInputs.map((input, index) => (
             <FilterInput
               key={index}
