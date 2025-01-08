@@ -67,9 +67,9 @@ export const FilterInput = ({
 
   if (isDatePicker) {
     return (
-      <div className="space-y-2">
-        <Label className="text-sm font-medium flex items-center gap-2">
-          <Icon className="h-4 w-4" />
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium flex items-center gap-1.5">
+          <Icon className="h-3.5 w-3.5" />
           <span>{label}</span>
         </Label>
         <div className="relative">
@@ -78,11 +78,11 @@ export const FilterInput = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal h-10 border border-border/50",
+                  "w-full justify-start text-left font-normal h-9 text-xs border border-border/50",
                   !date && "text-muted-foreground"
                 )}
               >
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
                 {date ? format(date, "dd.MM.yyyy") : <span>Pick a date</span>}
               </Button>
             </PopoverTrigger>
@@ -99,25 +99,25 @@ export const FilterInput = ({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 border border-border/50"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 h-5 w-5 border border-border/50"
               onClick={handleResetDate}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3" />
               <span className="sr-only">Reset date</span>
             </Button>
           )}
         </div>
         {helpText && (
-          <p className="text-xs text-muted-foreground">{helpText}</p>
+          <p className="text-[10px] text-muted-foreground">{helpText}</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
-      <Label className="text-sm font-medium flex items-center gap-2">
-        <Icon className="h-4 w-4" />
+    <div className="space-y-1.5">
+      <Label className="text-xs font-medium flex items-center gap-1.5">
+        <Icon className="h-3.5 w-3.5" />
         <span>{label}</span>
       </Label>
       <Input
@@ -131,10 +131,10 @@ export const FilterInput = ({
           }
         }}
         placeholder={placeholder}
-        className="h-10 border border-border/50"
+        className="h-9 text-xs border border-border/50"
       />
       {helpText && (
-        <p className="text-xs text-muted-foreground">{helpText}</p>
+        <p className="text-[10px] text-muted-foreground">{helpText}</p>
       )}
     </div>
   );

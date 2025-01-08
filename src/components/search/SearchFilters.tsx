@@ -143,9 +143,9 @@ export const SearchFilters = ({
 
       <div className="hidden md:block">
         <div className="bg-card/50 p-6 rounded-lg border border-border/50">
-          <div className="grid grid-cols-6 gap-4">
+          <div className="grid grid-cols-6 gap-6">
             {filterInputs.map((input, index) => (
-              <div key={index} className="min-w-[180px]">
+              <div key={index} className="w-full min-w-[150px] max-w-[200px]">
                 <FilterInput {...input} />
               </div>
             ))}
