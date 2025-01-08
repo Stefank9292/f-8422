@@ -84,13 +84,13 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="material-input pr-12"
+          className="material-input-with-icon"
           disabled={isLocked}
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (

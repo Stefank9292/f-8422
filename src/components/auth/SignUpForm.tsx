@@ -110,12 +110,12 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
           required
-          className="material-input pr-12"
+          className="material-input-with-icon"
         />
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (
@@ -133,12 +133,12 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          className="material-input pr-12"
+          className="material-input-with-icon"
         />
         <button
           type="button"
           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
           aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
         >
           {showConfirmPassword ? (

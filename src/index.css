@@ -44,47 +44,6 @@
     --sidebar-ring: 240 4.8% 95.9%;
   }
 
-  .dark {
-    --background: 220 47% 15%;
-    --foreground: 210 60% 85%;  /* Brighter navy blue */
-
-    --card: 220 47% 15%;
-    --card-foreground: 210 60% 85%;  /* Brighter navy blue */
-
-    --popover: 220 47% 15%;
-    --popover-foreground: 210 60% 85%;  /* Brighter navy blue */
-
-    --primary: 317 95% 57%;
-    --primary-foreground: 355.7 100% 97.3%;
-
-    --secondary: 220 47% 20%;
-    --secondary-foreground: 210 60% 85%;  /* Brighter navy blue */
-
-    --muted: 220 47% 20%;
-    --muted-foreground: 210 40% 75%;  /* Slightly dimmer navy blue for muted text */
-
-    --accent: 220 47% 20%;
-    --accent-foreground: 210 60% 85%;  /* Brighter navy blue */
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 220 47% 20%;
-    --input: 220 47% 20%;
-    --ring: 220 47% 20%;
-
-    --sidebar-background: 220 47% 15%;
-    --sidebar-foreground: 210 60% 85%;  /* Brighter navy blue */
-    --sidebar-primary: 317 95% 57%;
-    --sidebar-primary-foreground: 355.7 100% 97.3%;
-    --sidebar-accent: 220 47% 20%;
-    --sidebar-accent-foreground: 210 60% 85%;  /* Brighter navy blue */
-    --sidebar-border: 220 47% 20%;
-    --sidebar-ring: 220 47% 20%;
-  }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
@@ -142,7 +101,11 @@
   .material-input {
     @apply h-16 px-6 rounded-xl border-2 border-input bg-transparent 
            focus:border-primary focus:ring-2 focus:ring-secondary/20 transition-colors
-           text-base md:text-lg;
+           text-base md:text-lg w-full;
+  }
+
+  .material-input-with-icon {
+    @apply material-input pr-14;
   }
 
   .material-button {
