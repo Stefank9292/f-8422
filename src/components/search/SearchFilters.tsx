@@ -142,13 +142,14 @@ export const SearchFilters = ({
       </div>
 
       <div className="hidden md:block">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 bg-card/50 p-6 rounded-lg border border-border/50">
-          {filterInputs.map((input, index) => (
-            <FilterInput
-              key={index}
-              {...input}
-            />
-          ))}
+        <div className="bg-card/50 p-6 rounded-lg border border-border/50">
+          <div className="grid grid-cols-6 gap-4">
+            {filterInputs.map((input, index) => (
+              <div key={index} className="min-w-[180px]">
+                <FilterInput {...input} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
