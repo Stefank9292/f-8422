@@ -58,7 +58,7 @@ export function FilteredResultsSection({
   const totalPages = Math.ceil(filteredResults.length / pageSize);
 
   return (
-    <div className="mt-3 space-y-4 animate-fade-in">
+    <div className="mt-3 space-y-3 animate-fade-in">
       <div className="material-card border border-border/50">
         <SearchFilters
           filters={filters}
