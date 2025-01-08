@@ -1,26 +1,55 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SignInForm } from "@/components/auth/SignInForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AuthPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Check if there's an existing session
+    const checkSession = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Session check error:", sessionError);
+        return;
+      }
+      
+      if (session) {
+        const redirectTo = location.state?.from?.pathname || '/';
+        navigate(redirectTo, { replace: true });
+      }
+    };
+
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", event, session);
+      
       if (event === "SIGNED_IN") {
+        // Clear any existing errors
+        setError(null);
+        
+        // Show success toast
         toast({
           title: "Welcome!",
           description: "You have successfully signed in.",
         });
-        navigate("/");
+
+        // Redirect to the intended page or home
+        const redirectTo = location.state?.from?.pathname || '/';
+        navigate(redirectTo, { replace: true });
       }
+      
       if (event === "SIGNED_OUT") {
         toast({
           title: "Signed out",
@@ -30,19 +59,27 @@ const AuthPage = () => {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate, toast]);
+  }, [navigate, location, toast]);
 
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
         }
       });
 
       if (error) {
+        console.error("Google sign in error:", error);
+        setError(error.message);
         toast({
           title: "Error",
           description: error.message,
@@ -51,9 +88,11 @@ const AuthPage = () => {
       }
     } catch (error) {
       console.error("Google sign in error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to sign in with Google";
+      setError(errorMessage);
       toast({
         title: "Error",
-        description: "Failed to sign in with Google. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -74,6 +113,12 @@ const AuthPage = () => {
         </div>
         
         <div className="material-card p-6 space-y-6">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <Button 
             onClick={handleGoogleSignIn} 
             disabled={loading}
