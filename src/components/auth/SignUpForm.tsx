@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -19,6 +20,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     message: "",
@@ -86,6 +88,16 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the reCAPTCHA verification.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (inviteCode !== "Vyral2025") {
       toast({
         title: "Invalid Invite Code",
@@ -118,6 +130,9 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        captchaToken
+      }
     });
 
     if (error) {
@@ -130,6 +145,10 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       navigate("/auth/confirm-email", { state: { email } });
     }
     setLoading(false);
+  };
+
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
   };
 
   return (
@@ -176,6 +195,13 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           onChange={(e) => setInviteCode(e.target.value)}
           required
           className="material-input"
+        />
+      </div>
+      <div className="flex justify-center my-4">
+        <ReCAPTCHA
+          sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+          onChange={handleCaptchaChange}
+          theme="dark"
         />
       </div>
       <Button type="submit" className="w-full material-button-primary" disabled={loading}>

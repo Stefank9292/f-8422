@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -20,6 +21,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
   const [password, setPassword] = useState("");
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   useEffect(() => {
     checkRateLimit();
@@ -83,6 +85,15 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       return;
     }
 
+    if (!captchaToken) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the reCAPTCHA verification.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       
@@ -92,6 +103,9 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
+        options: {
+          captchaToken
+        }
       });
 
       if (error) {
@@ -145,6 +159,10 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     }
   };
 
+  const handleCaptchaChange = (token: string | null) => {
+    setCaptchaToken(token);
+  };
+
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
       <div className="space-y-2">
@@ -167,6 +185,13 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           required
           className="material-input"
           disabled={isLocked}
+        />
+      </div>
+      <div className="flex justify-center my-4">
+        <ReCAPTCHA
+          sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+          onChange={handleCaptchaChange}
+          theme="dark"
         />
       </div>
       <Button 
