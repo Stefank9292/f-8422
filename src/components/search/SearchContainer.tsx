@@ -160,6 +160,9 @@ export const SearchContainer = ({
             <div className="rounded-xl border border-border/50 overflow-hidden">
               <div className="flex items-center justify-between px-6 py-4 bg-card/50 border-b border-border/50">
                 <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Filter Results
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -171,9 +174,6 @@ export const SearchContainer = ({
                       isFiltersCollapsed ? "" : "transform rotate-180"
                     )} />
                   </Button>
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Filter Results
-                  </span>
                 </div>
                 <span className="text-[10px] text-muted-foreground/70">
                   Showing {displayPosts.length} results
