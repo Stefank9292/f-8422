@@ -6,6 +6,11 @@ import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
 import { SearchHistoryItemHeader } from "./SearchHistoryItemHeader";
 import { filterResults, FilterState } from "@/utils/filterResults";
+import { Button } from "@/components/ui/button";
+import { Filter, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { cn } from "@/lib/utils";
 
 interface SearchHistoryItemProps {
   item: {
@@ -20,6 +25,7 @@ interface SearchHistoryItemProps {
 
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isResultsOpen, setIsResultsOpen] = useLocalStorage('resultsOpen', true);
   const { toast } = useToast();
   const [sortKey, setSortKey] = useState<string>("");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
@@ -179,36 +185,61 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       
       {isExpanded && results.length > 0 && (
         <div className="mt-3 space-y-4 animate-fade-in">
-          <div className="px-1">
-            <SearchFilters
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onReset={handleResetFilters}
-              totalResults={results.length}
-              filteredResults={filteredResults.length}
-              currentPosts={filteredResults}
-            />
-          </div>
-          <div className="rounded-lg overflow-hidden">
-            <TableContent
-              currentPosts={currentPosts}
-              handleSort={handleSort}
-              handleCopyCaption={handleCopyCaption}
-              handleDownload={handleDownload}
-              formatNumber={formatNumber}
-              truncateCaption={truncateCaption}
-              sortKey={sortKey}
-              sortDirection={sortDirection}
-            />
-          </div>
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            pageSize={pageSize}
-            onPageChange={handlePageChange}
-            onPageSizeChange={handlePageSizeChange}
-            totalResults={filteredResults.length}
-          />
+          <Collapsible open={isResultsOpen} onOpenChange={setIsResultsOpen}>
+            <div className="flex items-center justify-between mb-4">
+              <CollapsibleTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2 border border-border/50"
+                >
+                  <Filter className="h-4 w-4" />
+                  <span className="text-sm font-medium">
+                    {isResultsOpen ? 'Hide Results' : 'Show Results'}
+                  </span>
+                  <ChevronDown className={cn(
+                    "w-4 h-4 transition-transform duration-200",
+                    isResultsOpen && "transform rotate-180"
+                  )} />
+                </Button>
+              </CollapsibleTrigger>
+              <span className="text-sm text-muted-foreground">
+                Showing {filteredResults.length} of {results.length} results
+              </span>
+            </div>
+            <CollapsibleContent className="transition-all duration-300">
+              <div className="px-1">
+                <SearchFilters
+                  filters={filters}
+                  onFilterChange={handleFilterChange}
+                  onReset={handleResetFilters}
+                  totalResults={results.length}
+                  filteredResults={filteredResults.length}
+                  currentPosts={filteredResults}
+                />
+              </div>
+              <div className="rounded-lg overflow-hidden mt-4">
+                <TableContent
+                  currentPosts={currentPosts}
+                  handleSort={handleSort}
+                  handleCopyCaption={handleCopyCaption}
+                  handleDownload={handleDownload}
+                  formatNumber={formatNumber}
+                  truncateCaption={truncateCaption}
+                  sortKey={sortKey}
+                  sortDirection={sortDirection}
+                />
+              </div>
+              <TablePagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
+                totalResults={filteredResults.length}
+              />
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       )}
     </div>
