@@ -16,6 +16,15 @@ const AuthPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check for error in URL params
+    const params = new URLSearchParams(window.location.hash.substring(1));
+    const errorDescription = params.get('error_description');
+    if (errorDescription) {
+      setError(errorDescription);
+      // Clear the URL without triggering a refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
       
@@ -24,6 +33,7 @@ const AuthPage = () => {
           title: "Welcome!",
           description: "You have successfully signed in.",
         });
+        // Get the intended path from location state, or default to home
         const redirectTo = location.state?.from?.pathname || "/";
         navigate(redirectTo, { replace: true });
       }
