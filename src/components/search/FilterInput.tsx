@@ -28,7 +28,6 @@ export const FilterInput = ({
   placeholder,
   type = "text",
   isDatePicker,
-  helpText,
 }: FilterInputProps) => {
   const [date, setDate] = useState<Date | undefined>();
 
@@ -107,9 +106,6 @@ export const FilterInput = ({
             </Button>
           )}
         </div>
-        {helpText && (
-          <p className="text-[10px] text-muted-foreground">{helpText}</p>
-        )}
       </div>
     );
   }
@@ -133,9 +129,6 @@ export const FilterInput = ({
         placeholder={placeholder}
         className="h-9 text-xs border border-border/50"
       />
-      {helpText && (
-        <p className="text-[10px] text-muted-foreground">{helpText}</p>
-      )}
     </div>
   );
 };
