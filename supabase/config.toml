@@ -1,22 +1,4 @@
 project_id = "uubpxlhfkxqjrsgnwlzh"
 
-[functions.create-checkout-session]
-verify_jwt = true
-
-[functions.check-subscription]
-verify_jwt = true
-
-[functions.cancel-subscription]
-verify_jwt = true
-
-[functions.resume-subscription]
-verify_jwt = true
-
-[functions.update-subscription]
-verify_jwt = true
-
-[functions.instagram-scraper]
-verify_jwt = true
-
-[functions.get-apify-key]
+[functions.get-recaptcha-key]
 verify_jwt = false
