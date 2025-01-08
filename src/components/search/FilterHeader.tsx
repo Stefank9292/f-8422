@@ -11,7 +11,7 @@ interface FilterHeaderProps {
 
 export const FilterHeader = ({ totalResults, filteredResults, onReset, currentPosts }: FilterHeaderProps) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-3 py-2.5 bg-card/50 rounded-t-lg border-x border-t border-border/50">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-6 bg-card/50 rounded-t-lg border-x border-t border-border/50">
       <div className="flex items-center gap-1.5">
         <Filter className="w-3.5 h-3.5 text-primary/70" />
         <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
