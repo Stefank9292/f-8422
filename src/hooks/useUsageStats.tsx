@@ -135,5 +135,6 @@ export const useUsageStats = (session: Session | null) => {
     usagePercentage,
     hasReachedLimit,
     getPlanName,
+    subscriptionStatus, // Added this line to fix the error
   };
 };
