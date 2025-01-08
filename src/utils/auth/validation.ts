@@ -18,44 +18,44 @@ export const validatePassword = (password: string): string | null => {
 };
 
 export const checkPasswordStrength = (password: string) => {
-  const minLength = 8;
   const hasUppercase = /[A-Z]/.test(password);
   const hasLowercase = /[a-z]/.test(password);
   const hasNumber = /[0-9]/.test(password);
   const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
   
+  // Calculate base score
   let score = 0;
   let message = "";
   let color = "";
   
-  // Base score from length
-  if (password.length >= 12) score += 2;
-  else if (password.length >= 8) score += 1;
+  // Length criteria
+  if (password.length >= 12) score += 40;
+  else if (password.length >= 8) score += 20;
   
-  // Additional criteria
-  if (hasUppercase) score += 1;
-  if (hasLowercase) score += 1;
-  if (hasNumber) score += 1;
-  if (hasSpecialChar) score += 1;
+  // Character type criteria
+  if (hasUppercase) score += 15;
+  if (hasLowercase) score += 15;
+  if (hasNumber) score += 15;
+  if (hasSpecialChar) score += 15;
   
-  // Determine strength level
-  if (score <= 2) {
+  // Determine strength level and message
+  if (score <= 30) {
     return {
-      score: (score / 6) * 100,
-      message: "Weak – Add uppercase, lowercase, numbers, and special characters",
-      color: "bg-red-500"
+      score: Math.min(score, 33),
+      message: "Weak – Add more character types and length",
+      color: "bg-red-500/20"
     };
-  } else if (score <= 4) {
+  } else if (score <= 70) {
     return {
-      score: (score / 6) * 100,
-      message: "Medium – Make it longer and add more character types",
-      color: "bg-yellow-500"
+      score: Math.min(score, 66),
+      message: "Medium – Add more character types or length",
+      color: "bg-yellow-500/20"
     };
   } else {
     return {
       score: 100,
       message: "Strong – Great password!",
-      color: "bg-green-500"
+      color: "bg-green-500/20"
     };
   }
 };

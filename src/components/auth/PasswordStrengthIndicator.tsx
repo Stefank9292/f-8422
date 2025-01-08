@@ -23,7 +23,7 @@ export const PasswordStrengthIndicator = ({ passwordStrength }: PasswordStrength
 
   return (
     <div 
-      className="space-y-2 animate-in fade-in duration-300"
+      className="space-y-2 animate-in fade-in duration-300 mt-2"
       role="status"
       aria-live="polite"
     >
