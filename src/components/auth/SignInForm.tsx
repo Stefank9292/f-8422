@@ -92,6 +92,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           onClick={() => setShowPassword(!showPassword)}
           className="material-input-icon"
           aria-label={showPassword ? "Hide password" : "Show password"}
+          disabled={isLocked}
         >
           {showPassword ? (
             <EyeOff className="h-5 w-5" />

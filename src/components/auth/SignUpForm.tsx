@@ -148,7 +148,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           )}
         </button>
         {confirmPassword && password !== confirmPassword && (
-          <p className="text-sm text-destructive">Passwords do not match</p>
+          <p className="text-sm text-destructive mt-1">Passwords do not match</p>
         )}
       </div>
       <div className="space-y-2">
