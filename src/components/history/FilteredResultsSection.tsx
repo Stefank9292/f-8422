@@ -60,7 +60,7 @@ export function FilteredResultsSection({
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
       <div className="w-full max-w-[90rem]">
-        <div className="rounded-xl border border-border/50 overflow-hidden">
+        <div className="rounded-xl border border-border/50">
           <SearchFilters
             filters={filters}
             onFilterChange={onFilterChange}
@@ -79,7 +79,7 @@ export function FilteredResultsSection({
         )}
       >
         <div className="w-full max-w-[90rem]">
-          <div className="material-card overflow-hidden">
+          <div className="rounded-xl border border-border/50">
             <TableContent
               currentPosts={currentPosts}
               handleSort={handleSort}
