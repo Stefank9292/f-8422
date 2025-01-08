@@ -39,7 +39,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
 
   const getButtonText = () => {
-    if (!subscriptionStatus?.subscribed && planId !== 'free') {
+    if (!subscriptionStatus?.subscribed) {
       if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
         return "Upgrade to Creator Pro Annual";
       }
@@ -47,13 +47,6 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
         return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
-    }
-
-    if (planId === 'free') {
-      if (!subscriptionStatus?.subscribed) {
-        return "Current Plan";
-      }
-      return "Downgrade to Free";
     }
 
     const isCurrentPlan = subscriptionStatus?.priceId === planId;
@@ -76,13 +69,10 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     return `Upgrade to ${planName}`;
   };
 
-  const isCurrentPlan = 
-    (planId === 'free' && !subscriptionStatus?.subscribed) || 
-    (subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId);
+  const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId;
 
-  const isDowngrade = 
-    (planId === 'free' && subscriptionStatus?.subscribed) || 
-    (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W");
+  const isDowngrade = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && 
+                     planId === "price_1QdtwnGX13ZRG2XihcM36r3W";
 
   const getButtonStyle = () => {
     if (isPopular) {
@@ -94,7 +84,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
 
-  if (isCurrentPlan && subscriptionStatus?.subscribed && planId !== 'free') {
+  if (isCurrentPlan) {
     return (
       <CancelSubscriptionButton 
         isCanceled={subscriptionStatus?.canceled}
@@ -110,13 +100,13 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   return (
     <Button 
       onClick={handleClick} 
-      disabled={loading || (isCurrentPlan && planId === 'free')}
+      disabled={loading || isCurrentPlan}
       className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
       variant={isPopular ? "default" : "secondary"}
     >
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
-        isUpgrade={!isCurrentPlan && planId !== 'free'}
+        isUpgrade={!isCurrentPlan}
         showThunderbolt={isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"}
       />
     </Button>

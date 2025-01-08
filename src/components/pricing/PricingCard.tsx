@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X } from "lucide-react";
+import { Check } from "lucide-react";
 import { SubscribeButton } from "@/components/SubscribeButton";
 
 interface PricingCardProps {
@@ -25,12 +25,8 @@ interface PricingCardProps {
 
 const FeatureItem = ({ included, text }: { included: boolean; text: string }) => (
   <li className="flex items-center gap-2">
-    {included ? (
-      <Check className="h-3.5 w-3.5 text-green-500" />
-    ) : (
-      <X className="h-3.5 w-3.5 text-red-500" />
-    )}
-    <span className={`text-[11px] ${!included ? "text-muted-foreground" : ""}`}>{text}</span>
+    <Check className="h-3.5 w-3.5 text-green-500" />
+    <span className="text-[11px]">{text}</span>
   </li>
 );
 
@@ -43,17 +39,7 @@ export const PricingCard = ({
   priceId,
 }: PricingCardProps) => {
   const getFeatures = () => {
-    if (priceId === 'free') {
-      return [
-        { included: true, text: "3 Total Searches" },
-        { included: true, text: "Maximum 5 Results per Search" },
-        { included: false, text: "Bulk Search" },
-        { included: false, text: "Contact Support" },
-        { included: false, text: "Search History" },
-        { included: false, text: "Recent Searches" },
-        { included: false, text: "Early Access to new Features" }
-      ];
-    } else if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return [
         { included: true, text: "25 Total Searches" },
         { included: true, text: "Maximum 25 Results per Search" },

@@ -108,23 +108,22 @@ export const useUsageStats = (session: Session | null) => {
   const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
                     subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
   
-  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
+  const maxRequests = isSteroidsUser ? Infinity : 25; // Pro users get 25 searches
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);
   const hasReachedLimit = isSteroidsUser ? false : usedRequests >= maxRequests;
 
   const getPlanName = () => {
-    if (!subscriptionStatus?.subscribed) return 'Free';
-    if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+        subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return 'Creator Pro';
     }
-    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
       return 'Creator on Steroids';
     }
-    return 'Free';
+    return 'Creator Pro';
   };
 
   return {

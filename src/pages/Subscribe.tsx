@@ -79,22 +79,6 @@ const SubscribePage = () => {
 
   const pricingPlans = [
     {
-      name: "Free Plan",
-      description: "Get started for free",
-      price: {
-        monthly: "0",
-        annual: { total: "0", perMonth: "0" }
-      },
-      features: [
-        { included: true, text: "3 Total Searches" },
-        { included: true, text: "Maximum 5 Results per Search" },
-        { included: false, text: "Bulk Search" },
-        { included: false, text: "Contact Support" },
-        { included: false, text: "Early Access to new Features" }
-      ],
-      priceId: "free"
-    },
-    {
       name: "Creator Pro",
       description: "For Professional Creators",
       price: {
@@ -132,7 +116,7 @@ const SubscribePage = () => {
   const { title, subtitle } = getPageTitle();
 
   if (!session) {
-    return null; // Don't render anything while checking auth
+    return null;
   }
 
   return (
