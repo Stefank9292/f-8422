@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -7,13 +7,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ConfirmEmail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [isResending, setIsResending] = useState(false);
+  const email = location.state?.email;
 
   const handleResendEmail = async () => {
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "No email address found. Please try signing up again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsResending(true);
     const { error } = await supabase.auth.resend({
-      type: 'signup'
+      type: 'signup',
+      email: email,
     });
 
     if (error) {
@@ -51,7 +63,7 @@ const ConfirmEmail = () => {
           
           <div className="space-y-4 text-muted-foreground">
             <p>
-              We've sent you a confirmation email. Click the link in the email to verify your account.
+              We've sent you a confirmation email to <span className="font-medium">{email}</span>. Click the link in the email to verify your account.
             </p>
             
             <div className="bg-secondary/50 rounded-lg p-4 text-left space-y-2">

@@ -127,7 +127,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         variant: "destructive",
       });
     } else {
-      navigate("/auth/confirm-email");
+      navigate("/auth/confirm-email", { state: { email } });
     }
     setLoading(false);
   };
