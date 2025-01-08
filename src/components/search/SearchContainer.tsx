@@ -71,15 +71,16 @@ export const SearchContainer = ({
       return;
     }
 
+    if (hasReachedLimit || requestCount >= maxRequests) {
+      toast({
+        title: "Monthly Limit Reached",
+        description: `You've used ${requestCount} out of ${maxRequests} monthly searches. Please upgrade your plan for more searches.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!isLoading && !isBulkSearching) {
-      if (hasReachedLimit || requestCount >= maxRequests) {
-        toast({
-          title: "Monthly Limit Reached",
-          description: `You've used ${requestCount} out of ${maxRequests} monthly searches. Please upgrade your plan for more searches.`,
-          variant: "destructive",
-        });
-        return;
-      }
       if (isSettingsOpen) {
         setIsSettingsOpen(false);
       }
@@ -88,6 +89,7 @@ export const SearchContainer = ({
   };
 
   const hasNoSearchesLeft = requestCount >= maxRequests;
+  const isSearchDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || hasNoSearchesLeft;
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -110,7 +112,7 @@ export const SearchContainer = ({
 
         <Button 
           onClick={onSearchClick}
-          disabled={isLoading || isBulkSearching || !username.trim() || hasReachedLimit || hasNoSearchesLeft}
+          disabled={isSearchDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
             username && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
