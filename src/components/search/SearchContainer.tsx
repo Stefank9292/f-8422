@@ -49,7 +49,6 @@ export const SearchContainer = ({
     resetFilters
   } = useSearchStore();
 
-  // Effect to scroll to results when they're loaded
   useEffect(() => {
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
       // Add a small delay to ensure the content is rendered
@@ -81,7 +80,6 @@ export const SearchContainer = ({
         });
         return;
       }
-      // Close settings if they are open before performing the search
       if (isSettingsOpen) {
         setIsSettingsOpen(false);
       }
@@ -162,7 +160,7 @@ export const SearchContainer = ({
             />
           </div>
           <div className="w-full max-w-[90rem]">
-            <div className="material-card overflow-hidden animate-in fade-in duration-300">
+            <div className="rounded-xl border border-border/50 overflow-hidden">
               <SearchResults searchResults={displayPosts} />
             </div>
           </div>
