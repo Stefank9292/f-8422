@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
-import { RecaptchaVerification } from "./RecaptchaVerification";
 import { validatePassword, checkPasswordStrength } from "@/utils/auth/validation";
 import { useAuthForm } from "@/hooks/useAuthForm";
 
@@ -22,7 +21,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     message: "",
@@ -41,15 +39,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!captchaToken) {
-      toast({
-        title: "Verification Required",
-        description: "Please complete the reCAPTCHA verification.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     if (inviteCode !== "Vyral2025") {
       toast({
@@ -84,9 +73,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          captchaToken
-        }
       });
 
       if (error) {
@@ -148,8 +134,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           className="material-input"
         />
       </div>
-      
-      <RecaptchaVerification onVerify={setCaptchaToken} />
       
       <Button type="submit" className="w-full material-button-primary" disabled={loading}>
         {loading ? "Loading..." : "Sign Up"}

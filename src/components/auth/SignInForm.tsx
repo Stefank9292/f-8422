@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { RecaptchaVerification } from "./RecaptchaVerification";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useAuthForm } from "@/hooks/useAuthForm";
 
@@ -16,7 +15,6 @@ interface SignInFormProps {
 export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { toast } = useToast();
   const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
     key: 'signin_attempts',
@@ -40,15 +38,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       return;
     }
 
-    if (!captchaToken) {
-      toast({
-        title: "Verification Required",
-        description: "Please complete the reCAPTCHA verification.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setLoading(true);
       
@@ -58,9 +47,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
-        options: {
-          captchaToken
-        }
       });
 
       if (error) {
@@ -100,8 +86,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           disabled={isLocked}
         />
       </div>
-      
-      <RecaptchaVerification onVerify={setCaptchaToken} />
       
       <Button 
         type="submit" 
