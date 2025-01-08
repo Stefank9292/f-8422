@@ -6,7 +6,7 @@ import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
@@ -36,6 +36,10 @@ export const SearchContainer = ({
   displayPosts
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFiltersCollapsed, setIsFiltersCollapsed] = useState(() => {
+    const saved = localStorage.getItem("filtersCollapsed");
+    return saved ? JSON.parse(saved) : false;
+  });
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
   const { 
@@ -59,6 +63,10 @@ export const SearchContainer = ({
       }, 100);
     }
   }, [displayPosts, isLoading, isBulkSearching]);
+
+  useEffect(() => {
+    localStorage.setItem("filtersCollapsed", JSON.stringify(isFiltersCollapsed));
+  }, [isFiltersCollapsed]);
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -150,14 +158,40 @@ export const SearchContainer = ({
         <div ref={resultsRef} className="space-y-4">
           <div className="w-full max-w-[90rem]">
             <div className="rounded-xl border border-border/50 overflow-hidden">
-              <SearchFilters
-                filters={filters}
-                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-                onReset={resetFilters}
-                totalResults={displayPosts.length}
-                filteredResults={displayPosts.length}
-                currentPosts={displayPosts}
-              />
+              <div className="flex items-center justify-between px-6 py-4 bg-card/50 border-b border-border/50">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsFiltersCollapsed(!isFiltersCollapsed)}
+                    className="h-6 w-6 p-0 hover:bg-transparent"
+                  >
+                    <ChevronDown className={cn(
+                      "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                      isFiltersCollapsed ? "" : "transform rotate-180"
+                    )} />
+                  </Button>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Filter Results
+                  </span>
+                </div>
+                <span className="text-[10px] text-muted-foreground/70">
+                  Showing {displayPosts.length} results
+                </span>
+              </div>
+              <div className={cn(
+                "transition-all duration-300 ease-in-out",
+                isFiltersCollapsed ? "max-h-0" : "max-h-[500px]"
+              )}>
+                <SearchFilters
+                  filters={filters}
+                  onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+                  onReset={resetFilters}
+                  totalResults={displayPosts.length}
+                  filteredResults={displayPosts.length}
+                  currentPosts={displayPosts}
+                />
+              </div>
             </div>
           </div>
           <div className="w-full max-w-[90rem]">
