@@ -62,12 +62,12 @@ export const ExportCSV = ({ currentPosts }: ExportCSVProps) => {
 
   return (
     <Button 
-      variant="outline" 
+      variant="ghost" 
       size="sm" 
       onClick={handleExportCSV}
-      className="w-full h-10 text-xs font-medium border border-border/50"
+      className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50 border border-border/50"
     >
-      <Download className="w-3.5 h-3.5 mr-2" />
+      <Download className="w-3.5 h-3.5 mr-1.5" />
       Export CSV
     </Button>
   );
