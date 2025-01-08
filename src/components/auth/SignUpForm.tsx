@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
 import ReCAPTCHA from "react-google-recaptcha";
+import { useRecaptchaSiteKey } from "@/hooks/useRecaptchaSiteKey";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -26,6 +27,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     message: "",
     color: "bg-red-500/20"
   });
+  const { data: siteKey, isLoading: isLoadingSiteKey, error: siteKeyError } = useRecaptchaSiteKey();
 
   const checkPasswordStrength = (password: string) => {
     const minLength = 8;
@@ -151,10 +153,12 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     setCaptchaToken(token);
   };
 
-  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  if (isLoadingSiteKey) {
+    return <div>Loading...</div>;
+  }
 
-  if (!siteKey) {
-    console.error('ReCAPTCHA site key is missing');
+  if (siteKeyError || !siteKey) {
+    console.error('ReCAPTCHA site key error:', siteKeyError);
     return (
       <div className="text-red-500">
         Error: ReCAPTCHA configuration is missing. Please contact support.

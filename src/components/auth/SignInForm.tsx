@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import ReCAPTCHA from "react-google-recaptcha";
+import { useRecaptchaSiteKey } from "@/hooks/useRecaptchaSiteKey";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -22,6 +23,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const { data: siteKey, isLoading: isLoadingSiteKey, error: siteKeyError } = useRecaptchaSiteKey();
 
   useEffect(() => {
     checkRateLimit();
@@ -163,10 +165,12 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     setCaptchaToken(token);
   };
 
-  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+  if (isLoadingSiteKey) {
+    return <div>Loading...</div>;
+  }
 
-  if (!siteKey) {
-    console.error('ReCAPTCHA site key is missing');
+  if (siteKeyError || !siteKey) {
+    console.error('ReCAPTCHA site key error:', siteKeyError);
     return (
       <div className="text-red-500">
         Error: ReCAPTCHA configuration is missing. Please contact support.
