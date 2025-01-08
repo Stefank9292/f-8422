@@ -16,36 +16,66 @@ const AuthPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for error in URL params
-    const params = new URLSearchParams(window.location.hash.substring(1));
-    const errorDescription = params.get('error_description');
-    if (errorDescription) {
-      setError(errorDescription);
-      // Clear the URL without triggering a refresh
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-
-    // Handle auth callback
     const handleAuthCallback = async () => {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      
-      if (sessionError) {
-        console.error("Session error:", sessionError);
-        setError(sessionError.message);
-        return;
-      }
+      try {
+        setLoading(true);
+        setError(null);
 
-      if (session) {
-        console.log("Session found, redirecting...");
-        const redirectTo = location.state?.from?.pathname || "/";
-        navigate(redirectTo, { replace: true });
+        // Check for error in URL params
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const errorDescription = params.get('error_description');
+        if (errorDescription) {
+          console.error("Auth error from URL:", errorDescription);
+          setError(errorDescription);
+          // Clear the URL without triggering a refresh
+          window.history.replaceState({}, document.title, window.location.pathname);
+          return;
+        }
+
+        // Get the current session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          setError(sessionError.message);
+          return;
+        }
+
+        if (session) {
+          console.log("Active session found, redirecting...");
+          const redirectTo = location.state?.from?.pathname || "/";
+          navigate(redirectTo, { replace: true });
+          return;
+        }
+
+        // If we're on the callback route but no session, check for access token
+        if (location.hash.includes('access_token')) {
+          console.log("Processing OAuth callback...");
+          const { data: { session }, error: signInError } = 
+            await supabase.auth.getSession();
+
+          if (signInError) {
+            console.error("Sign in error:", signInError);
+            setError(signInError.message);
+            return;
+          }
+
+          if (session) {
+            console.log("Successfully signed in via OAuth");
+            const redirectTo = location.state?.from?.pathname || "/";
+            navigate(redirectTo, { replace: true });
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Auth callback error:", err);
+        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      } finally {
+        setLoading(false);
       }
     };
 
-    // If we're on the callback route, handle it
-    if (location.pathname === '/auth/callback') {
-      handleAuthCallback();
-    }
+    handleAuthCallback();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
@@ -55,7 +85,6 @@ const AuthPage = () => {
           title: "Welcome!",
           description: "You have successfully signed in.",
         });
-        // Get the intended path from location state, or default to home
         const redirectTo = location.state?.from?.pathname || "/";
         navigate(redirectTo, { replace: true });
       }
@@ -65,10 +94,6 @@ const AuthPage = () => {
           title: "Signed out",
           description: "You have been signed out.",
         });
-      }
-
-      if (event === "USER_UPDATED") {
-        console.log("User updated:", session);
       }
     });
 
@@ -100,7 +125,7 @@ const AuthPage = () => {
           variant: "destructive",
         });
       } else {
-        console.log("Google sign in successful:", data);
+        console.log("Google sign in initiated:", data);
       }
     } catch (err) {
       console.error("Unexpected error during Google sign in:", err);
