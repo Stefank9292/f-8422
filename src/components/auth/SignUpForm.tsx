@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
 import { validatePassword, checkPasswordStrength } from "@/utils/auth/validation";
 import { useAuthForm } from "@/hooks/useAuthForm";
-import { Eye, EyeOff } from "lucide-react";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -22,8 +21,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     message: "",
@@ -103,50 +100,26 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           className="material-input"
         />
       </div>
-      <div className="space-y-2 relative">
+      <div className="space-y-2">
         <Input
-          type={showPassword ? "text" : "password"}
+          type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
           required
-          className="material-input-with-icon"
+          className="material-input"
         />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="material-input-icon"
-          aria-label={showPassword ? "Hide password" : "Show password"}
-        >
-          {showPassword ? (
-            <EyeOff className="h-5 w-5" />
-          ) : (
-            <Eye className="h-5 w-5" />
-          )}
-        </button>
         {password && <PasswordStrengthIndicator passwordStrength={passwordStrength} />}
       </div>
-      <div className="space-y-2 relative">
+      <div className="space-y-2">
         <Input
-          type={showConfirmPassword ? "text" : "password"}
+          type="password"
           placeholder="Confirm Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          className="material-input-with-icon"
+          className="material-input"
         />
-        <button
-          type="button"
-          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="material-input-icon"
-          aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
-        >
-          {showConfirmPassword ? (
-            <EyeOff className="h-5 w-5" />
-          ) : (
-            <Eye className="h-5 w-5" />
-          )}
-        </button>
         {confirmPassword && password !== confirmPassword && (
           <p className="text-sm text-destructive mt-1">Passwords do not match</p>
         )}

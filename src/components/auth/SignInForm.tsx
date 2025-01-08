@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useAuthForm } from "@/hooks/useAuthForm";
-import { Eye, EyeOff } from "lucide-react";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -16,7 +15,6 @@ interface SignInFormProps {
 export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
     key: 'signin_attempts',
@@ -77,29 +75,16 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           disabled={isLocked}
         />
       </div>
-      <div className="space-y-2 relative">
+      <div className="space-y-2">
         <Input
-          type={showPassword ? "text" : "password"}
+          type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="material-input-with-icon"
+          className="material-input"
           disabled={isLocked}
         />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="material-input-icon"
-          aria-label={showPassword ? "Hide password" : "Show password"}
-          disabled={isLocked}
-        >
-          {showPassword ? (
-            <EyeOff className="h-5 w-5" />
-          ) : (
-            <Eye className="h-5 w-5" />
-          )}
-        </button>
       </div>
       
       <Button 
