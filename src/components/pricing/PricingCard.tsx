@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, X } from "lucide-react";
+import { Check, X, AlertTriangle } from "lucide-react";
 import { SubscribeButton } from "@/components/SubscribeButton";
 
 interface PricingCardProps {
@@ -23,16 +23,26 @@ interface PricingCardProps {
   priceId: string;
 }
 
-const FeatureItem = ({ included, text }: { included: boolean; text: string }) => (
-  <li className="flex items-center gap-2">
-    {included ? (
-      <Check className="h-3.5 w-3.5 text-green-500" />
-    ) : (
-      <X className="h-3.5 w-3.5 text-red-500" />
-    )}
-    <span className="text-[11px]">{text}</span>
-  </li>
-);
+const FeatureItem = ({ included, text, priceId }: { included: boolean; text: string; priceId: string }) => {
+  const isProPlan = priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+  const shouldShowWarning = isProPlan && included && (
+    text === "25 Total Searches per Month" || 
+    text === "Maximum 25 Results per Username"
+  );
+
+  return (
+    <li className="flex items-center gap-2">
+      {!included ? (
+        <X className="h-3.5 w-3.5 text-red-500" />
+      ) : shouldShowWarning ? (
+        <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" />
+      ) : (
+        <Check className="h-3.5 w-3.5 text-green-500" />
+      )}
+      <span className="text-[11px]">{text}</span>
+    </li>
+  );
+};
 
 export const PricingCard = ({
   name,
@@ -91,7 +101,7 @@ export const PricingCard = ({
       </div>
       <ul className="space-y-3 pt-2">
         {getFeatures().map((feature, index) => (
-          <FeatureItem key={index} {...feature} />
+          <FeatureItem key={index} {...feature} priceId={priceId} />
         ))}
       </ul>
       <div className="pt-6">
