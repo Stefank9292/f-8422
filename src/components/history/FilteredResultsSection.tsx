@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { SearchFilters } from "../search/SearchFilters";
 import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
@@ -72,18 +70,6 @@ export function FilteredResultsSection({
             currentPosts={filteredResults}
           />
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="ml-2"
-        >
-          {isCollapsed ? (
-            <ChevronDown className="h-4 w-4" />
-          ) : (
-            <ChevronUp className="h-4 w-4" />
-          )}
-        </Button>
       </div>
 
       <div
