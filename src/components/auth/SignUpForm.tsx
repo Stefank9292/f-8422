@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +13,7 @@ interface SignUpFormProps {
 }
 
 export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProps) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,6 +126,8 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         description: error.message,
         variant: "destructive",
       });
+    } else {
+      navigate("/auth/confirm-email");
     }
     setLoading(false);
   };

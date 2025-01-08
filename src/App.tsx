@@ -17,6 +17,7 @@ import Success from "@/pages/Success";
 import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
 import SearchHistory from "@/pages/SearchHistory";
+import ConfirmEmail from "@/pages/ConfirmEmail";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,6 +75,7 @@ function App() {
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/auth/reset-password" element={<ResetPassword />} />
+                  <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
                   <Route
                     path="/"
                     element={
