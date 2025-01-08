@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost } from "@/types/instagram";
 import { saveSearchHistory } from "@/utils/searchHistory";
+import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
+import { useRequestCount } from "@/hooks/useRequestCount";
 
 export const useSearchState = () => {
   const [username, setUsername] = useState("");
@@ -92,7 +95,7 @@ export const useSearchState = () => {
       for (const [username, posts] of resultsByUsername) {
         if (posts.length > 0) {
           console.log(`Saving search history for ${username} with ${posts.length} posts`);
-          await saveSearchHistory(username, posts, urls);
+          await saveSearchHistory(username, posts);
         }
       }
       
@@ -107,6 +110,7 @@ export const useSearchState = () => {
 
   return {
     username,
+    setUsername,
     isLoading,
     isBulkSearching,
     hasReachedLimit: requestCount >= maxRequests,
