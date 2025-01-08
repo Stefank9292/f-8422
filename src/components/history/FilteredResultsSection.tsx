@@ -59,24 +59,26 @@ export function FilteredResultsSection({
 
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
-      <div className="rounded-xl border border-border/50">
-        <SearchFilters
-          filters={filters}
-          onFilterChange={onFilterChange}
-          onReset={onResetFilters}
-          totalResults={results.length}
-          filteredResults={filteredResults.length}
-          currentPosts={filteredResults}
-        />
+      <div className="flex items-center justify-between px-1">
+        <div className="flex-1">
+          <SearchFilters
+            filters={filters}
+            onFilterChange={onFilterChange}
+            onReset={onResetFilters}
+            totalResults={results.length}
+            filteredResults={filteredResults.length}
+            currentPosts={filteredResults}
+          />
+        </div>
       </div>
 
       <div
         className={cn(
-          "transition-all duration-300 ease-in-out",
+          "overflow-hidden transition-all duration-300 ease-in-out",
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
       >
-        <div className="rounded-xl border border-border/50">
+        <div className="rounded-lg overflow-hidden">
           <TableContent
             currentPosts={currentPosts}
             handleSort={handleSort}

@@ -147,19 +147,23 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div ref={resultsRef} className="w-full max-w-[90rem] space-y-4">
-          <div className="rounded-xl border border-border/50">
-            <SearchFilters
-              filters={filters}
-              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-              onReset={resetFilters}
-              totalResults={displayPosts.length}
-              filteredResults={displayPosts.length}
-              currentPosts={displayPosts}
-            />
+        <div ref={resultsRef} className="space-y-4">
+          <div className="w-full max-w-[90rem]">
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <SearchFilters
+                filters={filters}
+                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+                onReset={resetFilters}
+                totalResults={displayPosts.length}
+                filteredResults={displayPosts.length}
+                currentPosts={displayPosts}
+              />
+            </div>
           </div>
-          <div className="rounded-xl border border-border/50">
-            <SearchResults searchResults={displayPosts} />
+          <div className="w-full max-w-[90rem]">
+            <div className="material-card overflow-hidden">
+              <SearchResults searchResults={displayPosts} />
+            </div>
           </div>
         </div>
       )}
