@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { Eye, EyeOff } from "lucide-react";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -15,6 +16,7 @@ interface SignInFormProps {
 export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
     key: 'signin_attempts',
@@ -75,16 +77,28 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           disabled={isLocked}
         />
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2 relative">
         <Input
-          type="password"
+          type={showPassword ? "text" : "password"}
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="material-input"
+          className="material-input pr-12"
           disabled={isLocked}
         />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={showPassword ? "Hide password" : "Show password"}
+        >
+          {showPassword ? (
+            <EyeOff className="h-5 w-5" />
+          ) : (
+            <Eye className="h-5 w-5" />
+          )}
+        </button>
       </div>
       
       <Button 
