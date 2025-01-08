@@ -83,24 +83,66 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       return;
     }
 
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
-
-    if (error) {
-      updateRateLimit();
-      checkRateLimit();
+    try {
+      setLoading(true);
       
+      // First, ensure no existing session
+      await supabase.auth.signOut();
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+
+      if (error) {
+        console.error("Sign in error:", error);
+        updateRateLimit();
+        checkRateLimit();
+        
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Error",
+            description: "Invalid email or password",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "An error occurred during sign in",
+            variant: "destructive",
+          });
+        }
+        return;
+      }
+
+      if (!data.session) {
+        throw new Error("No session created after sign in");
+      }
+
+      // Verify the session is valid
+      const { data: { user }, error: userError } = await supabase.auth.getUser(
+        data.session.access_token
+      );
+
+      if (userError || !user) {
+        throw new Error("Failed to verify user session");
+      }
+
+      toast({
+        title: "Success",
+        description: "Successfully signed in",
+      });
+      
+    } catch (error) {
+      console.error("Sign in process error:", error);
       toast({
         title: "Error",
-        description: "Invalid email or password",
+        description: "Failed to complete sign in process",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
