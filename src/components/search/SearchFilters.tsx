@@ -87,7 +87,7 @@ export const SearchFilters = ({
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-0 animate-in fade-in">
       <FilterHeader
         totalResults={totalResults}
         filteredResults={filteredResults}
@@ -137,8 +137,8 @@ export const SearchFilters = ({
         </CollapsibleContent>
       </Collapsible>
 
-      <div className="bg-card/50 p-6 rounded-lg border border-border/50 hidden md:block">
-        <div className="grid grid-cols-6 gap-6">
+      <div className="bg-card/50 rounded-b-lg border-x border-b border-border/50 hidden md:block">
+        <div className="grid grid-cols-6 gap-6 p-6">
           {filterInputs.map((input, index) => (
             <div key={index} className="w-full min-w-[150px] max-w-[200px]">
               <FilterInput {...input} />
