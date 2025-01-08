@@ -1,23 +1,13 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
-import { useSearchStore } from "../../store/searchStore";
+import { InstagramPost } from "@/types/instagram";
 import { saveSearchHistory } from "@/utils/searchHistory";
-import { InstagramPost } from "@/utils/instagram/types/InstagramTypes";
-import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
-import { useRequestCount } from "@/hooks/useRequestCount";
 
 export const useSearchState = () => {
-  const {
-    username,
-    numberOfVideos,
-    selectedDate,
-  } = useSearchStore();
-  
+  const [username, setUsername] = useState("");
   const [isBulkSearching, setIsBulkSearching] = useState(false);
-  const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
   const [shouldFetch, setShouldFetch] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -34,10 +24,12 @@ export const useSearchState = () => {
   const requestCount = useRequestCount(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryKey: ['instagram-posts', username],
     queryFn: async () => {
+      if (!username.trim()) return [];
+      
       console.log('Fetching Instagram posts for:', username);
-      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
+      const results = await fetchInstagramPosts(username);
       
       if (results.length > 0) {
         await saveSearchHistory(username, results);
@@ -51,23 +43,10 @@ export const useSearchState = () => {
     gcTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
     refetchOnMount: false,
-    meta: {
-      onError: (error: Error) => {
-        console.error('Search error:', error);
-        toast({
-          title: "Search Failed",
-          description: error.message || "Failed to fetch Instagram posts",
-          variant: "destructive",
-        });
-        setShouldFetch(false);
-      }
-    },
   });
 
   const handleSearch = () => {
-    if (isLoading || isBulkSearching) {
-      return;
-    }
+    if (isLoading || isBulkSearching) return;
 
     if (!username) {
       toast({
@@ -87,16 +66,12 @@ export const useSearchState = () => {
       return;
     }
 
-    // Reset any existing results before new search
     queryClient.removeQueries({ queryKey: ['instagram-posts'] });
-    setBulkSearchResults([]);
     setShouldFetch(true);
   };
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
-    if (isLoading || isBulkSearching) {
-      return;
-    }
+    if (isLoading || isBulkSearching) return;
 
     setIsBulkSearching(true);
     try {
@@ -117,11 +92,10 @@ export const useSearchState = () => {
       for (const [username, posts] of resultsByUsername) {
         if (posts.length > 0) {
           console.log(`Saving search history for ${username} with ${posts.length} posts`);
-          await saveSearchHistory(username, posts);
+          await saveSearchHistory(username, posts, urls);
         }
       }
       
-      setBulkSearchResults(results);
       return results;
     } catch (error) {
       console.error('Bulk search error:', error);
@@ -130,8 +104,6 @@ export const useSearchState = () => {
       setIsBulkSearching(false);
     }
   };
-
-  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return {
     username,
@@ -142,7 +114,6 @@ export const useSearchState = () => {
     maxRequests,
     handleSearch,
     handleBulkSearch,
-    displayPosts,
-    subscriptionStatus,
+    displayPosts: posts,
   };
 };

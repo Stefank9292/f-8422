@@ -63,7 +63,9 @@ export async function fetchInstagramPosts(
     console.log('Number of videos requested:', numberOfVideos);
     console.log('Posts newer than:', postsNewerThan ? new Date(postsNewerThan).toLocaleString() : 'No date filter');
     
-    const instagramUrl = `https://www.instagram.com/${username.replace('@', '')}`;
+    const cleanUsername = username.replace('@', '').trim();
+    const instagramUrl = `https://www.instagram.com/${cleanUsername}`;
+    
     const requestBody: ApifyRequestBody = {
       addParentData: false,
       directUrls: [instagramUrl],
