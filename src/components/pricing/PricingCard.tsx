@@ -45,8 +45,8 @@ export const PricingCard = ({
   const getFeatures = () => {
     if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return [
-        { included: true, text: "25 Total Searches" },
-        { included: true, text: "Maximum 25 Results per Search" },
+        { included: true, text: "25 Total Searches per Month" },
+        { included: true, text: "Maximum 25 Results per Username" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },
         { included: false, text: "Search History" },
@@ -56,7 +56,7 @@ export const PricingCard = ({
     } else {
       return [
         { included: true, text: "Unlimited Searches" },
-        { included: true, text: "Maximum 50 Results per Search" },
+        { included: true, text: "Maximum 50 Results per Username" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },
         { included: true, text: "Search History" },
