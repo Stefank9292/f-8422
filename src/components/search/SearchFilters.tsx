@@ -99,7 +99,7 @@ export const SearchFilters = ({
         <CollapsibleTrigger asChild>
           <Button 
             variant="outline" 
-            className="w-full flex items-center justify-between p-4 border border-border/50"
+            className="w-full flex items-center justify-between p-4 border-x border-b border-border/50"
           >
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
@@ -137,7 +137,7 @@ export const SearchFilters = ({
         </CollapsibleContent>
       </Collapsible>
 
-      <div className="bg-card/50 rounded-b-lg border-x border-b border-border/50 hidden md:block">
+      <div className="bg-card/50 border-x border-b border-border/50 hidden md:block">
         <div className="grid grid-cols-6 gap-6 p-6">
           {filterInputs.map((input, index) => (
             <div key={index} className="w-full min-w-[150px] max-w-[200px]">
