@@ -17,6 +17,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const { toast } = useToast();
   const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
     key: 'signin_attempts',
     maxAttempts: 5,
