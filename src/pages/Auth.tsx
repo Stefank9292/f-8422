@@ -77,7 +77,8 @@ const AuthPage = () => {
           <Button 
             onClick={handleGoogleSignIn} 
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200"
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-900 border border-gray-200 !important"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
