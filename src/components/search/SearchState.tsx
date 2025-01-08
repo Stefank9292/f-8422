@@ -40,7 +40,12 @@ export const useSearchState = () => {
       
       // Check if user has reached their limit before making the request
       if (requestCount >= maxRequests) {
-        throw new Error(`You've reached your monthly limit of ${maxRequests} searches. Please upgrade your plan for more searches.`);
+        const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
+        throw new Error(`You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`);
+      }
+
+      if (!username.trim()) {
+        throw new Error('Please enter a valid Instagram username');
       }
       
       const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
@@ -105,11 +110,12 @@ export const useSearchState = () => {
       return;
     }
 
-    if (requestCount >= maxRequests) {
+    // Check if user has enough searches left for all URLs
+    if (requestCount + urls.length > maxRequests) {
       const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
       toast({
         title: "Monthly Limit Reached",
-        description: `You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`,
+        description: `This bulk search would exceed your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`,
         variant: "destructive",
       });
       return;

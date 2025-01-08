@@ -25,13 +25,23 @@ export const RequestUsageCounter = () => {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
       // Get requests for the current billing period
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('user_requests')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', session.user.id)
         .eq('request_type', 'instagram_search')
         .gte('created_at', startOfMonth.toISOString())
         .lt('created_at', endOfMonth.toISOString());
+
+      if (error) {
+        console.error('Error fetching request stats:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch usage statistics",
+          variant: "destructive",
+        });
+        return 0;
+      }
 
       return count || 0;
     },
@@ -65,7 +75,7 @@ export const RequestUsageCounter = () => {
         const lastResetDate = new Date(now);
         lastResetDate.setDate(lastResetDate.getDate() - 30);
 
-        const { data: requests } = await supabase
+        const { data: requests, error } = await supabase
           .from('user_requests')
           .select('last_reset_at')
           .eq('user_id', session.user.id)
@@ -73,16 +83,26 @@ export const RequestUsageCounter = () => {
           .order('last_reset_at', { ascending: false })
           .limit(1);
 
+        if (error) {
+          console.error('Error checking last reset date:', error);
+          return;
+        }
+
         const shouldReset = !requests?.[0]?.last_reset_at || 
                           new Date(requests[0].last_reset_at) < lastResetDate;
 
         if (shouldReset) {
-          await supabase
+          const { error: resetError } = await supabase
             .from('user_requests')
             .update({ last_reset_at: now.toISOString() })
             .eq('user_id', session.user.id)
             .eq('request_type', 'instagram_search')
             .lt('created_at', lastResetDate.toISOString());
+
+          if (resetError) {
+            console.error('Error resetting usage:', resetError);
+            return;
+          }
 
           await refetchRequestStats();
         }
