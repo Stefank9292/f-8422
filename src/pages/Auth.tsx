@@ -18,15 +18,20 @@ const AuthPage = () => {
   useEffect(() => {
     // Check if there's an existing session
     const checkSession = async () => {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError) {
-        console.error("Session check error:", sessionError);
-        return;
-      }
-      
-      if (session) {
-        const redirectTo = location.state?.from?.pathname || '/';
-        navigate(redirectTo, { replace: true });
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.error("Session check error:", sessionError);
+          return;
+        }
+        
+        if (session) {
+          console.log("Active session found, redirecting...");
+          const redirectTo = location.state?.from?.pathname || '/';
+          navigate(redirectTo, { replace: true });
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
       }
     };
 
@@ -45,8 +50,9 @@ const AuthPage = () => {
           description: "You have successfully signed in.",
         });
 
-        // Redirect to the intended page or home
+        // Get the intended path or default to home
         const redirectTo = location.state?.from?.pathname || '/';
+        console.log("Redirecting to:", redirectTo);
         navigate(redirectTo, { replace: true });
       }
       
