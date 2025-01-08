@@ -25,6 +25,28 @@ const AuthPage = () => {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
 
+    // Handle auth callback
+    const handleAuthCallback = async () => {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        setError(sessionError.message);
+        return;
+      }
+
+      if (session) {
+        console.log("Session found, redirecting...");
+        const redirectTo = location.state?.from?.pathname || "/";
+        navigate(redirectTo, { replace: true });
+      }
+    };
+
+    // If we're on the callback route, handle it
+    if (location.pathname === '/auth/callback') {
+      handleAuthCallback();
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log("Auth state changed:", event, session);
       
