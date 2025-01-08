@@ -1,9 +1,10 @@
-import { X, Instagram, History, Lock } from "lucide-react";
+import { X, Instagram, History, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -11,6 +12,10 @@ interface RecentSearchesProps {
 
 export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const saved = localStorage.getItem('recentSearchesCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
   const queryClient = useQueryClient();
 
   const { data: session } = useQuery({
@@ -52,7 +57,6 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
           table: 'search_history'
         },
         () => {
-          // Invalidate and refetch recent searches when search history changes
           queryClient.invalidateQueries({ queryKey: ['recent-searches'] });
         }
       )
@@ -62,6 +66,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
       supabase.removeChannel(channel);
     };
   }, [queryClient, isSteroidsUser]);
+
+  // Save collapsed state to localStorage
+  useEffect(() => {
+    localStorage.setItem('recentSearchesCollapsed', JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
@@ -119,34 +128,52 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   return (
     <div className="w-full flex flex-col items-center space-y-4 mt-6">
-      <div className="flex items-center gap-2">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="flex items-center gap-2 px-3 py-1.5 h-auto"
+      >
         <History className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-[11px] text-muted-foreground font-medium">Recent Searches</span>
-      </div>
-      <div className="w-full flex flex-wrap justify-center gap-2.5">
-        {visibleSearches.map((search) => (
-          <div
-            key={search.id}
-            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
-          >
-            <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-            <button
-              onClick={() => onSelect(search.search_query)}
-              className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+        {isCollapsed ? (
+          <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+        ) : (
+          <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
+        )}
+      </Button>
+      
+      <div
+        className={cn(
+          "w-full grid place-items-center transition-all duration-300 ease-in-out",
+          isCollapsed ? "max-h-0 opacity-0 overflow-hidden" : "max-h-[500px] opacity-100"
+        )}
+      >
+        <div className="w-full flex flex-wrap justify-center gap-2.5">
+          {visibleSearches.map((search) => (
+            <div
+              key={search.id}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
-              {search.search_query}
-            </button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-4 w-4 p-0 hover:bg-transparent"
-              onClick={() => handleRemove(search.id)}
-            >
-              <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-              <span className="sr-only">Remove search</span>
-            </Button>
-          </div>
-        ))}
+              <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+              <button
+                onClick={() => onSelect(search.search_query)}
+                className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+              >
+                {search.search_query}
+              </button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-4 w-4 p-0 hover:bg-transparent"
+                onClick={() => handleRemove(search.id)}
+              >
+                <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                <span className="sr-only">Remove search</span>
+              </Button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
