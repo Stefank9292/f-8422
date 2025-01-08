@@ -37,6 +37,12 @@ export const useSearchState = () => {
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
       console.log('Fetching Instagram posts for:', username);
+      
+      // Check if user has reached their limit before making the request
+      if (requestCount >= maxRequests) {
+        throw new Error(`You've reached your monthly limit of ${maxRequests} searches. Please upgrade your plan for more searches.`);
+      }
+      
       const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
       
       if (results.length > 0) {
@@ -45,7 +51,7 @@ export const useSearchState = () => {
       
       return results;
     },
-    enabled: shouldFetch && !!username && !isBulkSearching,
+    enabled: shouldFetch && !!username && !isBulkSearching && requestCount < maxRequests,
     retry: false,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 5, // Cache for 5 minutes
