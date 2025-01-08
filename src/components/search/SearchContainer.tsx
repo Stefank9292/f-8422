@@ -151,7 +151,7 @@ export const SearchContainer = ({
 
       {displayPosts.length > 0 && (
         <div ref={resultsRef} className="space-y-8">
-          <div className="w-full max-w-[90rem] rounded-t-lg overflow-hidden">
+          <div className="w-full max-w-[90rem]">
             <SearchFilters
               filters={filters}
               onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
