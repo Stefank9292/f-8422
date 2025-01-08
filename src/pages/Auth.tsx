@@ -6,8 +6,15 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 const INVITE_CODE = "Vyral2025";
+
+interface PasswordStrength {
+  score: number;
+  message: string;
+  color: string;
+}
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -16,7 +23,13 @@ const AuthPage = () => {
   const [inviteCode, setInviteCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>({
+    score: 0,
+    message: "",
+    color: "bg-destructive"
+  });
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -38,12 +51,90 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast]);
 
+  const checkPasswordStrength = (password: string): PasswordStrength => {
+    const minLength = 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
+
+    let score = 0;
+    if (password.length >= minLength) score++;
+    if (hasUppercase) score++;
+    if (hasLowercase) score++;
+    if (hasNumber) score++;
+    if (hasSpecialChar) score++;
+
+    if (score < 3) {
+      return {
+        score: (score / 5) * 100,
+        message: "Weak – Password must include uppercase, lowercase, numbers, and special characters",
+        color: "bg-destructive"
+      };
+    } else if (score < 5) {
+      return {
+        score: (score / 5) * 100,
+        message: "Medium – Password could be stronger",
+        color: "bg-yellow-500"
+      };
+    } else {
+      return {
+        score: 100,
+        message: "Strong – Password meets all requirements",
+        color: "bg-green-500"
+      };
+    }
+  };
+
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Password must include at least one uppercase letter";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "Password must include at least one lowercase letter";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "Password must include at least one number";
+    }
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+      return "Password must include at least one special character";
+    }
+    return null;
+  };
+
+  const handlePasswordChange = (newPassword: string) => {
+    setPassword(newPassword);
+    setPasswordStrength(checkPasswordStrength(newPassword));
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (inviteCode !== INVITE_CODE) {
       toast({
         title: "Invalid Invite Code",
         description: "Please enter a valid invite code to sign up.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      toast({
+        title: "Invalid Password",
+        description: passwordError,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match. Please try again.",
         variant: "destructive",
       });
       return;
@@ -149,9 +240,27 @@ const AuthPage = () => {
                   type="password"
                   placeholder="Password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   required
                 />
+                {password && (
+                  <div className="space-y-2">
+                    <Progress value={passwordStrength.score} className={`h-2 ${passwordStrength.color}`} />
+                    <p className="text-sm text-muted-foreground">{passwordStrength.message}</p>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+                {confirmPassword && password !== confirmPassword && (
+                  <p className="text-sm text-destructive">Passwords do not match</p>
+                )}
               </div>
               <div className="space-y-2">
                 <Input
