@@ -121,7 +121,7 @@ const SubscribePage = () => {
 
   return (
     <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-7xl mx-auto space-y-8 pt-8">
+      <div className="max-w-7xl mx-auto space-y-12 pt-8">
         <div className="space-y-4">
           <h1 className="text-2xl font-semibold tracking-tight text-center">{title}</h1>
           <p className="text-[13px] text-muted-foreground text-center">
@@ -129,7 +129,7 @@ const SubscribePage = () => {
           </p>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-12">
           <div className="flex items-center justify-center gap-4">
             <span className={`text-[11px] ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
               Monthly
