@@ -6,11 +6,12 @@ import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
-import { Loader2, Search } from "lucide-react";
+import { Loader2, Search, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface SearchContainerProps {
   username: string;
@@ -110,7 +111,7 @@ export const SearchContainer = ({
           disabled={isLoading || isBulkSearching || !username.trim() || hasReachedLimit}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            username ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            username && !hasReachedLimit ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             hasReachedLimit && "opacity-50 cursor-not-allowed"
           )}
@@ -121,10 +122,16 @@ export const SearchContainer = ({
               <span>This can take up to a minute...</span>
             </>
           ) : hasReachedLimit ? (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Monthly Limit Reached ({requestCount}/{maxRequests})
-            </>
+            <div className="flex items-center gap-2">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Monthly Limit Reached ({requestCount}/{maxRequests})</span>
+              <Link 
+                to="/subscribe" 
+                className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded hover:bg-white/30 transition-colors"
+              >
+                Upgrade
+              </Link>
+            </div>
           ) : (
             <>
               <Search className="mr-2 h-3.5 w-3.5" />
