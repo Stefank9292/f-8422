@@ -5,24 +5,19 @@ export const useRecaptchaSiteKey = () => {
   return useQuery({
     queryKey: ["recaptcha-site-key"],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session");
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-recaptcha-key`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
+      const response = await supabase.functions.invoke('get-recaptcha-key');
+      
+      if (response.error) {
+        console.error('Error fetching reCAPTCHA site key:', response.error);
+        throw new Error(response.error.message);
+      }
+      
+      const { data } = response;
+      if (!data?.siteKey) {
         throw new Error("Failed to fetch reCAPTCHA site key");
       }
 
-      const { siteKey } = await response.json();
-      return siteKey;
+      return data.siteKey;
     },
     retry: 1,
   });
