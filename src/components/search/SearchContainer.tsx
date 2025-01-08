@@ -8,7 +8,7 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
 import { Loader2, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
 
@@ -37,6 +37,7 @@ export const SearchContainer = ({
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
+  const resultsRef = useRef<HTMLDivElement>(null);
   const { 
     setUsername,
     numberOfVideos,
@@ -47,6 +48,19 @@ export const SearchContainer = ({
     setFilters,
     resetFilters
   } = useSearchStore();
+
+  // Effect to scroll to results when they're loaded
+  useEffect(() => {
+    if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
+      // Add a small delay to ensure the content is rendered
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [displayPosts, isLoading, isBulkSearching]);
 
   const onSearchClick = () => {
     if (!username.trim()) {
@@ -136,7 +150,7 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <>
+        <div ref={resultsRef}>
           <div className="w-full max-w-[90rem]">
             <SearchFilters
               filters={filters}
@@ -152,7 +166,7 @@ export const SearchContainer = ({
               <SearchResults searchResults={displayPosts} />
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );
