@@ -41,11 +41,12 @@ export const SearchFilters = ({
       value: filters.postsNewerThan,
       onChange: (value: string) => onFilterChange('postsNewerThan', value),
       placeholder: "dd.mm.yyyy",
-      isDatePicker: true
+      isDatePicker: true,
+      helpText: "Limited to posts from the last 90 days"
     },
     {
       icon: Eye,
-      label: "Min. Views",
+      label: "Minimum Views",
       value: filters.minViews,
       onChange: (value: string) => onFilterChange('minViews', value),
       placeholder: "e.g. 10000",
@@ -53,7 +54,7 @@ export const SearchFilters = ({
     },
     {
       icon: Play,
-      label: "Min. Plays",
+      label: "Minimum Plays",
       value: filters.minPlays,
       onChange: (value: string) => onFilterChange('minPlays', value),
       placeholder: "e.g. 5000",
@@ -61,7 +62,7 @@ export const SearchFilters = ({
     },
     {
       icon: Heart,
-      label: "Min. Likes",
+      label: "Minimum Likes",
       value: filters.minLikes,
       onChange: (value: string) => onFilterChange('minLikes', value),
       placeholder: "e.g. 1000",
@@ -69,7 +70,7 @@ export const SearchFilters = ({
     },
     {
       icon: MessageCircle,
-      label: "Min. Comments",
+      label: "Minimum Comments",
       value: filters.minComments,
       onChange: (value: string) => onFilterChange('minComments', value),
       placeholder: "e.g. 100",
@@ -77,7 +78,7 @@ export const SearchFilters = ({
     },
     {
       icon: Zap,
-      label: "Min. Engagement (%)",
+      label: "Minimum Engagement (%)",
       value: filters.minEngagement,
       onChange: (value: string) => onFilterChange('minEngagement', value),
       placeholder: "e.g. 5",
