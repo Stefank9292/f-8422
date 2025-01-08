@@ -18,43 +18,64 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    // Only return a generic message in production
+    return { 
+      hasError: true, 
+      error: process.env.NODE_ENV === 'production' 
+        ? new Error('An unexpected error occurred') 
+        : error 
+    };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error securely without exposing sensitive information
-    console.error('Uncaught error:', {
+    // Sanitize error information before logging
+    const sanitizedError = {
       name: error.name,
-      message: error.message,
-      componentStack: errorInfo.componentStack
-    });
+      message: this.sanitizeErrorMessage(error.message),
+      componentStack: this.sanitizeStackTrace(errorInfo.componentStack)
+    };
 
-    // If user is authenticated, we can log the error with user context
+    console.error('Uncaught error:', sanitizedError);
     this.logErrorSecurely(error, errorInfo);
+  }
+
+  private sanitizeErrorMessage(message: string): string {
+    // Remove potential sensitive information from error messages
+    return message.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi, '[EMAIL]')
+                 .replace(/\b\d{4}\b/g, '[ID]')
+                 .replace(/Bearer [a-zA-Z0-9\-._~+/]+=*/g, '[TOKEN]');
+  }
+
+  private sanitizeStackTrace(stack: string): string {
+    // Remove file paths and line numbers from stack trace
+    return stack.split('\n')
+                .map(line => line.replace(/\(.*\)/g, '(...)'))
+                .join('\n');
   }
 
   private async logErrorSecurely(error: Error, errorInfo: ErrorInfo) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        // Log error with user context but without sensitive data
-        console.error('Authenticated user error:', {
+        const sanitizedError = {
           userId: session.user.id,
           errorName: error.name,
-          errorMessage: error.message,
+          errorMessage: this.sanitizeErrorMessage(error.message),
           timestamp: new Date().toISOString()
-        });
+        };
+
+        // Log sanitized error
+        console.error('Authenticated user error:', sanitizedError);
       }
     } catch (loggingError) {
-      // Fail silently to avoid cascading errors
-      console.error('Error logging failed:', loggingError);
+      // Fail silently but log generic error
+      console.error('Error logging failed');
     }
   }
 
   private handleRefresh = () => {
     // Clear any cached data that might be causing the error
     if (window.localStorage) {
-      // Keep auth data but clear potentially corrupted state
       const authData = window.localStorage.getItem('supabase.auth.token');
       window.localStorage.clear();
       if (authData) {
@@ -72,7 +93,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <AlertTriangle className="w-12 h-12 text-red-500 mx-auto" />
             <h1 className="text-xl font-semibold">Something went wrong</h1>
             <p className="text-sm text-muted-foreground">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {process.env.NODE_ENV === 'production' 
+                ? 'An unexpected error occurred' 
+                : this.state.error?.message}
             </p>
             <div className="space-x-4">
               <button
