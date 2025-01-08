@@ -19,9 +19,12 @@ const AuthPage = () => {
     // Check if there's an existing session
     const checkSession = async () => {
       try {
+        setError(null);
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
         if (sessionError) {
           console.error("Session check error:", sessionError);
+          setError(sessionError.message);
           return;
         }
         
@@ -32,6 +35,7 @@ const AuthPage = () => {
         }
       } catch (error) {
         console.error("Session check failed:", error);
+        setError(error instanceof Error ? error.message : "Failed to check session");
       }
     };
 
