@@ -152,14 +152,16 @@ export const SearchContainer = ({
       {displayPosts.length > 0 && (
         <div ref={resultsRef} className="space-y-8">
           <div className="w-full max-w-[90rem]">
-            <SearchFilters
-              filters={filters}
-              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-              onReset={resetFilters}
-              totalResults={displayPosts.length}
-              filteredResults={displayPosts.length}
-              currentPosts={displayPosts}
-            />
+            <div className="rounded-xl overflow-hidden material-card">
+              <SearchFilters
+                filters={filters}
+                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+                onReset={resetFilters}
+                totalResults={displayPosts.length}
+                filteredResults={displayPosts.length}
+                currentPosts={displayPosts}
+              />
+            </div>
           </div>
           <div className="w-full max-w-[90rem]">
             <div className="material-card overflow-hidden animate-in fade-in duration-300">
