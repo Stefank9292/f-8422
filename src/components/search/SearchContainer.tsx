@@ -49,10 +49,8 @@ export const SearchContainer = ({
     resetFilters
   } = useSearchStore();
 
-  // Effect to scroll to results when they're loaded
   useEffect(() => {
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
-      // Add a small delay to ensure the content is rendered
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ 
           behavior: 'smooth',
@@ -81,7 +79,6 @@ export const SearchContainer = ({
         });
         return;
       }
-      // Close settings if they are open before performing the search
       if (isSettingsOpen) {
         setIsSettingsOpen(false);
       }
@@ -150,19 +147,21 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div ref={resultsRef} className="space-y-8">
+        <div ref={resultsRef} className="space-y-4">
           <div className="w-full max-w-[90rem]">
-            <SearchFilters
-              filters={filters}
-              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-              onReset={resetFilters}
-              totalResults={displayPosts.length}
-              filteredResults={displayPosts.length}
-              currentPosts={displayPosts}
-            />
+            <div className="rounded-xl border border-border/50 overflow-hidden">
+              <SearchFilters
+                filters={filters}
+                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+                onReset={resetFilters}
+                totalResults={displayPosts.length}
+                filteredResults={displayPosts.length}
+                currentPosts={displayPosts}
+              />
+            </div>
           </div>
           <div className="w-full max-w-[90rem]">
-            <div className="material-card overflow-hidden animate-in fade-in duration-300">
+            <div className="material-card overflow-hidden">
               <SearchResults searchResults={displayPosts} />
             </div>
           </div>
