@@ -15,6 +15,7 @@ export const useRequestCount = (session: Session | null) => {
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
+      // Get requests for the current billing period
       const { count } = await supabase
         .from('user_requests')
         .select('*', { count: 'exact', head: true })

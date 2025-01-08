@@ -79,9 +79,10 @@ export const useSearchState = () => {
     }
 
     if (requestCount >= maxRequests) {
+      const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
       toast({
         title: "Monthly Limit Reached",
-        description: `You've reached your monthly limit of ${maxRequests} searches.`,
+        description: `You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`,
         variant: "destructive",
       });
       return;
@@ -95,6 +96,16 @@ export const useSearchState = () => {
 
   const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
     if (isLoading || isBulkSearching) {
+      return;
+    }
+
+    if (requestCount >= maxRequests) {
+      const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
+      toast({
+        title: "Monthly Limit Reached",
+        description: `You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`,
+        variant: "destructive",
+      });
       return;
     }
 

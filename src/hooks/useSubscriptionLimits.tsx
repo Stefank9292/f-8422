@@ -4,7 +4,7 @@ import { Session } from "@supabase/supabase-js";
 
 export const useSubscriptionLimits = (session: Session | null) => {
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
@@ -19,12 +19,21 @@ export const useSubscriptionLimits = (session: Session | null) => {
   });
 
   const getMaxRequests = () => {
-    if (!subscriptionStatus?.priceId) return 3;
+    if (!subscriptionStatus?.priceId) return 3; // Free tier: 3 searches per month
+    
+    // Pro tier: 25 searches per month
     if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
+        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+      return 25;
+    }
+    
+    // Creator on Steroids tier: Unlimited searches
     if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return Infinity;
-    return 3;
+        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+      return Infinity;
+    }
+    
+    return 3; // Default to free tier
   };
 
   return {
