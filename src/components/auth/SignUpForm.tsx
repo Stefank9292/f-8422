@@ -115,7 +115,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         <button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          className="material-input-icon"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
           {showPassword ? (
@@ -138,7 +138,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         <button
           type="button"
           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+          className="material-input-icon"
           aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
         >
           {showConfirmPassword ? (
