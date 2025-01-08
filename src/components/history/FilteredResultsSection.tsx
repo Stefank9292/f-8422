@@ -59,8 +59,8 @@ export function FilteredResultsSection({
 
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between px-1">
-        <div className="flex-1">
+      <div className="w-full max-w-[90rem]">
+        <div className="rounded-xl border border-border/50 overflow-hidden">
           <SearchFilters
             filters={filters}
             onFilterChange={onFilterChange}
@@ -78,17 +78,19 @@ export function FilteredResultsSection({
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
       >
-        <div className="rounded-lg overflow-hidden">
-          <TableContent
-            currentPosts={currentPosts}
-            handleSort={handleSort}
-            handleCopyCaption={handleCopyCaption}
-            handleDownload={handleDownload}
-            formatNumber={formatNumber}
-            truncateCaption={truncateCaption}
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-          />
+        <div className="w-full max-w-[90rem]">
+          <div className="material-card overflow-hidden">
+            <TableContent
+              currentPosts={currentPosts}
+              handleSort={handleSort}
+              handleCopyCaption={handleCopyCaption}
+              handleDownload={handleDownload}
+              formatNumber={formatNumber}
+              truncateCaption={truncateCaption}
+              sortKey={sortKey}
+              sortDirection={sortDirection}
+            />
+          </div>
         </div>
         <TablePagination
           currentPage={currentPage}
