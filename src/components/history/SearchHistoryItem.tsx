@@ -105,6 +105,11 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     }
   };
 
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value));
+    setCurrentPage(1);
+  };
+
   const filteredResults = filterResults(results, filters);
 
   return (
@@ -129,7 +134,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
           currentPage={currentPage}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
-          onPageSizeChange={setPageSize}
+          onPageSizeChange={handlePageSizeChange}
           handleCopyCaption={handleCopyCaption}
           handleDownload={handleDownload}
           formatNumber={(num) => num.toLocaleString()}
