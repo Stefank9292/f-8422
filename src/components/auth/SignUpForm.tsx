@@ -151,6 +151,17 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     setCaptchaToken(token);
   };
 
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+
+  if (!siteKey) {
+    console.error('ReCAPTCHA site key is missing');
+    return (
+      <div className="text-red-500">
+        Error: ReCAPTCHA configuration is missing. Please contact support.
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
       <div className="space-y-2">
@@ -199,7 +210,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       </div>
       <div className="flex justify-center my-4">
         <ReCAPTCHA
-          sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+          sitekey={siteKey}
           onChange={handleCaptchaChange}
           theme="dark"
         />
