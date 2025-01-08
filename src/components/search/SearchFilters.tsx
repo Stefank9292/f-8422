@@ -2,10 +2,9 @@ import { Calendar, Eye, Play, Heart, MessageCircle, Zap, ChevronDown, Filter, X 
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ExportCSV } from "./ExportCSV";
-import { useLocalStorage } from "@/hooks/use-local-storage";
 
 interface FiltersType {
   minViews: string;
@@ -34,7 +33,6 @@ export const SearchFilters = ({
   currentPosts
 }: SearchFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isFiltersOpen, setIsFiltersOpen] = useLocalStorage('filtersOpen', true);
 
   const filterInputs = [
     {
@@ -143,37 +141,15 @@ export const SearchFilters = ({
       </div>
 
       <div className="hidden md:block">
-        <Collapsible open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <div className="flex items-center justify-between mb-4">
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="flex items-center gap-2 border border-border/50"
-              >
-                <Filter className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  {isFiltersOpen ? 'Hide Filters' : 'Show Filters'}
-                </span>
-                <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isFiltersOpen ? 'transform rotate-180' : ''}`} />
-              </Button>
-            </CollapsibleTrigger>
-            <span className="text-sm text-muted-foreground">
-              Showing {filteredResults} of {totalResults} results
-            </span>
-          </div>
-          <CollapsibleContent className="transition-all duration-300">
-            <div className="bg-card/50 p-6 rounded-lg border border-border/50">
-              <div className="grid grid-cols-6 gap-6">
-                {filterInputs.map((input, index) => (
-                  <div key={index} className="w-full min-w-[150px] max-w-[200px]">
-                    <FilterInput {...input} />
-                  </div>
-                ))}
+        <div className="bg-card/50 p-6 rounded-lg border border-border/50">
+          <div className="grid grid-cols-6 gap-6">
+            {filterInputs.map((input, index) => (
+              <div key={index} className="w-full min-w-[150px] max-w-[200px]">
+                <FilterInput {...input} />
               </div>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
