@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { SubscribeButton } from "@/components/SubscribeButton";
 
 interface PricingCardProps {
@@ -25,7 +25,11 @@ interface PricingCardProps {
 
 const FeatureItem = ({ included, text }: { included: boolean; text: string }) => (
   <li className="flex items-center gap-2">
-    <Check className="h-3.5 w-3.5 text-green-500" />
+    {included ? (
+      <Check className="h-3.5 w-3.5 text-green-500" />
+    ) : (
+      <X className="h-3.5 w-3.5 text-red-500" />
+    )}
     <span className="text-[11px]">{text}</span>
   </li>
 );
