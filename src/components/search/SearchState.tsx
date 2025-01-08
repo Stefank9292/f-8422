@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { InstagramPost } from "@/utils/instagram/types/InstagramTypes";
-import { useSubscriptionLimits } from "@/hooks/useSubscriptionLimits";
-import { useRequestCount } from "@/hooks/useRequestCount";
+import { useUsageStats } from "@/hooks/useUsageStats";
 
 export const useSearchState = () => {
   const {
@@ -20,7 +19,6 @@ export const useSearchState = () => {
   const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
   const [shouldFetch, setShouldFetch] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -30,15 +28,18 @@ export const useSearchState = () => {
     },
   });
 
-  const { maxRequests, subscriptionStatus } = useSubscriptionLimits(session);
-  const requestCount = useRequestCount(session);
+  const {
+    maxRequests,
+    usedRequests: requestCount,
+    hasReachedLimit,
+    subscriptionStatus
+  } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
       console.log('Fetching Instagram posts for:', username);
       
-      // Check if user has reached their limit before making the request
       if (requestCount >= maxRequests) {
         const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
         throw new Error(`You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`);
@@ -100,7 +101,6 @@ export const useSearchState = () => {
     }
 
     // Reset any existing results before new search
-    queryClient.removeQueries({ queryKey: ['instagram-posts'] });
     setBulkSearchResults([]);
     setShouldFetch(true);
   };
@@ -148,7 +148,7 @@ export const useSearchState = () => {
     username,
     isLoading,
     isBulkSearching,
-    hasReachedLimit: requestCount >= maxRequests,
+    hasReachedLimit,
     requestCount,
     maxRequests,
     handleSearch,
