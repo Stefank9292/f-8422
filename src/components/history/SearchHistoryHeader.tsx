@@ -52,7 +52,7 @@ export function SearchHistoryHeader({
           </HoverCard>
         </div>
         <p className="text-sm text-muted-foreground">
-          Showing {totalSearches} of 10 maximum searches
+          Showing {totalSearches} of 10
         </p>
       </div>
       {hasHistory && isSteroidsUser && (
