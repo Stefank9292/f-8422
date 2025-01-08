@@ -20,7 +20,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     message: "",
-    color: "bg-destructive"
+    color: "bg-red-600/20"
   });
 
   const checkPasswordStrength = (password: string) => {
@@ -41,19 +41,19 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return {
         score: (score / 5) * 100,
         message: "Weak – Password must include uppercase, lowercase, numbers, and special characters",
-        color: "bg-destructive"
+        color: "bg-red-600/20" // Lighter red for weak
       };
     } else if (score < 5) {
       return {
         score: (score / 5) * 100,
         message: "Medium – Password could be stronger",
-        color: "bg-yellow-500"
+        color: "bg-blue-600/50" // Medium navy blue for medium strength
       };
     } else {
       return {
         score: 100,
         message: "Strong – Password meets all requirements",
-        color: "bg-green-500"
+        color: "bg-blue-900" // Dark navy blue for strong
       };
     }
   };
