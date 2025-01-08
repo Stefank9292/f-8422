@@ -1,23 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 export const useRecaptchaSiteKey = () => {
   return useQuery({
     queryKey: ["recaptcha-site-key"],
     queryFn: async () => {
-      const response = await supabase.functions.invoke('get-recaptcha-key');
+      const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
       
-      if (response.error) {
-        console.error('Error fetching reCAPTCHA site key:', response.error);
-        throw new Error(response.error.message);
-      }
-      
-      const { data } = response;
-      if (!data?.siteKey) {
+      if (!siteKey) {
         throw new Error("Failed to fetch reCAPTCHA site key");
       }
 
-      return data.siteKey;
+      return siteKey;
     },
     retry: 1,
   });

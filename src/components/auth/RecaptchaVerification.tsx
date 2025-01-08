@@ -1,19 +1,14 @@
 import ReCAPTCHA from "react-google-recaptcha";
-import { useRecaptchaSiteKey } from "@/hooks/useRecaptchaSiteKey";
 
 interface RecaptchaVerificationProps {
   onVerify: (token: string | null) => void;
 }
 
 export const RecaptchaVerification = ({ onVerify }: RecaptchaVerificationProps) => {
-  const { data: siteKey, isLoading, error } = useRecaptchaSiteKey();
+  const siteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
-  if (isLoading) {
-    return <div>Loading verification...</div>;
-  }
-
-  if (error || !siteKey) {
-    console.error('ReCAPTCHA site key error:', error);
+  if (!siteKey) {
+    console.error('ReCAPTCHA site key is missing');
     return (
       <div className="text-red-500">
         Error: ReCAPTCHA configuration is missing. Please contact support.
