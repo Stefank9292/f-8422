@@ -63,6 +63,8 @@ export function SearchHistoryItemHeader({
     ? `@${extractUsername(urls[0])}`
     : query.startsWith('@') ? query : `@${extractUsername(query)}`;
 
+  console.log('Bulk search info:', { isBulkSearch, urlsLength: urls.length, displayQuery });
+
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
