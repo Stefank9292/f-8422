@@ -26,7 +26,13 @@ serve(async (req) => {
     if (!authHeader) {
       console.error('No authorization header provided');
       return new Response(
-        JSON.stringify({ error: 'No authorization header' }),
+        JSON.stringify({
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3,
+          error: 'No authorization header'
+        }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -54,10 +60,14 @@ serve(async (req) => {
       console.error('User verification error:', userError);
       return new Response(
         JSON.stringify({ 
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3,
           error: 'Invalid user session',
           details: userError?.message || 'No user found'
         }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -161,7 +171,7 @@ serve(async (req) => {
         details: error.message 
       }),
       { 
-        status: 500, 
+        status: 200, 
         headers: { 
           ...corsHeaders, 
           'Content-Type': 'application/json' 
