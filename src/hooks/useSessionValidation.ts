@@ -37,7 +37,7 @@ export const useSessionValidation = () => {
 
   const validateSession = async (currentSession: Session) => {
     try {
-      // First try to refresh the session
+      // Always try to refresh the session first
       const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
       
       if (refreshError) {
@@ -50,16 +50,16 @@ export const useSessionValidation = () => {
         return false;
       }
 
-      // Then verify the user with the refreshed token
-      const { data: { user }, error: userError } = await supabase.auth.getUser(
-        refreshResult.session.access_token
-      );
+      // Verify the refreshed session
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
       if (userError || !user) {
         console.error("Invalid session after refresh:", userError);
         return false;
       }
 
+      // Update the session with the refreshed one
+      setSession(refreshResult.session);
       return true;
     } catch (error) {
       console.error("Session validation error:", error);
@@ -92,9 +92,6 @@ export const useSessionValidation = () => {
           await handleSignOut();
           return;
         }
-
-        console.log("Setting valid session");
-        setSession(currentSession);
       } catch (error) {
         console.error("Session error:", error);
         const errorMessage = error instanceof Error ? error.message : "Session validation failed";
@@ -119,7 +116,12 @@ export const useSessionValidation = () => {
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
         if (currentSession) {
-          setSession(currentSession);
+          const isValid = await validateSession(currentSession);
+          if (!isValid) {
+            await handleSignOut();
+            return;
+          }
+          
           setError(null);
           
           if (event === 'SIGNED_IN') {
@@ -129,8 +131,6 @@ export const useSessionValidation = () => {
         }
         return;
       }
-
-      setSession(currentSession);
     });
 
     return () => {

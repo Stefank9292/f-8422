@@ -24,8 +24,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Subscription check error:', error);
-          // If we get an auth error, we'll return the free tier values
-          if (error.message.includes('Invalid user session')) {
+          // Return free tier values for auth errors
+          if (error.message.includes('Invalid user session') || 
+              error.message.includes('session_not_found')) {
             return {
               subscribed: false,
               priceId: null,
@@ -46,6 +47,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     enabled: !!session?.access_token,
     retry: false,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading || isLoadingSubscription) {
