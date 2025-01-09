@@ -4,7 +4,10 @@ import { PostTableRow } from "./TableRow";
 import { MobilePostRow } from "./MobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 export type SortDirection = "asc" | "desc";
 
@@ -32,6 +35,48 @@ export const TableContent = ({
   const isMobile = useIsMobile();
   const [internalSortKey, setInternalSortKey] = useState<string>("");
   const [internalSortDirection, setInternalSortDirection] = useState<SortDirection>("desc");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Set up real-time subscription for table content updates
+  useEffect(() => {
+    const setupSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
+
+      console.log('Setting up real-time subscription for table content');
+
+      const channel = supabase
+        .channel('table-content-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'search_results',
+            filter: `user_id=eq.${session.user.id}`
+          },
+          (payload) => {
+            console.log('Received table content update:', payload);
+            queryClient.invalidateQueries({ queryKey: ['search-results'] });
+            
+            toast({
+              title: "Content Updated",
+              description: "Table content has been updated.",
+              duration: 3000,
+            });
+          }
+        )
+        .subscribe();
+
+      return () => {
+        console.log('Cleaning up table content subscription');
+        supabase.removeChannel(channel);
+      };
+    };
+
+    setupSubscription();
+  }, [queryClient, toast]);
 
   // Use external sort state if provided, otherwise use internal state
   const sortKey = externalSortKey !== undefined ? externalSortKey : internalSortKey;
