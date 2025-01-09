@@ -105,10 +105,8 @@ export const SearchBar = ({
   };
 
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
-    subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || // Pro Monthly
-    subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV" || // Pro Annual
-    subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || // Ultra Monthly
-    subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0"    // Ultra Annual
+    subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
+    subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"    // Creator on Steroids Annual
   );
 
   return (
