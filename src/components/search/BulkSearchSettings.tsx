@@ -63,11 +63,11 @@ export const BulkSearchSettings = ({
   const getMaxVideos = () => {
     if (!subscriptionStatus?.priceId) return 5;
     // Pro tier (monthly and annual)
-    if (subscriptionStatus.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-        subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h") return 20;
+    if (subscriptionStatus.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+        subscriptionStatus.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") return 20;
     // Creator on Steroids tier (monthly and annual)
-    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return 50;
+    if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+        subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") return 50;
     return 5;
   };
 

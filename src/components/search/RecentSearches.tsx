@@ -41,8 +41,8 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     enabled: !!session?.access_token,
   });
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                        subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
   // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
