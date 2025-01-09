@@ -1,48 +1,27 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { useRateLimit } from "@/hooks/useRateLimit";
-import { useAuthForm } from "@/hooks/useAuthForm";
-import { AuthError } from "@supabase/supabase-js";
 
-interface SignInFormProps {
-  onViewChange: (view: "sign_in" | "sign_up") => void;
-  loading: boolean;
-  setLoading: (loading: boolean) => void;
-}
-
-export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
+export const SignInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
-  const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
-    key: 'signin_attempts',
-    maxAttempts: 5,
-    lockoutDuration: 15 * 60 * 1000 // 15 minutes
-  });
-  const { handleAuthError, handleAuthSuccess } = useAuthForm({
-    mode: 'sign_in',
-    updateRateLimit
-  });
+  const { updateRateLimit, isRateLimited } = useRateLimit();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isLocked) {
+    if (isRateLimited()) {
       toast({
-        title: "Too many attempts",
-        description: `Please try again in ${Math.ceil(remainingTime / 60)} minutes`,
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!email || !password) {
-      toast({
-        title: "Missing credentials",
-        description: "Please enter both email and password",
+        title: "Too Many Attempts",
+        description: "Please wait a moment before trying again.",
         variant: "destructive",
       });
       return;
@@ -51,13 +30,13 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
         password,
       });
 
       if (error) {
-        console.error("Sign in error:", error);
+        console.error('Sign in error:', error);
         
         // Handle specific error cases
         if (error.message.includes('Invalid login credentials')) {
@@ -69,19 +48,34 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           updateRateLimit();
           return;
         }
-        
-        handleAuthError(error);
+
+        // Handle other errors
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+        updateRateLimit();
         return;
       }
 
-      if (!data.session) {
-        throw new Error("No session created after authentication");
-      }
+      // Redirect to the original destination or default route
+      const from = location.state?.from?.pathname || "/";
+      navigate(from, { replace: true });
+      
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
 
-      await handleAuthSuccess(data.session);
-    } catch (error) {
-      console.error("Unexpected error during signin:", error);
-      handleAuthError(error as AuthError);
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      updateRateLimit();
     } finally {
       setLoading(false);
     }
@@ -96,50 +90,24 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="material-input"
-          disabled={isLocked}
+          className="h-9 text-[13px]"
         />
-      </div>
-      <div className="space-y-2">
         <Input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="material-input"
-          disabled={isLocked}
+          className="h-9 text-[13px]"
         />
       </div>
-      
       <Button 
         type="submit" 
-        className="w-full material-button-primary" 
-        disabled={loading || isLocked}
+        className="w-full h-9 text-[13px]" 
+        disabled={loading || isRateLimited()}
       >
-        {isLocked 
-          ? `Try again in ${Math.ceil(remainingTime / 60)} minutes` 
-          : loading 
-            ? "Loading..." 
-            : "Sign In"
-        }
+        {loading ? "Signing in..." : "Sign In"}
       </Button>
-
-      <p className="text-xs text-center text-muted-foreground mt-4">
-        By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
-      </p>
-      
-      <p className="text-sm text-center text-muted-foreground">
-        Don't have an account?{" "}
-        <button
-          type="button"
-          onClick={() => onViewChange("sign_up")}
-          className="text-primary hover:underline"
-          disabled={isLocked}
-        >
-          Sign Up
-        </button>
-      </p>
     </form>
   );
 };
