@@ -9,36 +9,6 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      invite_codes: {
-        Row: {
-          code: string
-          created_at: string
-          current_uses: number | null
-          id: string
-          max_uses: number
-          status: Database["public"]["Enums"]["invite_code_status"] | null
-          updated_at: string
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          current_uses?: number | null
-          id?: string
-          max_uses: number
-          status?: Database["public"]["Enums"]["invite_code_status"] | null
-          updated_at?: string
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          current_uses?: number | null
-          id?: string
-          max_uses?: number
-          status?: Database["public"]["Enums"]["invite_code_status"] | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -157,15 +127,8 @@ export type Database = {
         }
         Returns: Database["public"]["Enums"]["subscription_tier"]
       }
-      validate_invite_code: {
-        Args: {
-          p_code: string
-        }
-        Returns: boolean
-      }
     }
     Enums: {
-      invite_code_status: "active" | "expired"
       subscription_tier: "free" | "premium" | "ultra"
     }
     CompositeTypes: {

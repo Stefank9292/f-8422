@@ -82,8 +82,8 @@ const SubscribePage = () => {
       name: "Creator Pro",
       description: "For Professional Creators",
       price: {
-        monthly: "39",
-        annual: { total: "375", perMonth: "31.25" }
+        monthly: "29",
+        annual: { total: "276", perMonth: "23" }
       },
       features: [
         { included: true, text: "25 Total Searches per Month" },
@@ -100,8 +100,8 @@ const SubscribePage = () => {
       name: "Creator on Steroids",
       description: "For Viral Marketing Gods",
       price: {
-        monthly: "69",
-        annual: { total: "663", perMonth: "55.25" }
+        monthly: "49",
+        annual: { total: "470", perMonth: "39.17" }
       },
       features: [
         { included: true, text: "Unlimited Searches" },
