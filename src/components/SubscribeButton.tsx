@@ -40,7 +40,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
+      if (isAnnual && planId === "price_1QfKMYGX13ZRG2XioPYKCe7h") {
         return "Save 20% with annual";
       }
       if (isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
@@ -55,14 +55,14 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     }
 
     const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") || 
+      ((subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" && planId === "price_1QfKMYGX13ZRG2XioPYKCe7h") || 
        (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"));
 
     if (isMonthlyToAnnualUpgrade) {
       return "Save 20% with annual";
     }
 
-    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu") {
+    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1QfKMGGX13ZRG2XiFyskXyJo") {
       return "Downgrade to Creator Pro";
     }
 
