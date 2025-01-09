@@ -8,8 +8,6 @@ import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
 import { validatePassword, checkPasswordStrength } from "@/utils/auth/validation";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AuthError } from "@supabase/supabase-js";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -24,7 +22,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [inviteCode, setInviteCode] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [passwordStrength, setPasswordStrength] = useState({
     score: 0,
     message: "",
@@ -41,60 +38,59 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     setPasswordStrength(checkPasswordStrength(newPassword));
   };
 
-  const validateForm = () => {
-    setError(null);
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (inviteCode !== "Vyral2025") {
-      setError("Invalid invite code. Please enter a valid invite code to sign up.");
-      return false;
+      toast({
+        title: "Invalid Invite Code",
+        description: "Please enter a valid invite code to sign up.",
+        variant: "destructive",
+      });
+      return;
     }
 
     const passwordError = validatePassword(password);
     if (passwordError) {
-      setError(passwordError);
-      return false;
+      toast({
+        title: "Invalid Password",
+        description: passwordError,
+        variant: "destructive",
+      });
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match. Please try again.");
-      return false;
-    }
-
-    return true;
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match. Please try again.",
+        variant: "destructive",
+      });
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
       
-      console.log("Attempting signup with email:", email);
-      
+      // First check if session exists and sign out if it does
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession) {
+        await supabase.auth.signOut();
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth`,
-          data: {
-            email,
-          }
+          emailRedirectTo: window.location.origin + '/auth',
         }
       });
 
       if (error) {
         console.error("Signup error:", error);
-        setError(error.message);
         handleAuthError(error);
         return;
       }
-
-      console.log("Signup response:", data);
 
       if (!data.session) {
         toast({
@@ -108,7 +104,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       await handleAuthSuccess(data.session);
     } catch (error) {
       console.error("Unexpected error during signup:", error);
-      setError("An unexpected error occurred. Please try again.");
       handleAuthError(error as AuthError);
     } finally {
       setLoading(false);
@@ -117,13 +112,6 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <div className="space-y-2">
         <Input
           type="email"

@@ -6,8 +6,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useAuthForm } from "@/hooks/useAuthForm";
 import { AuthError } from "@supabase/supabase-js";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -18,7 +16,6 @@ interface SignInFormProps {
 export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { isLocked, remainingTime, updateRateLimit } = useRateLimit({
     key: 'signin_attempts',
@@ -43,21 +40,22 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     }
 
     if (!email || !password) {
-      setError("Please enter both email and password");
+      toast({
+        title: "Missing credentials",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
       
-      // Clear any existing session first
+      // First, ensure no existing session
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       if (existingSession) {
         await supabase.auth.signOut();
       }
-      
-      console.log("Attempting sign in with email:", email);
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
@@ -67,29 +65,21 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       if (error) {
         console.error("Sign in error:", error);
         if (error.message.includes('Invalid login credentials')) {
-          setError("Invalid email or password. Please check your credentials and try again.");
+          toast({
+            title: "Authentication Failed",
+            description: "Invalid email or password. Please check your credentials and try again.",
+            variant: "destructive",
+          });
           updateRateLimit();
-        } else if (error.message.includes('Email not confirmed')) {
-          setError("Please verify your email before signing in. Check your inbox for the confirmation link.");
-        } else if (error.message.includes('Invalid API key')) {
-          setError("Authentication service configuration error. Please contact support.");
         } else {
-          setError(error.message);
+          handleAuthError(error);
         }
-        handleAuthError(error);
         return;
       }
 
-      if (!data.session) {
-        setError("Failed to create session. Please try again.");
-        return;
-      }
-
-      console.log("Sign in successful:", data.session);
       await handleAuthSuccess(data.session);
     } catch (error) {
       console.error("Unexpected error during signin:", error);
-      setError("An unexpected error occurred. Please try again.");
       handleAuthError(error as AuthError);
     } finally {
       setLoading(false);
@@ -98,13 +88,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
 
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
-
       <div className="space-y-2">
         <Input
           type="email"
