@@ -40,10 +40,10 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+      if (isAnnual && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
         return "Save 20% with annual";
       }
-      if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+      if (isAnnual && planId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
         return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
