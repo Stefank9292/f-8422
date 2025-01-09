@@ -1,29 +1,37 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SearchHistoryItem } from "./SearchHistoryItem";
+import { SearchHistoryFilter } from "./SearchHistoryFilter";
+import { SearchHistoryLoading } from "./SearchHistoryLoading";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
-interface SearchHistoryListProps {
-  searchHistory: Array<{
-    id: string;
-    search_query: string;
-    created_at: string;
-    search_results?: Array<{ results: any[] }>;
-  }>;
-  onDelete: (id: string) => void;
-  isDeleting: boolean;
-}
-
-export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: SearchHistoryListProps) {
+export function SearchHistoryList() {
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
+  });
+
+  const { data: searchHistory, isLoading } = useQuery({
+    queryKey: ['search-history', session?.user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('search_history')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
   });
 
   const { data: subscriptionStatus } = useQuery({
@@ -43,50 +51,64 @@ export function SearchHistoryList({ searchHistory, onDelete, isDeleting }: Searc
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  
+  const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+                   subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
 
-  if (!isSteroidsUser) {
+  if (!isSteroidsUser && !isProUser) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 space-y-4">
+      <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
         <Lock className="w-12 h-12 text-muted-foreground" />
-        <div className="text-center space-y-2">
-          <h3 className="font-semibold text-lg">Search History Locked</h3>
-          <p className="text-sm text-muted-foreground max-w-md">
-            Search history is only available on the{' '}
-            <span className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse">
-              Creator on Steroids
-            </span>{' '}
-            plan. Upgrade your subscription to access this feature.
-          </p>
-          <Button 
-            variant="secondary"
-            className="mt-4 bg-[#221F26] text-white hover:bg-[#403E43]"
-            onClick={() => navigate('/subscribe')}
-          >
-            View Pricing Plans
-          </Button>
-        </div>
+        <h3 className="text-lg font-semibold">Search History Locked</h3>
+        <p className="text-sm text-muted-foreground max-w-md">
+          Upgrade to Creator Pro or Creator on Steroids to access your search history and more features.
+        </p>
+        <Button 
+          onClick={() => navigate('/subscribe')}
+          className="bg-[#1a365d] hover:bg-[#1a365d]/90 text-white"
+        >
+          Upgrade Now
+        </Button>
       </div>
     );
   }
 
-  if (searchHistory?.length === 0) {
-    return (
-      <div className="text-center py-12 text-muted-foreground">
-        No search history found
-      </div>
-    );
+  if (isLoading) {
+    return <SearchHistoryLoading />;
   }
+
+  const filteredHistory = searchHistory?.filter(item =>
+    searchQuery
+      ? item.search_query.toLowerCase().includes(searchQuery.toLowerCase())
+      : true
+  ) || [];
 
   return (
     <div className="space-y-4">
-      {searchHistory?.map((item) => (
-        <SearchHistoryItem
-          key={item.id}
-          item={item}
-          onDelete={onDelete}
-          isDeleting={isDeleting}
-        />
-      ))}
+      <SearchHistoryFilter
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
+      <div className="space-y-4">
+        {filteredHistory.map((item) => (
+          <SearchHistoryItem
+            key={item.id}
+            item={item}
+            onDelete={async () => {
+              await supabase
+                .from('search_history')
+                .delete()
+                .eq('id', item.id);
+            }}
+            isDeleting={false}
+          />
+        ))}
+        {filteredHistory.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            No search history found
+          </div>
+        )}
+      </div>
     </div>
   );
 }

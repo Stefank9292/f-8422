@@ -1,29 +1,15 @@
-import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
 import { SearchHistoryList } from "@/components/history/SearchHistoryList";
-import { SearchHistoryLoading } from "@/components/history/SearchHistoryLoading";
-import { SearchHistoryFilter } from "@/components/history/SearchHistoryFilter";
-import { InstagramPost } from "@/types/instagram";
-import { extractUsername } from "@/utils/instagram";
-import { transformSearchResults } from "@/utils/transformSearchResults";
-
-interface SearchHistoryResult {
-  id: string;
-  search_query: string;
-  created_at: string;
-  search_results?: Array<{ results: InstagramPost[] }>;
-  bulk_search_urls?: string[];
-}
+import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
+import { useNavigate } from "react-router-dom";
+import { Lock } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const SearchHistory = () => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -31,6 +17,46 @@ const SearchHistory = () => {
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
+  });
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        navigate('/auth');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const { data: searchHistory, isLoading } = useQuery({
+    queryKey: ['search-history', session?.user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('search_history')
+        .select(`
+          *,
+          search_results (
+            results
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.user.id,
   });
 
   const { data: subscriptionStatus } = useQuery({
@@ -48,145 +74,61 @@ const SearchHistory = () => {
     enabled: !!session?.access_token,
   });
 
-  const { data: searchHistory, isLoading } = useQuery({
-    queryKey: ['search-history'],
-    queryFn: async () => {
-      if (!session?.user?.id) return null;
-
-      const { data: historyData, error: historyError } = await supabase
-        .from('search_history')
-        .select(`
-          id,
-          search_query,
-          created_at,
-          bulk_search_urls,
-          search_results (
-            results
-          )
-        `)
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (historyError) {
-        console.error('Error fetching search history:', historyError);
-        throw historyError;
-      }
-
-      return historyData?.map(item => {
-        // Transform the search results using the utility function
-        const transformedResults = item.search_results?.map(sr => ({
-          results: transformSearchResults(sr as any).results
-        }));
-
-        return {
-          ...item,
-          search_query: item.bulk_search_urls?.length 
-            ? `${extractUsername(item.bulk_search_urls[0])} +${item.bulk_search_urls.length - 1}`
-            : item.search_query,
-          search_results: transformedResults
-        } as SearchHistoryResult;
-      }) || [];
-    },
-    enabled: !!session?.user?.id,
-  });
-
-  const handleDelete = async (id: string) => {
-    if (!session?.user?.id) return;
+  const handleClearHistory = async () => {
+    if (!session?.user.id) return;
 
     try {
-      setIsDeleting(true);
-      const { error } = await supabase
-        .from('search_history')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', session.user.id);
-
-      if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['search-history'] });
-      
-      toast({
-        title: "Success",
-        description: "Search history item deleted successfully",
-      });
-    } catch (error) {
-      console.error('Error deleting search history:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete search history item",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const handleDeleteAll = async () => {
-    if (!session?.user?.id) return;
-
-    try {
-      setIsDeletingAll(true);
       const { error } = await supabase
         .from('search_history')
         .delete()
         .eq('user_id', session.user.id);
 
       if (error) throw error;
-
-      queryClient.invalidateQueries({ queryKey: ['search-history'] });
-      
-      toast({
-        title: "Success",
-        description: "All search history deleted successfully",
-      });
     } catch (error) {
-      console.error('Error deleting all search history:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete all search history",
-        variant: "destructive",
-      });
-    } finally {
-      setIsDeletingAll(false);
+      console.error('Error clearing history:', error);
     }
   };
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  
+  const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+                   subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+
+  if (!isSteroidsUser && !isProUser) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex flex-col items-center justify-center p-8 text-center space-y-4">
+          <Lock className="w-12 h-12 text-muted-foreground" />
+          <h3 className="text-lg font-semibold">Search History Locked</h3>
+          <p className="text-sm text-muted-foreground max-w-md">
+            Upgrade to Creator Pro or Creator on Steroids to access your search history and more features.
+          </p>
+          <Button 
+            onClick={() => navigate('/subscribe')}
+            className="bg-[#1a365d] hover:bg-[#1a365d]/90 text-white"
+          >
+            Upgrade Now
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const filteredHistory = searchHistory?.filter(item =>
     isSteroidsUser && searchQuery
       ? item.search_query.toLowerCase().includes(searchQuery.toLowerCase())
       : true
-  );
-
-  if (isLoading) {
-    return <SearchHistoryLoading />;
-  }
+  ) || [];
 
   return (
-    <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
-      <SearchHistoryHeader 
-        onDeleteAll={handleDeleteAll}
-        isDeletingAll={isDeletingAll}
-        hasHistory={searchHistory && searchHistory.length > 0}
-        isSteroidsUser={isSteroidsUser}
-        totalSearches={searchHistory?.length || 0}
+    <div className="container mx-auto px-4 py-8">
+      <SearchHistoryHeader
+        totalSearches={filteredHistory.length}
+        onClearHistory={handleClearHistory}
+        isLoading={isLoading}
       />
-      
-      {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
-        <SearchHistoryFilter 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
-      )}
-      
-      <SearchHistoryList 
-        searchHistory={filteredHistory || []}
-        onDelete={handleDelete}
-        isDeleting={isDeleting}
-      />
+      <SearchHistoryList />
     </div>
   );
 };

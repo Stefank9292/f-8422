@@ -84,15 +84,25 @@ serve(async (req) => {
       cancelAtPeriodEnd: subscription.cancel_at_period_end
     })
 
+    let maxClicks = 3; // Default for free tier
+    
+    // Pro tier
+    if (priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+        priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
+      maxClicks = 25;
+    }
+    // Steroids tier
+    else if (priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+             priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
+      maxClicks = Infinity;
+    }
+
     return new Response(
       JSON.stringify({
         subscribed: true,
         priceId: priceId,
         canceled: subscription.cancel_at_period_end,
-        maxClicks: priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-                  priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ" ? 25 : 
-                  priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                  priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" ? Infinity : 3
+        maxClicks: maxClicks
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
