@@ -51,12 +51,46 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     try {
       setLoading(true);
       
-      // First, ensure no existing session
+      // First check if user exists and is confirmed
+      const { data: { user }, error: userError } = await supabase.auth.admin.getUserByEmail(
+        email.trim().toLowerCase()
+      );
+
+      if (userError) {
+        console.error("User lookup error:", userError);
+        toast({
+          title: "Authentication Failed",
+          description: "Unable to verify user account. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!user) {
+        toast({
+          title: "Authentication Failed",
+          description: "No account found with this email. Please sign up first.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!user.email_confirmed_at) {
+        toast({
+          title: "Email Not Verified",
+          description: "Please verify your email before signing in. Check your inbox for the confirmation link.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Clear any existing session
       const { data: { session: existingSession } } = await supabase.auth.getSession();
       if (existingSession) {
         await supabase.auth.signOut();
       }
       
+      // Attempt sign in
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -77,6 +111,17 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
         return;
       }
 
+      // Verify the session was created
+      if (!data.session) {
+        toast({
+          title: "Authentication Failed",
+          description: "Failed to create session. Please try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log("Sign in successful:", data.session);
       await handleAuthSuccess(data.session);
     } catch (error) {
       console.error("Unexpected error during signin:", error);
