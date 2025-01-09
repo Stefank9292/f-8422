@@ -100,22 +100,24 @@ export function SearchHistoryItemHeader({
               </HoverCardContent>
             </HoverCard>
           )}
-          <div className="font-medium truncate flex items-center space-x-1">
-            <span>{displayQuery}</span>
-            {isBulkSearch && urls.length > 1 && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full">
-                      +{urls.length - 1}
-                    </span>
-                  </TooltipTrigger>
-                  <TooltipContent align="start" className="text-xs">
-                    {urls.length} profiles in this bulk search
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+          <div className="font-medium truncate flex items-center">
+            <span className="inline-flex items-center">
+              {displayQuery}
+              {isBulkSearch && urls.length > 1 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
+                        +{urls.length - 1}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent align="start" className="text-xs">
+                      {urls.length} profiles in this bulk search
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </span>
           </div>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             {format(new Date(date), 'MMM d, HH:mm')}
