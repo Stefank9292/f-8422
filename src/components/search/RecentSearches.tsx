@@ -208,16 +208,16 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                             <span className="sr-only">Copy URLs</span>
                           </Button>
                         </div>
-                        <div className="max-h-[200px] overflow-y-auto">
+                        <ul className="max-h-[200px] overflow-y-auto list-none">
                           {search.bulk_search_urls.map((url: string, index: number) => (
-                            <p 
+                            <li 
                               key={index} 
-                              className="text-xs text-muted-foreground break-all hover:text-foreground transition-colors p-2 rounded-md hover:bg-secondary/50 mb-1 text-left"
+                              className="text-xs text-muted-foreground break-all p-2 mb-1 text-left"
                             >
                               {url}
-                            </p>
+                            </li>
                           ))}
-                        </div>
+                        </ul>
                       </HoverCardContent>
                     </HoverCard>
                   )}
