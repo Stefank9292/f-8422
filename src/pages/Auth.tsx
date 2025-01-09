@@ -6,6 +6,7 @@ import { SignInForm } from "@/components/auth/SignInForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthHeader } from "@/components/auth/AuthHeader";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const AuthPage = () => {
   const navigate = useNavigate();
@@ -80,34 +81,37 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast, location]);
 
+  // Force light theme for auth pages
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">
-      <div className="w-full max-w-md space-y-6">
-        <AuthHeader view={view} />
-        
-        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+    <ThemeProvider defaultTheme="light" storageKey="auth-theme">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">
+        <div className="w-full max-w-md space-y-6">
+          <AuthHeader view={view} />
+          
+          <div className="material-card p-6 space-y-6">
+            {error && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          {view === "sign_in" ? (
-            <SignInForm 
-              onViewChange={setView} 
-              loading={loading} 
-              setLoading={setLoading} 
-            />
-          ) : (
-            <SignUpForm 
-              onViewChange={setView} 
-              loading={loading} 
-              setLoading={setLoading} 
-            />
-          )}
+            {view === "sign_in" ? (
+              <SignInForm 
+                onViewChange={setView} 
+                loading={loading} 
+                setLoading={setLoading} 
+              />
+            ) : (
+              <SignUpForm 
+                onViewChange={setView} 
+                loading={loading} 
+                setLoading={setLoading} 
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </ThemeProvider>
   );
 };
 
