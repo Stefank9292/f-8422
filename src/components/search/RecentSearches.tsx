@@ -6,11 +6,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -175,25 +174,23 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               >
                 {search.search_query}
                 {search.bulk_search_urls?.length > 0 && (
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="text-[10px] text-muted-foreground cursor-help">
-                          +{search.bulk_search_urls.length - 1}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent className="w-60 p-2">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-medium">Additional URLs:</p>
-                          {search.bulk_search_urls.slice(1).map((url, index) => (
-                            <p key={index} className="text-[10px] text-muted-foreground break-all">
-                              {url}
-                            </p>
-                          ))}
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <span className="text-[10px] text-muted-foreground cursor-help">
+                        +{search.bulk_search_urls.length - 1}
+                      </span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-64 p-4">
+                      <div className="space-y-2">
+                        <p className="text-[11px] font-medium">Additional URLs:</p>
+                        {search.bulk_search_urls.slice(1).map((url, index) => (
+                          <p key={index} className="text-[11px] text-muted-foreground break-all">
+                            {url}
+                          </p>
+                        ))}
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 )}
               </button>
               <Button
