@@ -114,14 +114,11 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const filteredResults = filterResults(results, filters);
 
   const isBulkSearch = item.bulk_search_urls && item.bulk_search_urls.length > 0;
-  const searchLabel = isBulkSearch 
-    ? `Bulk Search (${item.bulk_search_urls.length} profiles)`
-    : `@${item.search_query}`;
 
   return (
     <div className="animate-fade-in">
       <SearchHistoryItemHeader
-        query={searchLabel}
+        query={item.search_query}
         date={item.created_at}
         resultsCount={results.length}
         isExpanded={isExpanded}
