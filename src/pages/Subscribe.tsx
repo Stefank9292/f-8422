@@ -68,8 +68,8 @@ const SubscribePage = () => {
 
   const priceIds = {
     premium: {
-      monthly: "price_1QdtwnGX13ZRG2XihcM36r3W",
-      annual: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+      monthly: "price_1QfKMGGX13ZRG2XiFyskXyJo",
+      annual: "price_1QfKMYGX13ZRG2XioPYKCe7h"
     },
     ultra: {
       monthly: "price_1Qdty5GX13ZRG2XiFxadAKJW",
@@ -85,15 +85,6 @@ const SubscribePage = () => {
         monthly: "49",
         annual: { total: "470", perMonth: "39.17" }
       },
-      features: [
-        { included: true, text: "25 Total Searches per Month" },
-        { included: true, text: "Maximum 25 Results per Username" },
-        { included: true, text: "Bulk Search" },
-        { included: true, text: "Contact Support" },
-        { included: false, text: "Search History" },
-        { included: false, text: "Recent Searches" },
-        { included: false, text: "Early Access to new Features" }
-      ],
       priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
     },
     {
@@ -103,15 +94,6 @@ const SubscribePage = () => {
         monthly: "69",
         annual: { total: "663", perMonth: "55.25" }
       },
-      features: [
-        { included: true, text: "Unlimited Searches" },
-        { included: true, text: "Maximum 50 Results per Username" },
-        { included: true, text: "Bulk Search" },
-        { included: true, text: "Contact Support" },
-        { included: true, text: "Search History" },
-        { included: true, text: "Recent Searches" },
-        { included: true, text: "Early Access to new Features" }
-      ],
       isPopular: true,
       priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly
     }
