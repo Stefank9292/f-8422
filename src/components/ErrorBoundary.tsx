@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { supabase } from "@/integrations/supabase/client";
+import * as Sentry from "@sentry/react";
 
 interface Props {
   children: ReactNode;
@@ -28,6 +29,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
+    
+    // Log to Sentry
+    Sentry.withScope((scope) => {
+      scope.setExtras(errorInfo);
+      Sentry.captureException(error);
+    });
+    
     this.logErrorSecurely(error, errorInfo);
   }
 
@@ -42,9 +50,16 @@ export class ErrorBoundary extends Component<Props, State> {
           timestamp: new Date().toISOString()
         };
         console.error('Authenticated user error:', sanitizedError);
+        
+        // Log to Sentry with user context
+        Sentry.setUser({
+          id: session.user.id,
+          email: session.user.email || undefined
+        });
       }
     } catch (loggingError) {
       console.error('Error logging failed');
+      Sentry.captureException(loggingError);
     }
   }
 
@@ -53,7 +68,6 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    // Clear any cached data that might be causing the error
     if (window.localStorage) {
       const authData = window.localStorage.getItem('supabase.auth.token');
       window.localStorage.clear();

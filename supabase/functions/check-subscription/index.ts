@@ -9,11 +9,10 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  console.log('Check subscription function called with method:', req.method);
+  console.log('[check-subscription] Function called with method:', req.method);
 
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    console.log('Handling OPTIONS preflight request');
+    console.log('[check-subscription] Handling OPTIONS preflight request');
     return new Response(null, { 
       status: 204,
       headers: corsHeaders 
@@ -21,17 +20,15 @@ serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
-      console.error('No authorization header provided');
+      console.error('[check-subscription] No authorization header provided');
       return new Response(
         JSON.stringify({ error: 'No authorization header' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Create a Supabase client with the auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -44,41 +41,37 @@ serve(async (req) => {
       }
     )
 
-    // Get the user from the auth header
     const {
       data: { user },
       error: userError,
     } = await supabaseClient.auth.getUser()
 
     if (userError || !user) {
-      console.error('User verification error:', userError);
+      console.error('[check-subscription] User verification error:', userError);
       return new Response(
         JSON.stringify({ error: 'Invalid user session' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    console.log('Verified user:', user.id);
+    console.log('[check-subscription] Verified user:', user.id);
 
-    // Get user's email
     const userEmail = user.email;
     if (!userEmail) {
-      console.error('No email found for user');
+      console.error('[check-subscription] No email found for user:', user.id);
       return new Response(
         JSON.stringify({ error: 'User email not found' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Get customer by email
     const customers = await stripe.customers.list({
       email: userEmail,
       limit: 1
     });
 
-    // If no customer found, return free tier status
     if (customers.data.length === 0) {
-      console.log('No Stripe customer found for email:', userEmail);
+      console.log('[check-subscription] No Stripe customer found for email:', userEmail);
       return new Response(
         JSON.stringify({
           subscribed: false,
@@ -91,18 +84,27 @@ serve(async (req) => {
     }
 
     const customer = customers.data[0];
-    console.log('Found Stripe customer:', customer.id);
+    console.log('[check-subscription] Found Stripe customer:', customer.id);
 
-    // Get all active subscriptions for the customer
     const subscriptions = await stripe.subscriptions.list({
       customer: customer.id,
       status: 'active',
       expand: ['data.items.data.price']
     });
 
-    // If no active subscriptions, return free tier status
     if (subscriptions.data.length === 0) {
-      console.log('No active subscriptions found for customer:', customer.id);
+      console.log('[check-subscription] No active subscriptions found for customer:', customer.id);
+      
+      // Log to Supabase
+      await supabaseClient
+        .from('subscription_logs')
+        .insert({
+          user_id: user.id,
+          event: 'subscription_check',
+          status: 'no_active_subscription',
+          details: { customer_id: customer.id }
+        });
+
       return new Response(
         JSON.stringify({
           subscribed: false,
@@ -114,18 +116,30 @@ serve(async (req) => {
       )
     }
 
-    // Get the most recent active subscription
     const subscription = subscriptions.data[0];
     const priceId = subscription.items.data[0].price.id;
 
-    console.log('Found active subscription:', {
+    console.log('[check-subscription] Found active subscription:', {
       id: subscription.id,
       priceId: priceId,
       status: subscription.status,
       cancelAtPeriodEnd: subscription.cancel_at_period_end
     });
 
-    // Return subscription status with CORS headers
+    // Log subscription check to Supabase
+    await supabaseClient
+      .from('subscription_logs')
+      .insert({
+        user_id: user.id,
+        event: 'subscription_check',
+        status: 'active',
+        details: {
+          subscription_id: subscription.id,
+          price_id: priceId,
+          canceled: subscription.cancel_at_period_end
+        }
+      });
+
     return new Response(
       JSON.stringify({
         subscribed: true,
@@ -142,7 +156,7 @@ serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('[check-subscription] Unexpected error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
