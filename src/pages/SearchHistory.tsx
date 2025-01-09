@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
 import { SearchHistoryList } from "@/components/history/SearchHistoryList";
+import { SearchHistoryLoading } from "@/components/history/SearchHistoryLoading";
+import { SearchHistoryFilter } from "@/components/history/SearchHistoryFilter";
 import { InstagramPost } from "@/types/instagram";
-import { Input } from "@/components/ui/input";
-import { transformSearchResults } from "@/utils/transformSearchResults";
+import { extractUsername } from "@/utils/instagram";
 
 interface SearchHistoryResult {
   id: string;
   search_query: string;
   created_at: string;
   search_results?: Array<{ results: InstagramPost[] }>;
+  bulk_search_urls?: string[];
 }
 
 const SearchHistory = () => {
@@ -23,7 +24,6 @@ const SearchHistory = () => {
   const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // First, get the session
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -47,27 +47,6 @@ const SearchHistory = () => {
     enabled: !!session?.access_token,
   });
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('search_history_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_history'
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['search-history'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
@@ -79,6 +58,7 @@ const SearchHistory = () => {
           id,
           search_query,
           created_at,
+          bulk_search_urls,
           search_results (
             results
           )
@@ -92,13 +72,13 @@ const SearchHistory = () => {
         throw historyError;
       }
 
-      // Transform the raw data to match our expected types
       return historyData?.map(item => ({
-        id: item.id,
-        search_query: item.search_query,
-        created_at: item.created_at,
+        ...item,
+        search_query: item.bulk_search_urls?.length 
+          ? `${extractUsername(item.bulk_search_urls[0])} +${item.bulk_search_urls.length - 1}`
+          : item.search_query,
         search_results: item.search_results?.map(sr => ({
-          results: transformSearchResults(sr as any).results
+          results: sr.results
         }))
       })) as SearchHistoryResult[];
     },
@@ -176,11 +156,7 @@ const SearchHistory = () => {
   );
 
   if (isLoading) {
-    return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <SearchHistoryLoading />;
   }
 
   return (
@@ -194,16 +170,10 @@ const SearchHistory = () => {
       />
       
       {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
-        <div className="relative w-full max-w-md mx-auto mb-6">
-          <Input
-            type="text"
-            placeholder="Search by username..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
+        <SearchHistoryFilter 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
       )}
       
       <SearchHistoryList 
