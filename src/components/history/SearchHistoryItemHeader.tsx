@@ -1,96 +1,136 @@
-import { useState } from "react";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { format } from "date-fns";
+import { ChevronDown, ChevronUp, Trash2, List, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { List, Copy, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface SearchHistoryItemHeaderProps {
-  searchQuery: string;
-  searchType: string;
-  bulkSearchUrls?: string[];
+  query: string;
+  date: string;
+  resultsCount: number;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onDelete: () => void;
+  isDeleting: boolean;
+  isBulkSearch?: boolean;
+  urls?: string[];
 }
 
-export function SearchHistoryItemHeader({ searchQuery, searchType, bulkSearchUrls }: SearchHistoryItemHeaderProps) {
-  const [copied, setCopied] = useState(false);
+export function SearchHistoryItemHeader({
+  query,
+  date,
+  resultsCount,
+  isExpanded,
+  onToggleExpand,
+  onDelete,
+  isDeleting,
+  isBulkSearch,
+  urls = []
+}: SearchHistoryItemHeaderProps) {
   const { toast } = useToast();
-  const isBulkSearch = searchType === 'bulk_instagram_search';
   
-  // Clean and format URLs properly
-  const urls = bulkSearchUrls?.map(url => {
-    // Remove any trailing colons
-    const cleanUrl = url.replace(/:+$/, '');
-    
-    // If it's just a username, convert it to a proper Instagram URL
-    if (!cleanUrl.startsWith('http')) {
-      return `https://www.instagram.com/${cleanUrl.replace('@', '')}`;
-    }
-    
-    return cleanUrl;
-  });
-
-  const handleCopyUrls = () => {
-    if (urls && urls.length > 0) {
-      navigator.clipboard.writeText(urls.join('\n'))
-        .then(() => {
-          setCopied(true);
-          toast({
-            title: "URLs Copied",
-            description: "The URLs have been copied to your clipboard",
-          });
-          setTimeout(() => setCopied(false), 2000);
-        })
-        .catch(() => {
-          toast({
-            title: "Copy Failed",
-            description: "Failed to copy URLs to clipboard",
-            variant: "destructive",
-          });
-        });
+  // Extract username from Instagram URL
+  const extractUsername = (url: string): string => {
+    try {
+      const username = url.split('instagram.com/')[1]?.split('/')[0];
+      return username ? username.replace('@', '') : query;
+    } catch {
+      return query;
     }
   };
+
+  const handleCopyUrls = () => {
+    if (urls.length) {
+      navigator.clipboard.writeText(urls.join('\n'));
+      toast({
+        description: "URLs copied to clipboard",
+      });
+    }
+  };
+
+  // Clean up the query to display as username
+  const cleanQuery = query.replace('https://www.instagram.com/', '').replace('https://instagram.com/', '').replace('/', '');
+  const displayQuery = cleanQuery.startsWith('@') ? cleanQuery : `@${cleanQuery}`;
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          {isBulkSearch && urls && urls.length > 0 && (
+          {isBulkSearch && (
             <HoverCard>
               <HoverCardTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <List className="h-4 w-4" />
+                  <List className="h-4 w-4 text-muted-foreground" />
+                  <span className="sr-only">View bulk search URLs</span>
                 </Button>
               </HoverCardTrigger>
-              <HoverCardContent className="w-80">
+              <HoverCardContent className="w-80 p-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
+                    <h4 className="text-sm font-semibold">Bulk Search URLs ({urls.length})</h4>
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-8 w-8 p-0"
                       onClick={handleCopyUrls}
                     >
-                      {copied ? (
-                        <Check className="h-4 w-4" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
+                      <Copy className="h-4 w-4" />
+                      <span className="sr-only">Copy URLs</span>
                     </Button>
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="space-y-0.5">
                     {urls.map((url, index) => (
-                      <div key={index} className="truncate">
-                        {url}
-                      </div>
+                      <p key={index} className="text-xs text-muted-foreground">
+                        @{extractUsername(url)}
+                      </p>
                     ))}
                   </div>
                 </div>
               </HoverCardContent>
             </HoverCard>
           )}
-          <span className="font-medium truncate">
-            {searchQuery}
+          <div className="font-medium truncate flex items-center">
+            <span className="inline-flex items-center">
+              {displayQuery}
+            </span>
+          </div>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {format(new Date(date), 'MMM d, HH:mm')}
           </span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            ({resultsCount})
+          </span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleExpand}
+            className={cn(
+              "h-8 w-8 p-0 transition-transform duration-200",
+              isExpanded && "bg-accent"
+            )}
+          >
+            {isExpanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            disabled={isDeleting}
+            className="h-8 w-8 p-0"
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
         </div>
       </div>
     </div>
