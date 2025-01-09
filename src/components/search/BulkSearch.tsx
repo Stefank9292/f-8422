@@ -7,6 +7,8 @@ import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { InstagramPost } from "@/types/instagram";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BulkSearchProps {
   isOpen: boolean;
@@ -23,6 +25,29 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
+
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status', session?.access_token],
+    queryFn: async () => {
+      if (!session?.access_token) return null;
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!session?.access_token,
+  });
 
   const handleSearch = async () => {
     const urlList = urls
@@ -62,6 +87,11 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
       });
     }
   };
+
+  const isBulkSearchEnabled = subscriptionStatus?.priceId && (
+    subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
+    subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"    // Creator on Steroids Annual
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
