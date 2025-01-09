@@ -1,10 +1,14 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { UserProfileInfo } from "./profile/UserProfileInfo";
 import { useUsageStats } from "@/hooks/useUsageStats";
+import { useToast } from "@/hooks/use-toast";
 
 export const RequestUsageCounter = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -38,6 +42,57 @@ export const RequestUsageCounter = () => {
     },
     enabled: !!session?.access_token,
   });
+
+  // Set up real-time subscription for user_requests table
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    console.log('Setting up real-time subscription for user_requests');
+
+    const channel = supabase
+      .channel('user-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_requests',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          // Invalidate the queries to trigger a refresh
+          queryClient.invalidateQueries({ queryKey: ['request-stats'] });
+          
+          // Show a toast notification
+          toast({
+            title: "Usage Updated",
+            description: "Your usage statistics have been updated.",
+            duration: 3000,
+          });
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+        
+        if (status === 'SUBSCRIBED') {
+          console.log('Successfully subscribed to real-time updates');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Failed to subscribe to real-time updates');
+          toast({
+            title: "Connection Error",
+            description: "Failed to connect to real-time updates. Retrying...",
+            variant: "destructive",
+          });
+        }
+      });
+
+    // Cleanup subscription on unmount
+    return () => {
+      console.log('Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient, toast]);
 
   if (!subscriptionStatus?.subscribed) {
     return null;
