@@ -117,6 +117,12 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   return (
     <div className="animate-fade-in">
+      console.log('SearchHistoryItem data:', { 
+        query: item.search_query,
+        bulk_search_urls: item.bulk_search_urls,
+        isBulkSearch
+      });
+
       <SearchHistoryItemHeader
         query={item.search_query}
         date={item.created_at}

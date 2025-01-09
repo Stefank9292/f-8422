@@ -59,11 +59,23 @@ export function SearchHistoryItemHeader({
     }
   };
 
-  const displayQuery = isBulkSearch && urls.length > 0
+  console.log('SearchHistoryItemHeader props:', { 
+    isBulkSearch, 
+    urls, 
+    query,
+    urlsExist: urls && Array.isArray(urls) && urls.length > 0
+  });
+
+  const displayQuery = isBulkSearch && urls && Array.isArray(urls) && urls.length > 0
     ? `@${extractUsername(urls[0])}`
     : query.startsWith('@') ? query : `@${extractUsername(query)}`;
 
-  console.log('Bulk search info:', { isBulkSearch, urlsLength: urls.length, displayQuery });
+  const shouldShowCounter = isBulkSearch && urls && Array.isArray(urls) && urls.length > 1;
+  console.log('Display logic:', { 
+    displayQuery, 
+    shouldShowCounter,
+    urlsLength: urls?.length
+  });
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
