@@ -3,54 +3,13 @@ import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { LoadingState } from "@/components/auth/LoadingState";
 import { ErrorState } from "@/components/auth/ErrorState";
 import { UndefinedSessionState } from "@/components/auth/UndefinedSessionState";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { session, isLoading, error } = useSessionValidation();
 
-  const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useQuery({
-    queryKey: ['subscription-status', session?.access_token],
-    queryFn: async () => {
-      if (!session?.access_token) return null;
-      
-      try {
-        const { data, error } = await supabase.functions.invoke('check-subscription', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
-        });
-        
-        if (error) {
-          console.error('Subscription check error:', error);
-          if (error.message.includes('Invalid user session') || 
-              error.message.includes('session_not_found')) {
-            return {
-              subscribed: false,
-              priceId: null,
-              canceled: false,
-              maxClicks: 0
-            };
-          }
-          throw error;
-        }
-
-        return data;
-      } catch (error) {
-        console.error('Error checking subscription:', error);
-        throw error;
-      }
-    },
-    enabled: !!session?.access_token,
-    retry: 1,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false
-  });
-
   // Show loading state only if we're loading the initial session
-  if (isLoading || (session && isLoadingSubscription)) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
@@ -66,23 +25,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
-  }
-
-  // If on subscribe page or auth page, allow access regardless of subscription status
-  if (location.pathname === '/subscribe' || location.pathname === '/auth') {
-    return <>{children}</>;
-  }
-
-  // Check if user is on Steroids or Pro plan
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-  
-  const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                    subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
-
-  // If no subscription and not on Steroids or Pro plan, redirect to subscribe
-  if (!subscriptionStatus?.subscribed && !isSteroidsUser && !isProUser) {
-    return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

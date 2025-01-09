@@ -10,31 +10,10 @@ export function useSearchHistoryAccess() {
     },
   });
 
-  const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status', session?.access_token],
-    queryFn: async () => {
-      if (!session?.access_token) return null;
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.access_token,
-  });
-
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-  
-  const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                    subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
-
   return {
     session,
-    isSteroidsUser,
-    isProUser,
-    hasAccess: isSteroidsUser || isProUser // Allow access for both Pro and Steroids users
+    isSteroidsUser: true,
+    isProUser: true,
+    hasAccess: true // Allow access for all users
   };
 }
