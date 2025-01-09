@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
 import { PlanButtonText } from "./subscription/PlanButtonText";
 import { useSubscriptionAction } from "@/hooks/useSubscriptionAction";
+import { getButtonText, getButtonStyle } from "@/utils/subscription";
 
 export interface SubscribeButtonProps {
   planId: string;
@@ -38,51 +39,9 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
 
-  const getButtonText = () => {
-    if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1QfKMYGX13ZRG2XioPYKCe7h") {
-        return "Save 20% with annual";
-      }
-      if (isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
-        return "Save 20% with annual";
-      }
-      return `Upgrade to ${planName}`;
-    }
-
-    const isCurrentPlan = subscriptionStatus?.priceId === planId;
-    if (isCurrentPlan) {
-      return "Current Plan";
-    }
-
-    const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" && planId === "price_1QfKMYGX13ZRG2XioPYKCe7h") || 
-       (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"));
-
-    if (isMonthlyToAnnualUpgrade) {
-      return "Save 20% with annual";
-    }
-
-    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1QfKMGGX13ZRG2XiFyskXyJo") {
-      return "Downgrade to Creator Pro";
-    }
-
-    return `Upgrade to ${planName}`;
-  };
-
   const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId;
-
   const isDowngrade = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && 
-                     planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
-
-  const getButtonStyle = () => {
-    if (isPopular) {
-      return "primary-gradient";
-    }
-    if (isDowngrade) {
-      return "bg-gray-500 hover:bg-gray-600 text-white";
-    }
-    return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
-  };
+                     planId === "price_1QfKMGGX13ZRG2XiFyskXyJo";
 
   if (isCurrentPlan) {
     return (
@@ -101,11 +60,11 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     <Button 
       onClick={handleClick} 
       disabled={loading || isCurrentPlan}
-      className={`w-full text-[11px] h-8 ${getButtonStyle()}`}
+      className={`w-full text-[11px] h-8 ${getButtonStyle(!!isPopular, isDowngrade)}`}
       variant={isPopular ? "default" : "secondary"}
     >
       <PlanButtonText 
-        text={loading ? "Loading..." : getButtonText()}
+        text={loading ? "Loading..." : getButtonText(subscriptionStatus, planId, isAnnual, planName)}
         isUpgrade={!isCurrentPlan}
         showThunderbolt={isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"}
       />
