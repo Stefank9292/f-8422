@@ -30,7 +30,7 @@ export const BulkSearchButton = ({ isEnabled, isLoading, onClick }: BulkSearchBu
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
   
   const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-                   subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+                    subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
 
   if (!isSteroidsUser && !isProUser) return null;
 

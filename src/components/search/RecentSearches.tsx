@@ -45,7 +45,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
   
   const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-                   subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+                    subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
 
   // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
@@ -59,7 +59,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   // Set up real-time listener for search history changes
   useEffect(() => {
-    if (!isSteroidsUser) return;
+    if (!isSteroidsUser && !isProUser) return;
 
     const channel = supabase
       .channel('search-history-changes')
@@ -79,7 +79,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient, isSteroidsUser]);
+  }, [queryClient, isSteroidsUser, isProUser]);
 
   // Save collapsed state to localStorage
   useEffect(() => {
@@ -89,7 +89,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
-      if (!isSteroidsUser) return [];
+      if (!isSteroidsUser && !isProUser) return [];
       
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
@@ -108,7 +108,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       return data || [];
     },
-    enabled: isSteroidsUser,
+    enabled: isSteroidsUser || isProUser,
   });
 
   const handleRemove = (id: string) => {
