@@ -59,23 +59,12 @@ export function SearchHistoryItemHeader({
     }
   };
 
-  console.log('SearchHistoryItemHeader props:', { 
-    isBulkSearch, 
-    urls, 
-    query,
-    urlsExist: urls && Array.isArray(urls) && urls.length > 0
-  });
+  // Clean up the query to display as username
+  const cleanQuery = query.replace('https://www.instagram.com/', '').replace('https://instagram.com/', '').replace('/', '');
+  const displayQuery = cleanQuery.startsWith('@') ? cleanQuery : `@${cleanQuery}`;
 
-  const displayQuery = isBulkSearch && urls && Array.isArray(urls) && urls.length > 0
-    ? `@${extractUsername(urls[0])}`
-    : query.startsWith('@') ? query : `@${extractUsername(query)}`;
-
-  const shouldShowCounter = isBulkSearch && urls && Array.isArray(urls) && urls.length > 1;
-  console.log('Display logic:', { 
-    displayQuery, 
-    shouldShowCounter,
-    urlsLength: urls?.length
-  });
+  // Determine if we should show the counter
+  const shouldShowCounter = isBulkSearch && urls && urls.length > 1;
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
@@ -117,11 +106,11 @@ export function SearchHistoryItemHeader({
           <div className="font-medium truncate flex items-center">
             <span className="inline-flex items-center">
               {displayQuery}
-              {isBulkSearch && urls.length > 1 && (
+              {shouldShowCounter && (
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
+                      <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
                         +{urls.length - 1}
                       </span>
                     </TooltipTrigger>
