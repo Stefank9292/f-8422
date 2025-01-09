@@ -118,7 +118,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
       {error && (
-        <Alert variant="destructive" className="bg-red-50">
+        <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -131,9 +131,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
-                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
-                     text-base md:text-lg w-full"
+          className="material-input"
         />
       </div>
       <div className="space-y-2">
@@ -143,9 +141,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
           required
-          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
-                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
-                     text-base md:text-lg w-full"
+          className="material-input"
         />
         {password && <PasswordStrengthIndicator passwordStrength={passwordStrength} />}
       </div>
@@ -156,9 +152,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
-          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
-                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
-                     text-base md:text-lg w-full"
+          className="material-input"
         />
         {confirmPassword && password !== confirmPassword && (
           <p className="text-sm text-destructive mt-1">Passwords do not match</p>
@@ -171,29 +165,19 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={inviteCode}
           onChange={(e) => setInviteCode(e.target.value)}
           required
-          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
-                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
-                     text-base md:text-lg w-full"
+          className="material-input"
         />
       </div>
       
-      <Button 
-        type="submit" 
-        className="w-full h-16 px-8 rounded-xl font-medium transition-all duration-200
-                 bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] text-white
-                 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed
-                 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2
-                 active:scale-95 text-base md:text-lg"
-        disabled={loading}
-      >
+      <Button type="submit" className="w-full material-button-primary" disabled={loading}>
         {loading ? "Loading..." : "Sign Up"}
       </Button>
 
-      <p className="text-xs text-center text-gray-500 mt-4">
+      <p className="text-xs text-center text-muted-foreground mt-4">
         By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
       </p>
       
-      <p className="text-sm text-center text-gray-500">
+      <p className="text-sm text-center text-muted-foreground">
         Already have an account?{" "}
         <button
           type="button"
