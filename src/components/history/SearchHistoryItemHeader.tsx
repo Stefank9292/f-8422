@@ -8,12 +8,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -63,9 +57,6 @@ export function SearchHistoryItemHeader({
   const cleanQuery = query.replace('https://www.instagram.com/', '').replace('https://instagram.com/', '').replace('/', '');
   const displayQuery = cleanQuery.startsWith('@') ? cleanQuery : `@${cleanQuery}`;
 
-  // Determine if we should show the counter
-  const shouldShowCounter = isBulkSearch && urls && urls.length > 1;
-
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
@@ -106,20 +97,6 @@ export function SearchHistoryItemHeader({
           <div className="font-medium truncate flex items-center">
             <span className="inline-flex items-center">
               {displayQuery}
-              {shouldShowCounter && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
-                        +{urls.length - 1}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent align="start" className="text-xs">
-                      {urls.length} profiles in this bulk search
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
             </span>
           </div>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
