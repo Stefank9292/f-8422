@@ -100,13 +100,13 @@ export function SearchHistoryItemHeader({
               </HoverCardContent>
             </HoverCard>
           )}
-          <span className="font-medium truncate">
+          <span className="font-medium truncate flex items-center">
             {displayQuery}
             {isBulkSearch && urls.length > 1 && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
+                    <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
                       +{urls.length - 1}
                     </span>
                   </TooltipTrigger>
