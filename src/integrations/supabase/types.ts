@@ -116,6 +116,33 @@ export type Database = {
           },
         ]
       }
+      subscription_logs: {
+        Row: {
+          created_at: string
+          details: Json | null
+          event: Database["public"]["Enums"]["subscription_event"]
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: Json | null
+          event: Database["public"]["Enums"]["subscription_event"]
+          id?: string
+          status: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: Json | null
+          event?: Database["public"]["Enums"]["subscription_event"]
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_requests: {
         Row: {
           created_at: string
@@ -166,6 +193,11 @@ export type Database = {
     }
     Enums: {
       invite_code_status: "active" | "expired"
+      subscription_event:
+        | "subscription_check"
+        | "subscription_created"
+        | "subscription_updated"
+        | "subscription_cancelled"
       subscription_tier: "free" | "premium" | "ultra"
     }
     CompositeTypes: {

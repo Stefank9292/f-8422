@@ -30,9 +30,11 @@ export class ErrorBoundary extends Component<Props, State> {
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error:', error, errorInfo);
     
-    // Log to Sentry
+    // Log to Sentry with proper typing
     Sentry.withScope((scope) => {
-      scope.setExtras(errorInfo);
+      Object.keys(errorInfo).forEach((key) => {
+        scope.setExtra(key, (errorInfo as any)[key]);
+      });
       Sentry.captureException(error);
     });
     
