@@ -23,18 +23,15 @@ const AuthPage = () => {
         setLoading(true);
         setError(null);
 
-        // Check for error in URL params
         const params = new URLSearchParams(window.location.hash.substring(1));
         const errorDescription = params.get('error_description');
         if (errorDescription) {
           console.error("Auth error from URL:", errorDescription);
           setError(errorDescription);
-          // Clear the URL without triggering a refresh
           window.history.replaceState({}, document.title, window.location.pathname);
           return;
         }
 
-        // Get the current session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -82,7 +79,6 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast, location]);
 
-  // Update URL when view changes
   useEffect(() => {
     const path = view === "sign_up" ? "/auth/sign-up" : "/auth";
     if (location.pathname !== path) {
@@ -90,7 +86,6 @@ const AuthPage = () => {
     }
   }, [view, navigate, location.pathname]);
 
-  // Update view when URL changes
   useEffect(() => {
     setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
   }, [location.pathname]);
