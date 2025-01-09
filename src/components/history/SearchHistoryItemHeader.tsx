@@ -121,7 +121,7 @@ export function SearchHistoryItemHeader({
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="inline-flex items-center text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
+                      <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer bg-secondary/50 px-1.5 py-0.5 rounded-full ml-1">
                         +{urls.length - 1}
                       </span>
                     </TooltipTrigger>
