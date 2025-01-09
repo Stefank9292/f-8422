@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const SearchHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const navigate = useNavigate();
 
   const { data: session } = useQuery({
@@ -74,8 +75,9 @@ const SearchHistory = () => {
     enabled: !!session?.access_token,
   });
 
-  const handleClearHistory = async () => {
+  const handleDeleteAll = async () => {
     if (!session?.user.id) return;
+    setIsDeletingAll(true);
 
     try {
       const { error } = await supabase
@@ -86,6 +88,8 @@ const SearchHistory = () => {
       if (error) throw error;
     } catch (error) {
       console.error('Error clearing history:', error);
+    } finally {
+      setIsDeletingAll(false);
     }
   };
 
@@ -125,8 +129,10 @@ const SearchHistory = () => {
     <div className="container mx-auto px-4 py-8">
       <SearchHistoryHeader
         totalSearches={filteredHistory.length}
-        onClearHistory={handleClearHistory}
-        isLoading={isLoading}
+        onDeleteAll={handleDeleteAll}
+        isDeletingAll={isDeletingAll}
+        hasHistory={filteredHistory.length > 0}
+        isSteroidsUser={isSteroidsUser}
       />
       <SearchHistoryList />
     </div>
