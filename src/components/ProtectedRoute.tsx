@@ -30,7 +30,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
               subscribed: false,
               priceId: null,
               canceled: false,
-              maxClicks: 3
+              maxClicks: 0
             };
           }
           throw error;
@@ -73,7 +73,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
 
-  // If no subscription and not on subscribe page, redirect to subscribe
+  // If no subscription, redirect to subscribe
   if (!subscriptionStatus?.subscribed) {
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }

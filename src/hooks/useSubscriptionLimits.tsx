@@ -19,7 +19,7 @@ export const useSubscriptionLimits = (session: Session | null) => {
   });
 
   const getMaxRequests = () => {
-    if (!subscriptionStatus?.priceId) return 3; // Free tier: 3 searches per month
+    if (!subscriptionStatus?.priceId) return 0;
     
     // Pro tier: 25 searches per month
     if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
@@ -33,7 +33,7 @@ export const useSubscriptionLimits = (session: Session | null) => {
       return Infinity;
     }
     
-    return 3; // Default to free tier
+    return 0;
   };
 
   return {
