@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useRateLimit } from "@/hooks/useRateLimit";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { AuthError } from "@supabase/supabase-js";
 
 interface SignInFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -38,11 +39,23 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       return;
     }
 
+    if (!email || !password) {
+      toast({
+        title: "Missing credentials",
+        description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
       
       // First, ensure no existing session
-      await supabase.auth.signOut();
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession) {
+        await supabase.auth.signOut();
+      }
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
@@ -50,13 +63,24 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       });
 
       if (error) {
-        handleAuthError(error);
+        console.error("Sign in error:", error);
+        if (error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Authentication Failed",
+            description: "Invalid email or password. Please check your credentials and try again.",
+            variant: "destructive",
+          });
+          updateRateLimit();
+        } else {
+          handleAuthError(error);
+        }
         return;
       }
 
       await handleAuthSuccess(data.session);
     } catch (error) {
-      handleAuthError(error as Error);
+      console.error("Unexpected error during signin:", error);
+      handleAuthError(error as AuthError);
     } finally {
       setLoading(false);
     }
