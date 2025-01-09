@@ -47,7 +47,7 @@ serve(async (req) => {
 
     console.log('Searching for Stripe customer...');
     const { data: customers, error: searchError } = await stripe.customers.search({
-      query: `metadata['supabaseUUID']:'${user.id}'`,
+      query: `email:'${user.email}'`,
     })
 
     if (searchError) {
@@ -143,16 +143,13 @@ serve(async (req) => {
       }
     });
 
-    // Determine if it's a Creator on Steroids plan
-    const isSteroidsPrice = priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                           priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-
     return new Response(
       JSON.stringify({
         subscribed: true,
         priceId: priceId,
         canceled: subscription.cancel_at_period_end,
-        maxClicks: isSteroidsPrice ? Infinity : 25
+        maxClicks: priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                  priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" ? Infinity : 25
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

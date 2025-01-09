@@ -3,12 +3,13 @@ import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { LoadingState } from "@/components/auth/LoadingState";
 import { ErrorState } from "@/components/auth/ErrorState";
 import { UndefinedSessionState } from "@/components/auth/UndefinedSessionState";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { session, isLoading, error } = useSessionValidation();
+  const queryClient = useQueryClient();
 
   const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
@@ -40,20 +41,14 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         return data;
       } catch (error) {
         console.error('Error checking subscription:', error);
-        // Return default values on error instead of throwing
-        return {
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        };
+        queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+        throw error;
       }
     },
     enabled: !!session?.access_token,
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchInterval: false, // Disable automatic refetching
-    refetchOnWindowFocus: false, // Disable refetch on window focus
-    retry: false // Disable retries on error
+    staleTime: 1000 * 60, // Cache for 1 minute
+    retry: 3,
+    retryDelay: 1000
   });
 
   // Show loading state only if we're loading the initial session
@@ -80,7 +75,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
 
-  // Don't show loading state for subscription check if we have cached data
+  // Show loading state for initial subscription check
   if (isLoadingSubscription && !subscriptionStatus) {
     return <LoadingState />;
   }
