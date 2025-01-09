@@ -72,6 +72,13 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     localStorage.setItem('recentSearchesCollapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
+  const extractUsername = (query: string): string => {
+    if (query.includes('instagram.com/')) {
+      return query.split('instagram.com/')[1]?.split('/')[0] || query;
+    }
+    return query;
+  };
+
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
@@ -92,7 +99,10 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         throw error;
       }
 
-      return data || [];
+      return data.map(item => ({
+        ...item,
+        search_query: extractUsername(item.search_query)
+      })) || [];
     },
     enabled: isSteroidsUser,
   });

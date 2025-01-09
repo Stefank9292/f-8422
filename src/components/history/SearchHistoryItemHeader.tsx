@@ -55,7 +55,7 @@ export function SearchHistoryItemHeader({
 
   const displayQuery = isBulkSearch && urls.length > 0
     ? `@${extractUsername(urls[0])} +${urls.length - 1}`
-    : query;
+    : extractUsername(query);
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
