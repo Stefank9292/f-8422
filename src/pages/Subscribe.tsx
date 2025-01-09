@@ -86,10 +86,12 @@ const SubscribePage = () => {
         annual: { total: "276", perMonth: "23" }
       },
       features: [
-        { included: true, text: "25 Total Searches" },
-        { included: true, text: "Maximum 20 Results per Search" },
+        { included: true, text: "25 Total Searches per Month" },
+        { included: true, text: "Maximum 25 Results per Username" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },
+        { included: false, text: "Search History" },
+        { included: false, text: "Recent Searches" },
         { included: false, text: "Early Access to new Features" }
       ],
       priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
@@ -103,9 +105,11 @@ const SubscribePage = () => {
       },
       features: [
         { included: true, text: "Unlimited Searches" },
-        { included: true, text: "Maximum 50 Results per Search" },
+        { included: true, text: "Maximum 50 Results per Username" },
         { included: true, text: "Bulk Search" },
         { included: true, text: "Contact Support" },
+        { included: true, text: "Search History" },
+        { included: true, text: "Recent Searches" },
         { included: true, text: "Early Access to new Features" }
       ],
       isPopular: true,
@@ -123,7 +127,7 @@ const SubscribePage = () => {
     <div className="min-h-screen p-4 bg-background">
       <div className="max-w-7xl mx-auto space-y-12 pt-8">
         <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight text-center">{title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-center dark:text-foreground">{title}</h1>
           <p className="text-[13px] text-muted-foreground text-center">
             {subtitle}
           </p>
@@ -143,7 +147,7 @@ const SubscribePage = () => {
               <span className={`text-[11px] ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
                 Annual
               </span>
-              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800">
+              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
                 Save 20%
               </Badge>
             </div>

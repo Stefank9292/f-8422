@@ -35,11 +35,11 @@ const FeatureItem = ({ included, text, priceId }: { included: boolean; text: str
       {!included ? (
         <X className="h-3.5 w-3.5 text-red-500" />
       ) : shouldShowWarning ? (
-        <AlertTriangle className="h-3.5 w-3.5 text-yellow-500" />
+        <AlertTriangle className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
       ) : (
-        <Check className="h-3.5 w-3.5 text-green-500" />
+        <Check className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
       )}
-      <span className="text-[11px]">{text}</span>
+      <span className="text-[11px] dark:text-gray-300">{text}</span>
     </li>
   );
 };
@@ -79,20 +79,20 @@ export const PricingCard = ({
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
-        ${isPopular ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm' : ''}`}
+        ${isPopular ? 'border-2 border-rose-400 ring-4 ring-rose-400/20 shadow-xl scale-105 bg-card/50 backdrop-blur-sm dark:bg-card/30 dark:shadow-none' : 'dark:bg-card/10 dark:border-border/10'}`}
     >
       <div className="space-y-3">
         <div className="flex items-center gap-1.5">
-          <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : ''}`}>
+          <h2 className={`text-lg font-semibold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : 'dark:text-gray-100'}`}>
             {name}
           </h2>
         </div>
-        <p className="text-[11px] text-muted-foreground leading-relaxed">{description}</p>
-        <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : ''}`}>
+        <p className="text-[11px] text-muted-foreground leading-relaxed dark:text-gray-400">{description}</p>
+        <div className={`text-xl font-bold ${isPopular ? 'instagram-gradient bg-clip-text text-transparent animate-synchronized-pulse' : 'dark:text-gray-100'}`}>
           {isAnnual ? (
             <>
               ${price.annual.total}/year
-              <span className="text-[11px] text-muted-foreground ml-2">(${price.annual.perMonth}/mo)</span>
+              <span className="text-[11px] text-muted-foreground ml-2 dark:text-gray-400">(${price.annual.perMonth}/mo)</span>
             </>
           ) : (
             `$${price.monthly}/mo`
