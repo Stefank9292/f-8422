@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { RecentSearchItem } from "./recent/RecentSearchItem";
 import { RecentSearchesHeader } from "./recent/RecentSearchesHeader";
+import { extractUsername } from "@/utils/instagram";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
