@@ -16,13 +16,18 @@ export const useSessionValidation = () => {
 
   const handleSignOut = async () => {
     try {
+      setIsLoading(true);
       await supabase.auth.signOut();
       queryClient.clear();
       setSession(null);
-      navigate('/auth', { 
-        replace: true,
-        state: { from: location, error: "Your session has expired. Please sign in again." }
-      });
+      
+      // Only navigate if we're not already on the auth page
+      if (location.pathname !== '/auth') {
+        navigate('/auth', { 
+          replace: true,
+          state: { from: location, error: "Your session has expired. Please sign in again." }
+        });
+      }
       
       toast({
         title: "Session Expired",
@@ -32,6 +37,8 @@ export const useSessionValidation = () => {
     } catch (error) {
       console.error("Sign out error:", error);
       setError("Failed to sign out properly");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -50,14 +57,6 @@ export const useSessionValidation = () => {
         return false;
       }
 
-      // Verify the refreshed session
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        console.error("Invalid session after refresh:", userError);
-        return false;
-      }
-
       // Update the session with the refreshed one
       setSession(refreshResult.session);
       return true;
@@ -68,6 +67,8 @@ export const useSessionValidation = () => {
   };
 
   useEffect(() => {
+    let mounted = true;
+
     const checkSession = async () => {
       try {
         setIsLoading(true);
@@ -83,22 +84,24 @@ export const useSessionValidation = () => {
         
         if (!currentSession) {
           console.log("No active session found");
-          setSession(null);
+          if (mounted) setSession(null);
           return;
         }
 
         const isValid = await validateSession(currentSession);
-        if (!isValid) {
+        if (!isValid && mounted) {
           await handleSignOut();
           return;
         }
       } catch (error) {
         console.error("Session error:", error);
         const errorMessage = error instanceof Error ? error.message : "Session validation failed";
-        setError(errorMessage);
-        await handleSignOut();
+        if (mounted) {
+          setError(errorMessage);
+          await handleSignOut();
+        }
       } finally {
-        setIsLoading(false);
+        if (mounted) setIsLoading(false);
       }
     };
 
@@ -108,14 +111,19 @@ export const useSessionValidation = () => {
       console.log("Auth state change:", event);
       
       if (event === 'SIGNED_OUT') {
-        setSession(null);
-        queryClient.clear();
-        navigate('/auth', { replace: true });
+        if (mounted) {
+          setSession(null);
+          queryClient.clear();
+          // Only navigate if we're not already on the auth page
+          if (location.pathname !== '/auth') {
+            navigate('/auth', { replace: true });
+          }
+        }
         return;
       }
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (currentSession) {
+        if (currentSession && mounted) {
           const isValid = await validateSession(currentSession);
           if (!isValid) {
             await handleSignOut();
@@ -134,6 +142,7 @@ export const useSessionValidation = () => {
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [queryClient, navigate, location, toast]);
