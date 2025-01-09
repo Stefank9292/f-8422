@@ -15,28 +15,17 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
+  const [formLoading, setFormLoading] = useState(false);
 
-  useEffect(() => {
-    // Set initial view based on URL
-    setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
-  }, [location.pathname]);
-
-  // Handle auth callback and session management
+  // Set initial view based on URL and handle session check
   useEffect(() => {
     let mounted = true;
 
-    const handleAuthCallback = async () => {
+    const initializeAuth = async () => {
       try {
-        if (!mounted) return;
-        
-        // Check for error in URL hash
-        const params = new URLSearchParams(window.location.hash.substring(1));
-        const errorDescription = params.get('error_description');
-        if (errorDescription) {
-          console.error("Auth error from URL:", errorDescription);
-          setError(errorDescription);
-          window.history.replaceState({}, document.title, window.location.pathname);
-          return;
+        // Set view based on URL path
+        if (mounted) {
+          setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
         }
 
         // Check for existing session
@@ -44,7 +33,9 @@ const AuthPage = () => {
         
         if (sessionError) {
           console.error("Session error:", sessionError);
-          setError(sessionError.message);
+          if (mounted) {
+            setError(sessionError.message);
+          }
           return;
         }
 
@@ -55,8 +46,10 @@ const AuthPage = () => {
           return;
         }
       } catch (err) {
-        console.error("Auth callback error:", err);
-        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+        console.error("Auth initialization error:", err);
+        if (mounted) {
+          setError(err instanceof Error ? err.message : "An unexpected error occurred");
+        }
       } finally {
         if (mounted) {
           setLoading(false);
@@ -64,7 +57,7 @@ const AuthPage = () => {
       }
     };
 
-    handleAuthCallback();
+    initializeAuth();
 
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -80,17 +73,6 @@ const AuthPage = () => {
         const redirectTo = location.state?.from?.pathname || "/";
         navigate(redirectTo, { replace: true });
       }
-      
-      if (event === "SIGNED_OUT") {
-        toast({
-          title: "Signed out",
-          description: "You have been signed out.",
-        });
-      }
-
-      if (event === "USER_UPDATED") {
-        setLoading(false);
-      }
     });
 
     return () => {
@@ -99,12 +81,12 @@ const AuthPage = () => {
     };
   }, [navigate, toast, location]);
 
-  // Handle view changes
+  // Handle view changes without URL updates
   const handleViewChange = (newView: "sign_in" | "sign_up") => {
-    const newPath = newView === "sign_up" ? "/auth/sign-up" : "/auth";
-    navigate(newPath, { replace: true });
+    setView(newView);
   };
 
+  // Show loading state only during initial session check
   if (loading) {
     return <LoadingState />;
   }
@@ -126,8 +108,8 @@ const AuthPage = () => {
           ) : (
             <SignUpForm 
               onViewChange={handleViewChange} 
-              loading={loading} 
-              setLoading={setLoading} 
+              loading={formLoading} 
+              setLoading={setFormLoading} 
             />
           )}
         </div>
