@@ -11,11 +11,13 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Initialize view based on current path, but don't update it on path changes
   const [view, setView] = useState<"sign_in" | "sign_up">(
     location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in"
   );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -79,19 +81,13 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast, location]);
 
-  useEffect(() => {
-    const path = view === "sign_up" ? "/auth/sign-up" : "/auth";
+  // Single effect to handle view changes and URL updates
+  const handleViewChange = (newView: "sign_in" | "sign_up") => {
+    setView(newView);
+    const path = newView === "sign_up" ? "/auth/sign-up" : "/auth";
     if (location.pathname !== path) {
       navigate(path, { replace: true });
     }
-  }, [view, navigate, location.pathname]);
-
-  useEffect(() => {
-    setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
-  }, [location.pathname]);
-
-  const handleViewChange = (newView: "sign_in" | "sign_up") => {
-    setView(newView);
   };
 
   return (
