@@ -1,11 +1,10 @@
-import { Lock } from "lucide-react";
+import { X, Instagram, History, Lock, ChevronDown, ChevronUp } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { RecentSearchItem } from "./recent/RecentSearchItem";
-import { RecentSearchesHeader } from "./recent/RecentSearchesHeader";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -43,16 +42,6 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-
-  // Extract username from Instagram URL
-  const extractUsername = (url: string): string => {
-    try {
-      const username = url.split('instagram.com/')[1]?.split('/')[0];
-      return username ? username.replace('@', '') : url;
-    } catch {
-      return url;
-    }
-  };
 
   // Set up real-time listener for search history changes
   useEffect(() => {
@@ -93,7 +82,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       const { data, error } = await supabase
         .from('search_history')
-        .select('id, search_query, bulk_search_urls')
+        .select('id, search_query')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -139,10 +128,19 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   return (
     <div className="w-full flex flex-col items-center space-y-4 mt-6">
-      <RecentSearchesHeader 
-        isCollapsed={isCollapsed}
+      <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-      />
+        className="inline-flex items-center justify-center gap-1.5 py-2 px-3 text-[10px] sm:text-[11px] text-gray-700 dark:text-gray-200 
+                 bg-gray-50/50 dark:bg-gray-800/30 transition-colors rounded-lg"
+      >
+        <History className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+        <span className="font-medium">Recent Searches</span>
+        {isCollapsed ? (
+          <ChevronDown className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+        ) : (
+          <ChevronUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+        )}
+      </button>
       
       <div
         className={cn(
@@ -151,22 +149,29 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         )}
       >
         <div className="w-full flex flex-wrap justify-center gap-2.5">
-          {visibleSearches.map((search) => {
-            const displayQuery = search.bulk_search_urls?.length 
-              ? `${extractUsername(search.bulk_search_urls[0])}`
-              : search.search_query;
-
-            return (
-              <RecentSearchItem
-                key={search.id}
-                id={search.id}
-                searchQuery={displayQuery}
-                bulkSearchUrls={search.bulk_search_urls}
-                onSelect={onSelect}
-                onRemove={handleRemove}
-              />
-            );
-          })}
+          {visibleSearches.map((search) => (
+            <div
+              key={search.id}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
+            >
+              <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+              <button
+                onClick={() => onSelect(search.search_query)}
+                className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+              >
+                {search.search_query}
+              </button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-4 w-4 p-0 hover:bg-transparent"
+                onClick={() => handleRemove(search.id)}
+              >
+                <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                <span className="sr-only">Remove search</span>
+              </Button>
+            </div>
+          ))}
         </div>
       </div>
     </div>

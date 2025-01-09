@@ -4,14 +4,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Session } from "@supabase/supabase-js";
 import { useEffect } from "react";
 
-// Define plan IDs as constants to avoid typos
-const PLAN_IDS = {
-  STEROIDS_MONTHLY: "price_1Qdt4NGX13ZRG2XiMWXryAm9",
-  STEROIDS_ANNUAL: "price_1Qdt5HGX13ZRG2XiUW80k3Fk",
-  PRO_MONTHLY: "price_1Qdt2dGX13ZRG2XiaKwG6VPu",
-  PRO_ANNUAL: "price_1Qdt3tGX13ZRG2XiesasShEJ"
-} as const;
-
 export const useUsageStats = (session: Session | null) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -51,30 +43,13 @@ export const useUsageStats = (session: Session | null) => {
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      if (!session?.access_token) {
-        console.log('No session token available');
-        return null;
-      }
-
-      try {
-        console.log('Checking subscription with token:', session.access_token.slice(0, 10) + '...');
-        const { data, error } = await supabase.functions.invoke('check-subscription', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
-        });
-
-        if (error) {
-          console.error('Subscription check error:', error);
-          throw error;
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
         }
-
-        console.log('Raw subscription check response:', data);
-        return data;
-      } catch (error) {
-        console.error('Failed to check subscription:', error);
-        throw error;
-      }
+      });
+      if (error) throw error;
+      return data;
     },
     enabled: !!session?.access_token,
   });
@@ -83,8 +58,8 @@ export const useUsageStats = (session: Session | null) => {
     const checkAndResetMonthlyUsage = async () => {
       if (!session?.user.id || !subscriptionStatus) return;
 
-      const isSteroidsUser = subscriptionStatus.priceId === PLAN_IDS.STEROIDS_MONTHLY || 
-                            subscriptionStatus.priceId === PLAN_IDS.STEROIDS_ANNUAL;
+      const isSteroidsUser = subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                            subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
       
       if (!isSteroidsUser) {
         const now = new Date();
@@ -128,36 +103,27 @@ export const useUsageStats = (session: Session | null) => {
     checkAndResetMonthlyUsage();
   }, [session?.user.id, subscriptionStatus, refetchRequestStats]);
 
-  const isSteroidsUser = subscriptionStatus?.priceId === PLAN_IDS.STEROIDS_MONTHLY || 
-                        subscriptionStatus?.priceId === PLAN_IDS.STEROIDS_ANNUAL;
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
   
-  const isProUser = subscriptionStatus?.priceId === PLAN_IDS.PRO_MONTHLY || 
-                    subscriptionStatus?.priceId === PLAN_IDS.PRO_ANNUAL;
-
-  console.log('Subscription status check:', {
-    rawPriceId: subscriptionStatus?.priceId,
-    isSteroidsUser,
-    isProUser,
-    subscriptionActive: subscriptionStatus?.subscribed,
-    planConstants: PLAN_IDS
-  });
-  
-  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
+  const maxRequests = isSteroidsUser ? Infinity : 25; // Pro users get 25 searches
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);
   const hasReachedLimit = isSteroidsUser ? false : usedRequests >= maxRequests;
 
   const getPlanName = () => {
-    if (subscriptionStatus?.priceId === PLAN_IDS.STEROIDS_MONTHLY || 
-        subscriptionStatus?.priceId === PLAN_IDS.STEROIDS_ANNUAL) {
-      return 'Creator on Steroids';
-    }
-    if (subscriptionStatus?.priceId === PLAN_IDS.PRO_MONTHLY || 
-        subscriptionStatus?.priceId === PLAN_IDS.PRO_ANNUAL) {
+    if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+        subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
       return 'Creator Pro';
     }
-    return 'Free Plan';
+    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+      return 'Creator on Steroids';
+    }
+    return 'Creator Pro';
   };
 
   return {
@@ -169,6 +135,6 @@ export const useUsageStats = (session: Session | null) => {
     usagePercentage,
     hasReachedLimit,
     getPlanName,
-    subscriptionStatus,
+    subscriptionStatus, // Added this line to fix the error
   };
 };

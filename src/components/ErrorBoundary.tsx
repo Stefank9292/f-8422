@@ -18,6 +18,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    // Only return a generic message in production
     return { 
       hasError: true, 
       error: process.env.NODE_ENV === 'production' 
@@ -27,8 +28,29 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    // Sanitize error information before logging
+    const sanitizedError = {
+      name: error.name,
+      message: this.sanitizeErrorMessage(error.message),
+      componentStack: this.sanitizeStackTrace(errorInfo.componentStack)
+    };
+
+    console.error('Uncaught error:', sanitizedError);
     this.logErrorSecurely(error, errorInfo);
+  }
+
+  private sanitizeErrorMessage(message: string): string {
+    // Remove potential sensitive information from error messages
+    return message.replace(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi, '[EMAIL]')
+                 .replace(/\b\d{4}\b/g, '[ID]')
+                 .replace(/Bearer [a-zA-Z0-9\-._~+/]+=*/g, '[TOKEN]');
+  }
+
+  private sanitizeStackTrace(stack: string): string {
+    // Remove file paths and line numbers from stack trace
+    return stack.split('\n')
+                .map(line => line.replace(/\(.*\)/g, '(...)'))
+                .join('\n');
   }
 
   private async logErrorSecurely(error: Error, errorInfo: ErrorInfo) {
@@ -38,21 +60,20 @@ export class ErrorBoundary extends Component<Props, State> {
         const sanitizedError = {
           userId: session.user.id,
           errorName: error.name,
-          errorMessage: error.message,
+          errorMessage: this.sanitizeErrorMessage(error.message),
           timestamp: new Date().toISOString()
         };
+
+        // Log sanitized error
         console.error('Authenticated user error:', sanitizedError);
       }
     } catch (loggingError) {
+      // Fail silently but log generic error
       console.error('Error logging failed');
     }
   }
 
   private handleRefresh = () => {
-    window.location.reload();
-  };
-
-  private handleGoHome = () => {
     // Clear any cached data that might be causing the error
     if (window.localStorage) {
       const authData = window.localStorage.getItem('supabase.auth.token');
@@ -61,7 +82,7 @@ export class ErrorBoundary extends Component<Props, State> {
         window.localStorage.setItem('supabase.auth.token', authData);
       }
     }
-    window.location.href = '/';
+    window.location.reload();
   };
 
   public render() {
@@ -79,13 +100,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="space-x-4">
               <button
                 onClick={this.handleRefresh}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm"
               >
                 Refresh page
               </button>
               <button
-                onClick={this.handleGoHome}
-                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm hover:bg-secondary/90 transition-colors"
+                onClick={() => window.location.href = '/'}
+                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm"
               >
                 Go to homepage
               </button>

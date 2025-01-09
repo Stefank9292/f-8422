@@ -5,13 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { BulkSearchSettings } from "./BulkSearchSettings";
 import { Search, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { saveSearchHistory } from "@/utils/searchHistory";
-import { InstagramPost } from "@/types/instagram";
 
 interface BulkSearchProps {
   isOpen: boolean;
   onClose: () => void;
-  onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<InstagramPost[]>;
+  onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -49,9 +47,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
     }
 
     try {
-      const results = await onSearch(urlList, numberOfVideos, selectedDate);
-      // Save bulk search results to history
-      await saveSearchHistory(urlList[0], results, urlList);
+      await onSearch(urlList, numberOfVideos, selectedDate);
       onClose();
     } catch (error) {
       console.error('Search error:', error);

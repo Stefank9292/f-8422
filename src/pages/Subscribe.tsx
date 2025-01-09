@@ -66,13 +66,24 @@ const SubscribePage = () => {
     };
   };
 
+  const priceIds = {
+    premium: {
+      monthly: "price_1QdtwnGX13ZRG2XihcM36r3W",
+      annual: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+    },
+    ultra: {
+      monthly: "price_1Qdty5GX13ZRG2XiFxadAKJW",
+      annual: "price_1QdtyHGX13ZRG2Xib8px0lu0"
+    }
+  };
+
   const pricingPlans = [
     {
       name: "Creator Pro",
       description: "For Professional Creators",
       price: {
-        monthly: "39",
-        annual: { total: "375", perMonth: "31.25" }
+        monthly: "29",
+        annual: { total: "276", perMonth: "23" }
       },
       features: [
         { included: true, text: "25 Total Searches per Month" },
@@ -83,14 +94,14 @@ const SubscribePage = () => {
         { included: false, text: "Recent Searches" },
         { included: false, text: "Early Access to new Features" }
       ],
-      priceId: isAnnual ? "price_1Qdt3tGX13ZRG2XiesasShEJ" : "price_1Qdt2dGX13ZRG2XiaKwG6VPu"
+      priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
     },
     {
       name: "Creator on Steroids",
       description: "For Viral Marketing Gods",
       price: {
-        monthly: "69",
-        annual: { total: "663", perMonth: "55.25" }
+        monthly: "49",
+        annual: { total: "470", perMonth: "39.17" }
       },
       features: [
         { included: true, text: "Unlimited Searches" },
@@ -102,7 +113,7 @@ const SubscribePage = () => {
         { included: true, text: "Early Access to new Features" }
       ],
       isPopular: true,
-      priceId: isAnnual ? "price_1Qdt5HGX13ZRG2XiUW80k3Fk" : "price_1Qdt4NGX13ZRG2XiMWXryAm9"
+      priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly
     }
   ];
 

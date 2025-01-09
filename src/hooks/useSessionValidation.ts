@@ -21,12 +21,19 @@ export const useSessionValidation = () => {
       queryClient.clear();
       setSession(null);
       
+      // Only navigate if we're not already on the auth page
       if (location.pathname !== '/auth') {
         navigate('/auth', { 
           replace: true,
-          state: { from: location }
+          state: { from: location, error: "Your session has expired. Please sign in again." }
         });
       }
+      
+      toast({
+        title: "Session Expired",
+        description: "Please sign in again to continue.",
+        variant: "destructive",
+      });
     } catch (error) {
       console.error("Sign out error:", error);
       setError("Failed to sign out properly");
@@ -35,10 +42,32 @@ export const useSessionValidation = () => {
     }
   };
 
+  const validateSession = async (currentSession: Session) => {
+    try {
+      // Always try to refresh the session first
+      const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError) {
+        console.error("Session refresh error:", refreshError);
+        return false;
+      }
+
+      if (!refreshResult.session) {
+        console.error("No session after refresh");
+        return false;
+      }
+
+      // Update the session with the refreshed one
+      setSession(refreshResult.session);
+      return true;
+    } catch (error) {
+      console.error("Session validation error:", error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
-    let authSubscription: { subscription: { unsubscribe: () => void } } | null = null;
-    let sessionCheckTimeout: NodeJS.Timeout | null = null;
 
     const checkSession = async () => {
       try {
@@ -59,36 +88,16 @@ export const useSessionValidation = () => {
           return;
         }
 
-        // Only refresh if the session is close to expiring
-        const expiresAt = new Date((currentSession.expires_at || 0) * 1000);
-        const now = new Date();
-        const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-        const REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
-
-        if (timeUntilExpiry < REFRESH_THRESHOLD) {
-          const { data: refreshResult, error: refreshError } = 
-            await supabase.auth.refreshSession();
-          
-          if (refreshError) {
-            console.error("Session refresh error:", refreshError);
-            if (mounted) {
-              await handleSignOut();
-            }
-            return;
-          }
-
-          if (mounted && refreshResult.session) {
-            setSession(refreshResult.session);
-          }
-        } else {
-          if (mounted) {
-            setSession(currentSession);
-          }
+        const isValid = await validateSession(currentSession);
+        if (!isValid && mounted) {
+          await handleSignOut();
+          return;
         }
       } catch (error) {
         console.error("Session error:", error);
+        const errorMessage = error instanceof Error ? error.message : "Session validation failed";
         if (mounted) {
-          setError("Session validation failed");
+          setError(errorMessage);
           await handleSignOut();
         }
       } finally {
@@ -96,49 +105,47 @@ export const useSessionValidation = () => {
       }
     };
 
-    // Set up auth state change listener
-    const setupAuthListener = () => {
-      const { data } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-        console.log("Auth state change:", event);
-        
-        if (event === 'SIGNED_OUT') {
-          if (mounted) {
-            setSession(null);
-            queryClient.clear();
-            if (location.pathname !== '/auth') {
-              navigate('/auth', { replace: true });
-            }
-          }
-          return;
-        }
-        
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          if (currentSession && mounted) {
-            setSession(currentSession);
-            setError(null);
-          }
-        }
-      });
-
-      // Store the subscription object
-      authSubscription = data;
-    };
-
-    // Initial session check
     checkSession();
-    setupAuthListener();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log("Auth state change:", event);
+      
+      if (event === 'SIGNED_OUT') {
+        if (mounted) {
+          setSession(null);
+          queryClient.clear();
+          // Only navigate if we're not already on the auth page
+          if (location.pathname !== '/auth') {
+            navigate('/auth', { replace: true });
+          }
+        }
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        if (currentSession && mounted) {
+          const isValid = await validateSession(currentSession);
+          if (!isValid) {
+            await handleSignOut();
+            return;
+          }
+          
+          setError(null);
+          
+          if (event === 'SIGNED_IN') {
+            const intendedPath = location.state?.from?.pathname || '/';
+            navigate(intendedPath, { replace: true });
+          }
+        }
+        return;
+      }
+    });
 
     return () => {
       mounted = false;
-      if (sessionCheckTimeout) {
-        clearTimeout(sessionCheckTimeout);
-      }
-      // Only unsubscribe if the subscription exists
-      if (authSubscription?.subscription?.unsubscribe) {
-        authSubscription.subscription.unsubscribe();
-      }
+      subscription.unsubscribe();
     };
-  }, [queryClient, navigate, location]);
+  }, [queryClient, navigate, location, toast]);
 
   return { session, isLoading, error };
 };

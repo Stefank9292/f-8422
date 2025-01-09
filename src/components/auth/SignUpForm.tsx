@@ -30,7 +30,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   
   const { handleAuthError, handleAuthSuccess } = useAuthForm({
     mode: 'sign_up',
-    onSuccess: () => navigate("/subscribe")
+    onSuccess: () => navigate("/auth/confirm-email", { state: { email } })
   });
 
   const handlePasswordChange = (newPassword: string) => {
@@ -41,22 +41,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate and trim all input fields
-    const trimmedEmail = email?.trim();
-    const trimmedPassword = password?.trim();
-    const trimmedConfirmPassword = confirmPassword?.trim();
-    const trimmedInviteCode = inviteCode?.trim();
-
-    if (!trimmedEmail || !trimmedPassword || !trimmedConfirmPassword || !trimmedInviteCode) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (trimmedInviteCode !== "Vyral2025") {
+    if (inviteCode !== "Vyral2025") {
       toast({
         title: "Invalid Invite Code",
         description: "Please enter a valid invite code to sign up.",
@@ -65,7 +50,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return;
     }
 
-    const passwordError = validatePassword(trimmedPassword);
+    const passwordError = validatePassword(password);
     if (passwordError) {
       toast({
         title: "Invalid Password",
@@ -75,7 +60,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return;
     }
 
-    if (trimmedPassword !== trimmedConfirmPassword) {
+    if (password !== confirmPassword) {
       toast({
         title: "Password Mismatch",
         description: "Passwords do not match. Please try again.",
@@ -94,13 +79,10 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       }
 
       const { data, error } = await supabase.auth.signUp({
-        email: trimmedEmail,
-        password: trimmedPassword,
+        email,
+        password,
         options: {
           emailRedirectTo: window.location.origin + '/auth',
-          data: {
-            email_confirmed: true // Skip email confirmation
-          }
         }
       });
 
@@ -110,16 +92,16 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         return;
       }
 
-      if (data.session) {
-        await handleAuthSuccess(data.session);
-        navigate("/subscribe");
-      } else {
+      if (!data.session) {
         toast({
-          title: "Account Created",
-          description: "Please sign in with your credentials.",
+          title: "Verification Required",
+          description: "Please check your email to verify your account.",
         });
-        onViewChange("sign_in");
+        navigate("/auth/confirm-email", { state: { email } });
+        return;
       }
+
+      await handleAuthSuccess(data.session);
     } catch (error) {
       console.error("Unexpected error during signup:", error);
       handleAuthError(error as AuthError);

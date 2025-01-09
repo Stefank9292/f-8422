@@ -39,11 +39,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       return;
     }
 
-    // Validate email and password before proceeding
-    const trimmedEmail = email?.trim();
-    const trimmedPassword = password?.trim();
-
-    if (!trimmedEmail || !trimmedPassword) {
+    if (!email || !password) {
       toast({
         title: "Missing credentials",
         description: "Please enter both email and password",
@@ -62,8 +58,8 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
       }
       
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail.toLowerCase(),
-        password: trimmedPassword,
+        email: email.trim().toLowerCase(),
+        password,
       });
 
       if (error) {
