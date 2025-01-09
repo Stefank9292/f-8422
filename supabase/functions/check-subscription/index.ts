@@ -11,7 +11,6 @@ const corsHeaders = {
 serve(async (req) => {
   console.log('Check subscription function called with method:', req.method);
 
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling OPTIONS preflight request');
     return new Response(null, { 
@@ -21,7 +20,6 @@ serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('No authorization header provided');
@@ -33,7 +31,6 @@ serve(async (req) => {
 
     console.log('Auth header found:', authHeader.substring(0, 20) + '...');
 
-    // Create a Supabase client with the auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -49,7 +46,6 @@ serve(async (req) => {
       }
     );
 
-    // Get the user from the auth header
     const {
       data: { user },
       error: userError,
@@ -80,7 +76,6 @@ serve(async (req) => {
 
     console.log('Verified user:', user.id);
 
-    // Get user's email
     const userEmail = user.email;
     if (!userEmail) {
       console.error('No email found for user');
@@ -93,13 +88,11 @@ serve(async (req) => {
       );
     }
 
-    // Get customer by email
     const customers = await stripe.customers.list({
       email: userEmail,
       limit: 1
     });
 
-    // If no customer found, return free tier status
     if (customers.data.length === 0) {
       console.log('No Stripe customer found for email:', userEmail);
       return new Response(
@@ -116,14 +109,14 @@ serve(async (req) => {
     const customer = customers.data[0];
     console.log('Found Stripe customer:', customer.id);
 
-    // Get all active subscriptions for the customer
     const subscriptions = await stripe.subscriptions.list({
       customer: customer.id,
       status: 'active',
       expand: ['data.items.data.price']
     });
 
-    // If no active subscriptions, return free tier status
+    console.log('Found subscriptions:', subscriptions.data.length);
+
     if (subscriptions.data.length === 0) {
       console.log('No active subscriptions found for customer:', customer.id);
       return new Response(
@@ -137,18 +130,16 @@ serve(async (req) => {
       );
     }
 
-    // Get the most recent active subscription
     const subscription = subscriptions.data[0];
     const priceId = subscription.items.data[0].price.id;
 
-    console.log('Found active subscription:', {
+    console.log('Active subscription found:', {
       id: subscription.id,
       priceId: priceId,
       status: subscription.status,
       cancelAtPeriodEnd: subscription.cancel_at_period_end
     });
 
-    // Return subscription status with CORS headers
     return new Response(
       JSON.stringify({
         subscribed: true,
