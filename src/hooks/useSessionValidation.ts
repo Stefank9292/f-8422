@@ -38,7 +38,6 @@ export const useSessionValidation = () => {
   useEffect(() => {
     let mounted = true;
     let authSubscription: { subscription: { unsubscribe: () => void } } | null = null;
-    let sessionCheckTimeout: NodeJS.Timeout | null = null;
 
     const checkSession = async () => {
       try {
@@ -59,13 +58,14 @@ export const useSessionValidation = () => {
           return;
         }
 
-        // Only refresh if the session is close to expiring
+        // Only refresh if the session is close to expiring (within 5 minutes)
         const expiresAt = new Date((currentSession.expires_at || 0) * 1000);
         const now = new Date();
         const timeUntilExpiry = expiresAt.getTime() - now.getTime();
         const REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 
         if (timeUntilExpiry < REFRESH_THRESHOLD) {
+          console.log('Session nearing expiry, refreshing...');
           const { data: refreshResult, error: refreshError } = 
             await supabase.auth.refreshSession();
           
@@ -96,7 +96,6 @@ export const useSessionValidation = () => {
       }
     };
 
-    // Set up auth state change listener
     const setupAuthListener = () => {
       const { data } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
         console.log("Auth state change:", event);
@@ -120,7 +119,6 @@ export const useSessionValidation = () => {
         }
       });
 
-      // Store the subscription object
       authSubscription = data;
     };
 
@@ -130,10 +128,6 @@ export const useSessionValidation = () => {
 
     return () => {
       mounted = false;
-      if (sessionCheckTimeout) {
-        clearTimeout(sessionCheckTimeout);
-      }
-      // Only unsubscribe if the subscription exists
       if (authSubscription?.subscription?.unsubscribe) {
         authSubscription.subscription.unsubscribe();
       }

@@ -13,9 +13,18 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
-      if (!session?.access_token) return null;
+      if (!session?.access_token) {
+        console.log('No session token available for subscription check');
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
+      }
       
       try {
+        console.log('Checking subscription status...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${session.access_token}`
@@ -24,35 +33,31 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Subscription check error:', error);
-          if (error.message.includes('Invalid user session') || 
-              error.message.includes('session_not_found')) {
-            return {
-              subscribed: false,
-              priceId: null,
-              canceled: false,
-              maxClicks: 3
-            };
-          }
           throw error;
         }
 
-        // Log the subscription status for debugging
-        console.log('Subscription status:', data);
+        console.log('Subscription status received:', data);
         return data;
       } catch (error) {
         console.error('Error checking subscription:', error);
-        throw error;
+        // Return default values on error instead of throwing
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
       }
     },
     enabled: !!session?.access_token,
-    retry: 1,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchOnWindowFocus: true, // Enable refetch on window focus to catch subscription updates
-    refetchInterval: 30000 // Refetch every 30 seconds to ensure subscription status is current
+    refetchInterval: false, // Disable automatic refetching
+    refetchOnWindowFocus: false, // Disable refetch on window focus
+    retry: false // Disable retries on error
   });
 
   // Show loading state only if we're loading the initial session
-  if (isLoading || (session && isLoadingSubscription)) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
@@ -73,6 +78,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // If on subscribe page or auth page, allow access regardless of subscription status
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
+  }
+
+  // Don't show loading state for subscription check if we have cached data
+  if (isLoadingSubscription && !subscriptionStatus) {
+    return <LoadingState />;
   }
 
   // Check if user has an active subscription by checking the priceId
