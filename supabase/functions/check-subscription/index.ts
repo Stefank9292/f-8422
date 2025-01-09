@@ -5,11 +5,17 @@ import Stripe from 'https://esm.sh/stripe@12.0.0?target=deno'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Max-Age': '86400',
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { 
+      headers: corsHeaders,
+      status: 204
+    })
   }
 
   try {
@@ -24,7 +30,14 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
-        global: { headers: { Authorization: authHeader } },
+        global: { 
+          headers: { 
+            Authorization: authHeader,
+          },
+        },
+        auth: {
+          persistSession: false
+        }
       }
     )
 
@@ -158,7 +171,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('Subscription check error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        subscribed: false,
+        priceId: null,
+        canceled: false,
+        maxClicks: 3
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
