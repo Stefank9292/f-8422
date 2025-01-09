@@ -50,10 +50,18 @@ serve(async (req) => {
       error: userError,
     } = await supabaseClient.auth.getUser()
 
-    if (userError || !user) {
+    if (userError) {
       console.error('User verification error:', userError);
       return new Response(
-        JSON.stringify({ error: 'Invalid user session' }),
+        JSON.stringify({ error: 'Invalid user session', details: userError.message }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (!user) {
+      console.error('No user found in session');
+      return new Response(
+        JSON.stringify({ error: 'No user found in session' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -133,18 +141,17 @@ serve(async (req) => {
         canceled: subscription.cancel_at_period_end,
         status: subscription.status
       }),
-      { 
-        headers: { 
-          ...corsHeaders, 
-          'Content-Type': 'application/json' 
-        } 
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
+      JSON.stringify({ 
+        error: 'Internal server error', 
+        details: error.message,
+        stack: error.stack 
+      }),
       { 
         status: 500, 
         headers: { 
