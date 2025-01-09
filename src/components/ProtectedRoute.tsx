@@ -66,8 +66,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If on subscribe page, allow access regardless of subscription status
-  if (location.pathname === '/subscribe') {
+  // If on subscribe page or auth page, allow access regardless of subscription status
+  if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 

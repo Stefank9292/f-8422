@@ -30,7 +30,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   
   const { handleAuthError, handleAuthSuccess } = useAuthForm({
     mode: 'sign_up',
-    onSuccess: () => navigate("/auth/confirm-email", { state: { email } })
+    onSuccess: () => navigate("/subscribe")
   });
 
   const handlePasswordChange = (newPassword: string) => {
@@ -83,6 +83,9 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         password,
         options: {
           emailRedirectTo: window.location.origin + '/auth',
+          data: {
+            email_confirmed: true // Skip email confirmation
+          }
         }
       });
 
@@ -92,16 +95,16 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
         return;
       }
 
-      if (!data.session) {
+      if (data.session) {
+        await handleAuthSuccess(data.session);
+        navigate("/subscribe");
+      } else {
         toast({
-          title: "Verification Required",
-          description: "Please check your email to verify your account.",
+          title: "Account Created",
+          description: "Please sign in with your credentials.",
         });
-        navigate("/auth/confirm-email", { state: { email } });
-        return;
+        onViewChange("sign_in");
       }
-
-      await handleAuthSuccess(data.session);
     } catch (error) {
       console.error("Unexpected error during signup:", error);
       handleAuthError(error as AuthError);
