@@ -41,17 +41,20 @@ export const useUsageStats = (session: Session | null) => {
   });
 
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
+      if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
       return data;
     },
     enabled: !!session?.access_token,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   useEffect(() => {
@@ -108,7 +111,7 @@ export const useUsageStats = (session: Session | null) => {
   const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
                    subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
   
-  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3); // Pro users get 25 searches
+  const maxRequests = isSteroidsUser ? Infinity : (isProUser ? 25 : 3);
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);

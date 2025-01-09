@@ -23,6 +23,8 @@ export function useSearchHistoryAccess() {
       return data;
     },
     enabled: !!session?.access_token,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
@@ -35,6 +37,7 @@ export function useSearchHistoryAccess() {
     session,
     isSteroidsUser,
     isProUser,
-    hasAccess: isSteroidsUser || isProUser
+    hasAccess: isSteroidsUser || isProUser,
+    subscriptionStatus
   };
 }
