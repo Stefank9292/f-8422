@@ -13,8 +13,6 @@ const AuthPage = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
-  // Initialize view based on current path
   const [view, setView] = useState<"sign_in" | "sign_up">(
     location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in"
   );
@@ -82,21 +80,11 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast, location]);
 
-  // Synchronize URL with view state
-  useEffect(() => {
-    const currentPath = location.pathname;
-    const expectedPath = view === "sign_up" ? "/auth/sign-up" : "/auth";
-    
-    if (currentPath !== expectedPath) {
-      navigate(expectedPath, { replace: true });
-    }
-  }, [view, navigate, location.pathname]);
-
   // Handle view changes
   const handleViewChange = (newView: "sign_in" | "sign_up") => {
-    if (newView !== view) {
-      setView(newView);
-    }
+    setView(newView);
+    const newPath = newView === "sign_up" ? "/auth/sign-up" : "/auth";
+    navigate(newPath, { replace: true });
   };
 
   return (
