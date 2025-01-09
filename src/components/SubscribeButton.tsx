@@ -12,6 +12,22 @@ export interface SubscribeButtonProps {
   isAnnual: boolean;
 }
 
+// Price IDs for different environments
+const PRICE_IDS = {
+  development: {
+    proMonthly: "price_1QdtwnGX13ZRG2XihcM36r3W",
+    proAnnual: "price_1Qdtx2GX13ZRG2XieXrqPxAV",
+    steroidsMonthly: "price_1Qdty5GX13ZRG2XiFxadAKJW",
+    steroidsAnnual: "price_1QdtyHGX13ZRG2Xib8px0lu0"
+  },
+  production: {
+    proMonthly: "price_1Qdt2dGX13ZRG2XiaKwG6VPu",
+    proAnnual: "price_1Qdt3tGX13ZRG2XiesasShEJ",
+    steroidsMonthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9",
+    steroidsAnnual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
+  }
+};
+
 export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: SubscribeButtonProps) => {
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -38,41 +54,61 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
 
+  // Map the planId to the correct environment-specific price ID
+  const getEnvironmentPriceId = (planId: string) => {
+    const isProduction = window.location.hostname !== 'localhost' && 
+                        !window.location.hostname.includes('lovable.app');
+    const priceIds = isProduction ? PRICE_IDS.production : PRICE_IDS.development;
+
+    switch(planId) {
+      case PRICE_IDS.development.proMonthly:
+        return isProduction ? PRICE_IDS.production.proMonthly : PRICE_IDS.development.proMonthly;
+      case PRICE_IDS.development.proAnnual:
+        return isProduction ? PRICE_IDS.production.proAnnual : PRICE_IDS.development.proAnnual;
+      case PRICE_IDS.development.steroidsMonthly:
+        return isProduction ? PRICE_IDS.production.steroidsMonthly : PRICE_IDS.development.steroidsMonthly;
+      case PRICE_IDS.development.steroidsAnnual:
+        return isProduction ? PRICE_IDS.production.steroidsAnnual : PRICE_IDS.development.steroidsAnnual;
+      default:
+        return planId;
+    }
+  };
+
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
+      if (isAnnual && planId === PRICE_IDS.development.proMonthly) {
         return "Save 20% with annual";
       }
-      if (isAnnual && planId === "price_1Qdty5GX13ZRG2XiFxadAKJW") {
+      if (isAnnual && planId === PRICE_IDS.development.steroidsMonthly) {
         return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
     }
 
-    const isCurrentPlan = subscriptionStatus?.priceId === planId;
+    const isCurrentPlan = subscriptionStatus?.priceId === getEnvironmentPriceId(planId);
     if (isCurrentPlan) {
       return "Current Plan";
     }
 
     const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") || 
-       (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
+      ((subscriptionStatus?.priceId === PRICE_IDS.development.proMonthly && planId === PRICE_IDS.development.proAnnual) || 
+       (subscriptionStatus?.priceId === PRICE_IDS.development.steroidsMonthly && planId === PRICE_IDS.development.steroidsAnnual));
 
     if (isMonthlyToAnnualUpgrade) {
       return "Save 20% with annual";
     }
 
-    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
+    if (subscriptionStatus?.priceId === PRICE_IDS.development.steroidsMonthly && planId === PRICE_IDS.development.proMonthly) {
       return "Downgrade to Creator Pro";
     }
 
     return `Upgrade to ${planName}`;
   };
 
-  const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId;
+  const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === getEnvironmentPriceId(planId);
 
-  const isDowngrade = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && 
-                     planId === "price_1QdtwnGX13ZRG2XihcM36r3W";
+  const isDowngrade = subscriptionStatus?.priceId === PRICE_IDS.development.steroidsMonthly && 
+                     planId === PRICE_IDS.development.proMonthly;
 
   const getButtonStyle = () => {
     if (isPopular) {
@@ -95,7 +131,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     );
   }
 
-  const handleClick = () => handleSubscriptionAction(planId, planName, subscriptionStatus);
+  const handleClick = () => handleSubscriptionAction(getEnvironmentPriceId(planId), planName, subscriptionStatus);
 
   return (
     <Button 
@@ -107,7 +143,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
         isUpgrade={!isCurrentPlan}
-        showThunderbolt={isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"}
+        showThunderbolt={isAnnual && planId === PRICE_IDS.development.steroidsAnnual}
       />
     </Button>
   );
