@@ -76,22 +76,25 @@ export function SearchHistoryItemHeader({
                 </Button>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 p-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 w-8 p-0"
+                      className="h-8 px-2.5 hover:bg-secondary"
                       onClick={handleCopyUrls}
                     >
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-3.5 w-3.5" />
                       <span className="sr-only">Copy URLs</span>
                     </Button>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
                     {urls.map((url, index) => (
-                      <p key={index} className="text-xs text-muted-foreground break-all">
+                      <p 
+                        key={index} 
+                        className="text-[11px] text-muted-foreground py-1.5 px-2.5 rounded-md bg-secondary/50 break-all"
+                      >
                         {url}
                       </p>
                     ))}
