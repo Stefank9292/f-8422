@@ -25,7 +25,7 @@ export const SearchState = ({ searchHistoryId, error, isSearching }: SearchState
       if (error) throw error;
       
       // Type assertion to ensure the results are of type InstagramPost[]
-      return (data?.results as unknown) as InstagramPost[];
+      return (data?.results as InstagramPost[]) || [];
     },
     enabled: !!searchHistoryId,
   });
@@ -42,5 +42,5 @@ export const SearchState = ({ searchHistoryId, error, isSearching }: SearchState
     return <SearchEmpty />;
   }
 
-  return <SearchResults results={searchResults} />;
+  return <SearchResults searchResults={searchResults} />;
 };
