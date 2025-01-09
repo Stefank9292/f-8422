@@ -9,6 +9,19 @@ const Index = () => {
   const [username, setUsername] = useState("");
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [hasReachedLimit, setHasReachedLimit] = useState(false);
+  const [requestCount] = useState(0);
+  const [maxRequests] = useState(100);
+  const [displayPosts] = useState<any[]>([]);
+
+  const handleSearch = () => {
+    setIsSearching(true);
+    // ... implement search logic
+  };
+
+  const handleBulkSearch = async (urls: string[], numVideos: number, date: Date | undefined) => {
+    setIsBulkSearching(true);
+    // ... implement bulk search logic
+  };
 
   return (
     <div>
@@ -17,21 +30,11 @@ const Index = () => {
         isLoading={isSearching}
         isBulkSearching={isBulkSearching}
         hasReachedLimit={hasReachedLimit}
-        onUsernameChange={setUsername}
-        onSearch={() => {
-          setIsSearching(true);
-          // ... implement search logic
-        }}
-        onBulkSearch={() => {
-          setIsBulkSearching(true);
-          // ... implement bulk search logic
-        }}
-        onClearSearch={() => {
-          setUsername("");
-          setSearchHistoryId(null);
-          setError(null);
-        }}
-        onError={setError}
+        requestCount={requestCount}
+        maxRequests={maxRequests}
+        handleSearch={handleSearch}
+        handleBulkSearch={handleBulkSearch}
+        displayPosts={displayPosts}
       />
       <SearchState 
         searchHistoryId={searchHistoryId}

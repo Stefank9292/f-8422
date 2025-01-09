@@ -41,5 +41,5 @@ export const SearchState = ({ searchHistoryId, error, isSearching }: SearchState
     return <SearchEmpty />;
   }
 
-  return <SearchResults posts={searchResults} />;
+  return <SearchResults searchResults={searchResults} />;
 };
