@@ -7,12 +7,12 @@ export function useSubscription(session: Session | null) {
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
-        console.log("No session available, redirecting to subscribe");
+        console.log("No session available, returning free tier values");
         return {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxClicks: 0
+          maxClicks: 3
         };
       }
 
@@ -26,12 +26,13 @@ export function useSubscription(session: Session | null) {
 
         if (error) {
           console.error('Subscription check error:', error);
+          // If we get an auth error, we'll return the free tier values
           if (error.message.includes('Invalid user session')) {
             return {
               subscribed: false,
               priceId: null,
               canceled: false,
-              maxClicks: 0
+              maxClicks: 3
             };
           }
           throw error;
@@ -41,16 +42,18 @@ export function useSubscription(session: Session | null) {
         return data;
       } catch (error) {
         console.error('Subscription check error:', error);
+        // Return default free tier values on error
         return {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxClicks: 0
+          maxClicks: 3
         };
       }
     },
     enabled: !!session?.access_token,
     retry: (failureCount, error) => {
+      // Only retry if it's not an auth error
       if (error instanceof Error && error.message.includes('Invalid user session')) {
         return false;
       }

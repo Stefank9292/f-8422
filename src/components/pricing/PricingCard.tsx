@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LucideIcon } from "lucide-react";
+import { Check, X, AlertTriangle } from "lucide-react";
 import { SubscribeButton } from "@/components/SubscribeButton";
 
 interface PricingCardProps {
@@ -17,21 +17,28 @@ interface PricingCardProps {
   features: Array<{
     included: boolean;
     text: string;
-    icon: LucideIcon;
   }>;
   isPopular?: boolean;
   isAnnual: boolean;
   priceId: string;
 }
 
-const FeatureItem = ({ included, text, icon: Icon }: { included: boolean; text: string; icon: LucideIcon }) => {
+const FeatureItem = ({ included, text, priceId }: { included: boolean; text: string; priceId: string }) => {
+  const isProPlan = priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+  const shouldShowWarning = isProPlan && included && (
+    text === "25 Searches per Month" || 
+    text === "Maximum 25 Results per Username"
+  );
+
   return (
     <li className="flex items-center gap-2">
-      <Icon className={`h-3.5 w-3.5 ${
-        Icon.name === 'Atten' ? 'text-yellow-500 dark:text-yellow-400' :
-        Icon.name === 'Check' ? 'text-green-500 dark:text-green-400' :
-        'text-red-500'
-      }`} />
+      {!included ? (
+        <X className="h-3.5 w-3.5 text-red-500" />
+      ) : shouldShowWarning ? (
+        <AlertTriangle className="h-3.5 w-3.5 text-yellow-500 dark:text-yellow-400" />
+      ) : (
+        <Check className="h-3.5 w-3.5 text-green-500 dark:text-green-400" />
+      )}
       <span className="text-[11px] dark:text-gray-300">{text}</span>
     </li>
   );
@@ -41,11 +48,34 @@ export const PricingCard = ({
   name,
   description,
   price,
-  features,
   isPopular,
   isAnnual,
   priceId,
 }: PricingCardProps) => {
+  const getFeatures = () => {
+    if (priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
+      return [
+        { included: true, text: "25 Searches per Month" },
+        { included: true, text: "Maximum 25 Results per Username" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: false, text: "Search History" },
+        { included: false, text: "Recent Searches" },
+        { included: false, text: "Early Access to new Features" }
+      ];
+    } else {
+      return [
+        { included: true, text: "Unlimited Searches" },
+        { included: true, text: "Maximum 50 Results per Username" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: true, text: "Search History" },
+        { included: true, text: "Recent Searches" },
+        { included: true, text: "Early Access to new Features" }
+      ];
+    }
+  };
+
   return (
     <Card 
       className={`p-6 space-y-6 relative w-[280px] transition-all duration-300 
@@ -70,8 +100,8 @@ export const PricingCard = ({
         </div>
       </div>
       <ul className="space-y-3 pt-2">
-        {features.map((feature, index) => (
-          <FeatureItem key={index} {...feature} />
+        {getFeatures().map((feature, index) => (
+          <FeatureItem key={index} {...feature} priceId={priceId} />
         ))}
       </ul>
       <div className="pt-6">

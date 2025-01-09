@@ -1,5 +1,3 @@
-import { Check, X } from "lucide-react";
-
 export const PRICING_CONFIG = {
   premium: {
     name: "Creator Pro",
@@ -14,13 +12,13 @@ export const PRICING_CONFIG = {
       perMonth: "39.17"
     },
     features: [
-      { included: true, text: "25 Searches per Month", icon: X },
-      { included: true, text: "Maximum 25 Results per Username", icon: X },
-      { included: true, text: "Bulk Search", icon: Check },
-      { included: true, text: "Contact Support", icon: Check },
-      { included: false, text: "Search History", icon: X },
-      { included: false, text: "Recent Searches", icon: X },
-      { included: false, text: "Early Access to new Features", icon: X }
+      { included: true, text: "25 Searches per Month" },
+      { included: true, text: "Maximum 25 Results per Username" },
+      { included: true, text: "Bulk Search" },
+      { included: true, text: "Contact Support" },
+      { included: false, text: "Search History" },
+      { included: false, text: "Recent Searches" },
+      { included: false, text: "Early Access to new Features" }
     ]
   },
   ultra: {
@@ -36,13 +34,13 @@ export const PRICING_CONFIG = {
       perMonth: "55.25"
     },
     features: [
-      { included: true, text: "Unlimited Searches", icon: Check },
-      { included: true, text: "Maximum 50 Results per Username", icon: Check },
-      { included: true, text: "Bulk Search", icon: Check },
-      { included: true, text: "Contact Support", icon: Check },
-      { included: true, text: "Search History", icon: Check },
-      { included: true, text: "Recent Searches", icon: Check },
-      { included: true, text: "Early Access to new Features", icon: Check }
+      { included: true, text: "Unlimited Searches" },
+      { included: true, text: "Maximum 50 Results per Username" },
+      { included: true, text: "Bulk Search" },
+      { included: true, text: "Contact Support" },
+      { included: true, text: "Search History" },
+      { included: true, text: "Recent Searches" },
+      { included: true, text: "Early Access to new Features" }
     ]
   }
 };

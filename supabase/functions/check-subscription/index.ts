@@ -87,13 +87,13 @@ serve(async (req) => {
     let maxClicks = 3; // Default for free tier
     
     // Pro tier
-    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    if (priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+        priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
       maxClicks = 25;
     }
     // Steroids tier
-    else if (priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-             priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+    else if (priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+             priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
       maxClicks = Infinity;
     }
 
