@@ -212,7 +212,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                           {search.bulk_search_urls.map((url: string, index: number) => (
                             <li 
                               key={index} 
-                              className="text-xs text-muted-foreground break-all p-2 mb-1 text-left"
+                              className="text-xs text-muted-foreground break-all py-0.5 px-2 text-left"
                             >
                               {url}
                             </li>
