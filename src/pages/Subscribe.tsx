@@ -1,163 +1,167 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-export default function Subscribe() {
+const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
-  const { data: session, isLoading: isLoading, error: sessionError } = useQuery({
+  const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return session;
+      const { data } = await supabase.auth.getSession();
+      return data.session;
     },
   });
 
-  const { data: subscriptionStatus, isLoading: isSubscriptionLoading } = useQuery({
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+      }
+    };
+
+    checkAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        navigate('/auth');
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [navigate]);
+
+  const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
     queryFn: async () => {
-      if (!session) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`
+          Authorization: `Bearer ${session?.access_token}`
         }
       });
       if (error) throw error;
       return data;
     },
+    enabled: !!session?.access_token,
   });
 
-  const title = "Level up your content game";
-  const description = "Choose the plan that best fits your needs. All plans include access to our core features.";
-
-  const proMonthlyPrice = "9.99";
-  const proAnnualPrice = "99.99";
-  const steroidsMonthlyPrice = "19.99";
-  const steroidsAnnualPrice = "199.99";
-
-  const proFeatures = [
-    "25 Total Searches per Month",
-    "Maximum 25 Results per Username",
-    "Export to CSV",
-    "Advanced Filters",
-    "Bulk Search (Up to 5 Usernames)",
-    "7 Days Search History",
-    "Priority Support"
-  ];
-
-  const steroidsFeatures = [
-    "50 Total Searches per Month",
-    "Maximum 50 Results per Username",
-    "Export to CSV",
-    "Advanced Filters",
-    "Bulk Search (Up to 10 Usernames)",
-    "30 Days Search History",
-    "Priority Support",
-    "Early Access to New Features"
-  ];
-
-  const handleCreateCheckoutSession = async (priceId: string) => {
-    const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-      headers: {
-        Authorization: `Bearer ${session.access_token}`
-      },
-      body: { priceId }
-    });
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create checkout session.",
-        variant: "destructive",
-      });
-      return;
+  const getPageTitle = () => {
+    if (!subscriptionStatus?.subscribed) {
+      return {
+        title: "Choose Your Plan",
+        subtitle: "Select the plan that best fits your needs and manage your subscription"
+      };
     }
-    window.location.href = data.url;
+    return {
+      title: "Manage Subscription",
+      subtitle: "View your current plan details and manage your subscription settings"
+    };
   };
 
-  if (isLoading || isSubscriptionLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background dark:bg-gray-900">
-        <div className="flex items-center gap-2">
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  const priceIds = {
+    premium: {
+      monthly: "price_1QdtwnGX13ZRG2XihcM36r3W",
+      annual: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+    },
+    ultra: {
+      monthly: "price_1Qdty5GX13ZRG2XiFxadAKJW",
+      annual: "price_1QdtyHGX13ZRG2Xib8px0lu0"
+    }
+  };
+
+  const pricingPlans = [
+    {
+      name: "Creator Pro",
+      description: "For Professional Creators",
+      price: {
+        monthly: "29",
+        annual: { total: "276", perMonth: "23" }
+      },
+      features: [
+        { included: true, text: "25 Total Searches" },
+        { included: true, text: "Maximum 20 Results per Search" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: false, text: "Early Access to new Features" }
+      ],
+      priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
+    },
+    {
+      name: "Creator on Steroids",
+      description: "For Viral Marketing Gods",
+      price: {
+        monthly: "49",
+        annual: { total: "470", perMonth: "39.17" }
+      },
+      features: [
+        { included: true, text: "Unlimited Searches" },
+        { included: true, text: "Maximum 50 Results per Search" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: true, text: "Early Access to new Features" }
+      ],
+      isPopular: true,
+      priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly
+    }
+  ];
+
+  const { title, subtitle } = getPageTitle();
 
   if (!session) {
-    navigate("/auth");
     return null;
   }
 
   return (
-    <div className="min-h-screen p-4 bg-background dark:bg-gray-900">
+    <div className="min-h-screen p-4 bg-background">
       <div className="max-w-7xl mx-auto space-y-12 pt-8">
         <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight text-center text-foreground dark:text-white">
-            {title}
-          </h1>
-          <p className="text-[13px] text-muted-foreground dark:text-gray-400 text-center">
-            {description}
+          <h1 className="text-2xl font-semibold tracking-tight text-center">{title}</h1>
+          <p className="text-[13px] text-muted-foreground text-center">
+            {subtitle}
           </p>
         </div>
 
         <div className="space-y-12">
           <div className="flex items-center justify-center gap-4">
-            <span className={`text-[11px] ${!isAnnual ? "text-foreground dark:text-white" : "text-muted-foreground dark:text-gray-400"}`}>
+            <span className={`text-[11px] ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
               Monthly
             </span>
             <Switch
               checked={isAnnual}
               onCheckedChange={setIsAnnual}
-              className="data-[state=checked]:bg-primary"
+              className="scale-90"
             />
-            <span className={`text-[11px] ${isAnnual ? "text-foreground dark:text-white" : "text-muted-foreground dark:text-gray-400"}`}>
-              Annual (Save 17%)
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={`text-[11px] ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+                Annual
+              </span>
+              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800">
+                Save 20%
+              </Badge>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <PricingCard
-              title="Creator Pro"
-              description="Perfect for creators who want to level up their content game"
-              price={isAnnual ? proAnnualPrice : proMonthlyPrice}
-              interval={isAnnual ? "year" : "month"}
-              features={proFeatures}
-              onSubscribe={() => handleCreateCheckoutSession(
-                isAnnual ? "price_1Qdtx2GX13ZRG2XieXrqPxAV" : "price_1QdtwnGX13ZRG2XihcM36r3W"
-              )}
-              isCurrentPlan={subscriptionStatus?.priceId === (
-                isAnnual ? "price_1Qdtx2GX13ZRG2XieXrqPxAV" : "price_1QdtwnGX13ZRG2XihcM36r3W"
-              )}
-              className="bg-white dark:bg-gray-800 border-border dark:border-gray-700"
-            />
-            <PricingCard
-              title="Creator on Steroids"
-              description="For power users who need more searches and results"
-              price={isAnnual ? steroidsAnnualPrice : steroidsMonthlyPrice}
-              interval={isAnnual ? "year" : "month"}
-              features={steroidsFeatures}
-              onSubscribe={() => handleCreateCheckoutSession(
-                isAnnual ? "price_1QdtyHGX13ZRG2Xib8px0lu0" : "price_1Qdty5GX13ZRG2XiFxadAKJW"
-              )}
-              isCurrentPlan={subscriptionStatus?.priceId === (
-                isAnnual ? "price_1QdtyHGX13ZRG2Xib8px0lu0" : "price_1Qdty5GX13ZRG2XiFxadAKJW"
-              )}
-              className="bg-white dark:bg-gray-800 border-border dark:border-gray-700"
-              featured
-            />
+          <div className="flex justify-center gap-6 flex-wrap">
+            {pricingPlans.map((plan, index) => (
+              <PricingCard
+                key={index}
+                {...plan}
+                isAnnual={isAnnual}
+              />
+            ))}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default SubscribePage;
