@@ -123,7 +123,6 @@ export const SearchBar = ({
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isLoading}
         />
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
         <BulkSearchButton 
