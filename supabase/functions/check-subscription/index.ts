@@ -15,13 +15,11 @@ serve(async (req) => {
   try {
     console.log('Starting subscription check...');
     
-    // Get authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       throw new Error('No authorization header')
     }
 
-    // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -30,7 +28,6 @@ serve(async (req) => {
       }
     )
 
-    // Get user
     console.log('Getting user session...');
     const {
       data: { user },
@@ -44,12 +41,10 @@ serve(async (req) => {
 
     console.log('User found:', user.id);
 
-    // Initialize Stripe
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
       apiVersion: '2023-10-16',
     })
 
-    // Get customer ID
     console.log('Searching for Stripe customer...');
     const { data: customers, error: searchError } = await stripe.customers.search({
       query: `metadata['supabaseUUID']:'${user.id}'`,
@@ -60,7 +55,6 @@ serve(async (req) => {
       throw searchError
     }
 
-    // If no customer found, return free tier values
     if (!customers || customers.length === 0) {
       console.log('No Stripe customer found, returning free tier values');
       return new Response(
@@ -79,17 +73,15 @@ serve(async (req) => {
     const customer = customers[0]
     console.log('Found Stripe customer:', customer.id);
 
-    // Get subscriptions
     console.log('Fetching subscriptions...');
     const subscriptions = await stripe.subscriptions.list({
       customer: customer.id,
       status: 'active',
-      expand: ['data.default_payment_method'],
+      expand: ['data.default_payment_method', 'data.items.data.price'],
     })
 
     if (!subscriptions.data.length) {
       console.log('No active subscriptions found');
-      // Log to subscription_logs
       await supabaseClient.from('subscription_logs').insert({
         user_id: user.id,
         event: 'subscription_check',
@@ -111,7 +103,32 @@ serve(async (req) => {
     }
 
     const subscription = subscriptions.data[0]
-    console.log('Active subscription found:', subscription.id);
+    const priceId = subscription.items.data[0].price.id
+    console.log('Active subscription found:', subscription.id, 'with price ID:', priceId);
+
+    // Define valid price IDs
+    const validPriceIds = [
+      "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+      "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+      "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+      "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+    ];
+
+    // Verify if the price ID is valid
+    if (!validPriceIds.includes(priceId)) {
+      console.error('Invalid price ID found:', priceId);
+      return new Response(
+        JSON.stringify({
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
 
     // Log to subscription_logs
     await supabaseClient.from('subscription_logs').insert({
@@ -120,18 +137,22 @@ serve(async (req) => {
       status: 'active',
       details: {
         subscription_id: subscription.id,
-        price_id: subscription.items.data[0].price.id,
+        price_id: priceId,
         customer_id: customer.id,
         cancel_at_period_end: subscription.cancel_at_period_end
       }
     });
 
+    // Determine if it's a Creator on Steroids plan
+    const isSteroidsPrice = priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                           priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+
     return new Response(
       JSON.stringify({
         subscribed: true,
-        priceId: subscription.items.data[0].price.id,
+        priceId: priceId,
         canceled: subscription.cancel_at_period_end,
-        maxClicks: subscription.items.data[0].price.id.includes('ultra') ? Infinity : 25
+        maxClicks: isSteroidsPrice ? Infinity : 25
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
