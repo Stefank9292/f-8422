@@ -30,7 +30,7 @@ export function FilteredResultsSection({
   filters,
   onFilterChange,
   onResetFilters,
-  filteredResults,
+  filteredResults: unfilteredResults,
   currentPage,
   pageSize,
   onPageChange,
@@ -48,14 +48,42 @@ export function FilteredResultsSection({
     return saved ? JSON.parse(saved) : false;
   });
 
+  // Apply sorting to filteredResults
+  const sortedResults = [...unfilteredResults].sort((a, b) => {
+    if (!sortKey) return 0;
+
+    let valueA = a[sortKey as keyof typeof a];
+    let valueB = b[sortKey as keyof typeof b];
+
+    // Handle special cases for different types of values
+    if (sortKey === 'date' || sortKey === 'timestamp') {
+      valueA = new Date(valueA as string).getTime();
+      valueB = new Date(valueB as string).getTime();
+    } else if (sortKey === 'engagement') {
+      valueA = parseFloat((valueA as string).replace('%', ''));
+      valueB = parseFloat((valueB as string).replace('%', ''));
+    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+      // No conversion needed for numbers
+    } else {
+      // Convert to strings for string comparison
+      valueA = String(valueA);
+      valueB = String(valueB);
+    }
+
+    if (sortDirection === 'asc') {
+      return valueA > valueB ? 1 : -1;
+    }
+    return valueA < valueB ? 1 : -1;
+  });
+
   useEffect(() => {
     localStorage.setItem("filterResultsCollapsed", JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const currentPosts = filteredResults.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredResults.length / pageSize);
+  const currentPosts = sortedResults.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedResults.length / pageSize);
 
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
@@ -66,8 +94,8 @@ export function FilteredResultsSection({
             onFilterChange={onFilterChange}
             onReset={onResetFilters}
             totalResults={results.length}
-            filteredResults={filteredResults.length}
-            currentPosts={filteredResults}
+            filteredResults={sortedResults.length}
+            currentPosts={sortedResults}
           />
         </div>
       </div>
@@ -96,7 +124,7 @@ export function FilteredResultsSection({
           pageSize={pageSize}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
-          totalResults={filteredResults.length}
+          totalResults={sortedResults.length}
         />
       </div>
     </div>
