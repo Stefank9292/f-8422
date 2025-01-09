@@ -8,6 +8,14 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+// Define plan IDs as constants
+const PLAN_IDS = {
+  STEROIDS_MONTHLY: "price_1Qdty5GX13ZRG2XiFxadAKJW",
+  STEROIDS_ANNUAL: "price_1QdtyHGX13ZRG2Xib8px0lu0",
+  PRO_MONTHLY: "price_1QdtwnGX13ZRG2XihcM36r3W",
+  PRO_ANNUAL: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+};
+
 serve(async (req) => {
   console.log('Check subscription function called with method:', req.method);
 
@@ -133,11 +141,15 @@ serve(async (req) => {
     const subscription = subscriptions.data[0];
     const priceId = subscription.items.data[0].price.id;
 
-    console.log('Active subscription found:', {
+    console.log('Active subscription details:', {
       id: subscription.id,
       priceId: priceId,
       status: subscription.status,
-      cancelAtPeriodEnd: subscription.cancel_at_period_end
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      isSteroidsMonthly: priceId === PLAN_IDS.STEROIDS_MONTHLY,
+      isSteroidsAnnual: priceId === PLAN_IDS.STEROIDS_ANNUAL,
+      isProMonthly: priceId === PLAN_IDS.PRO_MONTHLY,
+      isProAnnual: priceId === PLAN_IDS.PRO_ANNUAL
     });
 
     return new Response(
