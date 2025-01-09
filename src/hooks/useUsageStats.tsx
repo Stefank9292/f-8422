@@ -116,15 +116,16 @@ export const useUsageStats = (session: Session | null) => {
   const hasReachedLimit = isSteroidsUser ? false : usedRequests >= maxRequests;
 
   const getPlanName = () => {
-    if (subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-        subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
-      return 'Creator Pro';
-    }
+    // First check if it's a Steroids user to avoid defaulting to Pro
     if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
       return 'Creator on Steroids';
     }
-    return 'Creator Pro';
+    if (subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+        subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
+      return 'Creator Pro';
+    }
+    return 'Free Plan'; // Default to Free Plan instead of Creator Pro
   };
 
   return {
