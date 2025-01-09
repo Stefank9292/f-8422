@@ -24,15 +24,9 @@ export const useSessionValidation = () => {
       if (location.pathname !== '/auth') {
         navigate('/auth', { 
           replace: true,
-          state: { from: location, error: "Your session has expired. Please sign in again." }
+          state: { from: location }
         });
       }
-      
-      toast({
-        title: "Session Expired",
-        description: "Please sign in again to continue.",
-        variant: "destructive",
-      });
     } catch (error) {
       console.error("Sign out error:", error);
       setError("Failed to sign out properly");
@@ -44,6 +38,7 @@ export const useSessionValidation = () => {
   useEffect(() => {
     let mounted = true;
     let authListener: any;
+    let sessionCheckTimeout: NodeJS.Timeout;
 
     const checkSession = async () => {
       try {
@@ -71,7 +66,8 @@ export const useSessionValidation = () => {
         const REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
 
         if (timeUntilExpiry < REFRESH_THRESHOLD) {
-          const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
+          const { data: refreshResult, error: refreshError } = 
+            await supabase.auth.refreshSession();
           
           if (refreshError) {
             console.error("Session refresh error:", refreshError);
@@ -91,9 +87,8 @@ export const useSessionValidation = () => {
         }
       } catch (error) {
         console.error("Session error:", error);
-        const errorMessage = error instanceof Error ? error.message : "Session validation failed";
         if (mounted) {
-          setError(errorMessage);
+          setError("Session validation failed");
           await handleSignOut();
         }
       } finally {
@@ -101,8 +96,8 @@ export const useSessionValidation = () => {
       }
     };
 
-    // Initial session check
-    checkSession();
+    // Set a timeout for the initial session check
+    sessionCheckTimeout = setTimeout(checkSession, 0);
 
     // Set up auth state change listener
     authListener = supabase.auth.onAuthStateChange(async (event, currentSession) => {
@@ -123,22 +118,18 @@ export const useSessionValidation = () => {
         if (currentSession && mounted) {
           setSession(currentSession);
           setError(null);
-          
-          if (event === 'SIGNED_IN') {
-            const intendedPath = location.state?.from?.pathname || '/';
-            navigate(intendedPath, { replace: true });
-          }
         }
       }
     });
 
     return () => {
       mounted = false;
+      clearTimeout(sessionCheckTimeout);
       if (authListener) {
         authListener.subscription.unsubscribe();
       }
     };
-  }, [queryClient, navigate, location, toast]);
+  }, [queryClient, navigate, location]);
 
   return { session, isLoading, error };
 };

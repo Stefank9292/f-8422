@@ -24,7 +24,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Subscription check error:', error);
-          // Return free tier values for auth errors
           if (error.message.includes('Invalid user session') || 
               error.message.includes('session_not_found')) {
             return {
@@ -37,7 +36,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           throw error;
         }
 
-        console.log('Subscription check response:', data);
         return data;
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -45,12 +43,14 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
     },
     enabled: !!session?.access_token,
-    retry: false,
+    retry: 1,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
+    refetchInterval: false
   });
 
-  if (isLoading || isLoadingSubscription) {
+  // Show loading state only if we're loading the initial session
+  if (isLoading || (session && isLoadingSubscription)) {
     return <LoadingState />;
   }
 
@@ -58,10 +58,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <ErrorState error={error} onRetry={() => window.location.reload()} />;
   }
 
+  // Handle undefined session state
   if (session === undefined) {
     return <UndefinedSessionState onRefresh={() => window.location.reload()} />;
   }
 
+  // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
