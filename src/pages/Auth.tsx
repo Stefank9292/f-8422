@@ -81,11 +81,11 @@ const AuthPage = () => {
   }, [navigate, toast, location]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white p-4 animate-in fade-in duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">
       <div className="w-full max-w-md space-y-6">
         <AuthHeader view={view} />
         
-        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
           {error && (
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>{error}</AlertDescription>
