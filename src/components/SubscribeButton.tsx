@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
 import { PlanButtonText } from "./subscription/PlanButtonText";
 import { useSubscriptionAction } from "@/hooks/useSubscriptionAction";
+import { useToast } from "@/hooks/use-toast";
 
 export interface SubscribeButtonProps {
   planId: string;
@@ -29,6 +30,8 @@ const PRICE_IDS = {
 };
 
 export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: SubscribeButtonProps) => {
+  const { toast } = useToast();
+  
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -37,19 +40,35 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     },
   });
 
-  const { data: subscriptionStatus } = useQuery({
+  const { data: subscriptionStatus, error: subscriptionError } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) return null;
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
+      try {
+        const { data, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        
+        if (error) {
+          console.error('Subscription check error:', error);
+          throw error;
         }
-      });
-      if (error) throw error;
-      return data;
+        
+        return data;
+      } catch (error) {
+        console.error('Failed to check subscription:', error);
+        toast({
+          title: "Error",
+          description: "Failed to verify subscription status. Please try again.",
+          variant: "destructive",
+        });
+        return null;
+      }
     },
     enabled: !!session?.access_token,
+    retry: 1,
   });
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
@@ -131,7 +150,18 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     );
   }
 
-  const handleClick = () => handleSubscriptionAction(getEnvironmentPriceId(planId), planName, subscriptionStatus);
+  const handleClick = async () => {
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to subscribe to a plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    await handleSubscriptionAction(getEnvironmentPriceId(planId), planName, subscriptionStatus);
+  };
 
   return (
     <Button 
