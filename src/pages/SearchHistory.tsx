@@ -8,6 +8,7 @@ import { SearchHistoryLoading } from "@/components/history/SearchHistoryLoading"
 import { SearchHistoryFilter } from "@/components/history/SearchHistoryFilter";
 import { InstagramPost } from "@/types/instagram";
 import { extractUsername } from "@/utils/instagram";
+import { transformSearchResults } from "@/utils/transformSearchResults";
 
 interface SearchHistoryResult {
   id: string;
@@ -72,15 +73,20 @@ const SearchHistory = () => {
         throw historyError;
       }
 
-      return historyData?.map(item => ({
-        ...item,
-        search_query: item.bulk_search_urls?.length 
-          ? `${extractUsername(item.bulk_search_urls[0])} +${item.bulk_search_urls.length - 1}`
-          : item.search_query,
-        search_results: item.search_results?.map(sr => ({
-          results: sr.results
-        }))
-      })) as SearchHistoryResult[];
+      return historyData?.map(item => {
+        // Transform the search results using the utility function
+        const transformedResults = item.search_results?.map(sr => ({
+          results: transformSearchResults(sr as any).results
+        }));
+
+        return {
+          ...item,
+          search_query: item.bulk_search_urls?.length 
+            ? `${extractUsername(item.bulk_search_urls[0])} +${item.bulk_search_urls.length - 1}`
+            : item.search_query,
+          search_results: transformedResults
+        } as SearchHistoryResult;
+      }) || [];
     },
     enabled: !!session?.user?.id,
   });
