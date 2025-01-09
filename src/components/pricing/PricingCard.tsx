@@ -24,7 +24,7 @@ interface PricingCardProps {
 }
 
 const FeatureItem = ({ included, text, priceId }: { included: boolean; text: string; priceId: string }) => {
-  const isProPlan = priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+  const isProPlan = priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
   const shouldShowWarning = isProPlan && included && (
     text === "25 Total Searches per Month" || 
     text === "Maximum 25 Results per Username"
@@ -53,7 +53,7 @@ export const PricingCard = ({
   priceId,
 }: PricingCardProps) => {
   const getFeatures = () => {
-    if (priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    if (priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h") {
       return [
         { included: true, text: "25 Total Searches per Month" },
         { included: true, text: "Maximum 25 Results per Username" },
