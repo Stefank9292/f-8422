@@ -8,6 +8,12 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -54,7 +60,7 @@ export function SearchHistoryItemHeader({
   };
 
   const displayQuery = isBulkSearch && urls.length > 0
-    ? `@${extractUsername(urls[0])} +${urls.length - 1}`
+    ? `@${extractUsername(urls[0])}`
     : query.startsWith('@') ? query : `@${extractUsername(query)}`;
 
   return (
@@ -94,7 +100,23 @@ export function SearchHistoryItemHeader({
               </HoverCardContent>
             </HoverCard>
           )}
-          <span className="font-medium truncate">{displayQuery}</span>
+          <span className="font-medium truncate">
+            {displayQuery}
+            {isBulkSearch && urls.length > 1 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
+                      +{urls.length - 1}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent align="start" className="text-xs">
+                    {urls.length} profiles in this bulk search
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </span>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             {format(new Date(date), 'MMM d, HH:mm')}
           </span>
