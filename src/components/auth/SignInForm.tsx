@@ -99,7 +99,7 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-50">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -112,7 +112,9 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="material-input"
+          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
+                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
+                     text-base md:text-lg w-full"
           disabled={isLocked}
         />
       </div>
@@ -123,14 +125,20 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="material-input"
+          className="h-16 px-6 rounded-xl border-2 border-gray-200 bg-white 
+                     focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors
+                     text-base md:text-lg w-full"
           disabled={isLocked}
         />
       </div>
       
       <Button 
         type="submit" 
-        className="w-full material-button-primary" 
+        className="w-full h-16 px-8 rounded-xl font-medium transition-all duration-200
+                 bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] text-white
+                 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed
+                 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2
+                 active:scale-95 text-base md:text-lg" 
         disabled={loading || isLocked}
       >
         {isLocked 
@@ -141,11 +149,11 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
         }
       </Button>
 
-      <p className="text-xs text-center text-muted-foreground mt-4">
+      <p className="text-xs text-center text-gray-500 mt-4">
         By continuing, you're confirming that you've read our Terms & Conditions and Cookie Policy
       </p>
       
-      <p className="text-sm text-center text-muted-foreground">
+      <p className="text-sm text-center text-gray-500">
         Don't have an account?{" "}
         <button
           type="button"
