@@ -86,6 +86,16 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
           disabled={loading}
           className="material-input"
         />
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => navigate("/auth/reset-password")}
+            className="text-xs text-primary hover:underline"
+            disabled={loading}
+          >
+            Forgot password?
+          </button>
+        </div>
       </div>
       
       <Button 
