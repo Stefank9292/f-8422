@@ -1,4 +1,4 @@
-import { Atten, Check, X } from "lucide-react";
+import { Check, X } from "lucide-react";
 
 export const PRICING_CONFIG = {
   premium: {
@@ -14,8 +14,8 @@ export const PRICING_CONFIG = {
       perMonth: "39.17"
     },
     features: [
-      { included: true, text: "25 Searches per Month", icon: Atten },
-      { included: true, text: "Maximum 25 Results per Username", icon: Atten },
+      { included: true, text: "25 Searches per Month", icon: X },
+      { included: true, text: "Maximum 25 Results per Username", icon: X },
       { included: true, text: "Bulk Search", icon: Check },
       { included: true, text: "Contact Support", icon: Check },
       { included: false, text: "Search History", icon: X },
