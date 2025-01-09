@@ -43,7 +43,6 @@ export const useSessionValidation = () => {
 
   useEffect(() => {
     let mounted = true;
-    let authListener: any;
 
     const checkSession = async () => {
       try {
@@ -88,8 +87,8 @@ export const useSessionValidation = () => {
     // Initial session check
     checkSession();
 
-    // Set up auth state change listener
-    authListener = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+    // Set up auth state change listener and store the subscription
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log("Auth state change:", event);
       
       if (event === 'SIGNED_OUT') {
@@ -118,8 +117,9 @@ export const useSessionValidation = () => {
 
     return () => {
       mounted = false;
-      if (authListener) {
-        authListener.subscription.unsubscribe();
+      // Safely unsubscribe only if subscription exists
+      if (subscription) {
+        subscription.unsubscribe();
       }
     };
   }, [queryClient, navigate, location, toast]);
