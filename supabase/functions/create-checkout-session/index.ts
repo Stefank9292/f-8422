@@ -142,9 +142,10 @@ serve(async (req) => {
         allow_promotion_codes: true,
       })
 
-      console.log('Checkout session created:', session.id)
+      console.log('Checkout session created:', session)
 
       if (!session.url) {
+        console.error('No URL in session:', session)
         throw new Error('No checkout URL returned from Stripe')
       }
 

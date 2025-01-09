@@ -87,13 +87,22 @@ export const useSubscriptionAction = (session: any) => {
           throw error;
         }
 
-        console.log('Checkout session created:', data);
-        if (data?.url) {
-          window.location.href = data.url;
-          return;
-        } else {
+        if (!data) {
+          throw new Error('No response data received from checkout session creation');
+        }
+
+        console.log('Checkout session response:', data);
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (!data.url) {
           throw new Error('No checkout URL returned');
         }
+
+        window.location.href = data.url;
+        return;
       }
 
       queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
