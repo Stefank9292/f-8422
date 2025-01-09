@@ -55,7 +55,7 @@ export function SearchHistoryItemHeader({
 
   const displayQuery = isBulkSearch && urls.length > 0
     ? `@${extractUsername(urls[0])} +${urls.length - 1}`
-    : extractUsername(query);
+    : query.startsWith('@') ? query : `@${extractUsername(query)}`;
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
@@ -72,7 +72,7 @@ export function SearchHistoryItemHeader({
               <HoverCardContent className="w-80 p-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
+                    <h4 className="text-sm font-semibold">Bulk Search URLs ({urls.length})</h4>
                     <Button
                       variant="ghost"
                       size="sm"
