@@ -27,52 +27,56 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   // Set up real-time subscription for search results
   useEffect(() => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user?.id) return;
+    const setupSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
 
-    console.log('Setting up real-time subscription for search results');
+      console.log('Setting up real-time subscription for search results');
 
-    const channel = supabase
-      .channel('search-results-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_results',
-          filter: `user_id=eq.${session.user.id}`
-        },
-        (payload) => {
-          console.log('Received search results update:', payload);
-          // Invalidate the queries to trigger a refresh
-          queryClient.invalidateQueries({ queryKey: ['search-results'] });
+      const channel = supabase
+        .channel('search-results-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'search_results',
+            filter: `user_id=eq.${session.user.id}`
+          },
+          (payload) => {
+            console.log('Received search results update:', payload);
+            // Invalidate the queries to trigger a refresh
+            queryClient.invalidateQueries({ queryKey: ['search-results'] });
+            
+            toast({
+              title: "Results Updated",
+              description: "New search results are available.",
+              duration: 3000,
+            });
+          }
+        )
+        .subscribe((status) => {
+          console.log('Search results subscription status:', status);
           
-          toast({
-            title: "Results Updated",
-            description: "New search results are available.",
-            duration: 3000,
-          });
-        }
-      )
-      .subscribe((status) => {
-        console.log('Search results subscription status:', status);
-        
-        if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to search results updates');
-        } else if (status === 'CHANNEL_ERROR') {
-          console.error('Failed to subscribe to search results updates');
-          toast({
-            title: "Connection Error",
-            description: "Failed to connect to real-time updates. Retrying...",
-            variant: "destructive",
-          });
-        }
-      });
+          if (status === 'SUBSCRIBED') {
+            console.log('Successfully subscribed to search results updates');
+          } else if (status === 'CHANNEL_ERROR') {
+            console.error('Failed to subscribe to search results updates');
+            toast({
+              title: "Connection Error",
+              description: "Failed to connect to real-time updates. Retrying...",
+              variant: "destructive",
+            });
+          }
+        });
 
-    return () => {
-      console.log('Cleaning up search results subscription');
-      supabase.removeChannel(channel);
+      return () => {
+        console.log('Cleaning up search results subscription');
+        supabase.removeChannel(channel);
+      };
     };
+
+    setupSubscription();
   }, [queryClient, toast]);
 
   const handlePageSizeChange = (value: string) => {

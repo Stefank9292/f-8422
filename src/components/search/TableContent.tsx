@@ -40,38 +40,42 @@ export const TableContent = ({
 
   // Set up real-time subscription for table content updates
   useEffect(() => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user?.id) return;
+    const setupSubscription = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user?.id) return;
 
-    console.log('Setting up real-time subscription for table content');
+      console.log('Setting up real-time subscription for table content');
 
-    const channel = supabase
-      .channel('table-content-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'search_results',
-          filter: `user_id=eq.${session.user.id}`
-        },
-        (payload) => {
-          console.log('Received table content update:', payload);
-          queryClient.invalidateQueries({ queryKey: ['search-results'] });
-          
-          toast({
-            title: "Content Updated",
-            description: "Table content has been updated.",
-            duration: 3000,
-          });
-        }
-      )
-      .subscribe();
+      const channel = supabase
+        .channel('table-content-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'search_results',
+            filter: `user_id=eq.${session.user.id}`
+          },
+          (payload) => {
+            console.log('Received table content update:', payload);
+            queryClient.invalidateQueries({ queryKey: ['search-results'] });
+            
+            toast({
+              title: "Content Updated",
+              description: "Table content has been updated.",
+              duration: 3000,
+            });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      console.log('Cleaning up table content subscription');
-      supabase.removeChannel(channel);
+      return () => {
+        console.log('Cleaning up table content subscription');
+        supabase.removeChannel(channel);
+      };
     };
+
+    setupSubscription();
   }, [queryClient, toast]);
 
   // Use external sort state if provided, otherwise use internal state
