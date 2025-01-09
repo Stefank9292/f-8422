@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -169,9 +175,25 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               >
                 {search.search_query}
                 {search.bulk_search_urls?.length > 0 && (
-                  <span className="text-[10px] text-muted-foreground">
-                    +{search.bulk_search_urls.length - 1}
-                  </span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-[10px] text-muted-foreground cursor-help">
+                          +{search.bulk_search_urls.length - 1}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="w-60 p-2">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-medium">Additional URLs:</p>
+                          {search.bulk_search_urls.slice(1).map((url, index) => (
+                            <p key={index} className="text-[10px] text-muted-foreground break-all">
+                              {url}
+                            </p>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
               </button>
               <Button
