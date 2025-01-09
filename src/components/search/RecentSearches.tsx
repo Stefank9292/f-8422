@@ -43,6 +43,16 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
                         subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
 
+  // Extract username from Instagram URL
+  const extractUsername = (url: string): string => {
+    try {
+      const username = url.split('instagram.com/')[1]?.split('/')[0];
+      return username ? username.replace('@', '') : url;
+    } catch {
+      return url;
+    }
+  };
+
   // Set up real-time listener for search history changes
   useEffect(() => {
     if (!isSteroidsUser) return;
@@ -82,7 +92,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       const { data, error } = await supabase
         .from('search_history')
-        .select('id, search_query')
+        .select('id, search_query, bulk_search_urls')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -149,29 +159,35 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         )}
       >
         <div className="w-full flex flex-wrap justify-center gap-2.5">
-          {visibleSearches.map((search) => (
-            <div
-              key={search.id}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
-            >
-              <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-              <button
-                onClick={() => onSelect(search.search_query)}
-                className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+          {visibleSearches.map((search) => {
+            const displayQuery = search.bulk_search_urls?.length 
+              ? `${extractUsername(search.bulk_search_urls[0])} +${search.bulk_search_urls.length - 1}`
+              : search.search_query;
+
+            return (
+              <div
+                key={search.id}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
               >
-                {search.search_query}
-              </button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleRemove(search.id)}
-              >
-                <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                <span className="sr-only">Remove search</span>
-              </Button>
-            </div>
-          ))}
+                <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+                <button
+                  onClick={() => onSelect(search.search_query)}
+                  className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+                >
+                  {displayQuery}
+                </button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => handleRemove(search.id)}
+                >
+                  <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                  <span className="sr-only">Remove search</span>
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
