@@ -194,9 +194,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                       </HoverCardTrigger>
                       <HoverCardContent 
                         align="start"
-                        className="w-80 p-4 space-y-3"
+                        className="w-80 p-4"
                       >
-                        <div className="flex items-center justify-between border-b pb-2">
+                        <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-medium">Bulk Search URLs</h4>
                           <Button
                             variant="ghost"
@@ -208,11 +208,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                             <span className="sr-only">Copy URLs</span>
                           </Button>
                         </div>
-                        <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                        <div className="max-h-[200px] overflow-y-auto">
                           {search.bulk_search_urls.map((url: string, index: number) => (
                             <p 
                               key={index} 
-                              className="text-xs text-muted-foreground break-all hover:text-foreground transition-colors p-2 rounded-md hover:bg-secondary/50"
+                              className="text-xs text-muted-foreground break-all hover:text-foreground transition-colors p-2 rounded-md hover:bg-secondary/50 mb-1 text-left"
                             >
                               {url}
                             </p>
