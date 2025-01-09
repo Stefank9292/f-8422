@@ -194,10 +194,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       </Button>
 
       <p className="text-xs text-center text-muted-foreground mt-4">
-        By signing up, you agree to our{" "}
-        <a href="/terms" className="text-primary hover:underline">Terms of Service</a>{" "}
-        and{" "}
-        <a href="/privacy" className="text-primary hover:underline">Privacy Policy</a>
+        By signing up, you agree to our Terms of Service and Privacy Policy
       </p>
       
       <p className="text-sm text-center text-muted-foreground">
