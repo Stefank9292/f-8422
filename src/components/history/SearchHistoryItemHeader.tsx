@@ -1,7 +1,13 @@
 import { format } from "date-fns";
-import { ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Trash2, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -11,6 +17,8 @@ interface SearchHistoryItemHeaderProps {
   onToggleExpand: () => void;
   onDelete: () => void;
   isDeleting: boolean;
+  isBulkSearch?: boolean;
+  urls?: string[];
 }
 
 export function SearchHistoryItemHeader({
@@ -20,13 +28,34 @@ export function SearchHistoryItemHeader({
   isExpanded,
   onToggleExpand,
   onDelete,
-  isDeleting
+  isDeleting,
+  isBulkSearch,
+  urls = []
 }: SearchHistoryItemHeaderProps) {
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          <span className="font-medium truncate">@{query}</span>
+          {isBulkSearch && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <List className="h-4 w-4 text-muted-foreground" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="space-y-1">
+                    <p className="text-xs font-medium">Bulk Search URLs:</p>
+                    {urls.map((url, index) => (
+                      <p key={index} className="text-xs text-muted-foreground">
+                        {url}
+                      </p>
+                    ))}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          <span className="font-medium truncate">{query}</span>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             {format(new Date(date), 'MMM d, HH:mm')}
           </span>
