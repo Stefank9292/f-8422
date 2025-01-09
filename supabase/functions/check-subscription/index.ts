@@ -33,7 +33,7 @@ serve(async (req) => {
           maxClicks: 3,
           error: 'No authorization header'
         }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
