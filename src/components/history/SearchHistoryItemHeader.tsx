@@ -83,10 +83,10 @@ export function SearchHistoryItemHeader({
                       <span className="sr-only">Copy URLs</span>
                     </Button>
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {urls.map((url, index) => (
                       <p key={index} className="text-xs text-muted-foreground break-all">
-                        {url}
+                        @{extractUsername(url)}
                       </p>
                     ))}
                   </div>
