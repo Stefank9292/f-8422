@@ -37,47 +37,34 @@ export const useSessionValidation = () => {
 
   const validateSession = async (currentSession: Session) => {
     try {
+      // First try to refresh the session
+      const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError) {
+        console.error("Session refresh error:", refreshError);
+        return false;
+      }
+
+      if (!refreshResult.session) {
+        console.error("No session after refresh");
+        return false;
+      }
+
+      // Then verify the user with the refreshed token
       const { data: { user }, error: userError } = await supabase.auth.getUser(
-        currentSession.access_token
+        refreshResult.session.access_token
       );
       
       if (userError || !user) {
-        console.error("Invalid session token");
-        throw new Error("Invalid session token");
+        console.error("Invalid session after refresh:", userError);
+        return false;
       }
 
       return true;
     } catch (error) {
-      if (error instanceof Error && 
-          (error.message.includes('session_not_found') || 
-           error.message.includes('Invalid session token'))) {
-        console.error("Session validation failed");
-        return false;
-      }
-      throw error;
+      console.error("Session validation error:", error);
+      return false;
     }
-  };
-
-  const refreshSessionIfNeeded = async (currentSession: Session) => {
-    const expiresAt = currentSession.expires_at;
-    if (!expiresAt) return currentSession;
-
-    const expiresIn = expiresAt - Math.floor(Date.now() / 1000);
-    if (expiresIn >= 600) return currentSession; // More than 10 minutes until expiration
-
-    console.log("Refreshing session...");
-    const { data: { session: refreshedSession }, error: refreshError } = 
-      await supabase.auth.refreshSession();
-      
-    if (refreshError) {
-      if (refreshError.message.includes('refresh_token_not_found')) {
-        console.error("Refresh token not found");
-        return null;
-      }
-      throw refreshError;
-    }
-    
-    return refreshedSession;
   };
 
   useEffect(() => {
@@ -106,14 +93,8 @@ export const useSessionValidation = () => {
           return;
         }
 
-        const refreshedSession = await refreshSessionIfNeeded(currentSession);
-        if (!refreshedSession) {
-          await handleSignOut();
-          return;
-        }
-
         console.log("Setting valid session");
-        setSession(refreshedSession);
+        setSession(currentSession);
       } catch (error) {
         console.error("Session error:", error);
         const errorMessage = error instanceof Error ? error.message : "Session validation failed";
