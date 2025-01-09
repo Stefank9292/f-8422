@@ -1,31 +1,21 @@
 import { SearchContainer } from "@/components/search/SearchContainer";
-import { useSearchState } from "@/components/search/SearchState";
+import { SearchState } from "@/components/search/SearchState";
+import { useState } from "react";
 
 const Index = () => {
-  const {
-    username,
-    isLoading,
-    isBulkSearching,
-    hasReachedLimit,
-    requestCount,
-    maxRequests,
-    handleSearch,
-    handleBulkSearch,
-    displayPosts,
-  } = useSearchState();
+  const [searchHistoryId, setSearchHistoryId] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
   return (
-    <SearchContainer
-      username={username}
-      isLoading={isLoading}
-      isBulkSearching={isBulkSearching}
-      hasReachedLimit={hasReachedLimit}
-      requestCount={requestCount}
-      maxRequests={maxRequests}
-      handleSearch={handleSearch}
-      handleBulkSearch={handleBulkSearch}
-      displayPosts={displayPosts}
-    />
+    <div>
+      <SearchContainer />
+      <SearchState 
+        searchHistoryId={searchHistoryId}
+        error={error}
+        isSearching={isSearching}
+      />
+    </div>
   );
 };
 

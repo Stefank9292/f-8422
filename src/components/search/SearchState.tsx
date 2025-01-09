@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { InstagramPost } from "@/types/instagram";
-import { useSearchStore } from "@/stores/searchStore";
 import { SearchResults } from "./SearchResults";
 import { SearchLoading } from "./SearchLoading";
 import { SearchError } from "./SearchError";
@@ -10,11 +9,10 @@ import { SearchEmpty } from "./SearchEmpty";
 interface SearchStateProps {
   searchHistoryId: string | null;
   error: Error | null;
+  isSearching: boolean;
 }
 
-export const SearchState = ({ searchHistoryId, error }: SearchStateProps) => {
-  const { isSearching } = useSearchStore();
-
+export const SearchState = ({ searchHistoryId, error, isSearching }: SearchStateProps) => {
   const { data: searchResults, isLoading: isLoadingResults } = useQuery({
     queryKey: ['search-results', searchHistoryId],
     queryFn: async () => {
@@ -25,7 +23,9 @@ export const SearchState = ({ searchHistoryId, error }: SearchStateProps) => {
         .single();
       
       if (error) throw error;
-      return data?.results as InstagramPost[];
+      
+      // Type assertion to ensure the results are of type InstagramPost[]
+      return (data?.results as unknown) as InstagramPost[];
     },
     enabled: !!searchHistoryId,
   });
