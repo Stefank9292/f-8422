@@ -40,10 +40,10 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1Qe2WNGX13ZRG2XiJKqN8Y2p") {
+      if (isAnnual && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
         return "Save 20% with annual";
       }
-      if (isAnnual && planId === "price_1Qe2WNGX13ZRG2XiMpL5K3Rt") {
+      if (isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
         return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
@@ -55,14 +55,14 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     }
 
     const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1Qe2WNGX13ZRG2XiHgR4N1Pq" && planId === "price_1Qe2WNGX13ZRG2XiJKqN8Y2p") || 
-       (subscriptionStatus?.priceId === "price_1Qe2WNGX13ZRG2XiLnM2O3Qs" && planId === "price_1Qe2WNGX13ZRG2XiMpL5K3Rt"));
+      ((subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") || 
+       (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"));
 
     if (isMonthlyToAnnualUpgrade) {
       return "Save 20% with annual";
     }
 
-    if (subscriptionStatus?.priceId === "price_1Qe2WNGX13ZRG2XiLnM2O3Qs" && planId === "price_1Qe2WNGX13ZRG2XiHgR4N1Pq") {
+    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu") {
       return "Downgrade to Creator Pro";
     }
 
@@ -71,8 +71,8 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId;
 
-  const isDowngrade = subscriptionStatus?.priceId === "price_1Qe2WNGX13ZRG2XiLnM2O3Qs" && 
-                     planId === "price_1Qe2WNGX13ZRG2XiHgR4N1Pq";
+  const isDowngrade = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && 
+                     planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
 
   const getButtonStyle = () => {
     if (isPopular) {
@@ -107,7 +107,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
         isUpgrade={!isCurrentPlan}
-        showThunderbolt={isAnnual && planId === "price_1Qe2WNGX13ZRG2XiMpL5K3Rt"}
+        showThunderbolt={isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"}
       />
     </Button>
   );
