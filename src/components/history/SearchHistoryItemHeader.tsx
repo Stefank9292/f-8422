@@ -45,7 +45,7 @@ export function SearchHistoryItemHeader({
   };
 
   const displayQuery = isBulkSearch && urls.length > 0
-    ? `@${extractUsername(urls[0])}`
+    ? `@${extractUsername(urls[0])} +${urls.length - 1}`
     : query;
 
   const handleCopyUrls = () => {
