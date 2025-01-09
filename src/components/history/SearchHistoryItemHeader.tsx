@@ -34,7 +34,6 @@ export function SearchHistoryItemHeader({
 }: SearchHistoryItemHeaderProps) {
   const { toast } = useToast();
   
-  // Extract username from Instagram URL for bulk searches
   const extractUsername = (url: string): string => {
     try {
       const username = url.split('instagram.com/')[1]?.split('/')[0];
@@ -61,6 +60,13 @@ export function SearchHistoryItemHeader({
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
+          <span className="font-medium truncate">{displayQuery}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            {format(new Date(date), 'MMM d, HH:mm')}
+          </span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">
+            ({resultsCount})
+          </span>
           {isBulkSearch && (
             <HoverCard>
               <HoverCardTrigger asChild>
@@ -94,13 +100,6 @@ export function SearchHistoryItemHeader({
               </HoverCardContent>
             </HoverCard>
           )}
-          <span className="font-medium truncate">{displayQuery}</span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {format(new Date(date), 'MMM d, HH:mm')}
-          </span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            ({resultsCount})
-          </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           <Button
