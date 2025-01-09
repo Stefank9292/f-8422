@@ -23,6 +23,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       }
       return session;
     },
+    retry: false
   });
 
   const { data: subscriptionStatus, error: subscriptionError } = useQuery({
@@ -34,10 +35,16 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       }
 
       try {
-        console.log('Checking subscription with token:', session.access_token.slice(0, 10) + '...');
+        console.log('Checking subscription with session:', {
+          userId: session.user.id,
+          tokenLength: session.access_token.length,
+          tokenPrefix: session.access_token.slice(0, 10) + '...'
+        });
+
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
           }
         });
 
@@ -46,6 +53,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
           throw error;
         }
 
+        console.log('Subscription check response:', data);
         return data;
       } catch (error) {
         console.error('Failed to check subscription:', error);
@@ -53,7 +61,15 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       }
     },
     enabled: !!session?.access_token,
-    retry: false,
+    retry: (failureCount, error: any) => {
+      // Only retry if it's not an auth error
+      if (error?.message?.includes('Invalid user session') || 
+          error?.message?.includes('session_not_found') ||
+          error?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);

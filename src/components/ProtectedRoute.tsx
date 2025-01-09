@@ -14,22 +14,35 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) {
-        console.log('No session token available');
-        return null;
+        console.log('No session token available, returning default subscription status');
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
       }
       
       try {
-        console.log('Checking subscription with token:', session.access_token.slice(0, 10) + '...');
+        console.log('Checking subscription with session:', {
+          userId: session.user.id,
+          tokenLength: session.access_token.length,
+          tokenPrefix: session.access_token.slice(0, 10) + '...'
+        });
+
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
           }
         });
         
         if (error) {
           console.error('Subscription check error:', error);
+          // If we get an auth error, return default subscription status
           if (error.message.includes('Invalid user session') || 
-              error.message.includes('session_not_found')) {
+              error.message.includes('session_not_found') ||
+              error.status === 401) {
             return {
               subscribed: false,
               priceId: null,
@@ -40,14 +53,29 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           throw error;
         }
 
+        console.log('Subscription check response:', data);
         return data;
       } catch (error) {
         console.error('Error checking subscription:', error);
-        throw error;
+        // Return default subscription status on error
+        return {
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        };
       }
     },
     enabled: !!session?.access_token,
-    retry: 1,
+    retry: (failureCount, error: any) => {
+      // Only retry if it's not an auth error
+      if (error?.message?.includes('Invalid user session') || 
+          error?.message?.includes('session_not_found') ||
+          error?.status === 401) {
+        return false;
+      }
+      return failureCount < 2;
+    },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
     refetchInterval: false
