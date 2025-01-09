@@ -196,28 +196,30 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                         align="start"
                         className="w-80 p-4"
                       >
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-sm font-medium">Bulk Search URLs</h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0 hover:bg-secondary/80"
-                            onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
-                          >
-                            <Copy className="h-4 w-4" />
-                            <span className="sr-only">Copy URLs</span>
-                          </Button>
-                        </div>
-                        <ul className="max-h-[200px] overflow-y-auto list-none">
-                          {search.bulk_search_urls.map((url: string, index: number) => (
-                            <li 
-                              key={index} 
-                              className="text-xs text-muted-foreground break-all py-0.5 px-2 text-left"
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium">Bulk Search URLs</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0 hover:bg-secondary/80"
+                              onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
                             >
-                              {url}
-                            </li>
-                          ))}
-                        </ul>
+                              <Copy className="h-4 w-4" />
+                              <span className="sr-only">Copy URLs</span>
+                            </Button>
+                          </div>
+                          <ul className="list-none space-y-0.5">
+                            {search.bulk_search_urls.map((url: string, index: number) => (
+                              <li 
+                                key={index} 
+                                className="text-xs text-muted-foreground break-all py-0.5 text-left"
+                              >
+                                {url}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                       </HoverCardContent>
                     </HoverCard>
                   )}
