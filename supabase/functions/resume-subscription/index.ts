@@ -41,12 +41,9 @@ serve(async (req) => {
       throw new Error('No customer found')
     }
 
-    const price_id = "price_1QdBd2DoPDXfOSZFnG8aWuIq"
-
     const subscriptions = await stripe.subscriptions.list({
       customer: customers.data[0].id,
       status: 'active',
-      price: price_id,
       limit: 1
     })
 

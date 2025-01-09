@@ -58,8 +58,8 @@ export const useUsageStats = (session: Session | null) => {
     const checkAndResetMonthlyUsage = async () => {
       if (!session?.user.id || !subscriptionStatus) return;
 
-      const isSteroidsUser = subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                            subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+      const isSteroidsUser = subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                            subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
       
       if (!isSteroidsUser) {
         const now = new Date();
@@ -103,10 +103,10 @@ export const useUsageStats = (session: Session | null) => {
     checkAndResetMonthlyUsage();
   }, [session?.user.id, subscriptionStatus, refetchRequestStats]);
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
-  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+                    subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
   
   const maxRequests = isSteroidsUser ? Infinity : 25; // Pro users get 25 searches
   const usedRequests = requestStats || 0;
@@ -115,12 +115,12 @@ export const useUsageStats = (session: Session | null) => {
   const hasReachedLimit = isSteroidsUser ? false : usedRequests >= maxRequests;
 
   const getPlanName = () => {
-    if (subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
+    if (subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+        subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h") {
       return 'Creator Pro';
     }
-    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
+    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
       return 'Creator on Steroids';
     }
     return 'Creator Pro';
@@ -135,6 +135,6 @@ export const useUsageStats = (session: Session | null) => {
     usagePercentage,
     hasReachedLimit,
     getPlanName,
-    subscriptionStatus, // Added this line to fix the error
+    subscriptionStatus,
   };
 };
