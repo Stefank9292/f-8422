@@ -31,20 +31,15 @@ serve(async (req) => {
       )
     }
 
-    console.log('Auth header found:', authHeader.substring(0, 20) + '...');
-
     // Create a Supabase client with the auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
-        global: { 
-          headers: { Authorization: authHeader } 
-        },
+        global: { headers: { Authorization: authHeader } },
         auth: {
           autoRefreshToken: false,
           persistSession: false,
-          detectSessionInUrl: false
         }
       }
     )
@@ -55,25 +50,10 @@ serve(async (req) => {
       error: userError,
     } = await supabaseClient.auth.getUser()
 
-    if (userError) {
+    if (userError || !user) {
       console.error('User verification error:', userError);
       return new Response(
-        JSON.stringify({ 
-          error: 'Invalid user session', 
-          details: userError.message,
-          code: 'AUTH_ERROR'
-        }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    if (!user) {
-      console.error('No user found in session');
-      return new Response(
-        JSON.stringify({ 
-          error: 'No user found in session',
-          code: 'NO_USER'
-        }),
+        JSON.stringify({ error: 'Invalid user session' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -85,10 +65,7 @@ serve(async (req) => {
     if (!userEmail) {
       console.error('No email found for user');
       return new Response(
-        JSON.stringify({ 
-          error: 'User email not found',
-          code: 'NO_EMAIL'
-        }),
+        JSON.stringify({ error: 'User email not found' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
@@ -156,18 +133,18 @@ serve(async (req) => {
         canceled: subscription.cancel_at_period_end,
         status: subscription.status
       }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     )
 
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error', 
-        details: error.message,
-        stack: error.stack,
-        code: 'INTERNAL_ERROR'
-      }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
         status: 500, 
         headers: { 

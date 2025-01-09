@@ -16,70 +16,34 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Session error:', error);
-        throw error;
-      }
-      return session;
+      const { data } = await supabase.auth.getSession();
+      return data.session;
     },
-    retry: false
   });
 
-  const { data: subscriptionStatus, error: subscriptionError } = useQuery({
+  const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
-      if (!session?.access_token) {
-        console.log('No session token available');
-        return null;
-      }
-
-      try {
-        console.log('Checking subscription with session:', {
-          userId: session.user.id,
-          tokenLength: session.access_token.length,
-          tokenPrefix: session.access_token.slice(0, 10) + '...'
-        });
-
-        const { data, error } = await supabase.functions.invoke('check-subscription', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (error) {
-          console.error('Subscription check error:', error);
-          throw error;
+      if (!session?.access_token) return null;
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
-
-        console.log('Subscription check response:', data);
-        return data;
-      } catch (error) {
-        console.error('Failed to check subscription:', error);
-        throw error;
-      }
+      });
+      if (error) throw error;
+      return data;
     },
     enabled: !!session?.access_token,
-    retry: (failureCount, error: any) => {
-      // Only retry if it's not an auth error
-      if (error?.message?.includes('Invalid user session') || 
-          error?.message?.includes('session_not_found') ||
-          error?.status === 401) {
-        return false;
-      }
-      return failureCount < 2;
-    },
   });
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
 
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
-      if (isAnnual && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") {
+      if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
         return "Save 20% with annual";
       }
-      if (isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
+      if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
         return "Save 20% with annual";
       }
       return `Upgrade to ${planName}`;
@@ -91,14 +55,14 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     }
 
     const isMonthlyToAnnualUpgrade = isAnnual && 
-      ((subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" && planId === "price_1Qdt3tGX13ZRG2XiesasShEJ") || 
-       (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"));
+      ((subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") || 
+       (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"));
 
     if (isMonthlyToAnnualUpgrade) {
       return "Save 20% with annual";
     }
 
-    if (subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu") {
+    if (subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && planId === "price_1QdtwnGX13ZRG2XihcM36r3W") {
       return "Downgrade to Creator Pro";
     }
 
@@ -107,8 +71,8 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
 
   const isCurrentPlan = subscriptionStatus?.subscribed && subscriptionStatus.priceId === planId;
 
-  const isDowngrade = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" && 
-                     planId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
+  const isDowngrade = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" && 
+                     planId === "price_1QdtwnGX13ZRG2XihcM36r3W";
 
   const getButtonStyle = () => {
     if (isPopular) {
@@ -119,11 +83,6 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     }
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
-
-  if (subscriptionError) {
-    console.error('Subscription error:', subscriptionError);
-    return null;
-  }
 
   if (isCurrentPlan) {
     return (
@@ -148,7 +107,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
       <PlanButtonText 
         text={loading ? "Loading..." : getButtonText()}
         isUpgrade={!isCurrentPlan}
-        showThunderbolt={isAnnual && planId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"}
+        showThunderbolt={isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0"}
       />
     </Button>
   );
