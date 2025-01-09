@@ -1,10 +1,12 @@
-import { X, Instagram, History, Lock, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Instagram, History, Lock, ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { useToast } from "@/hooks/use-toast";
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
@@ -16,7 +18,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     const saved = localStorage.getItem('recentSearchesCollapsed');
     return saved ? JSON.parse(saved) : false;
   });
+  const [copiedStates, setCopiedStates] = useState<{ [key: string]: boolean }>({});
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -111,6 +115,34 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     setHiddenSearches(prev => [...prev, id]);
   };
 
+  const handleCopyUrls = async (urls: string[]) => {
+    try {
+      const urlsText = urls.join('\n');
+      await navigator.clipboard.writeText(urlsText);
+      
+      // Set copied state for this specific search
+      const searchId = urls.join('-');
+      setCopiedStates(prev => ({ ...prev, [searchId]: true }));
+      
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedStates(prev => ({ ...prev, [searchId]: false }));
+      }, 2000);
+
+      toast({
+        title: "URLs Copied",
+        description: "The Instagram URLs have been copied to your clipboard",
+      });
+    } catch (error) {
+      console.error('Failed to copy URLs:', error);
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy URLs to clipboard",
+        variant: "destructive",
+      });
+    }
+  };
+
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
 
   if (!isSteroidsUser) {
@@ -164,6 +196,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               ? `${extractUsername(search.bulk_search_urls[0])} +${search.bulk_search_urls.length - 1}`
               : search.search_query;
 
+            const searchId = search.bulk_search_urls?.join('-') || search.id;
+            const isCopied = copiedStates[searchId] || false;
+
             return (
               <div
                 key={search.id}
@@ -176,6 +211,41 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                 >
                   {displayQuery}
                 </button>
+                {search.bulk_search_urls && search.bulk_search_urls.length > 1 && (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <button className="text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+                        +{search.bulk_search_urls.length - 1}
+                      </button>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80 p-2">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Bulk Search URLs</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2"
+                            onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
+                          >
+                            {isCopied ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                        <div className="space-y-1">
+                          {search.bulk_search_urls?.map((url, index) => (
+                            <div key={index} className="text-xs text-muted-foreground">
+                              {url}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
                 <Button
                   variant="ghost"
                   size="icon"
