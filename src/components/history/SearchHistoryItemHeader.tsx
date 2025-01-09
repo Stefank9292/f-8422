@@ -85,7 +85,7 @@ export function SearchHistoryItemHeader({
                   </div>
                   <div className="space-y-0.5">
                     {urls.map((url, index) => (
-                      <p key={index} className="text-xs text-muted-foreground break-all">
+                      <p key={index} className="text-xs text-muted-foreground">
                         @{extractUsername(url)}
                       </p>
                     ))}
