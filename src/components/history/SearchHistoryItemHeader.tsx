@@ -34,7 +34,7 @@ export function SearchHistoryItemHeader({
 }: SearchHistoryItemHeaderProps) {
   const { toast } = useToast();
   
-  // Extract username from Instagram URL for bulk searches
+  // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
     try {
       const username = url.split('instagram.com/')[1]?.split('/')[0];
@@ -44,10 +44,6 @@ export function SearchHistoryItemHeader({
     }
   };
 
-  const displayQuery = isBulkSearch && urls.length > 0
-    ? `@${extractUsername(urls[0])} +${urls.length - 1}`
-    : query;
-
   const handleCopyUrls = () => {
     if (urls.length) {
       navigator.clipboard.writeText(urls.join('\n'));
@@ -56,6 +52,10 @@ export function SearchHistoryItemHeader({
       });
     }
   };
+
+  const displayQuery = isBulkSearch && urls.length > 0
+    ? `@${extractUsername(urls[0])} +${urls.length - 1}`
+    : query;
 
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
