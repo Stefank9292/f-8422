@@ -1,4 +1,4 @@
-import { X, Instagram, History, Lock, ChevronDown, ChevronUp, List, Copy } from "lucide-react";
+import { X, Instagram, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -179,54 +179,46 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
               <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-              {search.bulk_search_urls?.length ? (
-                <div className="flex items-center gap-1">
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <button
-                        onClick={() => onSelect(search.search_query)}
-                        className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
-                      >
-                        {search.search_query}
-                        <span className="text-[10px] text-muted-foreground">
-                          +{search.bulk_search_urls.length - 1}
-                        </span>
-                        <List className="h-3 w-3 text-muted-foreground" />
-                      </button>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="w-80 p-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
-                          >
-                            <Copy className="h-4 w-4" />
-                            <span className="sr-only">Copy URLs</span>
-                          </Button>
-                        </div>
-                        <div className="space-y-1">
-                          {search.bulk_search_urls.map((url, index) => (
-                            <p key={index} className="text-xs text-muted-foreground break-all">
-                              {url}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                </div>
-              ) : (
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => onSelect(search.search_query)}
-                  className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+                  className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
                 >
                   {search.search_query}
+                  {search.bulk_search_urls?.length > 0 && (
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <span className="text-[10px] text-muted-foreground cursor-pointer">
+                          +{search.bulk_search_urls.length - 1}
+                        </span>
+                      </HoverCardTrigger>
+                      <HoverCardContent className="w-80 p-4">
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
+                            >
+                              <Copy className="h-4 w-4" />
+                              <span className="sr-only">Copy URLs</span>
+                            </Button>
+                          </div>
+                          <div className="space-y-1">
+                            {search.bulk_search_urls.map((url: string, index: number) => (
+                              <p key={index} className="text-xs text-muted-foreground break-all">
+                                {url}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  )}
                 </button>
-              )}
+              </div>
               <Button
                 variant="ghost"
                 size="icon"
