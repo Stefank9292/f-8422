@@ -2,31 +2,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
-export const CancelSubscriptionButton = ({ 
-  isCanceled = false, 
-  children,
-  className 
-}: { 
-  isCanceled?: boolean;
-  children?: React.ReactNode;
+interface SubscribeButtonProps {
+  planId: string;
+  planName: string;
+  isPopular?: boolean;
+  isAnnual?: boolean;
   className?: string;
-}) => {
+}
+
+export const SubscribeButton = ({ 
+  planId,
+  planName,
+  isPopular,
+  isAnnual,
+  className 
+}: SubscribeButtonProps) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const queryClient = useQueryClient();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -36,28 +30,28 @@ export const CancelSubscriptionButton = ({
     },
   });
 
-  const handleCancel = async () => {
+  const handleSubscribe = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.functions.invoke('cancel-subscription', {
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { priceId: planId },
         headers: {
           Authorization: `Bearer ${session?.access_token}`
         }
       });
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Subscription Cancelled",
-        description: "Your subscription will be cancelled at the end of the billing period.",
-      });
 
-      queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-    } catch (error) {
-      console.error('Error:', error);
+      if (error) throw error;
+
+      if (data?.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
+    } catch (error: any) {
+      console.error('Subscription error:', error);
       toast({
         title: "Error",
-        description: "Failed to cancel subscription. Please try again.",
+        description: error.message || "Failed to start subscription process. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -65,48 +59,13 @@ export const CancelSubscriptionButton = ({
     }
   };
 
-  if (isCanceled) {
-    return (
-      <Button 
-        variant="outline" 
-        disabled 
-        className={`text-[11px] h-8 px-4 ${className}`}
-      >
-        {children || "Canceled"}
-      </Button>
-    );
-  }
-
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button 
-          variant="ghost"
-          disabled={loading}
-          className={`text-[11px] h-8 px-4 ${className}`}
-        >
-          {children || "Cancel Subscription"}
-        </Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-base">Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription className="text-[11px] text-muted-foreground">
-            Your subscription will be cancelled at the end of the current billing period. 
-            You will still have access to premium features until then.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel className="text-[11px] h-8">Keep Subscription</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleCancel} 
-            disabled={loading}
-            className="text-[11px] h-8 bg-[#1a365d] hover:bg-[#1a365d]/90 text-white"
-          >
-            {loading ? "Cancelling..." : "Yes, Cancel Subscription"}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <Button
+      onClick={handleSubscribe}
+      disabled={loading}
+      className={`${isPopular ? 'bg-[#D946EF] hover:bg-[#D946EF]/90' : 'bg-[#1a365d] hover:bg-[#1a365d]/90'} text-white ${className}`}
+    >
+      {loading ? "Processing..." : `Subscribe to ${planName}${isAnnual ? ' (Annual)' : ' (Monthly)'}`}
+    </Button>
   );
 };
