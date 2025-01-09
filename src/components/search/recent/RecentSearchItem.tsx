@@ -62,26 +62,29 @@ export const RecentSearchItem = ({
               +{bulkSearchUrls.length - 1}
             </button>
           </HoverCardTrigger>
-          <HoverCardContent className="w-80 p-2">
-            <div className="space-y-2">
+          <HoverCardContent className="w-80 p-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Bulk Search URLs</span>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 px-2"
+                  className="h-8 px-2.5 hover:bg-secondary"
                   onClick={() => handleCopyUrls(bulkSearchUrls)}
                 >
                   {isCopied ? (
-                    <Check className="h-4 w-4 text-green-500" />
+                    <Check className="h-3.5 w-3.5 text-green-500" />
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3.5 w-3.5" />
                   )}
                 </Button>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-2 max-h-[200px] overflow-y-auto pr-2">
                 {bulkSearchUrls.map((url, index) => (
-                  <div key={index} className="text-xs text-muted-foreground">
+                  <div 
+                    key={index} 
+                    className="text-[11px] text-muted-foreground py-1.5 px-2.5 rounded-md bg-secondary/50"
+                  >
                     {url}
                   </div>
                 ))}
