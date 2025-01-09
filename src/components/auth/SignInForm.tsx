@@ -51,12 +51,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     try {
       setLoading(true);
       
-      // First, ensure no existing session
-      const { data: { session: existingSession } } = await supabase.auth.getSession();
-      if (existingSession) {
-        await supabase.auth.signOut();
-      }
-      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -64,6 +58,8 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
 
       if (error) {
         console.error("Sign in error:", error);
+        
+        // Handle specific error cases
         if (error.message.includes('Invalid login credentials')) {
           toast({
             title: "Authentication Failed",
@@ -71,10 +67,15 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
             variant: "destructive",
           });
           updateRateLimit();
-        } else {
-          handleAuthError(error);
+          return;
         }
+        
+        handleAuthError(error);
         return;
+      }
+
+      if (!data.session) {
+        throw new Error("No session created after authentication");
       }
 
       await handleAuthSuccess(data.session);
