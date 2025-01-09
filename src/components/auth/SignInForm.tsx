@@ -51,6 +51,12 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
     try {
       setLoading(true);
       
+      // First, ensure no existing session
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession) {
+        await supabase.auth.signOut();
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -68,15 +74,6 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
         } else {
           handleAuthError(error);
         }
-        return;
-      }
-
-      if (!data.session) {
-        toast({
-          title: "Error",
-          description: "No session created. Please try again.",
-          variant: "destructive",
-        });
         return;
       }
 

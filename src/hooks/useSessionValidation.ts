@@ -24,15 +24,9 @@ export const useSessionValidation = () => {
       if (location.pathname !== '/auth') {
         navigate('/auth', { 
           replace: true,
-          state: { from: location, error: "Your session has expired. Please sign in again." }
+          state: { from: location }
         });
       }
-      
-      toast({
-        title: "Session Expired",
-        description: "Please sign in again to continue.",
-        variant: "destructive",
-      });
     } catch (error) {
       console.error("Sign out error:", error);
       setError("Failed to sign out properly");
@@ -43,10 +37,10 @@ export const useSessionValidation = () => {
 
   useEffect(() => {
     let mounted = true;
+    let authSubscription: { subscription: { unsubscribe: () => void } } | null = null;
+    let sessionCheckTimeout: NodeJS.Timeout | null = null;
 
     const checkSession = async () => {
-      if (!mounted) return;
-      
       try {
         setIsLoading(true);
         setError(null);
@@ -61,67 +55,90 @@ export const useSessionValidation = () => {
         
         if (!currentSession) {
           console.log("No active session found");
-          if (mounted) {
-            setSession(null);
-          }
+          if (mounted) setSession(null);
           return;
         }
 
-        if (mounted) {
-          setSession(currentSession);
+        // Only refresh if the session is close to expiring
+        const expiresAt = new Date((currentSession.expires_at || 0) * 1000);
+        const now = new Date();
+        const timeUntilExpiry = expiresAt.getTime() - now.getTime();
+        const REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes
+
+        if (timeUntilExpiry < REFRESH_THRESHOLD) {
+          const { data: refreshResult, error: refreshError } = 
+            await supabase.auth.refreshSession();
+          
+          if (refreshError) {
+            console.error("Session refresh error:", refreshError);
+            if (mounted) {
+              await handleSignOut();
+            }
+            return;
+          }
+
+          if (mounted && refreshResult.session) {
+            setSession(refreshResult.session);
+          }
+        } else {
+          if (mounted) {
+            setSession(currentSession);
+          }
         }
       } catch (error) {
         console.error("Session error:", error);
-        const errorMessage = error instanceof Error ? error.message : "Session validation failed";
         if (mounted) {
-          setError(errorMessage);
+          setError("Session validation failed");
           await handleSignOut();
         }
       } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
+        if (mounted) setIsLoading(false);
       }
+    };
+
+    // Set up auth state change listener
+    const setupAuthListener = () => {
+      const { data } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+        console.log("Auth state change:", event);
+        
+        if (event === 'SIGNED_OUT') {
+          if (mounted) {
+            setSession(null);
+            queryClient.clear();
+            if (location.pathname !== '/auth') {
+              navigate('/auth', { replace: true });
+            }
+          }
+          return;
+        }
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (currentSession && mounted) {
+            setSession(currentSession);
+            setError(null);
+          }
+        }
+      });
+
+      // Store the subscription object
+      authSubscription = data;
     };
 
     // Initial session check
     checkSession();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      if (!mounted) return;
-      
-      console.log("Auth state change:", event);
-      
-      if (event === 'SIGNED_OUT') {
-        setSession(null);
-        queryClient.clear();
-        if (location.pathname !== '/auth') {
-          navigate('/auth', { replace: true });
-        }
-        return;
-      }
-      
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (currentSession) {
-          setSession(currentSession);
-          setError(null);
-          
-          if (event === 'SIGNED_IN') {
-            const intendedPath = location.state?.from?.pathname || '/';
-            navigate(intendedPath, { replace: true });
-          }
-        }
-      }
-    });
+    setupAuthListener();
 
     return () => {
       mounted = false;
-      if (subscription) {
-        subscription.unsubscribe();
+      if (sessionCheckTimeout) {
+        clearTimeout(sessionCheckTimeout);
+      }
+      // Only unsubscribe if the subscription exists
+      if (authSubscription?.subscription?.unsubscribe) {
+        authSubscription.subscription.unsubscribe();
       }
     };
-  }, []); // Remove dependencies to prevent unnecessary re-renders
+  }, [queryClient, navigate, location]);
 
   return { session, isLoading, error };
 };
