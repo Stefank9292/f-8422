@@ -72,8 +72,8 @@ const SubscribePage = () => {
       annual: "price_1QfKMYGX13ZRG2XioPYKCe7h_test"
     },
     ultra: {
-      monthly: "price_1Qdty5GX13ZRG2XiFxadAKJW_test",
-      annual: "price_1QdtyHGX13ZRG2Xib8px0lu0_test"
+      monthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9_test",
+      annual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk_test"
     }
   };
 
