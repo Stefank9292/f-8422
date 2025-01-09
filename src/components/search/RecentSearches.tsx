@@ -188,31 +188,35 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
                   {search.bulk_search_urls?.length > 0 && (
                     <HoverCard>
                       <HoverCardTrigger asChild>
-                        <span className="text-[10px] text-muted-foreground cursor-pointer">
+                        <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
                           +{search.bulk_search_urls.length - 1}
                         </span>
                       </HoverCardTrigger>
-                      <HoverCardContent className="w-80 p-4">
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-semibold">Bulk Search URLs</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
+                      <HoverCardContent 
+                        align="start"
+                        className="w-80 p-4 space-y-3"
+                      >
+                        <div className="flex items-center justify-between border-b pb-2">
+                          <h4 className="text-sm font-medium">Bulk Search URLs</h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 hover:bg-secondary/80"
+                            onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
+                          >
+                            <Copy className="h-4 w-4" />
+                            <span className="sr-only">Copy URLs</span>
+                          </Button>
+                        </div>
+                        <div className="space-y-2 max-h-[200px] overflow-y-auto">
+                          {search.bulk_search_urls.map((url: string, index: number) => (
+                            <p 
+                              key={index} 
+                              className="text-xs text-muted-foreground break-all hover:text-foreground transition-colors p-2 rounded-md hover:bg-secondary/50"
                             >
-                              <Copy className="h-4 w-4" />
-                              <span className="sr-only">Copy URLs</span>
-                            </Button>
-                          </div>
-                          <div className="space-y-1">
-                            {search.bulk_search_urls.map((url: string, index: number) => (
-                              <p key={index} className="text-xs text-muted-foreground break-all">
-                                {url}
-                              </p>
-                            ))}
-                          </div>
+                              {url}
+                            </p>
+                          ))}
                         </div>
                       </HoverCardContent>
                     </HoverCard>
