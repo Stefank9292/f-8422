@@ -126,34 +126,55 @@ serve(async (req) => {
     }
 
     // Get the origin from the request headers and ensure it's properly formatted
-    const origin = req.headers.get('origin') || ''
+    const origin = req.headers.get('origin') || 'https://vyral-search.com'
     const baseUrl = origin.replace(/\/$/, '') // Remove trailing slash if present
 
     console.log('Creating checkout session with return URL:', baseUrl)
     
-    // Create the checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer: customer_id,
-      line_items: [{ price: priceId, quantity: 1 }],
-      mode: 'subscription',
-      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/subscribe?canceled=true`,
-      allow_promotion_codes: true,
-    })
+    try {
+      // Create the checkout session
+      const session = await stripe.checkout.sessions.create({
+        customer: customer_id,
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: 'subscription',
+        success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/subscribe?canceled=true`,
+        allow_promotion_codes: true,
+      })
 
-    console.log('Checkout session created:', session.id)
+      console.log('Checkout session created:', session.id)
 
-    return new Response(
-      JSON.stringify({ url: session.url }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
+      if (!session.url) {
+        throw new Error('No checkout URL returned from Stripe')
       }
-    )
+
+      return new Response(
+        JSON.stringify({ url: session.url }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      )
+    } catch (stripeError) {
+      console.error('Stripe checkout session creation error:', stripeError)
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to create checkout session',
+          details: stripeError.message 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      )
+    }
   } catch (error) {
     console.error('Error creating checkout session:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
