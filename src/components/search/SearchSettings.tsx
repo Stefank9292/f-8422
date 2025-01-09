@@ -53,10 +53,10 @@ export const SearchSettings = ({
 
   const getMaxVideos = () => {
     if (!subscriptionStatus?.priceId) return 5;
-    if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
-    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return 50;
+    if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+        subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") return 50;
+    if (subscriptionStatus.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+        subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h") return 25;
     return 5;
   };
 
@@ -64,7 +64,6 @@ export const SearchSettings = ({
 
   // Update local number of videos when subscription changes
   useEffect(() => {
-    const maxVideos = getMaxVideos();
     if (localNumberOfVideos > maxVideos) {
       setLocalNumberOfVideos(maxVideos);
       setNumberOfVideos(maxVideos);
