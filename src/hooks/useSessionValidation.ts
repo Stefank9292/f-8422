@@ -45,6 +45,8 @@ export const useSessionValidation = () => {
     let mounted = true;
 
     const checkSession = async () => {
+      if (!mounted) return;
+      
       try {
         setIsLoading(true);
         setError(null);
@@ -61,14 +63,12 @@ export const useSessionValidation = () => {
           console.log("No active session found");
           if (mounted) {
             setSession(null);
-            setIsLoading(false);
           }
           return;
         }
 
         if (mounted) {
           setSession(currentSession);
-          setIsLoading(false);
         }
       } catch (error) {
         console.error("Session error:", error);
@@ -87,23 +87,23 @@ export const useSessionValidation = () => {
     // Initial session check
     checkSession();
 
-    // Set up auth state change listener and store the subscription
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      if (!mounted) return;
+      
       console.log("Auth state change:", event);
       
       if (event === 'SIGNED_OUT') {
-        if (mounted) {
-          setSession(null);
-          queryClient.clear();
-          if (location.pathname !== '/auth') {
-            navigate('/auth', { replace: true });
-          }
+        setSession(null);
+        queryClient.clear();
+        if (location.pathname !== '/auth') {
+          navigate('/auth', { replace: true });
         }
         return;
       }
       
       if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (currentSession && mounted) {
+        if (currentSession) {
           setSession(currentSession);
           setError(null);
           
@@ -117,12 +117,11 @@ export const useSessionValidation = () => {
 
     return () => {
       mounted = false;
-      // Safely unsubscribe only if subscription exists
       if (subscription) {
         subscription.unsubscribe();
       }
     };
-  }, [queryClient, navigate, location, toast]);
+  }, []); // Remove dependencies to prevent unnecessary re-renders
 
   return { session, isLoading, error };
 };
