@@ -47,72 +47,84 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     });
 
-    // Get customer by email
-    const customers = await stripe.customers.list({
-      email: user.email,
-      limit: 1,
-    });
+    try {
+      // Get customer by email
+      const customers = await stripe.customers.list({
+        email: user.email,
+        limit: 1,
+      });
 
-    if (!customers.data.length) {
-      console.log('No Stripe customer found for email:', user.email);
+      console.log('Found customers:', customers.data.length);
+
+      if (!customers.data.length) {
+        console.log('No Stripe customer found for email:', user.email);
+        return new Response(
+          JSON.stringify({ subscribed: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const customer = customers.data[0];
+      console.log('Found Stripe customer:', customer.id);
+
+      // Get active subscriptions for customer
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: 'active',
+      });
+
+      console.log('Found subscriptions:', subscriptions.data.length);
+
+      if (!subscriptions.data.length) {
+        console.log('No active subscriptions found for customer:', customer.id);
+        return new Response(
+          JSON.stringify({ subscribed: false }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const subscription = subscriptions.data[0];
+      const priceId = subscription.items.data[0].price.id;
+
+      console.log('Found active subscription:', {
+        subscriptionId: subscription.id,
+        priceId: priceId,
+        status: subscription.status
+      });
+
+      // Check if the price ID matches any of our plan price IDs
+      const isSteroidsMonthly = priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9";
+      const isSteroidsAnnual = priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+      const isProMonthly = priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
+      const isProAnnual = priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+
+      const subscriptionDetails = {
+        subscribed: true,
+        priceId: priceId,
+        status: subscription.status,
+        canceled: subscription.cancel_at_period_end,
+        currentPeriodEnd: subscription.current_period_end,
+        isSteroids: isSteroidsMonthly || isSteroidsAnnual,
+        isPro: isProMonthly || isProAnnual
+      };
+
+      console.log('Returning subscription details:', subscriptionDetails);
+
       return new Response(
-        JSON.stringify({ subscribed: false }),
+        JSON.stringify(subscriptionDetails),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    } catch (stripeError) {
+      console.error('Stripe API error:', stripeError);
+      throw stripeError;
     }
-
-    const customer = customers.data[0];
-    console.log('Found Stripe customer:', customer.id);
-
-    // Get active subscriptions for customer
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customer.id,
-      status: 'active',
-    });
-
-    if (!subscriptions.data.length) {
-      console.log('No active subscriptions found for customer:', customer.id);
-      return new Response(
-        JSON.stringify({ subscribed: false }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const subscription = subscriptions.data[0];
-    const priceId = subscription.items.data[0].price.id;
-
-    console.log('Found active subscription:', {
-      subscriptionId: subscription.id,
-      priceId: priceId,
-      status: subscription.status
-    });
-
-    // Check if the price ID matches any of our plan price IDs
-    const isSteroidsMonthly = priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9";
-    const isSteroidsAnnual = priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-    const isProMonthly = priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
-    const isProAnnual = priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
-
-    const subscriptionDetails = {
-      subscribed: true,
-      priceId: priceId,
-      status: subscription.status,
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      currentPeriodEnd: subscription.current_period_end,
-      isSteroids: isSteroidsMonthly || isSteroidsAnnual,
-      isPro: isProMonthly || isProAnnual
-    };
-
-    console.log('Returning subscription details:', subscriptionDetails);
-
-    return new Response(
-      JSON.stringify(subscriptionDetails),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
   } catch (error) {
     console.error('Error in check-subscription:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
