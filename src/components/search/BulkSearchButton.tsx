@@ -32,6 +32,7 @@ export const BulkSearchButton = ({ isEnabled, isLoading, onClick }: BulkSearchBu
   const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
                     subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
 
+  // Show button for both Pro and Steroids users
   if (!isSteroidsUser && !isProUser) return null;
 
   return (

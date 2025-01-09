@@ -47,7 +47,7 @@ export const UserProfileInfo = ({
           </div>
         </div>
 
-        {isUltraPlan ? (
+        {(isUltraPlan || isSteroidsUser) ? (
           <div className="flex items-center gap-3">
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 

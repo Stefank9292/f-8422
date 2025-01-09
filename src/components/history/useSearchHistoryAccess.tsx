@@ -35,6 +35,6 @@ export function useSearchHistoryAccess() {
     session,
     isSteroidsUser,
     isProUser,
-    hasAccess: isSteroidsUser
+    hasAccess: isSteroidsUser || isProUser // Allow access for both Pro and Steroids users
   };
 }

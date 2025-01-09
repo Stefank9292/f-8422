@@ -73,8 +73,15 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
 
-  // If no subscription, redirect to subscribe
-  if (!subscriptionStatus?.subscribed) {
+  // Check if user is on Steroids or Pro plan
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  
+  const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+                    subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
+
+  // If no subscription and not on Steroids or Pro plan, redirect to subscribe
+  if (!subscriptionStatus?.subscribed && !isSteroidsUser && !isProUser) {
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }
 
