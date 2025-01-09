@@ -43,6 +43,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  
+  const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+                   subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
 
   // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
@@ -114,7 +117,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
 
-  if (!isSteroidsUser) {
+  if (!isSteroidsUser && !isProUser) {
     return (
       <div className="w-full flex flex-col items-center space-y-4 mt-6">
         <div className="flex items-center gap-2">
@@ -122,14 +125,14 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
           <span className="text-[11px] text-muted-foreground font-medium">Recent Searches Locked</span>
         </div>
         <p className="text-[11px] text-muted-foreground text-center">
-          Recent searches are only available on the{' '}
+          Recent searches are available on the{' '}
           <Link 
             to="/subscribe" 
             className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse hover:opacity-80 transition-opacity"
           >
-            Creator on Steroids
+            Creator Pro and Creator on Steroids
           </Link>{' '}
-          plan
+          plans
         </p>
       </div>
     );

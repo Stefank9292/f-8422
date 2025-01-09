@@ -64,7 +64,7 @@ export const BulkSearchSettings = ({
     if (!subscriptionStatus?.priceId) return 5;
     // Pro tier (monthly and annual)
     if (subscriptionStatus.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-        subscriptionStatus.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") return 20;
+        subscriptionStatus.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") return 25;
     // Creator on Steroids tier (monthly and annual)
     if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
         subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") return 50;
