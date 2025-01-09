@@ -17,6 +17,7 @@ serve(async (req) => {
     // Get the authorization header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
+      console.error('No authorization header provided');
       throw new Error('No authorization header');
     }
 
@@ -59,7 +60,10 @@ serve(async (req) => {
       if (!customers.data.length) {
         console.log('No Stripe customer found for email:', user.email);
         return new Response(
-          JSON.stringify({ subscribed: false }),
+          JSON.stringify({ 
+            subscribed: false,
+            message: 'No Stripe customer found'
+          }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -78,7 +82,10 @@ serve(async (req) => {
       if (!subscriptions.data.length) {
         console.log('No active subscriptions found for customer:', customer.id);
         return new Response(
-          JSON.stringify({ subscribed: false }),
+          JSON.stringify({ 
+            subscribed: false,
+            message: 'No active subscription found'
+          }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
@@ -123,7 +130,8 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        details: error.stack 
+        details: error.stack,
+        message: 'Failed to check subscription status'
       }),
       { 
         status: 500,
