@@ -61,7 +61,7 @@ export function SearchHistoryItemHeader({
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          {isBulkSearch && (
+          {isBulkSearch && urls && urls.length > 0 && (
             <HoverCard>
               <HoverCardTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
