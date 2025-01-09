@@ -6,10 +6,10 @@ import { useEffect } from "react";
 
 // Define plan IDs as constants to avoid typos
 const PLAN_IDS = {
-  STEROIDS_MONTHLY: "price_1Qdty5GX13ZRG2XiFxadAKJW",
-  STEROIDS_ANNUAL: "price_1QdtyHGX13ZRG2Xib8px0lu0",
-  PRO_MONTHLY: "price_1QdtwnGX13ZRG2XihcM36r3W",
-  PRO_ANNUAL: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+  STEROIDS_MONTHLY: "price_1Qdt4NGX13ZRG2XiMWXryAm9",
+  STEROIDS_ANNUAL: "price_1Qdt5HGX13ZRG2XiUW80k3Fk",
+  PRO_MONTHLY: "price_1Qdt2dGX13ZRG2XiaKwG6VPu",
+  PRO_ANNUAL: "price_1Qdt3tGX13ZRG2XiesasShEJ"
 } as const;
 
 export const useUsageStats = (session: Session | null) => {
