@@ -175,7 +175,7 @@ export const BulkSearchSettings = ({
                   />
                 </PopoverContent>
               )}
-            </div>
+            </Popover>
           </div>
         </div>
       )}
