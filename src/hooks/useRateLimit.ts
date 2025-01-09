@@ -10,7 +10,21 @@ export const useRateLimit = ({ key, maxAttempts, lockoutDuration }: RateLimitCon
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
 
+  // Clear existing rate limit data for development
   useEffect(() => {
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      localStorage.removeItem(key);
+    }
+  }, [key]);
+
+  useEffect(() => {
+    // Skip rate limiting for localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      setIsLocked(false);
+      setRemainingTime(0);
+      return;
+    }
+
     const checkRateLimit = () => {
       const rateLimitData = localStorage.getItem(key);
       if (rateLimitData) {
@@ -34,6 +48,11 @@ export const useRateLimit = ({ key, maxAttempts, lockoutDuration }: RateLimitCon
   }, [key, maxAttempts, lockoutDuration]);
 
   const updateRateLimit = () => {
+    // Skip rate limiting for localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return;
+    }
+
     const rateLimitData = localStorage.getItem(key);
     const now = Date.now();
     
