@@ -36,6 +36,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           throw error;
         }
 
+        // Log the subscription status for debugging
+        console.log('Subscription status:', data);
         return data;
       } catch (error) {
         console.error('Error checking subscription:', error);
@@ -45,8 +47,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     enabled: !!session?.access_token,
     retry: 1,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-    refetchOnWindowFocus: false,
-    refetchInterval: false
+    refetchOnWindowFocus: true, // Enable refetch on window focus to catch subscription updates
+    refetchInterval: 30000 // Refetch every 30 seconds to ensure subscription status is current
   });
 
   // Show loading state only if we're loading the initial session
@@ -73,8 +75,17 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <>{children}</>;
   }
 
-  // If no subscription and not on subscribe page, redirect to subscribe
-  if (!subscriptionStatus?.subscribed) {
+  // Check if user has an active subscription by checking the priceId
+  const hasActiveSubscription = subscriptionStatus?.priceId && [
+    "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+    "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+    "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+    "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+  ].includes(subscriptionStatus.priceId);
+
+  // If no active subscription and not on subscribe page, redirect to subscribe
+  if (!hasActiveSubscription) {
+    console.log('No active subscription found, redirecting to subscribe page');
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }
 
