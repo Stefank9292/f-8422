@@ -122,23 +122,56 @@ export const useSearchState = () => {
     }
 
     setIsBulkSearching(true);
+
+    // Create a new AbortController for this search
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     try {
-      const results = await fetchBulkInstagramPosts(urls, numVideos, date);
-      
-      for (const url of urls) {
-        const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
-        if (urlResults.length > 0) {
-          await saveSearchHistory(url, urlResults);
+      // Use React Query's background mutation to handle the bulk search
+      const { mutateAsync } = useQuery({
+        queryKey: ['bulk-search', urls, numVideos, date],
+        queryFn: async () => {
+          const results = await fetchBulkInstagramPosts(urls, numVideos, date);
+          
+          // Save search history for each URL
+          for (const url of urls) {
+            const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
+            if (urlResults.length > 0) {
+              await saveSearchHistory(url, urlResults);
+            }
+          }
+          
+          setBulkSearchResults(results);
+          setIsBulkSearching(false);
+          
+          toast({
+            description: "Bulk search completed successfully",
+          });
+          
+          return results;
+        },
+        enabled: false, // Don't run automatically
+        retry: false,
+        gcTime: 0, // Don't cache the results
+        meta: {
+          onError: (error: Error) => {
+            console.error('Bulk search error:', error);
+            toast({
+              title: "Search Failed",
+              description: error.message || "Failed to fetch Instagram posts",
+              variant: "destructive",
+            });
+            setIsBulkSearching(false);
+          }
         }
-      }
-      
-      setBulkSearchResults(results);
-      return results;
+      });
+
+      // Start the mutation
+      return await mutateAsync();
     } catch (error) {
       console.error('Bulk search error:', error);
       throw error;
-    } finally {
-      setIsBulkSearching(false);
     }
   };
 
