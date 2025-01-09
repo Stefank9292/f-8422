@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { PasswordStrengthIndicator } from "./PasswordStrengthIndicator";
 import { validatePassword, checkPasswordStrength } from "@/utils/auth/validation";
 import { useAuthForm } from "@/hooks/useAuthForm";
+import { AuthError } from "@supabase/supabase-js";
 
 interface SignUpFormProps {
   onViewChange: (view: "sign_in" | "sign_up") => void;
@@ -70,19 +71,40 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
 
     try {
       setLoading(true);
+      
+      // First check if session exists and sign out if it does
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession) {
+        await supabase.auth.signOut();
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          emailRedirectTo: window.location.origin + '/auth',
+        }
       });
 
       if (error) {
+        console.error("Signup error:", error);
         handleAuthError(error);
+        return;
+      }
+
+      if (!data.session) {
+        toast({
+          title: "Verification Required",
+          description: "Please check your email to verify your account.",
+        });
+        navigate("/auth/confirm-email", { state: { email } });
         return;
       }
 
       await handleAuthSuccess(data.session);
     } catch (error) {
-      handleAuthError(error as Error);
+      console.error("Unexpected error during signup:", error);
+      handleAuthError(error as AuthError);
     } finally {
       setLoading(false);
     }
