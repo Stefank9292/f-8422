@@ -106,7 +106,9 @@ export const SearchBar = ({
 
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
     subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
-    subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"    // Creator on Steroids Annual
+    subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" || // Creator on Steroids Annual
+    subscriptionStatus.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || // Creator Pro Monthly
+    subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h"    // Creator Pro Annual
   );
 
   return (
