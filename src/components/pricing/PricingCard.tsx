@@ -14,10 +14,6 @@ interface PricingCardProps {
       perMonth: string;
     };
   };
-  features: Array<{
-    included: boolean;
-    text: string;
-  }>;
   isPopular?: boolean;
   isAnnual: boolean;
   priceId: string;
