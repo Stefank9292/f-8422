@@ -33,8 +33,7 @@ export const RecentSearchItem = ({
       }, 2000);
 
       toast({
-        title: "URLs Copied",
-        description: "The Instagram URLs have been copied to your clipboard",
+        description: "URLs copied to clipboard",
       });
     } catch (error) {
       console.error('Failed to copy URLs:', error);
