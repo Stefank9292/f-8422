@@ -63,7 +63,9 @@ export const SubscribeButton = ({
     <Button
       onClick={handleSubscribe}
       disabled={loading}
-      className={`${isPopular ? 'bg-[#D946EF] hover:bg-[#D946EF]/90' : 'bg-[#1a365d] hover:bg-[#1a365d]/90'} text-white ${className}`}
+      variant={isPopular ? "default" : "secondary"}
+      size="lg"
+      className={`w-full ${className}`}
     >
       {loading ? "Processing..." : `Subscribe to ${planName}${isAnnual ? ' (Annual)' : ' (Monthly)'}`}
     </Button>
