@@ -37,8 +37,8 @@ export const useSessionValidation = () => {
 
   useEffect(() => {
     let mounted = true;
-    let authListener: any;
-    let sessionCheckTimeout: NodeJS.Timeout;
+    let authSubscription: { subscription: { unsubscribe: () => void } } | null = null;
+    let sessionCheckTimeout: NodeJS.Timeout | null = null;
 
     const checkSession = async () => {
       try {
@@ -96,37 +96,46 @@ export const useSessionValidation = () => {
       }
     };
 
-    // Set a timeout for the initial session check
-    sessionCheckTimeout = setTimeout(checkSession, 0);
-
     // Set up auth state change listener
-    authListener = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log("Auth state change:", event);
-      
-      if (event === 'SIGNED_OUT') {
-        if (mounted) {
-          setSession(null);
-          queryClient.clear();
-          if (location.pathname !== '/auth') {
-            navigate('/auth', { replace: true });
+    const setupAuthListener = () => {
+      const { data } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+        console.log("Auth state change:", event);
+        
+        if (event === 'SIGNED_OUT') {
+          if (mounted) {
+            setSession(null);
+            queryClient.clear();
+            if (location.pathname !== '/auth') {
+              navigate('/auth', { replace: true });
+            }
+          }
+          return;
+        }
+        
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (currentSession && mounted) {
+            setSession(currentSession);
+            setError(null);
           }
         }
-        return;
-      }
-      
-      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-        if (currentSession && mounted) {
-          setSession(currentSession);
-          setError(null);
-        }
-      }
-    });
+      });
+
+      // Store the subscription object
+      authSubscription = data;
+    };
+
+    // Initial session check
+    checkSession();
+    setupAuthListener();
 
     return () => {
       mounted = false;
-      clearTimeout(sessionCheckTimeout);
-      if (authListener) {
-        authListener.subscription.unsubscribe();
+      if (sessionCheckTimeout) {
+        clearTimeout(sessionCheckTimeout);
+      }
+      // Only unsubscribe if the subscription exists
+      if (authSubscription?.subscription?.unsubscribe) {
+        authSubscription.subscription.unsubscribe();
       }
     };
   }, [queryClient, navigate, location]);
