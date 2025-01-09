@@ -1,85 +1,54 @@
 import { useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useRateLimit } from "@/hooks/useRateLimit";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
-export const SignInForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+interface SignInFormProps {
+  onViewChange: (view: "sign_in" | "sign_up") => void;
+}
+
+export const SignInForm = ({ onViewChange }: SignInFormProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { isLocked, updateRateLimit } = useRateLimit({
-    key: "signin_attempts",
-    maxAttempts: 5,
-    lockoutDuration: 5 * 60 * 1000 // 5 minutes
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { handleAuthError, handleAuthSuccess } = useAuthForm({
+    mode: 'sign_in',
+    onSuccess: () => {
+      const redirectTo = location.state?.from?.pathname || "/";
+      navigate(redirectTo);
+    }
   });
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isLocked) {
-      toast({
-        title: "Too Many Attempts",
-        description: "Please wait a moment before trying again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setLoading(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
-        console.error('Sign in error:', error);
-        
-        // Handle specific error cases
-        if (error.message.includes('Invalid login credentials')) {
-          toast({
-            title: "Account Not Found",
-            description: "We couldn't find an account with these credentials. Would you like to sign up instead?",
-            variant: "destructive",
-          });
-          updateRateLimit();
-          return;
-        }
-
-        // Handle other errors
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-        updateRateLimit();
+        console.error("Login error:", error);
+        handleAuthError(error);
         return;
       }
 
-      // Redirect to the original destination or default route
-      const from = location.state?.from?.pathname || "/";
-      navigate(from, { replace: true });
-      
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      });
-
-    } catch (error: any) {
-      console.error('Sign in error:', error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
-      updateRateLimit();
+      if (data.session) {
+        await handleAuthSuccess(data.session);
+      }
+    } catch (error) {
+      console.error("Unexpected error during login:", error);
+      handleAuthError(error as Error);
     } finally {
       setLoading(false);
     }
@@ -94,35 +63,42 @@ export const SignInForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="h-9 text-[13px]"
+          className="material-input"
         />
+      </div>
+      <div className="space-y-2">
         <Input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="h-9 text-[13px]"
+          className="material-input"
         />
         <div className="flex justify-end">
-          <Link to="/auth/reset-password" className="text-sm text-primary hover:underline">
+          <button
+            type="button"
+            onClick={() => navigate("/auth/reset-password")}
+            className="text-xs text-primary hover:underline"
+          >
             Forgot password?
-          </Link>
+          </button>
         </div>
       </div>
-      <Button 
-        type="submit" 
-        className="w-full h-9 text-[13px]" 
-        disabled={loading || isLocked}
-      >
+      
+      <Button type="submit" className="w-full material-button-primary" disabled={loading}>
         {loading ? "Signing in..." : "Sign In"}
       </Button>
 
       <p className="text-sm text-center text-muted-foreground">
         Don't have an account?{" "}
-        <Link to="/auth/sign-up" className="text-primary hover:underline">
+        <button
+          type="button"
+          onClick={() => onViewChange("sign_up")}
+          className="text-primary hover:underline"
+        >
           Sign Up
-        </Link>
+        </button>
       </p>
     </form>
   );

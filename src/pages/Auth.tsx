@@ -11,7 +11,9 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
+  const [view, setView] = useState<"sign_in" | "sign_up">(
+    location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,6 +82,23 @@ const AuthPage = () => {
     return () => subscription.unsubscribe();
   }, [navigate, toast, location]);
 
+  // Update URL when view changes
+  useEffect(() => {
+    const path = view === "sign_up" ? "/auth/sign-up" : "/auth";
+    if (location.pathname !== path) {
+      navigate(path, { replace: true });
+    }
+  }, [view, navigate, location.pathname]);
+
+  // Update view when URL changes
+  useEffect(() => {
+    setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
+  }, [location.pathname]);
+
+  const handleViewChange = (newView: "sign_in" | "sign_up") => {
+    setView(newView);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">
       <div className="w-full max-w-md space-y-6">
@@ -93,10 +112,10 @@ const AuthPage = () => {
           )}
 
           {view === "sign_in" ? (
-            <SignInForm />
+            <SignInForm onViewChange={handleViewChange} />
           ) : (
             <SignUpForm 
-              onViewChange={setView} 
+              onViewChange={handleViewChange} 
               loading={loading} 
               setLoading={setLoading} 
             />
