@@ -72,17 +72,14 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
     try {
       setLoading(true);
       
-      // First check if session exists and sign out if it does
-      const { data: { session: existingSession } } = await supabase.auth.getSession();
-      if (existingSession) {
-        await supabase.auth.signOut();
-      }
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin + '/auth',
+          emailRedirectTo: `${window.location.origin}/auth`,
+          data: {
+            email,
+          }
         }
       });
 
