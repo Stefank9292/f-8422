@@ -62,8 +62,8 @@ export const SignInForm = ({ onViewChange, loading, setLoading }: SignInFormProp
         // Handle specific error cases
         if (error.message.includes('Invalid login credentials')) {
           toast({
-            title: "Authentication Failed",
-            description: "Invalid email or password. Please check your credentials and try again.",
+            title: "Account Not Found",
+            description: "We couldn't find an account with these credentials. Would you like to sign up instead?",
             variant: "destructive",
           });
           updateRateLimit();
