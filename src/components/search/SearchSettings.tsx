@@ -33,12 +33,18 @@ export const SearchSettings = ({
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return null;
-
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session.access_token}`
