@@ -16,24 +16,44 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session error:', error);
+        throw error;
+      }
+      return session;
     },
   });
 
-  const { data: subscriptionStatus } = useQuery({
+  const { data: subscriptionStatus, error: subscriptionError } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
-      if (!session?.access_token) return null;
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
+      if (!session?.access_token) {
+        console.log('No session token available');
+        return null;
+      }
+
+      try {
+        console.log('Checking subscription with token:', session.access_token.slice(0, 10) + '...');
+        const { data, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+
+        if (error) {
+          console.error('Subscription check error:', error);
+          throw error;
         }
-      });
-      if (error) throw error;
-      return data;
+
+        return data;
+      } catch (error) {
+        console.error('Failed to check subscription:', error);
+        throw error;
+      }
     },
     enabled: !!session?.access_token,
+    retry: false,
   });
 
   const { loading, handleSubscriptionAction } = useSubscriptionAction(session);
@@ -83,6 +103,11 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     }
     return "bg-[#1A1F2C] hover:bg-[#1A1F2C]/90 text-white";
   };
+
+  if (subscriptionError) {
+    console.error('Subscription error:', subscriptionError);
+    return null;
+  }
 
   if (isCurrentPlan) {
     return (

@@ -13,9 +13,13 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
-      if (!session?.access_token) return null;
+      if (!session?.access_token) {
+        console.log('No session token available');
+        return null;
+      }
       
       try {
+        console.log('Checking subscription with token:', session.access_token.slice(0, 10) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${session.access_token}`
