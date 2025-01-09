@@ -5,7 +5,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { ResetPassword } from "@/components/auth/ResetPassword";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -74,7 +73,6 @@ function App() {
               <main className="flex-1 overflow-y-auto">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
-                  <Route path="/auth/reset-password" element={<ResetPassword />} />
                   <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
                   <Route
                     path="/"
