@@ -91,6 +91,18 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
 
       if (error) {
         console.error("Signup error:", error);
+        
+        // Handle specific error cases
+        if (error.message.includes('User already registered')) {
+          toast({
+            title: "Account Already Exists",
+            description: "This email is already registered. Please sign in instead.",
+            variant: "destructive",
+          });
+          onViewChange("sign_in");
+          return;
+        }
+        
         handleAuthError(error);
         return;
       }
