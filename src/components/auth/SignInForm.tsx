@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -104,6 +104,11 @@ export const SignInForm = () => {
           required
           className="h-9 text-[13px]"
         />
+        <div className="flex justify-end">
+          <Link to="/auth/reset-password" className="text-sm text-primary hover:underline">
+            Forgot password?
+          </Link>
+        </div>
       </div>
       <Button 
         type="submit" 
@@ -112,6 +117,13 @@ export const SignInForm = () => {
       >
         {loading ? "Signing in..." : "Sign In"}
       </Button>
+
+      <p className="text-sm text-center text-muted-foreground">
+        Don't have an account?{" "}
+        <Link to="/auth/sign-up" className="text-primary hover:underline">
+          Sign Up
+        </Link>
+      </p>
     </form>
   );
 };
