@@ -32,6 +32,11 @@ export function SearchHistoryItemHeader({
   isBulkSearch,
   urls = []
 }: SearchHistoryItemHeaderProps) {
+  // Extract username from Instagram URL for bulk searches
+  const displayQuery = isBulkSearch && urls.length > 0
+    ? `@${urls[0].split('instagram.com/')[1]?.split('/')[0] || query}`
+    : query;
+
   return (
     <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
       <div className="flex items-center justify-between gap-3">
@@ -55,7 +60,7 @@ export function SearchHistoryItemHeader({
               </Tooltip>
             </TooltipProvider>
           )}
-          <span className="font-medium truncate">{query}</span>
+          <span className="font-medium truncate">{displayQuery}</span>
           <span className="text-xs text-muted-foreground whitespace-nowrap">
             {format(new Date(date), 'MMM d, HH:mm')}
           </span>
