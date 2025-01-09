@@ -1,5 +1,7 @@
 import { List } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface BulkSearchButtonProps {
   isEnabled: boolean;
@@ -8,7 +10,26 @@ interface BulkSearchButtonProps {
 }
 
 export const BulkSearchButton = ({ isEnabled, isLoading, onClick }: BulkSearchButtonProps) => {
-  if (!isEnabled) return null;
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.access_token) return null;
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+
+  if (!isSteroidsUser) return null;
 
   return (
     <Button
