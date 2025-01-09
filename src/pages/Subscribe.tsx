@@ -68,12 +68,12 @@ const SubscribePage = () => {
 
   const priceIds = {
     premium: {
-      monthly: "price_1QfKMGGX13ZRG2XiFyskXyJo_test",
-      annual: "price_1QfKMYGX13ZRG2XioPYKCe7h_test"
+      monthly: "price_1QfKMGGX13ZRG2XiFyskXyJo",
+      annual: "price_1QfKMYGX13ZRG2XioPYKCe7h"
     },
     ultra: {
-      monthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9_test",
-      annual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk_test"
+      monthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9",
+      annual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
     }
   };
 
