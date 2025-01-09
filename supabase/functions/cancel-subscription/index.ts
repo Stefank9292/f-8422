@@ -12,28 +12,29 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-  )
-
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+    )
+
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
-    const user = data.user
-    const email = user?.email
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
 
-    if (!email) {
-      throw new Error('No email found')
+    if (userError || !user?.email) {
+      console.error('Auth error:', userError)
+      throw new Error('Authentication required')
     }
+
+    console.log('Canceling subscription for user:', user.email)
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
     const customers = await stripe.customers.list({
-      email: email,
+      email: user.email,
       limit: 1
     })
 
@@ -69,10 +70,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error cancelling subscription:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        details: error instanceof Error ? error.stack : undefined
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: error instanceof Error && error.message === 'Authentication required' ? 401 : 500,
       }
     )
   }

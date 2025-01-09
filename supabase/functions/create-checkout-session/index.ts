@@ -20,10 +20,11 @@ serve(async (req) => {
 
     const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user } } = await supabaseClient.auth.getUser(token)
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
 
-    if (!user?.email) {
-      throw new Error('No email found')
+    if (userError || !user?.email) {
+      console.error('Auth error:', userError)
+      throw new Error('Authentication required')
     }
 
     const { priceId } = await req.json()
@@ -31,7 +32,7 @@ serve(async (req) => {
       throw new Error('No price ID provided')
     }
 
-    console.log('Creating checkout session for:', { email: user.email, priceId });
+    console.log('Creating checkout session for:', { email: user.email, priceId })
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -45,15 +46,14 @@ serve(async (req) => {
 
     let customer_id
     if (customers.data.length === 0) {
-      // Create new customer if none exists
       const customer = await stripe.customers.create({
         email: user.email,
       })
       customer_id = customer.id
-      console.log('Created new customer:', customer_id);
+      console.log('Created new customer:', customer_id)
     } else {
       customer_id = customers.data[0].id
-      console.log('Found existing customer:', customer_id);
+      console.log('Found existing customer:', customer_id)
 
       // Check for existing subscriptions
       const subscriptions = await stripe.subscriptions.list({
@@ -66,7 +66,6 @@ serve(async (req) => {
         const currentSubscription = subscriptions.data[0]
         const currentPriceId = currentSubscription.items.data[0].price.id
 
-        // If trying to subscribe to the same plan, return error
         if (currentPriceId === priceId) {
           return new Response(
             JSON.stringify({ error: "You are already subscribed to this plan" }),
@@ -77,21 +76,18 @@ serve(async (req) => {
           )
         }
 
-        // Cancel current subscription immediately for both upgrade to Ultra and downgrade to Premium
-        console.log('Canceling existing subscription for upgrade/downgrade');
+        console.log('Canceling existing subscription for upgrade/downgrade')
         await stripe.subscriptions.cancel(currentSubscription.id, {
           prorate: true
         })
       }
     }
 
-    // Get the origin from the request headers and ensure it's properly formatted
     const origin = req.headers.get('origin') || ''
-    const baseUrl = origin.replace(/\/$/, '') // Remove trailing slash if present
+    const baseUrl = origin.replace(/\/$/, '')
 
-    console.log('Creating checkout session with return URL:', baseUrl);
+    console.log('Creating checkout session with return URL:', baseUrl)
     
-    // Create the checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -99,9 +95,14 @@ serve(async (req) => {
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
       allow_promotion_codes: true,
+      payment_method_types: ['card'],
+      billing_address_collection: 'required',
+      customer_update: {
+        address: 'auto'
+      }
     })
 
-    console.log('Checkout session created:', session.id);
+    console.log('Checkout session created:', session.id)
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -113,10 +114,13 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        details: error instanceof Error ? error.stack : undefined
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: error instanceof Error && error.message === 'Authentication required' ? 401 : 500,
       }
     )
   }
