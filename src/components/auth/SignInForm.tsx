@@ -13,12 +13,16 @@ export const SignInForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const { updateRateLimit, isRateLimited } = useRateLimit();
+  const { isLocked, updateRateLimit } = useRateLimit({
+    key: "signin_attempts",
+    maxAttempts: 5,
+    lockoutDuration: 5 * 60 * 1000 // 5 minutes
+  });
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (isRateLimited()) {
+    if (isLocked) {
       toast({
         title: "Too Many Attempts",
         description: "Please wait a moment before trying again.",
@@ -104,7 +108,7 @@ export const SignInForm = () => {
       <Button 
         type="submit" 
         className="w-full h-9 text-[13px]" 
-        disabled={loading || isRateLimited()}
+        disabled={loading || isLocked}
       >
         {loading ? "Signing in..." : "Sign In"}
       </Button>

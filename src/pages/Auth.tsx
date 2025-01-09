@@ -93,11 +93,7 @@ const AuthPage = () => {
           )}
 
           {view === "sign_in" ? (
-            <SignInForm 
-              onViewChange={setView} 
-              loading={loading} 
-              setLoading={setLoading} 
-            />
+            <SignInForm />
           ) : (
             <SignUpForm 
               onViewChange={setView} 
