@@ -1,142 +1,157 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.47.0';
-import Stripe from 'https://esm.sh/stripe@11.1.0?target=deno';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { stripe } from '../_shared/stripe.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
 serve(async (req) => {
+  console.log('Check subscription function called with method:', req.method);
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    console.log('Handling OPTIONS preflight request');
+    return new Response(null, { 
+      status: 204,
+      headers: corsHeaders 
+    });
   }
 
   try {
     // Get the authorization header
-    const authHeader = req.headers.get('authorization');
+    const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       console.error('No authorization header provided');
-      throw new Error('No authorization header');
+      return new Response(
+        JSON.stringify({ error: 'No authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    // Create Supabase client
+    // Create a Supabase client with the auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
         global: { headers: { Authorization: authHeader } },
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        }
       }
-    );
+    )
 
-    // Get the user
+    // Get the user from the auth header
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser()
 
     if (userError || !user) {
-      console.error('Error getting user:', userError);
-      throw new Error('Error getting user');
+      console.error('User verification error:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid user session' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
     }
 
-    console.log('Checking subscription for user:', user.email);
+    console.log('Verified user:', user.id);
 
-    // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
-      apiVersion: '2023-10-16',
+    // Get user's email
+    const userEmail = user.email;
+    if (!userEmail) {
+      console.error('No email found for user');
+      return new Response(
+        JSON.stringify({ error: 'User email not found' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Get customer by email
+    const customers = await stripe.customers.list({
+      email: userEmail,
+      limit: 1
     });
 
-    try {
-      // Get customer by email
-      const customers = await stripe.customers.list({
-        email: user.email,
-        limit: 1,
-      });
+    // If no customer found, return free tier status
+    if (customers.data.length === 0) {
+      console.log('No Stripe customer found for email:', userEmail);
+      return new Response(
+        JSON.stringify({
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      console.log('Found customers:', customers.data.length);
+    const customer = customers.data[0];
+    console.log('Found Stripe customer:', customer.id);
 
-      if (!customers.data.length) {
-        console.log('No Stripe customer found for email:', user.email);
-        return new Response(
-          JSON.stringify({ 
-            subscribed: false,
-            message: 'No Stripe customer found'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+    // Get all active subscriptions for the customer
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customer.id,
+      status: 'active',
+      expand: ['data.items.data.price']
+    });
 
-      const customer = customers.data[0];
-      console.log('Found Stripe customer:', customer.id);
+    // If no active subscriptions, return free tier status
+    if (subscriptions.data.length === 0) {
+      console.log('No active subscriptions found for customer:', customer.id);
+      return new Response(
+        JSON.stringify({
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      // Get active subscriptions for customer
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customer.id,
-        status: 'active',
-      });
+    // Get the most recent active subscription
+    const subscription = subscriptions.data[0];
+    const priceId = subscription.items.data[0].price.id;
 
-      console.log('Found subscriptions:', subscriptions.data.length);
+    console.log('Found active subscription:', {
+      id: subscription.id,
+      priceId: priceId,
+      status: subscription.status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end
+    });
 
-      if (!subscriptions.data.length) {
-        console.log('No active subscriptions found for customer:', customer.id);
-        return new Response(
-          JSON.stringify({ 
-            subscribed: false,
-            message: 'No active subscription found'
-          }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      const subscription = subscriptions.data[0];
-      const priceId = subscription.items.data[0].price.id;
-
-      console.log('Found active subscription:', {
-        subscriptionId: subscription.id,
-        priceId: priceId,
-        status: subscription.status
-      });
-
-      // Check if the price ID matches any of our plan price IDs
-      const isSteroidsMonthly = priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9";
-      const isSteroidsAnnual = priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-      const isProMonthly = priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu";
-      const isProAnnual = priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
-
-      const subscriptionDetails = {
+    // Return subscription status with CORS headers
+    return new Response(
+      JSON.stringify({
         subscribed: true,
         priceId: priceId,
-        status: subscription.status,
         canceled: subscription.cancel_at_period_end,
-        currentPeriodEnd: subscription.current_period_end,
-        isSteroids: isSteroidsMonthly || isSteroidsAnnual,
-        isPro: isProMonthly || isProAnnual
-      };
-
-      console.log('Returning subscription details:', subscriptionDetails);
-
-      return new Response(
-        JSON.stringify(subscriptionDetails),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    } catch (stripeError) {
-      console.error('Stripe API error:', stripeError);
-      throw stripeError;
-    }
-  } catch (error) {
-    console.error('Error in check-subscription:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.stack,
-        message: 'Failed to check subscription status'
+        status: subscription.status
       }),
       { 
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
       }
-    );
+    )
+
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
+      { 
+        status: 500, 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
+    )
   }
-});
+})

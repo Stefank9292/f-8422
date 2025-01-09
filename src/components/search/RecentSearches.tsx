@@ -41,11 +41,8 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     enabled: !!session?.access_token,
   });
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-  
-  const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-                    subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
 
   // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
@@ -59,7 +56,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   // Set up real-time listener for search history changes
   useEffect(() => {
-    if (!isSteroidsUser && !isProUser) return;
+    if (!isSteroidsUser) return;
 
     const channel = supabase
       .channel('search-history-changes')
@@ -79,7 +76,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient, isSteroidsUser, isProUser]);
+  }, [queryClient, isSteroidsUser]);
 
   // Save collapsed state to localStorage
   useEffect(() => {
@@ -89,7 +86,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-searches'],
     queryFn: async () => {
-      if (!isSteroidsUser && !isProUser) return [];
+      if (!isSteroidsUser) return [];
       
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
@@ -108,7 +105,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       return data || [];
     },
-    enabled: isSteroidsUser || isProUser,
+    enabled: isSteroidsUser,
   });
 
   const handleRemove = (id: string) => {
@@ -117,7 +114,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
 
-  if (!isSteroidsUser && !isProUser) {
+  if (!isSteroidsUser) {
     return (
       <div className="w-full flex flex-col items-center space-y-4 mt-6">
         <div className="flex items-center gap-2">
@@ -125,14 +122,14 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
           <span className="text-[11px] text-muted-foreground font-medium">Recent Searches Locked</span>
         </div>
         <p className="text-[11px] text-muted-foreground text-center">
-          Recent searches are available on the{' '}
+          Recent searches are only available on the{' '}
           <Link 
             to="/subscribe" 
             className="instagram-gradient bg-clip-text text-transparent font-semibold animate-synchronized-pulse hover:opacity-80 transition-opacity"
           >
-            Creator Pro and Creator on Steroids
+            Creator on Steroids
           </Link>{' '}
-          plans
+          plan
         </p>
       </div>
     );

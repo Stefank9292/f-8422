@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { PricingCard } from "@/components/pricing/PricingCard";
-import { PricingToggle } from "@/components/pricing/PricingToggle";
-import { PRICING_CONFIG } from "@/config/pricing";
+import { useNavigate } from "react-router-dom";
 
 const SubscribePage = () => {
   const [isAnnual, setIsAnnual] = useState(false);
@@ -66,29 +66,54 @@ const SubscribePage = () => {
     };
   };
 
+  const priceIds = {
+    premium: {
+      monthly: "price_1QdtwnGX13ZRG2XihcM36r3W",
+      annual: "price_1Qdtx2GX13ZRG2XieXrqPxAV"
+    },
+    ultra: {
+      monthly: "price_1Qdty5GX13ZRG2XiFxadAKJW",
+      annual: "price_1QdtyHGX13ZRG2Xib8px0lu0"
+    }
+  };
+
   const pricingPlans = [
     {
-      ...PRICING_CONFIG.premium,
+      name: "Creator Pro",
+      description: "For Professional Creators",
       price: {
-        monthly: PRICING_CONFIG.premium.monthly.price,
-        annual: {
-          total: PRICING_CONFIG.premium.annual.total,
-          perMonth: PRICING_CONFIG.premium.annual.perMonth
-        }
+        monthly: "29",
+        annual: { total: "276", perMonth: "23" }
       },
-      priceId: isAnnual ? PRICING_CONFIG.premium.annual.priceId : PRICING_CONFIG.premium.monthly.priceId
+      features: [
+        { included: true, text: "25 Total Searches per Month" },
+        { included: true, text: "Maximum 25 Results per Username" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: false, text: "Search History" },
+        { included: false, text: "Recent Searches" },
+        { included: false, text: "Early Access to new Features" }
+      ],
+      priceId: isAnnual ? priceIds.premium.annual : priceIds.premium.monthly
     },
     {
-      ...PRICING_CONFIG.ultra,
+      name: "Creator on Steroids",
+      description: "For Viral Marketing Gods",
       price: {
-        monthly: PRICING_CONFIG.ultra.monthly.price,
-        annual: {
-          total: PRICING_CONFIG.ultra.annual.total,
-          perMonth: PRICING_CONFIG.ultra.annual.perMonth
-        }
+        monthly: "49",
+        annual: { total: "470", perMonth: "39.17" }
       },
+      features: [
+        { included: true, text: "Unlimited Searches" },
+        { included: true, text: "Maximum 50 Results per Username" },
+        { included: true, text: "Bulk Search" },
+        { included: true, text: "Contact Support" },
+        { included: true, text: "Search History" },
+        { included: true, text: "Recent Searches" },
+        { included: true, text: "Early Access to new Features" }
+      ],
       isPopular: true,
-      priceId: isAnnual ? PRICING_CONFIG.ultra.annual.priceId : PRICING_CONFIG.ultra.monthly.priceId
+      priceId: isAnnual ? priceIds.ultra.annual : priceIds.ultra.monthly
     }
   ];
 
@@ -109,7 +134,24 @@ const SubscribePage = () => {
         </div>
 
         <div className="space-y-12">
-          <PricingToggle isAnnual={isAnnual} onToggle={setIsAnnual} />
+          <div className="flex items-center justify-center gap-4">
+            <span className={`text-[11px] ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+              Monthly
+            </span>
+            <Switch
+              checked={isAnnual}
+              onCheckedChange={setIsAnnual}
+              className="scale-90"
+            />
+            <div className="flex items-center gap-2">
+              <span className={`text-[11px] ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+                Annual
+              </span>
+              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                Save 20%
+              </Badge>
+            </div>
+          </div>
 
           <div className="flex justify-center gap-6 flex-wrap">
             {pricingPlans.map((plan, index) => (

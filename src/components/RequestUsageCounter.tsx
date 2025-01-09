@@ -37,15 +37,10 @@ export const RequestUsageCounter = () => {
           Authorization: `Bearer ${session.access_token}`
         }
       });
-      if (error) {
-        console.error('Subscription check error:', error);
-        return null;
-      }
+      if (error) throw error;
       return data;
     },
     enabled: !!session?.access_token,
-    retry: 3,
-    retryDelay: 1000,
   });
 
   // Set up real-time subscription for user_requests table

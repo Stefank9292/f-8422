@@ -33,39 +33,30 @@ export const SearchSettings = ({
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-  const { data: session } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
-    },
-  });
-
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status', session?.access_token],
+    queryKey: ['subscription-status'],
     queryFn: async () => {
-      if (!session?.access_token) return null;
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.access_token) return null;
+
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
-          Authorization: `Bearer ${session.access_token}`
+          Authorization: `Bearer ${session.session.access_token}`
         }
       });
       if (error) throw error;
       return data;
     },
-    enabled: !!session?.access_token,
-    retry: 3,
-    retryDelay: 1000,
   });
 
   const isFreeUser = !subscriptionStatus?.subscribed;
 
   const getMaxVideos = () => {
     if (!subscriptionStatus?.priceId) return 5;
-    if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-        subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") return 50;
-    if (subscriptionStatus.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-        subscriptionStatus.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ") return 25;
+    if (subscriptionStatus.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+        subscriptionStatus.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") return 25;
+    if (subscriptionStatus.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+        subscriptionStatus.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0") return 50;
     return 5;
   };
 
