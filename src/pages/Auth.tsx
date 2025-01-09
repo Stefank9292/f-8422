@@ -6,24 +6,30 @@ import { SignInForm } from "@/components/auth/SignInForm";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthHeader } from "@/components/auth/AuthHeader";
+import { LoadingState } from "@/components/auth/LoadingState";
 
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"sign_in" | "sign_up">(
-    location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in"
-  );
+  const [view, setView] = useState<"sign_in" | "sign_up">("sign_in");
+
+  useEffect(() => {
+    // Set initial view based on URL
+    setView(location.pathname === "/auth/sign-up" ? "sign_up" : "sign_in");
+  }, [location.pathname]);
 
   // Handle auth callback and session management
   useEffect(() => {
+    let mounted = true;
+
     const handleAuthCallback = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
+        if (!mounted) return;
+        
+        // Check for error in URL hash
         const params = new URLSearchParams(window.location.hash.substring(1));
         const errorDescription = params.get('error_description');
         if (errorDescription) {
@@ -33,6 +39,7 @@ const AuthPage = () => {
           return;
         }
 
+        // Check for existing session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -51,16 +58,21 @@ const AuthPage = () => {
         console.error("Auth callback error:", err);
         setError(err instanceof Error ? err.message : "An unexpected error occurred");
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     handleAuthCallback();
 
+    // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, session);
+      if (!mounted) return;
       
-      if (event === "SIGNED_IN") {
+      console.log("Auth state changed:", event);
+      
+      if (event === "SIGNED_IN" && session) {
         toast({
           title: "Welcome!",
           description: "You have successfully signed in.",
@@ -75,17 +87,27 @@ const AuthPage = () => {
           description: "You have been signed out.",
         });
       }
+
+      if (event === "USER_UPDATED") {
+        setLoading(false);
+      }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate, toast, location]);
 
   // Handle view changes
   const handleViewChange = (newView: "sign_in" | "sign_up") => {
-    setView(newView);
     const newPath = newView === "sign_up" ? "/auth/sign-up" : "/auth";
     navigate(newPath, { replace: true });
   };
+
+  if (loading) {
+    return <LoadingState />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4 animate-in fade-in duration-300">

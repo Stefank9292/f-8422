@@ -29,6 +29,15 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     try {
       setLoading(true);
       
@@ -63,6 +72,7 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
       </div>
@@ -73,6 +83,7 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
         <div className="flex justify-end">
@@ -80,13 +91,18 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
             type="button"
             onClick={() => navigate("/auth/reset-password")}
             className="text-xs text-primary hover:underline"
+            disabled={loading}
           >
             Forgot password?
           </button>
         </div>
       </div>
       
-      <Button type="submit" className="w-full material-button-primary" disabled={loading}>
+      <Button 
+        type="submit" 
+        className="w-full material-button-primary" 
+        disabled={loading}
+      >
         {loading ? "Signing in..." : "Sign In"}
       </Button>
 
@@ -96,6 +112,7 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
           type="button"
           onClick={() => onViewChange("sign_up")}
           className="text-primary hover:underline"
+          disabled={loading}
         >
           Sign Up
         </button>

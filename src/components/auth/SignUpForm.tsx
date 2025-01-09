@@ -41,6 +41,15 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!email || !password || !confirmPassword || !inviteCode) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (inviteCode !== "Vyral2025") {
       toast({
         title: "Invalid Invite Code",
@@ -134,6 +143,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
       </div>
@@ -144,6 +154,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={password}
           onChange={(e) => handlePasswordChange(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
         {password && <PasswordStrengthIndicator passwordStrength={passwordStrength} />}
@@ -155,6 +166,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
         {confirmPassword && password !== confirmPassword && (
@@ -168,12 +180,17 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           value={inviteCode}
           onChange={(e) => setInviteCode(e.target.value)}
           required
+          disabled={loading}
           className="material-input"
         />
       </div>
       
-      <Button type="submit" className="w-full material-button-primary" disabled={loading}>
-        {loading ? "Loading..." : "Sign Up"}
+      <Button 
+        type="submit" 
+        className="w-full material-button-primary" 
+        disabled={loading}
+      >
+        {loading ? "Creating Account..." : "Sign Up"}
       </Button>
 
       <p className="text-xs text-center text-muted-foreground mt-4">
@@ -189,6 +206,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
           type="button"
           onClick={() => onViewChange("sign_in")}
           className="text-primary hover:underline"
+          disabled={loading}
         >
           Sign In
         </button>
