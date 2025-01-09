@@ -5,7 +5,6 @@ import { SearchResults } from "./SearchResults";
 import { SearchLoading } from "./SearchLoading";
 import { SearchError } from "./SearchError";
 import { SearchEmpty } from "./SearchEmpty";
-import { transformSearchResults } from "@/utils/transformSearchResults";
 
 interface SearchStateProps {
   searchHistoryId: string | null;
@@ -25,9 +24,8 @@ export const SearchState = ({ searchHistoryId, error, isSearching }: SearchState
       
       if (error) throw error;
       
-      // Transform the raw data into InstagramPost[] type
-      const transformedData = transformSearchResults(data);
-      return transformedData.results;
+      // Type assertion to ensure the results are of type InstagramPost[]
+      return (data?.results as InstagramPost[]) || [];
     },
     enabled: !!searchHistoryId,
   });

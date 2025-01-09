@@ -26,14 +26,8 @@ serve(async (req) => {
     if (!authHeader) {
       console.error('No authorization header provided');
       return new Response(
-        JSON.stringify({
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3,
-          error: 'No authorization header'
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'No authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -59,15 +53,8 @@ serve(async (req) => {
     if (userError || !user) {
       console.error('User verification error:', userError);
       return new Response(
-        JSON.stringify({ 
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3,
-          error: 'Invalid user session',
-          details: userError?.message || 'No user found'
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Invalid user session' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -78,13 +65,8 @@ serve(async (req) => {
     if (!userEmail) {
       console.error('No email found for user');
       return new Response(
-        JSON.stringify({ 
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'User email not found' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -162,16 +144,9 @@ serve(async (req) => {
   } catch (error) {
     console.error('Unexpected error:', error);
     return new Response(
-      JSON.stringify({ 
-        subscribed: false,
-        priceId: null,
-        canceled: false,
-        maxClicks: 3,
-        error: 'Internal server error', 
-        details: error.message 
-      }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { 
-        status: 200, 
+        status: 500, 
         headers: { 
           ...corsHeaders, 
           'Content-Type': 'application/json' 

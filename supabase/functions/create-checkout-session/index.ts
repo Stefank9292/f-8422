@@ -18,57 +18,20 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
     )
 
-    // Get the authorization header and validate it
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('No authorization header found')
-      return new Response(
-        JSON.stringify({ error: 'No authorization header' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    }
-
+    const authHeader = req.headers.get('Authorization')!
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token)
+    const { data: { user } } = await supabaseClient.auth.getUser(token)
 
-    if (userError || !user) {
-      console.error('User verification failed:', userError)
-      return new Response(
-        JSON.stringify({ error: 'Invalid user session' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    }
-
-    if (!user.email) {
-      console.error('No email found for user:', user.id)
-      return new Response(
-        JSON.stringify({ error: 'No email associated with user account' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
+    if (!user?.email) {
+      throw new Error('No email found')
     }
 
     const { priceId } = await req.json()
     if (!priceId) {
-      console.error('No price ID provided')
-      return new Response(
-        JSON.stringify({ error: 'No price ID provided' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
+      throw new Error('No price ID provided')
     }
 
-    console.log('Creating checkout session for:', { email: user.email, priceId })
+    console.log('Creating checkout session for:', { email: user.email, priceId });
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -85,15 +48,12 @@ serve(async (req) => {
       // Create new customer if none exists
       const customer = await stripe.customers.create({
         email: user.email,
-        metadata: {
-          supabase_user_id: user.id
-        }
       })
       customer_id = customer.id
-      console.log('Created new customer:', customer_id)
+      console.log('Created new customer:', customer_id);
     } else {
       customer_id = customers.data[0].id
-      console.log('Found existing customer:', customer_id)
+      console.log('Found existing customer:', customer_id);
 
       // Check for existing subscriptions
       const subscriptions = await stripe.subscriptions.list({
@@ -112,13 +72,13 @@ serve(async (req) => {
             JSON.stringify({ error: "You are already subscribed to this plan" }),
             { 
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-              status: 200,
+              status: 400,
             }
           )
         }
 
-        // Cancel current subscription immediately for both upgrade and downgrade
-        console.log('Canceling existing subscription for upgrade/downgrade')
+        // Cancel current subscription immediately for both upgrade to Ultra and downgrade to Premium
+        console.log('Canceling existing subscription for upgrade/downgrade');
         await stripe.subscriptions.cancel(currentSubscription.id, {
           prorate: true
         })
@@ -126,59 +86,37 @@ serve(async (req) => {
     }
 
     // Get the origin from the request headers and ensure it's properly formatted
-    const origin = req.headers.get('origin') || 'https://vyral-search.com'
+    const origin = req.headers.get('origin') || ''
     const baseUrl = origin.replace(/\/$/, '') // Remove trailing slash if present
 
-    console.log('Creating checkout session with return URL:', baseUrl)
+    console.log('Creating checkout session with return URL:', baseUrl);
     
-    try {
-      // Create the checkout session
-      const session = await stripe.checkout.sessions.create({
-        customer: customer_id,
-        line_items: [{ price: priceId, quantity: 1 }],
-        mode: 'subscription',
-        success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${baseUrl}/subscribe?canceled=true`,
-        allow_promotion_codes: true,
-      })
+    // Create the checkout session
+    const session = await stripe.checkout.sessions.create({
+      customer: customer_id,
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/subscribe?canceled=true`,
+      allow_promotion_codes: true,
+    })
 
-      console.log('Checkout session created:', session)
+    console.log('Checkout session created:', session.id);
 
-      if (!session.url) {
-        console.error('No URL in session:', session)
-        throw new Error('No checkout URL returned from Stripe')
-      }
-
-      return new Response(
-        JSON.stringify({ url: session.url }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    } catch (stripeError) {
-      console.error('Stripe checkout session creation error:', stripeError)
-      return new Response(
-        JSON.stringify({ 
-          error: 'Failed to create checkout session',
-          details: stripeError.message 
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        }
-      )
-    }
-  } catch (error) {
-    console.error('Error creating checkout session:', error)
     return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        details: error.message 
-      }),
-      {
+      JSON.stringify({ url: session.url }),
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
+      }
+    )
+  } catch (error) {
+    console.error('Error:', error)
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
       }
     )
   }
