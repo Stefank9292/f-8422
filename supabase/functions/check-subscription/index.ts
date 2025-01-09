@@ -89,10 +89,10 @@ serve(async (req) => {
         subscribed: true,
         priceId: priceId,
         canceled: subscription.cancel_at_period_end,
-        maxClicks: priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
-                  priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV" ? 25 : 
-                  priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                  priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0" ? Infinity : 3
+        maxClicks: priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
+                  priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ" ? 25 : 
+                  priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                  priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" ? Infinity : 3
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
