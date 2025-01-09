@@ -41,7 +41,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
   const getButtonText = () => {
     if (!subscriptionStatus?.subscribed) {
       if (isAnnual && planId === "price_1Qdtx2GX13ZRG2XieXrqPxAV") {
-        return "Upgrade to Creator Pro Annual";
+        return "Save 20% with annual";
       }
       if (isAnnual && planId === "price_1QdtyHGX13ZRG2Xib8px0lu0") {
         return "Save 20% with annual";

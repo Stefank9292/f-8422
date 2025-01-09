@@ -41,7 +41,22 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (inviteCode !== "Vyral2025") {
+    // Validate and trim all input fields
+    const trimmedEmail = email?.trim();
+    const trimmedPassword = password?.trim();
+    const trimmedConfirmPassword = confirmPassword?.trim();
+    const trimmedInviteCode = inviteCode?.trim();
+
+    if (!trimmedEmail || !trimmedPassword || !trimmedConfirmPassword || !trimmedInviteCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (trimmedInviteCode !== "Vyral2025") {
       toast({
         title: "Invalid Invite Code",
         description: "Please enter a valid invite code to sign up.",
@@ -50,7 +65,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return;
     }
 
-    const passwordError = validatePassword(password);
+    const passwordError = validatePassword(trimmedPassword);
     if (passwordError) {
       toast({
         title: "Invalid Password",
@@ -60,7 +75,7 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (trimmedPassword !== trimmedConfirmPassword) {
       toast({
         title: "Password Mismatch",
         description: "Passwords do not match. Please try again.",
@@ -79,8 +94,8 @@ export const SignUpForm = ({ onViewChange, loading, setLoading }: SignUpFormProp
       }
 
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: trimmedEmail,
+        password: trimmedPassword,
         options: {
           emailRedirectTo: window.location.origin + '/auth',
           data: {
