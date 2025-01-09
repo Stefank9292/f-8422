@@ -41,11 +41,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     enabled: !!session?.access_token,
   });
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
+                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
   
-  const isProUser = subscriptionStatus?.priceId === "price_1Qdt2dGX13ZRG2XiaKwG6VPu" || 
-                    subscriptionStatus?.priceId === "price_1Qdt3tGX13ZRG2XiesasShEJ";
+  const isProUser = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W" || 
+                    subscriptionStatus?.priceId === "price_1Qdtx2GX13ZRG2XieXrqPxAV";
 
   // Extract username from Instagram URL
   const extractUsername = (url: string): string => {
