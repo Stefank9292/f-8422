@@ -47,8 +47,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
     "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
     "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-    "price_1QdtyHGX13ZRG2Xib8px0lu0"  // Creator on Steroids Annual
+    "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
+
+  console.log('Subscription status:', subscriptionStatus);
+  console.log('Has active subscription:', hasActiveSubscription);
+  console.log('Current price ID:', subscriptionStatus?.priceId);
 
   // If no active subscription and not on subscribe page, redirect to subscribe
   if (!hasActiveSubscription) {
