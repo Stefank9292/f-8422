@@ -23,21 +23,22 @@ serve(async (req) => {
     
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
+      console.error('No authorization header provided');
       throw new Error('No authorization header')
     }
 
+    // Create Supabase client with auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: { 
-          headers: { 
-            Authorization: authHeader,
-          },
+          headers: { Authorization: authHeader },
         },
         auth: {
           persistSession: false,
           autoRefreshToken: false,
+          detectSessionInUrl: false
         }
       }
     )
@@ -48,9 +49,38 @@ serve(async (req) => {
       error: userError,
     } = await supabaseClient.auth.getUser()
 
-    if (userError || !user) {
+    if (userError) {
       console.error('User session error:', userError);
-      throw new Error('Invalid user session')
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid user session',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
+
+    if (!user) {
+      console.error('No user found in session');
+      return new Response(
+        JSON.stringify({
+          error: 'No user found',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
     }
 
     console.log('User found:', user.id);
@@ -81,6 +111,7 @@ serve(async (req) => {
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
         }
       )
     }
@@ -113,6 +144,7 @@ serve(async (req) => {
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
         }
       )
     }
@@ -141,6 +173,7 @@ serve(async (req) => {
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
         }
       )
     }
@@ -168,6 +201,7 @@ serve(async (req) => {
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
       }
     )
   } catch (error) {
@@ -182,7 +216,7 @@ serve(async (req) => {
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: error.status || 500,
       }
     )
   }
