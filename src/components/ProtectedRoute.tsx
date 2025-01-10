@@ -25,15 +25,26 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
       
       try {
-        console.log('Checking subscription status...');
+        console.log('Checking subscription status with token:', session.access_token.slice(0, 10) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
+            Authorization: `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json'
           }
         });
         
         if (error) {
           console.error('Subscription check error:', error);
+          // If we get an auth error, invalidate the query and return free tier values
+          if (error.status === 401) {
+            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+            return {
+              subscribed: false,
+              priceId: null,
+              canceled: false,
+              maxClicks: 3
+            };
+          }
           throw error;
         }
 
@@ -47,7 +58,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     },
     enabled: !!session?.access_token,
     staleTime: 1000 * 60, // Cache for 1 minute
-    retry: 3,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 401 errors
+      if (error?.status === 401) return false;
+      return failureCount < 3;
+    },
     retryDelay: 1000
   });
 

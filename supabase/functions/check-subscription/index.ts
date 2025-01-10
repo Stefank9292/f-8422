@@ -40,13 +40,32 @@ serve(async (req) => {
       )
     }
 
+    // Extract the token
+    const token = authHeader.split(' ')[1]
+    if (!token) {
+      console.error('No token found in authorization header');
+      return new Response(
+        JSON.stringify({
+          error: 'No token provided',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      )
+    }
+
     // Create Supabase client with auth header
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: { 
-          headers: { Authorization: authHeader },
+          headers: { Authorization: `Bearer ${token}` },
         },
         auth: {
           autoRefreshToken: false,
