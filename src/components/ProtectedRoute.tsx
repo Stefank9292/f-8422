@@ -25,39 +25,51 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
       
       try {
-        // Ensure session is valid before making the request
+        // First check if session is valid
         const { data: currentSession } = await supabase.auth.getSession();
         if (!currentSession.session) {
-          console.log('Session expired, refreshing...');
-          const { data: refreshResult } = await supabase.auth.refreshSession();
-          if (!refreshResult.session) {
-            throw new Error('Failed to refresh session');
+          console.log('Session expired, attempting refresh...');
+          const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
+          
+          if (refreshError || !refreshResult.session) {
+            console.error('Session refresh failed:', refreshError);
+            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+            return {
+              subscribed: false,
+              priceId: null,
+              canceled: false,
+              maxClicks: 3
+            };
           }
+          
+          // Use the new session token
+          console.log('Session refreshed successfully');
         }
 
-        console.log('Checking subscription status with token:', session.access_token.slice(0, 10) + '...');
+        // Get the latest session token
+        const { data: { session: latestSession } } = await supabase.auth.getSession();
+        if (!latestSession?.access_token) {
+          throw new Error('No valid session token available');
+        }
+
+        console.log('Checking subscription with token:', latestSession.access_token.slice(0, 10) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${session.access_token}`,
+            Authorization: `Bearer ${latestSession.access_token}`,
             'Content-Type': 'application/json'
           }
         });
         
         if (error) {
           console.error('Subscription check error:', error);
-          // If we get an auth error, invalidate the query and return free tier values
           if (error.status === 401) {
             queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-            // Try to refresh the session
-            const { data: refreshResult } = await supabase.auth.refreshSession();
-            if (!refreshResult.session) {
-              return {
-                subscribed: false,
-                priceId: null,
-                canceled: false,
-                maxClicks: 3
-              };
-            }
+            return {
+              subscribed: false,
+              priceId: null,
+              canceled: false,
+              maxClicks: 3
+            };
           }
           throw error;
         }
@@ -73,7 +85,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     enabled: !!session?.access_token,
     staleTime: 1000 * 60, // Cache for 1 minute
     retry: (failureCount, error: any) => {
-      // Don't retry on 401 errors after session refresh attempt
       if (error?.status === 401) return false;
       return failureCount < 3;
     },

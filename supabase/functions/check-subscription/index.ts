@@ -21,7 +21,7 @@ serve(async (req) => {
   try {
     console.log('Starting subscription check...');
     
-    // Get the authorization header and validate JWT token format
+    // Get and validate the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.error('Invalid or missing authorization header');
@@ -40,7 +40,6 @@ serve(async (req) => {
       )
     }
 
-    // Extract and validate the token
     const token = authHeader.split(' ')[1]
     if (!token) {
       console.error('No token found in authorization header');
@@ -59,50 +58,25 @@ serve(async (req) => {
       )
     }
 
-    // Create Supabase client with auth header
-    const supabaseClient = createClient(
+    // Create Supabase admin client
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       {
-        global: { 
-          headers: { Authorization: `Bearer ${token}` },
-        },
         auth: {
           autoRefreshToken: false,
-          persistSession: false,
+          persistSession: false
         }
-      }
-    )
+    })
 
-    // Get user from session with enhanced error logging
-    console.log('Getting user session...');
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseClient.auth.getUser()
-
-    if (userError) {
-      console.error('User session error:', userError);
+    // Verify the JWT token
+    const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(token)
+    
+    if (verifyError || !user) {
+      console.error('Token verification failed:', verifyError);
       return new Response(
         JSON.stringify({
           error: 'Invalid user session',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
-    }
-
-    if (!user) {
-      console.error('No user found in session');
-      return new Response(
-        JSON.stringify({
-          error: 'No user found',
           subscribed: false,
           priceId: null,
           canceled: false,
@@ -160,7 +134,7 @@ serve(async (req) => {
 
     if (!subscriptions.data.length) {
       console.log('No active subscriptions found');
-      await supabaseClient.from('subscription_logs').insert({
+      await supabaseAdmin.from('subscription_logs').insert({
         user_id: user.id,
         event: 'subscription_check',
         status: 'no_subscription',
@@ -211,7 +185,7 @@ serve(async (req) => {
     }
 
     // Log to subscription_logs
-    await supabaseClient.from('subscription_logs').insert({
+    await supabaseAdmin.from('subscription_logs').insert({
       user_id: user.id,
       event: 'subscription_check',
       status: 'active',
