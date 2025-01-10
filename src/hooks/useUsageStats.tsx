@@ -9,7 +9,7 @@ export const useUsageStats = (session: Session | null) => {
   const queryClient = useQueryClient();
 
   const { data: requestStats, refetch: refetchRequestStats } = useQuery({
-    queryKey: ['request-stats'],
+    queryKey: ['request-stats', session?.user?.id],
     queryFn: async () => {
       if (!session?.user.id) return null;
       
@@ -38,11 +38,14 @@ export const useUsageStats = (session: Session | null) => {
       return count || 0;
     },
     enabled: !!session?.user.id,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache the results
   });
 
   const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
+    queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
+      if (!session?.access_token) return null;
       const { data, error } = await supabase.functions.invoke('check-subscription', {
         headers: {
           Authorization: `Bearer ${session?.access_token}`
@@ -53,6 +56,38 @@ export const useUsageStats = (session: Session | null) => {
     },
     enabled: !!session?.access_token,
   });
+
+  // Set up real-time subscription for user_requests table
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    console.log('Setting up real-time subscription for user_requests');
+
+    const channel = supabase
+      .channel('user-requests-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_requests',
+          filter: `user_id=eq.${session.user.id}`
+        },
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          // Invalidate the request-stats query to trigger a refetch
+          queryClient.invalidateQueries({ 
+            queryKey: ['request-stats', session.user.id]
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up real-time subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [session?.user?.id, queryClient]);
 
   useEffect(() => {
     const checkAndResetMonthlyUsage = async () => {
