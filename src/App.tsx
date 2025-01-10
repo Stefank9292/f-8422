@@ -6,7 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
-import { SearchHistory } from "@/pages/SearchHistory";
+import SearchHistory from "@/pages/SearchHistory";
 import Subscribe from "@/pages/Subscribe";
 import Success from "@/pages/Success";
 import FAQ from "@/pages/FAQ";
