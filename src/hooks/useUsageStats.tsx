@@ -39,22 +39,34 @@ export const useUsageStats = (session: Session | null) => {
     },
     enabled: !!session?.user.id,
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache the results
+    gcTime: 0, // Don't cache the results (replaced cacheTime with gcTime)
   });
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
       if (!session?.access_token) return null;
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
+      try {
+        console.log('Checking subscription status...');
+        const { data, error } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        });
+        if (error) {
+          console.error('Subscription check error:', error);
+          throw error;
         }
-      });
-      if (error) throw error;
-      return data;
+        console.log('Subscription status received:', data);
+        return data;
+      } catch (error) {
+        console.error('Failed to check subscription:', error);
+        return null;
+      }
     },
     enabled: !!session?.access_token,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Set up real-time subscription for user_requests table
