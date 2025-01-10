@@ -54,23 +54,6 @@ serve(async (req) => {
 
     // Get the JWT token from the Authorization header
     const token = authHeader.split(' ')[1]
-    if (!token) {
-      console.error('No token found in authorization header');
-      return new Response(
-        JSON.stringify({
-          error: 'No token provided',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
-    }
-
     console.log('Verifying token:', token.substring(0, 10) + '...');
 
     // Verify the JWT token
