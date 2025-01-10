@@ -92,7 +92,6 @@ const SearchHistory = () => {
         throw historyError;
       }
 
-      // Transform the raw data to match our expected types
       return historyData?.map(item => ({
         id: item.id,
         search_query: item.search_query,
@@ -166,8 +165,8 @@ const SearchHistory = () => {
     }
   };
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdty5GX13ZRG2XiFxadAKJW" || 
-                        subscriptionStatus?.priceId === "price_1QdtyHGX13ZRG2Xib8px0lu0";
+  // Update the isSteroidsUser check to use the correct price ID
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9";
 
   const filteredHistory = searchHistory?.filter(item =>
     isSteroidsUser && searchQuery
