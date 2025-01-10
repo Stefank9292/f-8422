@@ -36,7 +36,9 @@ function App() {
 
   // Listen for auth state changes
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event);
+      
       if (event === 'SIGNED_IN') {
         console.log('User signed in:', session?.user?.id);
         queryClient.invalidateQueries();
@@ -44,16 +46,42 @@ function App() {
           description: "Successfully signed in",
         });
       }
+      
       if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+        // Clear all queries and local storage on sign out
         queryClient.clear();
+        localStorage.removeItem('supabase.auth.token');
         toast({
           description: "Successfully signed out",
         });
       }
+      
       if (event === 'TOKEN_REFRESHED') {
         console.log('Token refreshed');
         queryClient.invalidateQueries();
+      }
+
+      // Handle refresh token errors
+      if (event === 'INITIAL_SESSION') {
+        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          if (error.message.includes('refresh_token_not_found')) {
+            console.log('Invalid refresh token, clearing session');
+            await supabase.auth.signOut();
+            queryClient.clear();
+            localStorage.removeItem('supabase.auth.token');
+            toast({
+              title: "Session Expired",
+              description: "Please sign in again",
+              variant: "destructive",
+            });
+          }
+        } else if (!currentSession) {
+          console.log('No active session found');
+        }
       }
     });
 
