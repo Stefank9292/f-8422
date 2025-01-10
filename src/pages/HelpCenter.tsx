@@ -1,4 +1,4 @@
-import { BookOpen, AlertCircle, CheckCircle, Play, Mail } from "lucide-react";
+import { BookOpen, AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -42,17 +42,14 @@ const HelpCenter = () => {
 
         <div className="relative rounded-xl overflow-hidden border">
           <AspectRatio ratio={16 / 9}>
-            <div className="absolute inset-0 bg-black/20 z-10 flex items-center justify-center group cursor-pointer hover:bg-black/30 transition-colors">
-              <div className="h-16 w-16 rounded-full bg-white/25 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                <Play className="h-8 w-8 text-white fill-white translate-x-0.5" />
-              </div>
-            </div>
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <div className="text-center space-y-2">
-                <h3 className="text-2xl font-semibold text-muted-foreground">Tutorial Video</h3>
-                <p className="text-sm text-muted-foreground/80">Coming Soon</p>
-              </div>
-            </div>
+            <iframe
+              src="https://www.youtube.com/embed/vag-IdUeWyk"
+              title="VyralSearch Tutorial Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+              aria-label="VyralSearch tutorial video showing how to use the application"
+            />
           </AspectRatio>
         </div>
 
