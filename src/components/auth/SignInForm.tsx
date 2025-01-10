@@ -31,7 +31,7 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
     
     if (!email || !password) {
       toast({
-        title: "Error",
+        title: "Validation Error",
         description: "Please fill in all fields",
         variant: "destructive",
       });
@@ -42,12 +42,11 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
       setLoading(true);
       
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
 
       if (error) {
-        console.error("Login error:", error);
         handleAuthError(error);
         return;
       }
@@ -56,7 +55,6 @@ export const SignInForm = ({ onViewChange }: SignInFormProps) => {
         await handleAuthSuccess(data.session);
       }
     } catch (error) {
-      console.error("Unexpected error during login:", error);
       handleAuthError(error as Error);
     } finally {
       setLoading(false);
