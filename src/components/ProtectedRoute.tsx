@@ -26,14 +26,20 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       
       try {
         // First check if session is valid
-        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session check error:', sessionError);
+          throw sessionError;
+        }
+
         if (!currentSession) {
           console.log('Session expired, attempting refresh...');
           const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
           
           if (refreshError || !refreshResult.session) {
             console.error('Session refresh failed:', refreshError);
-            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+            queryClient.invalidateQueries({ queryKey: ['session'] });
             return {
               subscribed: false,
               priceId: null,
@@ -42,7 +48,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
             };
           }
           
-          // Use the new session token
           console.log('Session refreshed successfully');
           
           // Call check-subscription with new token
@@ -53,7 +58,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
             }
           });
           
-          if (error) throw error;
+          if (error) {
+            console.error('Subscription check error with refreshed token:', error);
+            throw error;
+          }
+          
           return data;
         }
 
