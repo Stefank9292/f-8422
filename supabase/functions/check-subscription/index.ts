@@ -9,126 +9,138 @@ const corsHeaders = {
   'Access-Control-Max-Age': '86400',
 }
 
+const createErrorResponse = (error: string, status = 401) => {
+  return new Response(
+    JSON.stringify({
+      error,
+      subscribed: false,
+      priceId: null,
+      canceled: false,
+      maxClicks: 3
+    }),
+    {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status
+    }
+  )
+}
+
+const validateAuthHeader = (authHeader: string | null) => {
+  if (!authHeader) {
+    console.error('Missing authorization header');
+    return { error: 'Missing authorization header' };
+  }
+
+  if (!authHeader.startsWith('Bearer ')) {
+    console.error('Invalid authorization header format');
+    return { error: 'Invalid authorization header format' };
+  }
+
+  return { token: authHeader.split(' ')[1] };
+}
+
+const verifyUser = async (token: string) => {
+  const supabaseAdmin = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  );
+
+  const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(token);
+  
+  if (verifyError) {
+    console.error('Token verification failed:', verifyError);
+    return { error: 'Invalid user session' };
+  }
+
+  if (!user) {
+    console.error('No user found for token');
+    return { error: 'User not found' };
+  }
+
+  return { user };
+}
+
+const getStripeSubscription = async (userEmail: string) => {
+  const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
+    apiVersion: '2023-10-16',
+    httpClient: Stripe.createFetchHttpClient(),
+  });
+
+  const { data: customers, error: searchError } = await stripe.customers.search({
+    query: `email:'${userEmail}'`,
+  });
+
+  if (searchError) {
+    console.error('Stripe customer search error:', searchError);
+    throw searchError;
+  }
+
+  if (!customers || customers.length === 0) {
+    console.log('No Stripe customer found, returning free tier values');
+    return null;
+  }
+
+  const customer = customers[0];
+  console.log('Found Stripe customer:', customer.id);
+
+  const subscriptions = await stripe.subscriptions.list({
+    customer: customer.id,
+    status: 'active',
+    expand: ['data.default_payment_method', 'data.items.data.price'],
+  });
+
+  if (!subscriptions.data.length) {
+    console.log('No active subscriptions found');
+    return null;
+  }
+
+  return subscriptions.data[0];
+}
+
+const validatePriceId = (priceId: string) => {
+  const validPriceIds = [
+    "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+    "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+    "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+    "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+  ];
+  return validPriceIds.includes(priceId);
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     console.log('Handling CORS preflight request');
     return new Response(null, { 
       headers: corsHeaders,
       status: 204
-    })
+    });
   }
 
   try {
     console.log('Starting subscription check...');
     
-    // Get and validate the authorization header
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('Missing authorization header');
-      return new Response(
-        JSON.stringify({
-          error: 'Missing authorization header',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
+    // Validate auth header
+    const authResult = validateAuthHeader(req.headers.get('Authorization'));
+    if (authResult.error) {
+      return createErrorResponse(authResult.error);
     }
 
-    if (!authHeader.startsWith('Bearer ')) {
-      console.error('Invalid authorization header format');
-      return new Response(
-        JSON.stringify({
-          error: 'Invalid authorization header format',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
+    // Verify user
+    const userResult = await verifyUser(authResult.token!);
+    if (userResult.error) {
+      return createErrorResponse(userResult.error);
     }
 
-    // Create Supabase admin client
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-    })
-
-    // Get the JWT token from the Authorization header
-    const token = authHeader.split(' ')[1]
-    console.log('Verifying token:', token.substring(0, 10) + '...');
-
-    // Verify the JWT token
-    const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(token)
+    // Get subscription
+    const subscription = await getStripeSubscription(userResult.user.email!);
     
-    if (verifyError) {
-      console.error('Token verification failed:', verifyError);
-      return new Response(
-        JSON.stringify({
-          error: 'Invalid user session',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
-    }
-
-    if (!user) {
-      console.error('No user found for token');
-      return new Response(
-        JSON.stringify({
-          error: 'User not found',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
-    }
-
-    console.log('User found:', user.id);
-
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
-      apiVersion: '2023-10-16',
-      httpClient: Stripe.createFetchHttpClient(),
-    })
-
-    console.log('Searching for Stripe customer...');
-    const { data: customers, error: searchError } = await stripe.customers.search({
-      query: `email:'${user.email}'`,
-    })
-
-    if (searchError) {
-      console.error('Stripe customer search error:', searchError);
-      throw searchError
-    }
-
-    if (!customers || customers.length === 0) {
-      console.log('No Stripe customer found, returning free tier values');
+    if (!subscription) {
       return new Response(
         JSON.stringify({
           subscribed: false,
@@ -140,56 +152,12 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200
         }
-      )
+      );
     }
 
-    const customer = customers[0]
-    console.log('Found Stripe customer:', customer.id);
-
-    console.log('Fetching subscriptions...');
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customer.id,
-      status: 'active',
-      expand: ['data.default_payment_method', 'data.items.data.price'],
-    })
-
-    if (!subscriptions.data.length) {
-      console.log('No active subscriptions found');
-      await supabaseAdmin.from('subscription_logs').insert({
-        user_id: user.id,
-        event: 'subscription_check',
-        status: 'no_subscription',
-        details: { customer_id: customer.id }
-      });
-
-      return new Response(
-        JSON.stringify({
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200
-        }
-      )
-    }
-
-    const subscription = subscriptions.data[0]
-    const priceId = subscription.items.data[0].price.id
-    console.log('Active subscription found:', subscription.id, 'with price ID:', priceId);
-
-    // Define valid price IDs
-    const validPriceIds = [
-      "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
-      "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
-      "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-      "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
-    ];
-
-    // Verify if the price ID is valid
-    if (!validPriceIds.includes(priceId)) {
+    const priceId = subscription.items.data[0].price.id;
+    
+    if (!validatePriceId(priceId)) {
       console.error('Invalid price ID found:', priceId);
       return new Response(
         JSON.stringify({
@@ -202,18 +170,29 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200
         }
-      )
+      );
     }
 
     // Log to subscription_logs
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    );
+
     await supabaseAdmin.from('subscription_logs').insert({
-      user_id: user.id,
+      user_id: userResult.user.id,
       event: 'subscription_check',
       status: 'active',
       details: {
         subscription_id: subscription.id,
         price_id: priceId,
-        customer_id: customer.id,
+        customer_id: subscription.customer,
         cancel_at_period_end: subscription.cancel_at_period_end
       }
     });
@@ -230,22 +209,10 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
       }
-    )
+    );
 
   } catch (error) {
     console.error('Subscription check error:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        subscribed: false,
-        priceId: null,
-        canceled: false,
-        maxClicks: 3
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.status || 400,
-      }
-    )
+    return createErrorResponse(error.message, error.status || 400);
   }
-})
+});
