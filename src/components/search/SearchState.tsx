@@ -55,6 +55,9 @@ export const useSearchState = () => {
         await saveSearchHistory(username, results);
       }
       
+      // Reset shouldFetch after successful search
+      setShouldFetch(false);
+      
       return results;
     },
     enabled: shouldFetch && !!username && !isBulkSearching && requestCount < maxRequests,
@@ -71,6 +74,7 @@ export const useSearchState = () => {
           description: error.message || "Failed to fetch Instagram posts",
           variant: "destructive",
         });
+        // Reset shouldFetch on error
         setShouldFetch(false);
       }
     },
@@ -139,6 +143,8 @@ export const useSearchState = () => {
       throw error;
     } finally {
       setIsBulkSearching(false);
+      // Reset shouldFetch after bulk search
+      setShouldFetch(false);
     }
   };
 
