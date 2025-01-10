@@ -25,6 +25,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       }
       
       try {
+        // Ensure session is valid before making the request
+        const { data: currentSession } = await supabase.auth.getSession();
+        if (!currentSession.session) {
+          console.log('Session expired, refreshing...');
+          const { data: refreshResult } = await supabase.auth.refreshSession();
+          if (!refreshResult.session) {
+            throw new Error('Failed to refresh session');
+          }
+        }
+
         console.log('Checking subscription status with token:', session.access_token.slice(0, 10) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
@@ -38,13 +48,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           // If we get an auth error, invalidate the query and return free tier values
           if (error.status === 401) {
             queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-            await supabase.auth.refreshSession();
-            return {
-              subscribed: false,
-              priceId: null,
-              canceled: false,
-              maxClicks: 3
-            };
+            // Try to refresh the session
+            const { data: refreshResult } = await supabase.auth.refreshSession();
+            if (!refreshResult.session) {
+              return {
+                subscribed: false,
+                priceId: null,
+                canceled: false,
+                maxClicks: 3
+              };
+            }
           }
           throw error;
         }
