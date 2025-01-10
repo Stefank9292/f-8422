@@ -12,6 +12,7 @@ const corsHeaders = {
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight request');
     return new Response(null, { 
       headers: corsHeaders,
       status: 204
@@ -23,29 +24,11 @@ serve(async (req) => {
     
     // Get and validate the authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Invalid or missing authorization header');
+    if (!authHeader) {
+      console.error('No authorization header found');
       return new Response(
         JSON.stringify({
-          error: 'Invalid authorization header format',
-          subscribed: false,
-          priceId: null,
-          canceled: false,
-          maxClicks: 3
-        }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 401
-        }
-      )
-    }
-
-    const token = authHeader.split(' ')[1]
-    if (!token) {
-      console.error('No token found in authorization header');
-      return new Response(
-        JSON.stringify({
-          error: 'No token provided',
+          error: 'No authorization header',
           subscribed: false,
           priceId: null,
           canceled: false,
@@ -68,6 +51,10 @@ serve(async (req) => {
           persistSession: false
         }
     })
+
+    // Get the JWT token from the Authorization header
+    const token = authHeader.replace('Bearer ', '')
+    console.log('Verifying token:', token.substring(0, 10) + '...');
 
     // Verify the JWT token
     const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(token)
