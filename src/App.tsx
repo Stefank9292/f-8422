@@ -12,6 +12,7 @@ import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
 import ConfirmEmail from "@/pages/ConfirmEmail";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 const queryClient = new QueryClient();
 
@@ -20,64 +21,66 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <Router>
-          <div className="flex">
-            <AppSidebar />
-            <main className="flex-1 min-h-screen">
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/confirm-email" element={<ConfirmEmail />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <Index />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/history"
-                  element={
-                    <ProtectedRoute>
-                      <SearchHistory />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/subscribe"
-                  element={
-                    <ProtectedRoute>
-                      <Subscribe />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/success"
-                  element={
-                    <ProtectedRoute>
-                      <Success />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/faq"
-                  element={
-                    <ProtectedRoute>
-                      <FAQ />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/help"
-                  element={
-                    <ProtectedRoute>
-                      <HelpCenter />
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            </main>
-          </div>
-          <Toaster />
+          <SidebarProvider>
+            <div className="flex min-h-screen w-full">
+              <AppSidebar />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/confirm-email" element={<ConfirmEmail />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Index />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/history"
+                    element={
+                      <ProtectedRoute>
+                        <SearchHistory />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/subscribe"
+                    element={
+                      <ProtectedRoute>
+                        <Subscribe />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/success"
+                    element={
+                      <ProtectedRoute>
+                        <Success />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/faq"
+                    element={
+                      <ProtectedRoute>
+                        <FAQ />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/help"
+                    element={
+                      <ProtectedRoute>
+                        <HelpCenter />
+                      </ProtectedRoute>
+                    }
+                  />
+                </Routes>
+              </main>
+            </div>
+            <Toaster />
+          </SidebarProvider>
         </Router>
       </ErrorBoundary>
     </QueryClientProvider>
