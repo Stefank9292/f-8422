@@ -73,22 +73,33 @@ export function AppSidebar() {
 
             <div className="mt-auto space-y-2">
               <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarSettings 
-                    currentPath={location.pathname}
-                    subscriptionStatus={subscriptionStatus}
-                  />
-                </SidebarMenuItem>
+                {/* Only show subscription-dependent items if there's a subscription */}
+                {subscriptionStatus?.subscribed && (
+                  <>
+                    <SidebarMenuItem>
+                      <SidebarSettings 
+                        currentPath={location.pathname}
+                        subscriptionStatus={subscriptionStatus}
+                      />
+                    </SidebarMenuItem>
 
-                <SidebarMenuItem>
-                  <RequestUsageCounter />
-                </SidebarMenuItem>
+                    <SidebarMenuItem>
+                      <RequestUsageCounter />
+                    </SidebarMenuItem>
+                  </>
+                )}
 
+                {/* Always show sign out button if there's a session */}
                 <SidebarMenuItem>
                   <div className="px-2 py-2">
                     <button
                       onClick={async () => {
-                        await supabase.auth.signOut();
+                        try {
+                          await supabase.auth.signOut();
+                          console.log('Successfully signed out');
+                        } catch (error) {
+                          console.error('Sign out error:', error);
+                        }
                       }}
                       className="w-full px-2 py-1 rounded-full flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
                     >
