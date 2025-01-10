@@ -23,11 +23,11 @@ serve(async (req) => {
     
     // Get the authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Invalid or missing authorization header');
+    if (!authHeader) {
+      console.error('Missing authorization header');
       return new Response(
         JSON.stringify({
-          error: 'Invalid authorization header',
+          error: 'Missing authorization header',
           subscribed: false,
           priceId: null,
           canceled: false,
@@ -41,7 +41,7 @@ serve(async (req) => {
     }
 
     // Extract and validate the token
-    const token = authHeader.split(' ')[1]
+    const token = authHeader.replace('Bearer ', '')
     if (!token) {
       console.error('No token found in authorization header');
       return new Response(
