@@ -24,8 +24,25 @@ serve(async (req) => {
     
     // Get and validate the authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('Invalid or missing authorization header');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      return new Response(
+        JSON.stringify({
+          error: 'Missing authorization header',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      )
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
+      console.error('Invalid authorization header format');
       return new Response(
         JSON.stringify({
           error: 'Invalid authorization header format',
@@ -59,11 +76,28 @@ serve(async (req) => {
     // Verify the JWT token
     const { data: { user }, error: verifyError } = await supabaseAdmin.auth.getUser(token)
     
-    if (verifyError || !user) {
+    if (verifyError) {
       console.error('Token verification failed:', verifyError);
       return new Response(
         JSON.stringify({
           error: 'Invalid user session',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      )
+    }
+
+    if (!user) {
+      console.error('No user found for token');
+      return new Response(
+        JSON.stringify({
+          error: 'User not found',
           subscribed: false,
           priceId: null,
           canceled: false,
