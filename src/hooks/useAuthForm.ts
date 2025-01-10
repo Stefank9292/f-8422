@@ -20,13 +20,13 @@ export const useAuthForm = ({ mode, onSuccess, updateRateLimit }: AuthFormConfig
       switch (error.status) {
         case 400:
           if (error.message.includes('Invalid login credentials')) {
-            return 'The email or password you entered is incorrect. Please try again.';
+            return 'E-Mail or password wrong please try again';
           }
           if (error.message.includes('Email not confirmed')) {
             return 'Please verify your email address before signing in.';
           }
           if (error.message.includes('User not found')) {
-            return 'No account found with this email address. Please check your email or sign up for a new account.';
+            return 'User not found or doesnt exist';
           }
           return 'The credentials you entered are invalid. Please check and try again.';
         case 422:
