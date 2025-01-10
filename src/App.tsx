@@ -20,8 +20,8 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
-        <Router>
-          <SidebarProvider>
+        <SidebarProvider>
+          <Router>
             <div className="flex min-h-screen w-full">
               <AppSidebar />
               <main className="flex-1">
@@ -80,8 +80,8 @@ function App() {
               </main>
             </div>
             <Toaster />
-          </SidebarProvider>
-        </Router>
+          </Router>
+        </SidebarProvider>
       </ErrorBoundary>
     </QueryClientProvider>
   );
