@@ -36,7 +36,8 @@ serve(async (req) => {
           },
         },
         auth: {
-          persistSession: false
+          persistSession: false,
+          autoRefreshToken: false,
         }
       }
     )
@@ -56,6 +57,7 @@ serve(async (req) => {
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
       apiVersion: '2023-10-16',
+      httpClient: Stripe.createFetchHttpClient(),
     })
 
     console.log('Searching for Stripe customer...');
