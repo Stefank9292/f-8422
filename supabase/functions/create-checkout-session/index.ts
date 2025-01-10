@@ -54,6 +54,29 @@ serve(async (req) => {
     } else {
       customer_id = customers.data[0].id
       console.log('Found existing customer:', customer_id);
+
+      // Check for existing subscriptions to prevent duplicate subscriptions
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customer_id,
+        status: 'active',
+        limit: 1
+      })
+
+      if (subscriptions.data.length > 0) {
+        const currentSubscription = subscriptions.data[0]
+        const currentPriceId = currentSubscription.items.data[0].price.id
+
+        // If trying to subscribe to the same plan, return error
+        if (currentPriceId === priceId) {
+          return new Response(
+            JSON.stringify({ error: "You are already subscribed to this plan" }),
+            { 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 400,
+            }
+          )
+        }
+      }
     }
 
     // Get the origin from the request headers and ensure it's properly formatted
@@ -62,7 +85,7 @@ serve(async (req) => {
 
     console.log('Creating checkout session with return URL:', baseUrl);
     
-    // Create the checkout session without canceling the current subscription
+    // Create checkout session with proper subscription handling
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       line_items: [{ price: priceId, quantity: 1 }],
@@ -71,7 +94,6 @@ serve(async (req) => {
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
       allow_promotion_codes: true,
       subscription_data: {
-        // This ensures proper subscription upgrade/downgrade behavior
         billing_cycle_anchor: 'now',
         proration_behavior: 'create_prorations'
       }
