@@ -21,13 +21,13 @@ serve(async (req) => {
   try {
     console.log('Starting subscription check...');
     
-    // Get the authorization header
+    // Get the authorization header and validate JWT token format
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('Missing authorization header');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Invalid or missing authorization header');
       return new Response(
         JSON.stringify({
-          error: 'Missing authorization header',
+          error: 'Invalid authorization header format',
           subscribed: false,
           priceId: null,
           canceled: false,
@@ -41,7 +41,7 @@ serve(async (req) => {
     }
 
     // Extract and validate the token
-    const token = authHeader.replace('Bearer ', '')
+    const token = authHeader.split(' ')[1]
     if (!token) {
       console.error('No token found in authorization header');
       return new Response(
@@ -236,6 +236,7 @@ serve(async (req) => {
         status: 200
       }
     )
+
   } catch (error) {
     console.error('Subscription check error:', error);
     return new Response(
