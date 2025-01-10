@@ -21,10 +21,23 @@ serve(async (req) => {
   try {
     console.log('Starting subscription check...');
     
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error('No authorization header found');
-      throw new Error('No authorization header')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Invalid or missing authorization header');
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid authorization header',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      )
     }
 
     // Create Supabase client with auth header
@@ -42,6 +55,7 @@ serve(async (req) => {
       }
     )
 
+    // Get user from session
     console.log('Getting user session...');
     const {
       data: { user },
