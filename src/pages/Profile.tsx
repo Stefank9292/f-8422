@@ -55,7 +55,6 @@ export const Profile = () => {
 
       const updates = [];
 
-      // Update email if changed
       if (email !== session?.user?.email) {
         const { error: emailError } = await supabase.auth.updateUser({ 
           email: email 
@@ -64,7 +63,6 @@ export const Profile = () => {
         updates.push("email");
       }
 
-      // Update username if changed
       if (username !== profile?.username) {
         const { error: profileError } = await supabase
           .from('profiles')
@@ -75,7 +73,6 @@ export const Profile = () => {
         updates.push("username");
       }
 
-      // Update password if provided
       if (newPassword) {
         const passwordValidation = validatePassword(newPassword);
         if (passwordValidation) {
@@ -115,67 +112,74 @@ export const Profile = () => {
   const passwordStrength = checkPasswordStrength(newPassword);
 
   return (
-    <div className="container max-w-2xl mx-auto p-4">
-      <Card className="p-6 space-y-6">
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6">
+      <div className="max-w-2xl mx-auto space-y-8">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Profile Settings</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
           <p className="text-muted-foreground">
-            Update your profile information
+            Manage your account settings and preferences
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="username" className="text-sm font-medium">
-              Username
-            </label>
-            <Input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter your username"
-            />
-          </div>
+        <Card className="p-6 sm:p-8 space-y-8">
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <label htmlFor="username" className="text-sm font-medium block">
+                Username
+              </label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Enter your username"
+                className="h-11"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium">
-              Email
-            </label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-            />
-          </div>
+            <div className="space-y-4">
+              <label htmlFor="email" className="text-sm font-medium block">
+                Email Address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="h-11"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium">
-              New Password
-            </label>
-            <Input
-              id="password"
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="Enter new password"
-            />
-            {newPassword && (
-              <PasswordStrengthIndicator passwordStrength={passwordStrength} />
-            )}
-          </div>
+            <div className="space-y-4">
+              <label htmlFor="password" className="text-sm font-medium block">
+                New Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                className="h-11"
+              />
+              {newPassword && (
+                <div className="mt-2">
+                  <PasswordStrengthIndicator passwordStrength={passwordStrength} />
+                </div>
+              )}
+            </div>
 
-          <Button
-            onClick={handleUpdateProfile}
-            disabled={loading}
-            className="w-full primary-gradient"
-          >
-            {loading ? "Updating..." : "Save Changes"}
-          </Button>
-        </div>
-      </Card>
+            <Button
+              onClick={handleUpdateProfile}
+              disabled={loading}
+              className="w-full h-11 primary-gradient"
+            >
+              {loading ? "Updating..." : "Save Changes"}
+            </Button>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 };
