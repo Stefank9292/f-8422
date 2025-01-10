@@ -31,7 +31,7 @@ export const UserProfileInfo = ({
   return (
     <div className="w-full p-3 bg-card/50 rounded-xl border border-border/50">
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
+        <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
           <div className="flex flex-col">
             <span className={`text-[10px] ${
@@ -45,7 +45,7 @@ export const UserProfileInfo = ({
               {email}
             </span>
           </div>
-        </div>
+        </Link>
 
         {isUltraPlan ? (
           <div className="flex items-center gap-3">

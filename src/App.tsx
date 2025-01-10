@@ -1,165 +1,95 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/toaster";
 import { AppSidebar } from "@/components/AppSidebar";
-import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Auth } from "@/pages/Auth";
+import { Index } from "@/pages/Index";
+import { SearchHistory } from "@/pages/SearchHistory";
+import { Subscribe } from "@/pages/Subscribe";
+import { Success } from "@/pages/Success";
+import { FAQ } from "@/pages/FAQ";
+import { HelpCenter } from "@/pages/HelpCenter";
+import { ConfirmEmail } from "@/pages/ConfirmEmail";
+import { Profile } from "@/pages/Profile";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import Index from "@/pages/Index";
-import Auth from "@/pages/Auth";
-import Subscribe from "@/pages/Subscribe";
-import Success from "@/pages/Success";
-import FAQ from "@/pages/FAQ";
-import HelpCenter from "@/pages/HelpCenter";
-import SearchHistory from "@/pages/SearchHistory";
-import ConfirmEmail from "@/pages/ConfirmEmail";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // Data remains fresh for 5 minutes
-      gcTime: 1000 * 60 * 10, // Keep unused data in cache for 10 minutes
-      retry: 3, // Retry failed requests 3 times
-      refetchOnWindowFocus: true, // Enable refetch on window focus
-      refetchOnReconnect: true, // Enable refetch on reconnect
-      refetchOnMount: true, // Enable refetch on component mount
-    },
-  },
-});
+const queryClient = new QueryClient();
 
 function App() {
-  const { toast } = useToast();
-
-  // Listen for auth state changes
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event);
-      
-      if (event === 'SIGNED_IN') {
-        console.log('User signed in:', session?.user?.id);
-        queryClient.invalidateQueries();
-        toast({
-          description: "Successfully signed in",
-        });
-      }
-      
-      if (event === 'SIGNED_OUT') {
-        console.log('User signed out');
-        // Clear all queries and local storage on sign out
-        queryClient.clear();
-        localStorage.removeItem('supabase.auth.token');
-        toast({
-          description: "Successfully signed out",
-        });
-      }
-      
-      if (event === 'TOKEN_REFRESHED') {
-        console.log('Token refreshed');
-        queryClient.invalidateQueries();
-      }
-
-      // Handle refresh token errors
-      if (event === 'INITIAL_SESSION') {
-        const { data: { session: currentSession }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Session error:', error);
-          if (error.message.includes('refresh_token_not_found')) {
-            console.log('Invalid refresh token, clearing session');
-            await supabase.auth.signOut();
-            queryClient.clear();
-            localStorage.removeItem('supabase.auth.token');
-            toast({
-              title: "Session Expired",
-              description: "Please sign in again",
-              variant: "destructive",
-            });
-          }
-        } else if (!currentSession) {
-          console.log('No active session found');
-        }
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [toast, queryClient]);
-
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ErrorBoundary>
         <Router>
-          <SidebarProvider defaultOpen>
-            <div className="min-h-screen flex w-full animate-in fade-in duration-200">
-              <AppSidebar />
-              <SidebarTrigger />
-              <main className="flex-1 overflow-y-auto">
-                <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/subscribe"
-                    element={
-                      <ProtectedRoute>
-                        <Subscribe />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/success"
-                    element={
-                      <ProtectedRoute>
-                        <Success />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/faq"
-                    element={
-                      <ProtectedRoute>
-                        <FAQ />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/help"
-                    element={
-                      <ProtectedRoute>
-                        <HelpCenter />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/history"
-                    element={
-                      <ProtectedRoute>
-                        <SearchHistory />
-                      </ProtectedRoute>
-                    }
-                  />
-                  {/* Catch all route - redirect to home */}
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
-            </div>
-          </SidebarProvider>
+          <div className="flex">
+            <AppSidebar />
+            <main className="flex-1 min-h-screen">
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/confirm-email" element={<ConfirmEmail />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/history"
+                  element={
+                    <ProtectedRoute>
+                      <SearchHistory />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/subscribe"
+                  element={
+                    <ProtectedRoute>
+                      <Subscribe />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/success"
+                  element={
+                    <ProtectedRoute>
+                      <Success />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/faq"
+                  element={
+                    <ProtectedRoute>
+                      <FAQ />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/help"
+                  element={
+                    <ProtectedRoute>
+                      <HelpCenter />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+              </Routes>
+            </main>
+          </div>
           <Toaster />
         </Router>
-      </QueryClientProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </QueryClientProvider>
   );
 }
 
