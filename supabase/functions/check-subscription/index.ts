@@ -40,7 +40,7 @@ serve(async (req) => {
       )
     }
 
-    // Extract the token
+    // Extract and validate the token
     const token = authHeader.split(' ')[1]
     if (!token) {
       console.error('No token found in authorization header');
@@ -74,7 +74,7 @@ serve(async (req) => {
       }
     )
 
-    // Get user from session
+    // Get user from session with enhanced error logging
     console.log('Getting user session...');
     const {
       data: { user },

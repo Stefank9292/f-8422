@@ -38,6 +38,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           // If we get an auth error, invalidate the query and return free tier values
           if (error.status === 401) {
             queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+            await supabase.auth.refreshSession();
             return {
               subscribed: false,
               priceId: null,
@@ -59,14 +60,13 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     enabled: !!session?.access_token,
     staleTime: 1000 * 60, // Cache for 1 minute
     retry: (failureCount, error: any) => {
-      // Don't retry on 401 errors
+      // Don't retry on 401 errors after session refresh attempt
       if (error?.status === 401) return false;
       return failureCount < 3;
     },
     retryDelay: 1000
   });
 
-  // Show loading state only if we're loading the initial session
   if (isLoading) {
     return <LoadingState />;
   }
@@ -110,4 +110,4 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
+});
