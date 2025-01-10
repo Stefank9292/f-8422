@@ -55,7 +55,7 @@ export function SearchHistoryHeader({
           Showing {totalSearches} of 10
         </p>
       </div>
-      {hasHistory && isSteroidsUser && (
+      {hasHistory && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button 
