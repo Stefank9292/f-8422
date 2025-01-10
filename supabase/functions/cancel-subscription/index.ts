@@ -51,13 +51,12 @@ serve(async (req) => {
       throw new Error('No active subscription found')
     }
 
-    // Cancel the subscription immediately instead of at period end
-    await stripe.subscriptions.cancel(subscriptions.data[0].id, {
-      invoice_now: true,
-      prorate: true
+    // Update subscription to cancel at period end instead of immediately
+    await stripe.subscriptions.update(subscriptions.data[0].id, {
+      cancel_at_period_end: true
     });
 
-    console.log('Subscription cancelled immediately')
+    console.log('Subscription scheduled for cancellation at period end')
 
     return new Response(
       JSON.stringify({ success: true }),
