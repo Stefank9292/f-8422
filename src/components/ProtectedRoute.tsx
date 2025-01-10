@@ -26,8 +26,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       
       try {
         // First check if session is valid
-        const { data: currentSession } = await supabase.auth.getSession();
-        if (!currentSession.session) {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (!currentSession) {
           console.log('Session expired, attempting refresh...');
           const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
           
@@ -44,33 +44,30 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           
           // Use the new session token
           console.log('Session refreshed successfully');
+          
+          // Call check-subscription with new token
+          const { data, error } = await supabase.functions.invoke('check-subscription', {
+            headers: {
+              Authorization: `Bearer ${refreshResult.session.access_token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (error) throw error;
+          return data;
         }
 
-        // Get the latest session token
-        const { data: { session: latestSession } } = await supabase.auth.getSession();
-        if (!latestSession?.access_token) {
-          throw new Error('No valid session token available');
-        }
-
-        console.log('Checking subscription with token:', latestSession.access_token.slice(0, 10) + '...');
+        // Use existing valid session
+        console.log('Using existing valid session token');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${latestSession.access_token}`,
+            Authorization: `Bearer ${currentSession.access_token}`,
             'Content-Type': 'application/json'
           }
         });
         
         if (error) {
           console.error('Subscription check error:', error);
-          if (error.status === 401) {
-            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-            return {
-              subscribed: false,
-              priceId: null,
-              canceled: false,
-              maxClicks: 3
-            };
-          }
           throw error;
         }
 
