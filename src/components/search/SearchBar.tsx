@@ -13,6 +13,7 @@ interface SearchBarProps {
   onSearch: () => void;
   onBulkSearch?: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<any>;
   isLoading?: boolean;
+  hasReachedLimit?: boolean;
 }
 
 export const SearchBar = ({ 
@@ -20,7 +21,8 @@ export const SearchBar = ({
   onUsernameChange, 
   onSearch,
   onBulkSearch,
-  isLoading 
+  isLoading,
+  hasReachedLimit = false
 }: SearchBarProps) => {
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const placeholder = usePlaceholderAnimation();
@@ -49,56 +51,8 @@ export const SearchBar = ({
     enabled: !!session?.access_token,
   });
 
-  const { data: requestStats } = useQuery({
-    queryKey: ['request-stats'],
-    queryFn: async () => {
-      if (!session?.user.id) return null;
-      
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-
-      const { count } = await supabase
-        .from('user_requests')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', session.user.id)
-        .eq('request_type', 'instagram_search')
-        .gte('created_at', startOfMonth.toISOString())
-        .lt('created_at', endOfMonth.toISOString())
-        .or(`last_reset_at.is.null,last_reset_at.lt.${startOfMonth.toISOString()}`);
-
-      return count || 0;
-    },
-    enabled: !!session?.user.id,
-  });
-
-  // Listen for real-time updates on user_requests
-  useEffect(() => {
-    if (!session?.user.id) return;
-
-    const channel = supabase
-      .channel('user-requests-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'user_requests',
-          filter: `user_id=eq.${session.user.id}`
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['request-stats'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [session?.user.id, queryClient]);
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isLoading && username.trim()) {
+    if (e.key === 'Enter' && !isLoading && username.trim() && !hasReachedLimit) {
       e.preventDefault();
       onSearch();
     }
@@ -123,12 +77,13 @@ export const SearchBar = ({
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          disabled={isLoading}
+          disabled={isLoading || hasReachedLimit}
         />
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
         <BulkSearchButton 
           isEnabled={isBulkSearchEnabled}
           isLoading={isLoading}
+          hasReachedLimit={hasReachedLimit}
           onClick={() => setIsBulkSearchOpen(true)}
         />
       </div>
@@ -139,6 +94,7 @@ export const SearchBar = ({
           onClose={() => setIsBulkSearchOpen(false)}
           onSearch={onBulkSearch || (() => Promise.resolve())}
           isLoading={isLoading}
+          hasReachedLimit={hasReachedLimit}
         />
       )}
     </>

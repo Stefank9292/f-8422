@@ -71,7 +71,7 @@ export const SearchContainer = ({
       return;
     }
 
-    if (hasReachedLimit || requestCount >= maxRequests) {
+    if (hasReachedLimit) {
       toast({
         title: "Monthly Limit Reached",
         description: `You've used ${requestCount} out of ${maxRequests} monthly searches. Please upgrade your plan for more searches.`,
@@ -108,6 +108,7 @@ export const SearchContainer = ({
           onBulkSearch={handleBulkSearch}
           isLoading={isLoading || isBulkSearching}
           onUsernameChange={setUsername}
+          hasReachedLimit={hasReachedLimit}
         />
 
         <Button 

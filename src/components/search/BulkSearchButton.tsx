@@ -4,10 +4,16 @@ import { Button } from "@/components/ui/button";
 interface BulkSearchButtonProps {
   isEnabled: boolean;
   isLoading: boolean;
+  hasReachedLimit: boolean;
   onClick: () => void;
 }
 
-export const BulkSearchButton = ({ isEnabled, isLoading, onClick }: BulkSearchButtonProps) => {
+export const BulkSearchButton = ({ 
+  isEnabled, 
+  isLoading, 
+  hasReachedLimit,
+  onClick 
+}: BulkSearchButtonProps) => {
   if (!isEnabled) return null;
 
   return (
@@ -18,7 +24,7 @@ export const BulkSearchButton = ({ isEnabled, isLoading, onClick }: BulkSearchBu
                 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800/80
                 h-7 px-3 rounded-lg"
       onClick={onClick}
-      disabled={isLoading}
+      disabled={isLoading || hasReachedLimit}
     >
       <List className="w-3.5 h-3.5" />
       <span className="hidden md:inline text-[11px] font-medium">Bulk Search</span>

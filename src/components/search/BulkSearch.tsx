@@ -3,23 +3,31 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { BulkSearchSettings } from "./BulkSearchSettings";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { InstagramPost } from "@/types/instagram";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
 
 interface BulkSearchProps {
   isOpen: boolean;
   onClose: () => void;
   onSearch: (urls: string[], numberOfVideos: number, selectedDate: Date | undefined) => Promise<InstagramPost[]>;
   isLoading?: boolean;
+  hasReachedLimit?: boolean;
 }
 
 const MAX_URLS = 20;
 
-export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: BulkSearchProps) => {
+export const BulkSearch = ({ 
+  isOpen, 
+  onClose, 
+  onSearch, 
+  isLoading = false,
+  hasReachedLimit = false
+}: BulkSearchProps) => {
   const [urls, setUrls] = useState<string>("");
   const [numberOfVideos, setNumberOfVideos] = useState(3);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -50,6 +58,15 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
   });
 
   const handleSearch = async () => {
+    if (hasReachedLimit) {
+      toast({
+        title: "Monthly Limit Reached",
+        description: "You've reached your monthly search limit. Please upgrade your plan for more searches.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const urlList = urls
       .split('\n')
       .map(url => url.trim())
@@ -75,7 +92,6 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
 
     try {
       const results = await onSearch(urlList, numberOfVideos, selectedDate);
-      // Save bulk search results to history
       await saveSearchHistory(urlList[0], results, urlList);
       onClose();
     } catch (error) {
@@ -118,7 +134,7 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
               className="min-h-[120px] sm:min-h-[200px] font-mono text-xs sm:text-sm resize-none bg-background border-input focus:ring-2 focus:ring-primary/20 rounded-xl w-full"
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
-              disabled={isLoading}
+              disabled={isLoading || hasReachedLimit}
             />
             <p className={`text-[10px] sm:text-xs ${urls.split('\n').filter(url => url.trim() !== "").length > MAX_URLS ? 'text-destructive' : 'text-muted-foreground'} text-right`}>
               {urls.split('\n').filter(url => url.trim() !== "").length} / {MAX_URLS} URLs
@@ -132,15 +148,15 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
             setNumberOfVideos={setNumberOfVideos}
             selectedDate={selectedDate}
             setSelectedDate={setSelectedDate}
-            disabled={isLoading}
+            disabled={isLoading || hasReachedLimit}
           />
 
           <div className="flex justify-center w-full">
             <Button 
               onClick={handleSearch}
-              disabled={isLoading || !urls}
+              disabled={isLoading || !urls || hasReachedLimit}
               className={`w-full h-10 text-[11px] font-medium transition-all duration-300 ${
-                urls ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
+                urls && !hasReachedLimit ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800"
               } text-white dark:text-gray-100 shadow-sm hover:shadow-md`}
             >
               {isLoading ? (
@@ -148,6 +164,17 @@ export const BulkSearch = ({ isOpen, onClose, onSearch, isLoading = false }: Bul
                   <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
                   Searching...
                 </>
+              ) : hasReachedLimit ? (
+                <div className="flex items-center gap-2">
+                  <Lock className="h-3.5 w-3.5" />
+                  <span>Monthly Limit Reached</span>
+                  <Link 
+                    to="/subscribe" 
+                    className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded hover:bg-white/30 transition-colors"
+                  >
+                    Upgrade
+                  </Link>
+                </div>
               ) : (
                 <>
                   <Search className="mr-2 h-3.5 w-3.5" />
