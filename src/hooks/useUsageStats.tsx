@@ -38,8 +38,8 @@ export const useUsageStats = (session: Session | null) => {
       return count || 0;
     },
     enabled: !!session?.user.id,
-    staleTime: 0, // Always fetch fresh data
-    gcTime: 0, // Don't cache the results (replaced cacheTime with gcTime)
+    staleTime: 0,
+    gcTime: 0,
   });
 
   const { data: subscriptionStatus } = useQuery({
@@ -69,7 +69,7 @@ export const useUsageStats = (session: Session | null) => {
     retryDelay: 1000,
   });
 
-  // Set up real-time subscription for user_requests table
+  // Set up real-time subscription for user_requests
   useEffect(() => {
     if (!session?.user?.id) return;
 
@@ -87,7 +87,6 @@ export const useUsageStats = (session: Session | null) => {
         },
         (payload) => {
           console.log('Received real-time update:', payload);
-          // Invalidate the request-stats query to trigger a refetch
           queryClient.invalidateQueries({ 
             queryKey: ['request-stats', session.user.id]
           });
@@ -101,61 +100,62 @@ export const useUsageStats = (session: Session | null) => {
     };
   }, [session?.user?.id, queryClient]);
 
+  // Check and reset monthly usage
   useEffect(() => {
     const checkAndResetMonthlyUsage = async () => {
       if (!session?.user.id || !subscriptionStatus) return;
 
-      const isSteroidsUser = subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                            subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-      
-      if (!isSteroidsUser) {
-        const now = new Date();
-        const lastResetDate = new Date(now);
-        lastResetDate.setDate(lastResetDate.getDate() - 30);
+      const now = new Date();
+      const lastResetDate = new Date(now);
+      lastResetDate.setDate(lastResetDate.getDate() - 30);
 
-        const { data: requests, error } = await supabase
+      const { data: requests, error } = await supabase
+        .from('user_requests')
+        .select('last_reset_at')
+        .eq('user_id', session.user.id)
+        .eq('request_type', 'instagram_search')
+        .order('last_reset_at', { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error('Error checking last reset date:', error);
+        return;
+      }
+
+      const shouldReset = !requests?.[0]?.last_reset_at || 
+                        new Date(requests[0].last_reset_at) < lastResetDate;
+
+      if (shouldReset) {
+        const { error: resetError } = await supabase
           .from('user_requests')
-          .select('last_reset_at')
+          .update({ last_reset_at: now.toISOString() })
           .eq('user_id', session.user.id)
           .eq('request_type', 'instagram_search')
-          .order('last_reset_at', { ascending: false })
-          .limit(1);
+          .lt('created_at', lastResetDate.toISOString());
 
-        if (error) {
-          console.error('Error checking last reset date:', error);
+        if (resetError) {
+          console.error('Error resetting usage:', resetError);
           return;
         }
 
-        const shouldReset = !requests?.[0]?.last_reset_at || 
-                          new Date(requests[0].last_reset_at) < lastResetDate;
-
-        if (shouldReset) {
-          const { error: resetError } = await supabase
-            .from('user_requests')
-            .update({ last_reset_at: now.toISOString() })
-            .eq('user_id', session.user.id)
-            .eq('request_type', 'instagram_search')
-            .lt('created_at', lastResetDate.toISOString());
-
-          if (resetError) {
-            console.error('Error resetting usage:', resetError);
-            return;
-          }
-
-          await refetchRequestStats();
-        }
+        await refetchRequestStats();
+        
+        toast({
+          title: "Monthly Usage Reset",
+          description: "Your search usage has been reset for the new billing period.",
+        });
       }
     };
 
     checkAndResetMonthlyUsage();
-  }, [session?.user.id, subscriptionStatus, refetchRequestStats]);
+  }, [session?.user.id, subscriptionStatus, refetchRequestStats, toast]);
 
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
   const isProUser = subscriptionStatus?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
                     subscriptionStatus?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h";
   
-  const maxRequests = isSteroidsUser ? Infinity : 25; // Pro users get 25 searches
+  const maxRequests = isSteroidsUser ? Infinity : isProUser ? 25 : 3; // Pro users get 25 searches
   const usedRequests = requestStats || 0;
   const remainingRequests = isSteroidsUser ? Infinity : Math.max(0, maxRequests - usedRequests);
   const usagePercentage = isSteroidsUser ? 0 : ((usedRequests / maxRequests) * 100);
@@ -170,7 +170,7 @@ export const useUsageStats = (session: Session | null) => {
         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") {
       return 'Creator on Steroids';
     }
-    return 'Creator Pro';
+    return 'Free Plan';
   };
 
   return {

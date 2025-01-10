@@ -32,6 +32,8 @@ export const useSearchState = () => {
     maxRequests,
     usedRequests: requestCount,
     hasReachedLimit,
+    isProUser,
+    isSteroidsUser,
     subscriptionStatus
   } = useUsageStats(session);
 
@@ -48,14 +50,24 @@ export const useSearchState = () => {
       if (!username.trim()) {
         throw new Error('Please enter a valid Instagram username');
       }
+
+      // Enforce video limit based on subscription
+      const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
+      const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
       
-      const results = await fetchInstagramPosts(username, numberOfVideos, selectedDate);
+      if (numberOfVideos > maxVideosPerSearch) {
+        toast({
+          title: "Video Limit Applied",
+          description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
+        });
+      }
+      
+      const results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
       
       if (results.length > 0) {
         await saveSearchHistory(username, results);
       }
       
-      // Reset shouldFetch after successful search
       setShouldFetch(false);
       
       return results;
@@ -63,7 +75,7 @@ export const useSearchState = () => {
     enabled: shouldFetch && !!username && !isBulkSearching && requestCount < maxRequests,
     retry: false,
     staleTime: Infinity,
-    gcTime: 1000 * 60 * 5, // Cache for 5 minutes
+    gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     meta: {
@@ -74,7 +86,6 @@ export const useSearchState = () => {
           description: error.message || "Failed to fetch Instagram posts",
           variant: "destructive",
         });
-        // Reset shouldFetch on error
         setShouldFetch(false);
       }
     },
@@ -125,9 +136,20 @@ export const useSearchState = () => {
       return;
     }
 
+    // Enforce video limit based on subscription
+    const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
+    const adjustedNumVideos = Math.min(numVideos, maxVideosPerSearch);
+
+    if (numVideos > maxVideosPerSearch) {
+      toast({
+        title: "Video Limit Applied",
+        description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
+      });
+    }
+
     setIsBulkSearching(true);
     try {
-      const results = await fetchBulkInstagramPosts(urls, numVideos, date);
+      const results = await fetchBulkInstagramPosts(urls, adjustedNumVideos, date);
       
       for (const url of urls) {
         const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
@@ -143,7 +165,6 @@ export const useSearchState = () => {
       throw error;
     } finally {
       setIsBulkSearching(false);
-      // Reset shouldFetch after bulk search
       setShouldFetch(false);
     }
   };
