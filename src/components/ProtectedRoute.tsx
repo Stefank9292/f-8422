@@ -5,11 +5,13 @@ import { ErrorState } from "@/components/auth/ErrorState";
 import { UndefinedSessionState } from "@/components/auth/UndefinedSessionState";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { session, isLoading, error } = useSessionValidation();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
@@ -34,39 +36,23 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         }
 
         if (!currentSession) {
-          console.log('Session expired, attempting refresh...');
-          const { data: refreshResult, error: refreshError } = await supabase.auth.refreshSession();
-          
-          if (refreshError || !refreshResult.session) {
-            console.error('Session refresh failed:', refreshError);
-            queryClient.invalidateQueries({ queryKey: ['session'] });
-            return {
-              subscribed: false,
-              priceId: null,
-              canceled: false,
-              maxClicks: 3
-            };
-          }
-          
-          console.log('Session refreshed successfully');
-          
-          // Call check-subscription with new token
-          const { data, error } = await supabase.functions.invoke('check-subscription', {
-            headers: {
-              Authorization: `Bearer ${refreshResult.session.access_token}`,
-              'Content-Type': 'application/json'
-            }
+          console.log('No active session, redirecting to auth...');
+          // Clear any existing session data
+          await supabase.auth.signOut();
+          queryClient.clear();
+          toast({
+            title: "Session Expired",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
           });
-          
-          if (error) {
-            console.error('Subscription check error with refreshed token:', error);
-            throw error;
-          }
-          
-          return data;
+          return {
+            subscribed: false,
+            priceId: null,
+            canceled: false,
+            maxClicks: 3
+          };
         }
 
-        // Use existing valid session
         console.log('Using existing valid session token');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
@@ -77,6 +63,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         
         if (error) {
           console.error('Subscription check error:', error);
+          // If we get a 401, clear the session and redirect to auth
+          if (error.status === 401) {
+            await supabase.auth.signOut();
+            queryClient.clear();
+            toast({
+              title: "Session Expired",
+              description: "Please sign in again to continue.",
+              variant: "destructive",
+            });
+          }
           throw error;
         }
 
@@ -91,7 +87,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     enabled: !!session?.access_token,
     staleTime: 1000 * 60, // Cache for 1 minute
     retry: (failureCount, error: any) => {
-      if (error?.status === 401) return false;
+      // Don't retry on auth errors
+      if (error?.status === 401 || error?.message?.includes('refresh_token_not_found')) {
+        return false;
+      }
       return failureCount < 3;
     },
     retryDelay: 1000
@@ -102,7 +101,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    return <ErrorState error={error} onRetry={() => window.location.reload()} />;
+    // If we have an auth error, redirect to login
+    if (error.toString().includes('refresh_token_not_found')) {
+      return <Navigate to="/auth" state={{ from: location }} replace />;
+    }
+    return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
   }
 
   // Handle undefined session state
