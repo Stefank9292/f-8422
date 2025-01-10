@@ -20,21 +20,24 @@ export const useAuthForm = ({ mode, onSuccess, updateRateLimit }: AuthFormConfig
       switch (error.status) {
         case 400:
           if (error.message.includes('Invalid login credentials')) {
-            return 'Invalid email or password. Please check your credentials and try again.';
+            return 'The email or password you entered is incorrect. Please try again.';
           }
           if (error.message.includes('Email not confirmed')) {
             return 'Please verify your email address before signing in.';
           }
-          return 'Invalid credentials. Please check your input and try again.';
+          if (error.message.includes('User not found')) {
+            return 'No account found with this email address. Please check your email or sign up for a new account.';
+          }
+          return 'The credentials you entered are invalid. Please check and try again.';
         case 422:
-          return 'Invalid email format. Please enter a valid email address.';
+          return 'Please enter a valid email address.';
         case 429:
-          return 'Too many attempts. Please try again later.';
+          return 'Too many login attempts. Please wait a moment before trying again.';
         default:
-          return 'An error occurred during authentication. Please try again.';
+          return 'Something went wrong. Please try again later.';
       }
     }
-    return 'An unexpected error occurred. Please try again.';
+    return 'Something went wrong. Please try again later.';
   };
 
   const handleAuthError = (error: Error) => {
@@ -43,10 +46,10 @@ export const useAuthForm = ({ mode, onSuccess, updateRateLimit }: AuthFormConfig
     
     const errorMessage = error instanceof AuthError 
       ? getAuthErrorMessage(error)
-      : 'An unexpected error occurred. Please try again.';
+      : 'Something went wrong. Please try again later.';
 
     toast({
-      title: "Authentication Error",
+      title: mode === 'sign_in' ? 'Sign In Failed' : 'Sign Up Failed',
       description: errorMessage,
       variant: "destructive",
     });
