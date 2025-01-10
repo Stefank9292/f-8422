@@ -11,7 +11,6 @@ import { checkPasswordStrength } from "@/utils/auth/validation";
 
 export const Profile = () => {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -24,30 +23,11 @@ export const Profile = () => {
     },
   });
 
-  const { data: profile } = useQuery({
-    queryKey: ['profile', session?.user?.id],
-    queryFn: async () => {
-      if (!session?.user?.id) return null;
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.user?.id,
-  });
-
   useEffect(() => {
     if (session?.user) {
       setEmail(session.user.email || "");
     }
-    if (profile) {
-      setUsername(profile.username || "");
-    }
-  }, [session?.user, profile]);
+  }, [session?.user]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -61,16 +41,6 @@ export const Profile = () => {
         });
         if (emailError) throw emailError;
         updates.push("email");
-      }
-
-      if (username !== profile?.username) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .update({ username })
-          .eq('id', session?.user?.id);
-        
-        if (profileError) throw profileError;
-        updates.push("username");
       }
 
       if (newPassword) {
@@ -123,20 +93,6 @@ export const Profile = () => {
 
         <Card className="p-6 sm:p-8 space-y-8">
           <div className="space-y-6">
-            <div className="space-y-4">
-              <label htmlFor="username" className="text-sm font-medium block">
-                Username
-              </label>
-              <Input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
-                className="h-11"
-              />
-            </div>
-
             <div className="space-y-4">
               <label htmlFor="email" className="text-sm font-medium block">
                 Email Address
