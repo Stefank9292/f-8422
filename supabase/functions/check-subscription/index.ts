@@ -24,7 +24,19 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       console.error('No authorization header provided');
-      throw new Error('No authorization header')
+      return new Response(
+        JSON.stringify({
+          error: 'No authorization header',
+          subscribed: false,
+          priceId: null,
+          canceled: false,
+          maxClicks: 3
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
+        }
+      )
     }
 
     // Create Supabase client with auth header
@@ -60,8 +72,8 @@ serve(async (req) => {
           maxClicks: 3
         }),
         {
-          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
         }
       )
     }
@@ -77,8 +89,8 @@ serve(async (req) => {
           maxClicks: 3
         }),
         {
-          status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 401
         }
       )
     }
