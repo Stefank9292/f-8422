@@ -108,17 +108,14 @@ serve(async (req) => {
 
     console.log('Creating checkout session with return URL:', baseUrl);
     
-    // Create checkout session with proper subscription handling
+    // Create checkout session without proration settings
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
-      allow_promotion_codes: true,
-      subscription_data: {
-        proration_behavior: 'create_prorations'
-      }
+      allow_promotion_codes: true
     })
 
     console.log('Checkout session created:', session.id);
