@@ -13,25 +13,45 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-    )
-
-    const authHeader = req.headers.get('Authorization')!
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user } } = await supabaseClient.auth.getUser(token)
-
-    if (!user?.email) {
-      throw new Error('No email found')
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      console.error('No authorization header provided')
+      throw new Error('No authorization header')
     }
 
-    console.log('Creating checkout session for:', { email: user.email });
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+    )
+
+    // Get user from the JWT token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    )
+
+    if (userError) {
+      console.error('Error getting user:', userError)
+      throw userError
+    }
+
+    if (!user) {
+      console.error('No user found')
+      throw new Error('No user found')
+    }
+
+    if (!user.email) {
+      console.error('No email found for user:', user.id)
+      throw new Error('No email found')
+    }
 
     const { priceId } = await req.json()
     if (!priceId) {
       throw new Error('No price ID provided')
     }
+
+    console.log('Creating checkout session for:', { email: user.email });
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -55,7 +75,7 @@ serve(async (req) => {
       customer_id = customers.data[0].id
       console.log('Found existing customer:', customer_id);
 
-      // Check for existing subscriptions to prevent duplicate subscriptions
+      // Check for existing subscriptions
       const subscriptions = await stripe.subscriptions.list({
         customer: customer_id,
         status: 'active',
