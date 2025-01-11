@@ -8,11 +8,14 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
+    console.log('Starting checkout session creation...');
+
     // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -114,7 +117,6 @@ serve(async (req) => {
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
       allow_promotion_codes: true,
       subscription_data: {
-        trial_period_days: null,
         proration_behavior: 'create_prorations'
       }
     })
