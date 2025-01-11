@@ -4,11 +4,33 @@ import { LoadingState } from "@/components/auth/LoadingState";
 import { ErrorState } from "@/components/auth/ErrorState";
 import { UndefinedSessionState } from "@/components/auth/UndefinedSessionState";
 import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { session, isLoading, error } = useSessionValidation();
   const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useSubscriptionCheck(session);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const handleSessionError = async () => {
+      if (error?.toString().includes('refresh_token_not_found')) {
+        console.log('Session error detected, signing out...');
+        await supabase.auth.signOut();
+        toast({
+          title: "Session Expired",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    if (error) {
+      handleSessionError();
+    }
+  }, [error, toast]);
 
   if (isLoading) {
     return <LoadingState />;
