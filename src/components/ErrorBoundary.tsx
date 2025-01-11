@@ -19,6 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    console.error('Error caught in getDerivedStateFromError:', error);
     return { 
       hasError: true, 
       error: process.env.NODE_ENV === 'production' 
@@ -28,7 +29,14 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Uncaught error:', error, errorInfo);
+    console.error('Detailed error information:', {
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      },
+      componentStack: errorInfo.componentStack
+    });
     
     // Log to Sentry with proper typing
     Sentry.withScope((scope) => {
@@ -49,9 +57,10 @@ export class ErrorBoundary extends Component<Props, State> {
           userId: session.user.id,
           errorName: error.name,
           errorMessage: error.message,
+          errorStack: error.stack,
           timestamp: new Date().toISOString()
         };
-        console.error('Authenticated user error:', sanitizedError);
+        console.error('Authenticated user error details:', sanitizedError);
         
         // Log to Sentry with user context
         Sentry.setUser({
@@ -60,7 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
         });
       }
     } catch (loggingError) {
-      console.error('Error logging failed');
+      console.error('Error during error logging:', loggingError);
       Sentry.captureException(loggingError);
     }
   }

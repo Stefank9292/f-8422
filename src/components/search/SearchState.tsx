@@ -40,7 +40,13 @@ export const useSearchState = () => {
   const { data: posts = [], isLoading, error } = useQuery({
     queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
-      console.log('Fetching Instagram posts for:', username);
+      console.log('Starting Instagram search with params:', {
+        username,
+        numberOfVideos,
+        selectedDate,
+        requestCount,
+        maxRequests
+      });
       
       if (requestCount >= maxRequests) {
         const planName = subscriptionStatus?.priceId ? 'Pro' : 'Free';
@@ -62,15 +68,21 @@ export const useSearchState = () => {
         });
       }
       
-      const results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
-      
-      if (results.length > 0) {
-        await saveSearchHistory(username, results);
+      try {
+        console.log('Fetching Instagram posts...');
+        const results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
+        console.log('Received results:', results);
+        
+        if (results.length > 0) {
+          await saveSearchHistory(username, results);
+        }
+        
+        setShouldFetch(false);
+        return results;
+      } catch (error) {
+        console.error('Error fetching Instagram posts:', error);
+        throw error;
       }
-      
-      setShouldFetch(false);
-      
-      return results;
     },
     enabled: shouldFetch && !!username && !isBulkSearching && requestCount < maxRequests,
     retry: false,
@@ -80,7 +92,13 @@ export const useSearchState = () => {
     refetchOnMount: false,
     meta: {
       onError: (error: Error) => {
-        console.error('Search error:', error);
+        console.error('Search error details:', {
+          error: error.message,
+          stack: error.stack,
+          username,
+          numberOfVideos,
+          selectedDate
+        });
         toast({
           title: "Search Failed",
           description: error.message || "Failed to fetch Instagram posts",
