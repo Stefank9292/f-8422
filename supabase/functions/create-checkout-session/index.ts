@@ -114,7 +114,7 @@ serve(async (req) => {
       cancel_url: `${baseUrl}/subscribe?canceled=true`,
       allow_promotion_codes: true,
       subscription_data: {
-        billing_cycle_anchor: 'now',
+        trial_period_days: null,
         proration_behavior: 'create_prorations'
       }
     })
