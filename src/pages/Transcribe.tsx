@@ -26,6 +26,7 @@ const Transcribe = () => {
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
   const [generatedScript, setGeneratedScript] = useState<string | undefined>();
   const [transcription, setTranscription] = useState<string | undefined>();
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
@@ -88,6 +89,7 @@ const Transcribe = () => {
     }
     
     try {
+      setIsGenerating(true);
       const { data, error } = await supabase.functions.invoke('generate-variation', {
         body: { transcriptionId: currentTranscriptionId }
       });
@@ -102,6 +104,8 @@ const Transcribe = () => {
         description: "Failed to generate script variation. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -215,7 +219,7 @@ const Transcribe = () => {
             <TranscriptionDisplay 
               transcription={transcription}
               onGenerateVariation={generateVariation}
-              isGenerating={false}
+              isGenerating={isGenerating}
             />
           )}
           {generatedScript && (
