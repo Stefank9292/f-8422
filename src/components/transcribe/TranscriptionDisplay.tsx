@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Wand2, Loader2, Copy } from "lucide-react";
+import { Wand2, Loader2, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface TranscriptionDisplayProps {
@@ -14,13 +15,25 @@ export function TranscriptionDisplay({
   onGenerateVariation,
   isGenerating 
 }: TranscriptionDisplayProps) {
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(transcription);
-    toast({
-      description: "Transcription copied to clipboard",
-    });
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(transcription);
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Transcription copied to clipboard",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy transcription to clipboard",
+      });
+    }
   };
 
   return (
@@ -30,13 +43,17 @@ export function TranscriptionDisplay({
           <h3 className="text-lg font-medium">Original Transcription</h3>
           <div className="flex items-center gap-2">
             <Button
-              onClick={handleCopy}
-              variant="secondary"
+              onClick={handleCopyToClipboard}
+              variant="outline"
               size="sm"
               className="h-8"
             >
-              <Copy className="mr-2 h-4 w-4" />
-              Copy
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
             </Button>
             <Button
               onClick={onGenerateVariation}
