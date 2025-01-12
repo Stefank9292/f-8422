@@ -30,10 +30,12 @@ serve(async (req) => {
       .single();
 
     if (fetchError) {
+      console.error('Database fetch error:', fetchError);
       throw fetchError;
     }
 
     // Generate variation using GPT-4
+    console.log('Sending request to GPT-4...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -57,6 +59,7 @@ serve(async (req) => {
 
     if (!response.ok) {
       const error = await response.json();
+      console.error('GPT-4 API error:', error);
       throw new Error(error.error?.message || 'Failed to generate variation');
     }
 
@@ -77,6 +80,7 @@ serve(async (req) => {
       .single();
 
     if (insertError) {
+      console.error('Database insert error:', insertError);
       throw insertError;
     }
 

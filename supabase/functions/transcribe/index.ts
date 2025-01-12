@@ -34,6 +34,7 @@ serve(async (req) => {
     formData.append('model', 'whisper-1');
 
     // Transcribe using Whisper API
+    console.log('Sending request to Whisper API...');
     const transcriptionResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
@@ -44,6 +45,7 @@ serve(async (req) => {
 
     if (!transcriptionResponse.ok) {
       const error = await transcriptionResponse.json();
+      console.error('Whisper API error:', error);
       throw new Error(error.error?.message || 'Failed to transcribe video');
     }
 
@@ -62,6 +64,7 @@ serve(async (req) => {
       .single();
 
     if (scriptError) {
+      console.error('Database error:', scriptError);
       throw scriptError;
     }
 
