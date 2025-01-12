@@ -16,12 +16,12 @@ export const FilterHeader = ({ totalResults, filteredResults, onReset, currentPo
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-6 pt-6 pb-3 bg-card/50 border-x border-t border-border/50">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-6 pt-6 pb-3 bg-card/50 sm:border-x sm:border-t sm:border-border/50">
       {isMobile ? (
         <CollapsibleTrigger asChild>
           <Button 
             variant="outline" 
-            className="w-full flex items-center justify-between p-4 border-x border-b border-border/50"
+            className="w-full flex items-center justify-between p-4 sm:border-x sm:border-b sm:border-border/50"
           >
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
