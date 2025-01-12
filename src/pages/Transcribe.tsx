@@ -18,6 +18,7 @@ const Transcribe = () => {
   const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<"video" | "text">("video");
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
@@ -179,7 +180,11 @@ const Transcribe = () => {
         </p>
       </div>
       
-      <Tabs defaultValue="video" className="space-y-6">
+      <Tabs 
+        defaultValue="video" 
+        className="space-y-6"
+        onValueChange={(value) => setActiveTab(value as "video" | "text")}
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="video" className="space-x-2">
             <VideoIcon className="h-4 w-4" />
@@ -197,6 +202,30 @@ const Transcribe = () => {
             isLoading={transcribeMutation.isPending}
             stage={transcriptionStage}
           />
+          
+          {scripts && activeTab === "video" && (
+            <div className="space-y-6">
+              <TranscriptionDisplay 
+                transcription={scripts.original_text}
+                onGenerateVariation={handleGenerateVariation}
+                isGenerating={generateVariationMutation.isPending}
+              />
+
+              {variations && variations.length > 0 && (
+                <div className="space-y-4">
+                  <h2 className="text-lg font-semibold">Generated Variations</h2>
+                  <div className="grid gap-4">
+                    {variations.map((variation) => (
+                      <ScriptVariation 
+                        key={variation.id}
+                        variation={variation.variation_text || variation.original_text}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="text" className="space-y-6">
@@ -207,30 +236,6 @@ const Transcribe = () => {
           />
         </TabsContent>
       </Tabs>
-
-      {scripts && (
-        <div className="space-y-6">
-          <TranscriptionDisplay 
-            transcription={scripts.original_text}
-            onGenerateVariation={handleGenerateVariation}
-            isGenerating={generateVariationMutation.isPending}
-          />
-
-          {variations && variations.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold">Generated Variations</h2>
-              <div className="grid gap-4">
-                {variations.map((variation) => (
-                  <ScriptVariation 
-                    key={variation.id}
-                    variation={variation.variation_text || variation.original_text}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
