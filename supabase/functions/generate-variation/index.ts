@@ -12,18 +12,31 @@ serve(async (req) => {
   }
 
   try {
+    // Get auth user
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (userError || !user) {
+      throw new Error('Invalid user token');
+    }
+
     const { transcriptionId } = await req.json();
     console.log('Generating variation for transcription:', transcriptionId);
 
     if (!transcriptionId) {
       throw new Error('Transcription ID is required');
     }
-
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     // Get original transcription
     const { data: originalScript, error: fetchError } = await supabaseClient
@@ -73,7 +86,7 @@ serve(async (req) => {
     const { data: variationScript, error: insertError } = await supabaseClient
       .from('scripts')
       .insert({
-        user_id: req.auth.uid,
+        user_id: user.id,
         original_text: variation,
         script_type: 'variation',
         parent_script_id: transcriptionId
@@ -104,7 +117,10 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
