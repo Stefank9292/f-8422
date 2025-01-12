@@ -23,10 +23,10 @@ export const PostTableRow = ({
     return num.toLocaleString('de-DE').replace(/,/g, '.');
   };
 
-  // Format engagement rate to always show 2 decimal places without %
+  // Format engagement rate to always show 2 decimal places
   const formattedEngagement = typeof post.engagement === 'string' 
-    ? parseFloat(post.engagement).toFixed(2)
-    : post.engagement.toFixed(2);
+    ? `${parseFloat(post.engagement).toFixed(2)}%`
+    : `${post.engagement.toFixed(2)}%`;
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
