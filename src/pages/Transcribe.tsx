@@ -3,11 +3,14 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
+import { TextToScriptForm } from "@/components/transcribe/TextToScriptForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
 import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { Tables } from "@/integrations/supabase/types";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { VideoIcon, FileTextIcon } from "lucide-react";
 
 type Script = Tables<"scripts">;
 
@@ -71,7 +74,41 @@ const Transcribe = () => {
     },
   });
 
-  const generateVariationMutation = useMutation<Script>({
+  const textToScriptMutation = useMutation({
+    mutationFn: async (text: string) => {
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: text,
+          script_type: 'text'
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setCurrentTranscriptionId(scriptData.id);
+      localStorage.setItem('currentTranscriptionId', scriptData.id);
+      return scriptData;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scripts'] });
+      toast({
+        title: "Success",
+        description: "Text converted to script successfully!",
+      });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to convert text to script",
+      });
+    },
+  });
+
+  const generateVariationMutation = useMutation({
     mutationFn: async () => {
       if (!currentTranscriptionId) throw new Error("No transcription selected");
       
@@ -155,17 +192,39 @@ const Transcribe = () => {
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight">Video Transcriber</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Script Generator</h1>
         <p className="text-sm text-muted-foreground">
-          Transform your Instagram videos into text with our AI-powered transcription service.
+          Transform your videos or text content into engaging social media scripts.
         </p>
       </div>
       
-      <TranscribeForm 
-        onSubmit={(url) => transcribeMutation.mutateAsync(url)}
-        isLoading={transcribeMutation.isPending}
-        stage={transcriptionStage}
-      />
+      <Tabs defaultValue="video" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="video" className="space-x-2">
+            <VideoIcon className="h-4 w-4" />
+            <span>Video to Script</span>
+          </TabsTrigger>
+          <TabsTrigger value="text" className="space-x-2">
+            <FileTextIcon className="h-4 w-4" />
+            <span>Text to Script</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="video" className="space-y-6">
+          <TranscribeForm 
+            onSubmit={(url) => transcribeMutation.mutateAsync(url)}
+            isLoading={transcribeMutation.isPending}
+            stage={transcriptionStage}
+          />
+        </TabsContent>
+
+        <TabsContent value="text" className="space-y-6">
+          <TextToScriptForm 
+            onSubmit={(text) => textToScriptMutation.mutateAsync(text)}
+            isLoading={textToScriptMutation.isPending}
+          />
+        </TabsContent>
+      </Tabs>
 
       {scripts && (
         <div className="space-y-6">
