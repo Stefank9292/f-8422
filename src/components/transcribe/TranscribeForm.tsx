@@ -43,8 +43,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to transcribe video",
-        icon: <AlertCircle className="h-5 w-5" />
+        description: error instanceof Error ? error.message : "Failed to transcribe video"
       });
     }
   };
