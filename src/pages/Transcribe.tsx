@@ -125,7 +125,7 @@ const Transcribe = () => {
     },
     enabled: !!currentTranscriptionId,
     staleTime: Infinity, // Keep data fresh indefinitely
-    cacheTime: 1000 * 60 * 60, // Cache for 1 hour
+    gcTime: 1000 * 60 * 60, // Cache for 1 hour (formerly cacheTime)
   });
 
   const { data: variations } = useQuery({
@@ -151,7 +151,7 @@ const Transcribe = () => {
     },
     enabled: !!currentTranscriptionId,
     staleTime: Infinity, // Keep data fresh indefinitely
-    cacheTime: 1000 * 60 * 60, // Cache for 1 hour
+    gcTime: 1000 * 60 * 60, // Cache for 1 hour (formerly cacheTime)
   });
 
   return (
