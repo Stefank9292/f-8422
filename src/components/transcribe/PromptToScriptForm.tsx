@@ -12,7 +12,6 @@ import { ScriptVariation } from "./ScriptVariation";
 
 const formSchema = z.object({
   prompt: z.string().min(10, "Please enter at least 10 characters for your prompt"),
-  text: z.string().min(50, "Please enter at least 50 characters of text")
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -29,13 +28,12 @@ export function PromptToScriptForm({ onSubmit, isLoading, generatedScript }: Pro
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
-      text: ""
     }
   });
 
   const handleSubmit = async (data: FormData) => {
     try {
-      await onSubmit(data.prompt, data.text);
+      await onSubmit(data.prompt, "");
       form.reset();
       toast({
         title: "Success",
@@ -65,24 +63,6 @@ export function PromptToScriptForm({ onSubmit, isLoading, generatedScript }: Pro
                     <Textarea 
                       placeholder="Enter your instructions for how to transform the text..." 
                       className="min-h-[100px]"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Your Text Content</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Paste your text content here..." 
-                      className="min-h-[200px]"
                       {...field}
                       disabled={isLoading}
                     />
