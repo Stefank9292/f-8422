@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, AlertCircle, Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
+import { supabase } from "@/integrations/supabase/client";
 
 const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
 
@@ -37,15 +38,19 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
   });
 
   const handleSubmit = async (data: FormData) => {
-    try {
-      await onSubmit(data.url);
-      form.reset();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to transcribe video"
-      });
+    if (selectedFile) {
+      await handleFileUpload();
+    } else {
+      try {
+        await onSubmit(data.url);
+        form.reset();
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to transcribe video"
+        });
+      }
     }
   };
 
@@ -72,6 +77,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       // Call onSubmit with the transcribed text
       await onSubmit(data.text);
       setSelectedFile(null);
+      form.reset();
     } catch (error) {
       toast({
         variant: "destructive",
@@ -114,7 +120,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                       placeholder="https://www.instagram.com/p/..." 
                       className="h-10"
                       {...field}
-                      disabled={isLoading}
+                      disabled={isLoading || !!selectedFile}
                     />
                   </FormControl>
                   <FormMessage />
@@ -128,7 +134,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                 className="w-full sm:w-auto"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Transcribe Video
+                {selectedFile ? 'Transcribe File' : 'Transcribe Video'}
               </Button>
 
               <div className="flex gap-2 items-center">
@@ -150,17 +156,6 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                   <Upload className="mr-2 h-4 w-4" />
                   Upload File
                 </Button>
-                {selectedFile && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleFileUpload}
-                    disabled={isLoading}
-                  >
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Transcribe File
-                  </Button>
-                )}
               </div>
             </div>
           </form>
