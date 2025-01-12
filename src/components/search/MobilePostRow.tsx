@@ -30,7 +30,7 @@ export const MobilePostRow = ({
     <Collapsible
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="rounded-lg border border-border bg-card text-card-foreground shadow-sm"
+      className="rounded-lg bg-card text-card-foreground shadow-sm"
     >
       <CollapsibleTrigger className="flex w-full items-start justify-between p-4 hover:bg-muted/50">
         <div className="flex flex-col items-start gap-2">
