@@ -67,7 +67,10 @@ serve(async (req) => {
     }
 
     const contentType = videoResponse.headers.get('content-type');
-    if (!contentType?.includes('video')) {
+    console.log('Content type:', contentType);
+
+    // Accept both video and audio content types
+    if (!contentType?.includes('video') && !contentType?.includes('audio')) {
       console.error('Invalid content type:', contentType);
       throw new Error('Invalid content type: ' + contentType);
     }
@@ -79,10 +82,12 @@ serve(async (req) => {
     }
 
     // 3. Prepare form data for Whisper API
-    console.log('Preparing video for transcription...');
+    console.log('Preparing audio for transcription...');
     const formData = new FormData();
-    formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }), 'video.mp4');
+    formData.append('file', new Blob([videoBuffer], { type: 'audio/mp4' }), 'audio.mp4');
     formData.append('model', 'whisper-1');
+    formData.append('language', 'en');
+    formData.append('response_format', 'json');
 
     // 4. Send to Whisper API
     console.log('Sending to Whisper API...');
