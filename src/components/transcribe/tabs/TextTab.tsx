@@ -2,10 +2,21 @@ import { useState } from "react";
 import { TextToScriptForm } from "@/components/transcribe/TextToScriptForm";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranscriptionStore } from "@/store/transcriptionStore";
+import { useEffect } from "react";
 
 export function TextTab() {
-  const [textGeneratedScript, setTextGeneratedScript] = useState<string | undefined>();
+  const { textGeneratedScript, setTextGeneratedScript } = useTranscriptionStore();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setTextGeneratedScript(undefined);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [setTextGeneratedScript]);
 
   const textToScriptMutation = useMutation({
     mutationFn: async (text: string) => {

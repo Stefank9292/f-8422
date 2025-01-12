@@ -5,16 +5,34 @@ import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranscriptionStore } from "@/store/transcriptionStore";
+import { useEffect } from "react";
 
 export function FileTab() {
-  const [fileGeneratedScript, setFileGeneratedScript] = useState<string | undefined>();
-  const [promptGeneratedScript, setPromptGeneratedScript] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
+
+  const {
+    fileTranscription,
+    fileGeneratedScript,
+    setFileTranscription,
+    setFileGeneratedScript
+  } = useTranscriptionStore();
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setFileTranscription(undefined);
+      setFileGeneratedScript(undefined);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [setFileTranscription, setFileGeneratedScript]);
 
   const fileToScriptMutation = useMutation({
     mutationFn: async (filePath: string) => {
@@ -36,7 +54,7 @@ export function FileTab() {
 
       if (scriptError) throw scriptError;
       
-      setFileGeneratedScript(data.text);
+      setFileTranscription(data.text);
       const newTranscriptionId = scriptData.id;
       setCurrentTranscriptionId(newTranscriptionId);
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
@@ -45,7 +63,7 @@ export function FileTab() {
   });
 
   const generateVariation = async () => {
-    if (!fileGeneratedScript) {
+    if (!fileTranscription) {
       toast({
         title: "Error",
         description: "No transcription available. Please transcribe a file first.",
@@ -57,7 +75,7 @@ export function FileTab() {
     try {
       setIsGenerating(true);
       const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
-        body: { text: fileGeneratedScript }
+        body: { text: fileTranscription }
       });
 
       if (aiError) throw aiError;
@@ -66,7 +84,7 @@ export function FileTab() {
         .from('scripts')
         .insert({
           user_id: (await supabase.auth.getUser()).data.user?.id,
-          original_text: fileGeneratedScript,
+          original_text: fileTranscription,
           variation_text: aiResponse.text,
           script_type: 'variation' as const,
           parent_script_id: currentTranscriptionId
@@ -76,7 +94,7 @@ export function FileTab() {
 
       if (scriptError) throw scriptError;
       
-      setPromptGeneratedScript(aiResponse.text);
+      setFileGeneratedScript(aiResponse.text);
     } catch (error) {
       console.error('Error generating variation:', error);
       toast({
@@ -100,17 +118,15 @@ export function FileTab() {
         onSubmit={handleFileToScript}
         isLoading={fileToScriptMutation.isPending}
       />
+      {fileTranscription && (
+        <TranscriptionDisplay 
+          transcription={fileTranscription}
+          onGenerateVariation={generateVariation}
+          isGenerating={isGenerating}
+        />
+      )}
       {fileGeneratedScript && (
-        <>
-          <TranscriptionDisplay 
-            transcription={fileGeneratedScript}
-            onGenerateVariation={generateVariation}
-            isGenerating={isGenerating}
-          />
-          {promptGeneratedScript && (
-            <ScriptVariation variation={promptGeneratedScript} />
-          )}
-        </>
+        <ScriptVariation variation={fileGeneratedScript} />
       )}
     </div>
   );

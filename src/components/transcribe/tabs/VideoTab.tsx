@@ -6,17 +6,35 @@ import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgres
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTranscriptionStore } from "@/store/transcriptionStore";
+import { useEffect } from "react";
 
 export function VideoTab() {
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
-  const [transcription, setTranscription] = useState<string | undefined>();
-  const [videoGeneratedScript, setVideoGeneratedScript] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
+  
+  const {
+    videoTranscription,
+    videoGeneratedScript,
+    setVideoTranscription,
+    setVideoGeneratedScript
+  } = useTranscriptionStore();
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      setVideoTranscription(undefined);
+      setVideoGeneratedScript(undefined);
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [setVideoTranscription, setVideoGeneratedScript]);
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
@@ -47,7 +65,7 @@ export function VideoTab() {
       if (scriptError) throw scriptError;
       
       setTranscriptionStage('completed');
-      setTranscription(data.text);
+      setVideoTranscription(data.text);
       const newTranscriptionId = scriptData.id;
       setCurrentTranscriptionId(newTranscriptionId);
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
@@ -56,7 +74,7 @@ export function VideoTab() {
   });
 
   const generateVariation = async () => {
-    if (!transcription) {
+    if (!videoTranscription) {
       toast({
         title: "Error",
         description: "No transcription available. Please transcribe a video first.",
@@ -68,7 +86,7 @@ export function VideoTab() {
     try {
       setIsGenerating(true);
       const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
-        body: { text: transcription }
+        body: { text: videoTranscription }
       });
 
       if (aiError) throw aiError;
@@ -77,7 +95,7 @@ export function VideoTab() {
         .from('scripts')
         .insert({
           user_id: (await supabase.auth.getUser()).data.user?.id,
-          original_text: transcription,
+          original_text: videoTranscription,
           variation_text: aiResponse.text,
           script_type: 'variation' as const,
           parent_script_id: currentTranscriptionId
@@ -112,9 +130,9 @@ export function VideoTab() {
         isLoading={transcribeMutation.isPending}
         stage={transcriptionStage}
       />
-      {transcription && (
+      {videoTranscription && (
         <TranscriptionDisplay 
-          transcription={transcription}
+          transcription={videoTranscription}
           onGenerateVariation={generateVariation}
           isGenerating={isGenerating}
         />
