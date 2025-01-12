@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2, Upload, Link, File } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
@@ -134,7 +134,17 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                 className="w-full sm:w-auto"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {selectedFile ? 'Transcribe File' : 'Transcribe Video'}
+                {selectedFile ? (
+                  <>
+                    <File className="mr-2 h-4 w-4" />
+                    Transcribe File
+                  </>
+                ) : (
+                  <>
+                    <Link className="mr-2 h-4 w-4" />
+                    Transcribe Video
+                  </>
+                )}
               </Button>
 
               <div className="flex gap-2 items-center">
