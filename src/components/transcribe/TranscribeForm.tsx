@@ -207,7 +207,10 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       </Card>
 
       {isLoading && stage && (
-        <TranscriptionProgress stage={stage} />
+        <TranscriptionProgress 
+          stage={stage} 
+          isFileUpload={!!selectedFile} 
+        />
       )}
     </div>
   );
