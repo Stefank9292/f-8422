@@ -43,10 +43,7 @@ const Transcribe = () => {
         body: { url }
       });
 
-      if (error) {
-        console.error('Transcription error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       console.log('Transcription response:', data);
       
@@ -94,10 +91,66 @@ const Transcribe = () => {
 
       if (scriptError) throw scriptError;
       
-      setTranscription(data.text);
+      setFileGeneratedScript(data.text);
       const newTranscriptionId = scriptData.id;
       setCurrentTranscriptionId(newTranscriptionId);
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
+      return scriptData;
+    },
+  });
+
+  const textToScriptMutation = useMutation({
+    mutationFn: async (text: string) => {
+      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
+        body: { text }
+      });
+
+      if (aiError) throw aiError;
+
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: text,
+          variation_text: aiResponse.text,
+          script_type: 'transcription' as const
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setCurrentTranscriptionId(scriptData.id);
+      localStorage.setItem('currentTranscriptionId', scriptData.id);
+      setTextGeneratedScript(aiResponse.text);
+      return scriptData;
+    },
+  });
+
+  const promptToScriptMutation = useMutation({
+    mutationFn: async ({ prompt, text }: { prompt: string; text: string }) => {
+      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-prompt-script', {
+        body: { prompt, text }
+      });
+
+      if (aiError) throw aiError;
+
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: text,
+          variation_text: aiResponse.text,
+          script_type: 'transcription' as const
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setCurrentTranscriptionId(scriptData.id);
+      localStorage.setItem('currentTranscriptionId', scriptData.id);
+      setPromptGeneratedScript(aiResponse.text);
       return scriptData;
     },
   });
@@ -134,7 +187,7 @@ const Transcribe = () => {
 
       if (scriptError) throw scriptError;
       
-      setFileGeneratedScript(aiResponse.text);
+      setPromptGeneratedScript(aiResponse.text);
     } catch (error) {
       console.error('Error generating variation:', error);
       toast({
@@ -163,8 +216,7 @@ const Transcribe = () => {
   };
 
   const handleFileToScript = async (filePath: string) => {
-    const result = await fileToScriptMutation.mutateAsync(filePath);
-    setFileGeneratedScript(result.original_text);
+    await fileToScriptMutation.mutateAsync(filePath);
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
@@ -210,7 +262,7 @@ const Transcribe = () => {
           {transcription && (
             <TranscriptionDisplay 
               transcription={transcription}
-              onGenerateVariation={generateVariation}
+              onGenerateVariation={generateFileVariation}
               isGenerating={isGenerating}
             />
           )}
