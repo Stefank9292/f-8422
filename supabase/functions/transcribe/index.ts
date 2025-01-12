@@ -86,7 +86,17 @@ serve(async (req) => {
       audioType = videoResponse.headers.get('content-type') || 'video/mp4';
     } else if (file) {
       console.log('Processing uploaded file:', fileName);
-      audioData = file;
+      
+      // Convert base64 to ArrayBuffer if needed
+      if (typeof file === 'string' && file.includes('base64,')) {
+        const base64Data = file.split('base64,')[1];
+        audioData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)).buffer;
+      } else if (file instanceof ArrayBuffer) {
+        audioData = file;
+      } else {
+        throw new Error('Invalid file data format');
+      }
+      
       audioType = fileType;
 
       // Validate file type
@@ -105,7 +115,8 @@ serve(async (req) => {
     // Prepare form data for Whisper API
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
-    const blob = new Blob([audioData], { type: audioType });
+    const uint8Array = new Uint8Array(audioData);
+    const blob = new Blob([uint8Array], { type: audioType });
     formData.append('file', blob, fileName || 'video.mp4');
     formData.append('model', 'whisper-1');
 
