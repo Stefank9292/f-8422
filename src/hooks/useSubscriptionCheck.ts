@@ -54,7 +54,7 @@ export const useSubscriptionCheck = (session: Session | null) => {
           };
         }
 
-        console.log('Using existing valid session token');
+        console.log('Using session token for subscription check:', currentSession.access_token);
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${currentSession.access_token}`,
@@ -88,7 +88,7 @@ export const useSubscriptionCheck = (session: Session | null) => {
     staleTime: 1000 * 60, // Cache for 1 minute
     retry: (failureCount, error: any) => {
       // Don't retry on auth errors
-      if (error?.status === 401 || error?.message?.includes('refresh_token_not_found')) {
+      if (error?.status === 401 || error?.message?.includes('Invalid user session')) {
         return false;
       }
       return failureCount < 3;

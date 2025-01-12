@@ -7,17 +7,23 @@ import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { session, isLoading, error } = useSessionValidation();
-  const { data: subscriptionStatus, isLoading: isLoadingSubscription } = useSubscriptionCheck(session);
+  const queryClient = useQueryClient();
+  const { data: subscriptionStatus, isLoading: isLoadingSubscription, error: subscriptionError } = useSubscriptionCheck(session);
   const { toast } = useToast();
 
   useEffect(() => {
     const handleSessionError = async () => {
-      if (error?.toString().includes('refresh_token_not_found')) {
-        console.log('Session error detected, signing out...');
+      if (error?.toString().includes('refresh_token_not_found') || 
+          error?.toString().includes('Invalid user session')) {
+        console.log('Session error detected, signing out...', error);
+        // Clear query cache
+        queryClient.clear();
+        // Sign out
         await supabase.auth.signOut();
         toast({
           title: "Session Expired",
@@ -30,7 +36,16 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     if (error) {
       handleSessionError();
     }
-  }, [error, toast]);
+  }, [error, toast, queryClient]);
+
+  useEffect(() => {
+    if (subscriptionError) {
+      console.log('Subscription check error:', subscriptionError);
+      if (subscriptionError.status === 401) {
+        queryClient.invalidateQueries({ queryKey: ['session'] });
+      }
+    }
+  }, [subscriptionError, queryClient]);
 
   if (isLoading) {
     return <LoadingState />;
@@ -38,7 +53,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (error) {
     // If we have an auth error, redirect to login
-    if (error.toString().includes('refresh_token_not_found')) {
+    if (error.toString().includes('refresh_token_not_found') || 
+        error.toString().includes('Invalid user session')) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
     }
     return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
