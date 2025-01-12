@@ -1,39 +1,28 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0';
+import OpenAI from "https://esm.sh/openai@4.28.0";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
-  // Enable CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-      }
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const openai = new OpenAI({
+      apiKey: Deno.env.get('OPENAI_API_KEY'),
+    });
+
     // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    // Get the user from the request
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
-
-    if (userError || !user) {
-      throw new Error('User not authenticated');
-    }
 
     const { transcriptionId } = await req.json();
     console.log('Generating variation for transcription:', transcriptionId);
@@ -53,15 +42,11 @@ serve(async (req) => {
       throw new Error('Failed to fetch original script');
     }
 
-    // Initialize OpenAI
-    const configuration = new Configuration({
-      apiKey: Deno.env.get('OPENAI_API_KEY'),
-    });
-    const openai = new OpenAIApi(configuration);
+    console.log('Original script:', originalScript);
 
     // Generate variation using OpenAI
-    const completion = await openai.createChatCompletion({
-      model: "gpt-4",
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
@@ -74,9 +59,25 @@ serve(async (req) => {
       ],
     });
 
-    const variation = completion.data.choices[0]?.message?.content;
+    const variation = completion.choices[0]?.message?.content;
     if (!variation) {
       throw new Error('Failed to generate variation');
+    }
+
+    console.log('Generated variation:', variation);
+
+    // Get user ID from auth header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+
+    if (userError || !user) {
+      throw new Error('User not authenticated');
     }
 
     // Store the variation
@@ -92,24 +93,22 @@ serve(async (req) => {
       .single();
 
     if (insertError) {
+      console.error('Error storing variation:', insertError);
       throw new Error('Failed to store variation');
     }
 
     return new Response(JSON.stringify(variationScript), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    console.error('Error in generate-variation function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }), 
+      { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
