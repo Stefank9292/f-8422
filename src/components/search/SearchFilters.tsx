@@ -137,10 +137,10 @@ export const SearchFilters = ({
         </CollapsibleContent>
       </Collapsible>
 
-      <div className="bg-card/50 border-x border-b border-border/50">
-        <div className="grid grid-cols-6 gap-6 p-6">
+      <div className="hidden md:block bg-card/50 border-x border-b border-border/50">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
           {filterInputs.map((input, index) => (
-            <div key={index} className="w-full min-w-[150px] max-w-[200px]">
+            <div key={index} className="w-full">
               <FilterInput {...input} />
             </div>
           ))}

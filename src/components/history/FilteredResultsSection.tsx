@@ -48,7 +48,6 @@ export function FilteredResultsSection({
     return saved ? JSON.parse(saved) : false;
   });
 
-  // Apply sorting to filteredResults
   const sortedResults = [...unfilteredResults].sort((a, b) => {
     if (!sortKey) return 0;
 
@@ -64,7 +63,6 @@ export function FilteredResultsSection({
     } else if (typeof valueA === 'number' && typeof valueB === 'number') {
       // No conversion needed for numbers
     } else {
-      // Convert to strings for string comparison
       valueA = String(valueA);
       valueB = String(valueB);
     }
@@ -85,8 +83,8 @@ export function FilteredResultsSection({
   const totalPages = Math.ceil(sortedResults.length / pageSize);
 
   return (
-    <div className="mt-3 space-y-4 animate-fade-in px-2 sm:px-0">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="mt-3 space-y-4 animate-fade-in px-4 sm:px-6 md:px-8">
+      <div className="flex flex-col space-y-4">
         <div className="w-full">
           <SearchFilters
             filters={filters}
@@ -128,4 +126,4 @@ export function FilteredResultsSection({
       </div>
     </div>
   );
-}
+};
