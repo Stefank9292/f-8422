@@ -76,7 +76,7 @@ export const SearchFilters = ({
     },
     {
       icon: Zap,
-      label: "Min. Engagement (%)",
+      label: "Min. Engagement",
       value: filters.minEngagement,
       onChange: (value: string) => onFilterChange('minEngagement', value),
       placeholder: "e.g. 5",
