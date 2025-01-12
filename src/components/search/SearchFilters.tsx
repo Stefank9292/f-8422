@@ -3,8 +3,6 @@ import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ExportCSV } from "./ExportCSV";
 
 interface FiltersType {
   minViews: string;
@@ -104,17 +102,6 @@ export const SearchFilters = ({
                 {...input}
               />
             ))}
-            <div className="flex flex-col gap-3 pt-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={onReset}
-                className="w-full h-10 text-xs font-medium border border-border/50"
-              >
-                Reset Filters
-              </Button>
-              <ExportCSV currentPosts={currentPosts} />
-            </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
