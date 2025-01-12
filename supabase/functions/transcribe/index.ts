@@ -88,6 +88,7 @@ serve(async (req) => {
       console.log('Video downloaded successfully, size:', audioData.byteLength, 'bytes');
     } else if (file) {
       console.log('Processing uploaded file:', fileName);
+      console.log('File type:', fileType);
       
       // Convert base64 to ArrayBuffer if needed
       if (typeof file === 'string' && file.includes('base64,')) {
@@ -97,6 +98,7 @@ serve(async (req) => {
       } else if (file instanceof ArrayBuffer) {
         audioData = file;
       } else {
+        console.error('Invalid file data format:', typeof file);
         throw new Error('Invalid file data format');
       }
       
