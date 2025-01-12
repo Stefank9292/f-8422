@@ -78,16 +78,23 @@ const Transcribe = () => {
   });
 
   const generateVariation = async () => {
-    if (!transcription) return;
+    if (!currentTranscriptionId) {
+      toast({
+        title: "Error",
+        description: "No transcription available. Please transcribe a video first.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       const { data, error } = await supabase.functions.invoke('generate-variation', {
-        body: { text: transcription }
+        body: { transcriptionId: currentTranscriptionId }
       });
 
       if (error) throw error;
 
-      setGeneratedScript(data.text);
+      setGeneratedScript(data.variation_text);
     } catch (error) {
       console.error('Error generating variation:', error);
       toast({
