@@ -2,6 +2,3 @@ project_id = "uubpxlhfkxqjrsgnwlzh"
 
 [functions.transcribe]
 verify_jwt = true
-
-[functions.generate-variation]
-verify_jwt = true

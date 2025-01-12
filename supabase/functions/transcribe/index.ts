@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -31,7 +30,7 @@ serve(async (req) => {
     const videoBuffer = await videoResponse.arrayBuffer();
     console.log('Video downloaded, size:', videoBuffer.byteLength);
 
-    // Prepare form data with video file directly
+    // Prepare form data with video file
     console.log('Preparing video for transcription...');
     const formData = new FormData();
     formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }), 'video.mp4');
