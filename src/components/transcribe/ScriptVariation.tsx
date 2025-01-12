@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card";
 
 interface ScriptVariationProps {
   variation: string;
@@ -170,6 +171,14 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
                 style={{ width: `${readabilityScore}%` }}
               />
             </div>
+            <HoverCard>
+              <HoverCardTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </HoverCardTrigger>
+              <HoverCardContent className="text-sm">
+                Score based on sentence length and word complexity - higher scores indicate better readability.
+              </HoverCardContent>
+            </HoverCard>
           </div>
         </div>
         <Button
