@@ -95,7 +95,7 @@ export const SearchFilters = ({
           isMobile={true}
         />
         <CollapsibleContent className="mt-4">
-          <div className="space-y-6 bg-card/50 rounded-lg p-4 border border-border/50">
+          <div className="space-y-6 bg-card/50 rounded-lg p-4">
             {filterInputs.map((input, index) => (
               <FilterInput
                 key={index}
