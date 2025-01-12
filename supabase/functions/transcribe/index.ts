@@ -35,6 +35,11 @@ serve(async (req) => {
     const { url } = await req.json();
     console.log('Processing URL:', url);
 
+    // Validate URL format
+    if (!url.includes('instagram.com')) {
+      throw new Error('Invalid Instagram URL format');
+    }
+
     // Fetch video details from Instagram
     const response = await fetch('https://api.apify.com/v2/acts/apify~instagram-post-scraper/run-sync-get-dataset-items', {
       method: 'POST',
@@ -53,13 +58,15 @@ serve(async (req) => {
         "resultsLimit": 1,
         "resultsType": "details",
         "searchLimit": 1,
-        "searchType": "user"
+        "searchType": "user",
+        "maxRequestRetries": 3
       })
     });
 
     if (!response.ok) {
-      console.error('Instagram API error:', await response.text());
-      throw new Error(`Failed to fetch video details: ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Instagram API error:', errorText);
+      throw new Error(`Failed to fetch video details: ${response.statusText || 'Bad Request'}`);
     }
 
     const data = await response.json();
@@ -69,7 +76,8 @@ serve(async (req) => {
       throw new Error('No video data found');
     }
 
-    // Mock transcription for now
+    // For now, return a mock transcription
+    // In a real implementation, you would process the video and transcribe it
     const transcriptionText = "This is a mock transcription of the video content.";
 
     return new Response(
