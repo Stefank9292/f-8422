@@ -34,7 +34,6 @@ const Transcribe = () => {
       setTranscriptionStage('transcribing');
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // Store the transcription in the database
       const { data: scriptData, error: scriptError } = await supabase
         .from('scripts')
         .insert({
@@ -76,9 +75,11 @@ const Transcribe = () => {
       });
 
       if (error) throw error;
+      
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scripts'] });
+      queryClient.invalidateQueries({ queryKey: ['variations', currentTranscriptionId] });
       toast({
         title: "Success",
         description: "Script variation generated successfully!",
@@ -172,7 +173,7 @@ const Transcribe = () => {
                 {variations.map((variation) => (
                   <ScriptVariation 
                     key={variation.id}
-                    variation={variation.original_text}
+                    variation={variation.variation_text || variation.original_text}
                   />
                 ))}
               </div>

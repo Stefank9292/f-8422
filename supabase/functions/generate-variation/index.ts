@@ -8,7 +8,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -18,7 +17,6 @@ serve(async (req) => {
       apiKey: Deno.env.get('OPENAI_API_KEY'),
     });
 
-    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -31,7 +29,6 @@ serve(async (req) => {
       throw new Error('Transcription ID is required');
     }
 
-    // Get original transcription
     const { data: originalScript, error: fetchError } = await supabaseClient
       .from('scripts')
       .select('original_text')
@@ -44,9 +41,8 @@ serve(async (req) => {
 
     console.log('Original script:', originalScript);
 
-    // Generate variation using OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
@@ -66,7 +62,6 @@ serve(async (req) => {
 
     console.log('Generated variation:', variation);
 
-    // Get user ID from auth header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       throw new Error('No authorization header');
@@ -80,12 +75,12 @@ serve(async (req) => {
       throw new Error('User not authenticated');
     }
 
-    // Store the variation
     const { data: variationScript, error: insertError } = await supabaseClient
       .from('scripts')
       .insert({
         user_id: user.id,
-        original_text: variation,
+        original_text: originalScript.original_text,
+        variation_text: variation,
         script_type: 'variation',
         parent_script_id: transcriptionId
       })
