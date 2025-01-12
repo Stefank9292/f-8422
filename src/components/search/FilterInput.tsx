@@ -66,7 +66,7 @@ export const FilterInput = ({
 
   if (isDatePicker) {
     return (
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 w-full">
         <Label className="text-xs font-medium flex items-center gap-1.5">
           <Icon className="h-3.5 w-3.5" />
           <span>{label}</span>
@@ -111,7 +111,7 @@ export const FilterInput = ({
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5 w-full">
       <Label className="text-xs font-medium flex items-center gap-1.5">
         <Icon className="h-3.5 w-3.5" />
         <span>{label}</span>

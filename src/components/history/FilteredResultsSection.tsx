@@ -55,7 +55,6 @@ export function FilteredResultsSection({
     let valueA = a[sortKey as keyof typeof a];
     let valueB = b[sortKey as keyof typeof b];
 
-    // Handle special cases for different types of values
     if (sortKey === 'date' || sortKey === 'timestamp') {
       valueA = new Date(valueA as string).getTime();
       valueB = new Date(valueB as string).getTime();
@@ -86,9 +85,9 @@ export function FilteredResultsSection({
   const totalPages = Math.ceil(sortedResults.length / pageSize);
 
   return (
-    <div className="mt-3 space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between px-1">
-        <div className="flex-1">
+    <div className="mt-3 space-y-4 animate-fade-in px-2 sm:px-0">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="w-full">
           <SearchFilters
             filters={filters}
             onFilterChange={onFilterChange}
