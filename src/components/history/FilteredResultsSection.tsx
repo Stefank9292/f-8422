@@ -99,11 +99,11 @@ export function FilteredResultsSection({
 
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out",
+          "overflow-hidden transition-all duration-300 ease-in-out rounded-lg border border-border/50",
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
       >
-        <div className="rounded-lg overflow-hidden border border-border/50">
+        <div className="overflow-hidden">
           <TableContent
             currentPosts={currentPosts}
             handleSort={handleSort}
