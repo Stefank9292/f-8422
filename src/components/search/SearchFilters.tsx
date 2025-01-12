@@ -1,7 +1,7 @@
-import { Calendar, Eye, Play, Heart, MessageCircle, Zap, ChevronDown, Filter, X } from "lucide-react";
+import { Calendar, Eye, Play, Heart, MessageCircle, Zap } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ExportCSV } from "./ExportCSV";
@@ -88,31 +88,14 @@ export const SearchFilters = ({
 
   return (
     <div className="space-y-0 animate-in fade-in">
-      <FilterHeader
-        totalResults={totalResults}
-        filteredResults={filteredResults}
-        onReset={onReset}
-        currentPosts={currentPosts}
-      />
-
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="md:hidden">
-        <CollapsibleTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="w-full flex items-center justify-between p-4 border-x border-b border-border/50"
-          >
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <span className="text-sm font-medium">Filter Results</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
-                Showing {filteredResults} of {totalResults}
-              </span>
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
-            </div>
-          </Button>
-        </CollapsibleTrigger>
+        <FilterHeader
+          totalResults={totalResults}
+          filteredResults={filteredResults}
+          onReset={onReset}
+          currentPosts={currentPosts}
+          isMobile={true}
+        />
         <CollapsibleContent className="mt-4">
           <div className="space-y-6 bg-card/50 rounded-lg p-4 border border-border/50">
             {filterInputs.map((input, index) => (
@@ -128,7 +111,6 @@ export const SearchFilters = ({
                 onClick={onReset}
                 className="w-full h-10 text-xs font-medium border border-border/50"
               >
-                <X className="w-3.5 h-3.5 mr-2" />
                 Reset Filters
               </Button>
               <ExportCSV currentPosts={currentPosts} />
@@ -137,13 +119,22 @@ export const SearchFilters = ({
         </CollapsibleContent>
       </Collapsible>
 
-      <div className="hidden md:block bg-card/50 border-x border-b border-border/50">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
-          {filterInputs.map((input, index) => (
-            <div key={index} className="w-full">
-              <FilterInput {...input} />
-            </div>
-          ))}
+      <div className="hidden md:block">
+        <FilterHeader
+          totalResults={totalResults}
+          filteredResults={filteredResults}
+          onReset={onReset}
+          currentPosts={currentPosts}
+          isMobile={false}
+        />
+        <div className="bg-card/50 border-x border-b border-border/50">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
+            {filterInputs.map((input, index) => (
+              <div key={index} className="w-full">
+                <FilterInput {...input} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
