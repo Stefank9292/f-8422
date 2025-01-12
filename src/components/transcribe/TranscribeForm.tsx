@@ -48,16 +48,17 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
     <div className="space-y-6">
       <Card className="p-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Instagram Video URL</FormLabel>
+                  <FormLabel className="text-base">Instagram Video URL</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="https://www.instagram.com/reel/..." 
+                      className="h-12"
                       {...field}
                       disabled={isLoading}
                     />
@@ -66,7 +67,12 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              size="lg"
+              className="w-full sm:w-auto"
+            >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Transcribe Video
             </Button>

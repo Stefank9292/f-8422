@@ -17,7 +17,7 @@ const Transcribe = () => {
     mutationFn: async (url: string) => {
       setTranscriptionStage('preparing');
       
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate preparation time
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setTranscriptionStage('downloading');
       
       const { data, error } = await supabase.functions.invoke('transcribe', {
@@ -27,7 +27,7 @@ const Transcribe = () => {
       if (error) throw error;
       
       setTranscriptionStage('transcribing');
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate transcription time
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       setTranscriptionStage('completed');
       return data;
@@ -77,7 +77,7 @@ const Transcribe = () => {
     },
   });
 
-  const { data: scripts, isLoading: isLoadingScripts } = useQuery({
+  const { data: scripts } = useQuery({
     queryKey: ['scripts'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -102,8 +102,13 @@ const Transcribe = () => {
   const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <h1 className="text-2xl font-bold">Instagram Video Transcriber</h1>
+    <div className="container mx-auto py-8 space-y-8">
+      <div className="space-y-4">
+        <h1 className="text-4xl font-bold tracking-tight">Video Transcriber</h1>
+        <p className="text-muted-foreground">
+          Transform your Instagram videos into text with our AI-powered transcription service.
+        </p>
+      </div>
       
       <TranscribeForm 
         onSubmit={(url) => transcribeMutation.mutateAsync(url)}
@@ -112,7 +117,7 @@ const Transcribe = () => {
       />
 
       {currentTranscription && (
-        <div className="space-y-6">
+        <div className="space-y-8">
           <TranscriptionDisplay 
             transcription={currentTranscription.original_text}
             onGenerateVariation={() => generateVariationMutation.mutateAsync()}
@@ -121,13 +126,15 @@ const Transcribe = () => {
 
           {variations && variations.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Generated Variations</h2>
-              {variations.map((variation) => (
-                <ScriptVariation 
-                  key={variation.id}
-                  variation={variation.original_text}
-                />
-              ))}
+              <h2 className="text-2xl font-semibold tracking-tight">Generated Variations</h2>
+              <div className="grid gap-4 md:grid-cols-2">
+                {variations.map((variation) => (
+                  <ScriptVariation 
+                    key={variation.id}
+                    variation={variation.original_text}
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>

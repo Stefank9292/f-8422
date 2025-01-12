@@ -2,6 +2,7 @@ import React from 'react';
 import { LoaderCircle, Download, Mic, CheckCircle } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 
 export type TranscriptionStage = 'preparing' | 'downloading' | 'transcribing' | 'completed';
 
@@ -28,7 +29,7 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
     },
     { 
       key: 'completed', 
-      label: '✅ Transcription complete! Here\'s what the video says:',
+      label: '✨ Transcription complete! Here\'s what the video says:',
       icon: <CheckCircle className="h-6 w-6 text-green-500" />
     }
   ];
@@ -37,8 +38,8 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
   const progress = ((currentStageIndex + 1) / stages.length) * 100;
 
   return (
-    <div className="space-y-6 p-4 bg-background rounded-lg border">
-      <Progress value={progress} className="w-full" />
+    <Card className="p-6 space-y-6">
+      <Progress value={progress} className="h-2" />
       
       <div className="space-y-4">
         {stages.map((s, index) => {
@@ -49,7 +50,7 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
             <div 
               key={s.key}
               className={cn(
-                "flex items-center space-x-4 p-4 rounded-md transition-colors",
+                "flex items-center gap-4 p-4 rounded-lg transition-colors",
                 isCurrentStage && "bg-primary/10",
                 isPastStage && "opacity-50"
               )}
@@ -58,7 +59,7 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
                 {s.icon}
               </div>
               <p className={cn(
-                "text-sm",
+                "text-base md:text-lg",
                 isCurrentStage && "font-medium"
               )}>
                 {s.label}
@@ -67,6 +68,6 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
           );
         })}
       </div>
-    </div>
+    </Card>
   );
 }
