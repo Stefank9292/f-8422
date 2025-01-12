@@ -61,11 +61,18 @@ const Transcribe = () => {
 
   const textToScriptMutation = useMutation({
     mutationFn: async (text: string) => {
+      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
+        body: { text }
+      });
+
+      if (aiError) throw aiError;
+
       const { data: scriptData, error: scriptError } = await supabase
         .from('scripts')
         .insert({
           user_id: session?.user.id,
           original_text: text,
+          variation_text: aiResponse.text,
           script_type: 'transcription' as const
         })
         .select()
