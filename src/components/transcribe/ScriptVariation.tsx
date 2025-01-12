@@ -1,10 +1,17 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Copy, Check } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface ScriptVariationProps {
   variation: string;
 }
 
 export function ScriptVariation({ variation }: ScriptVariationProps) {
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
+
   // Split the content into sections based on numbered lists and headers
   const formatContent = (text: string) => {
     const sections = text.split(/(?=\d\. |\n\n)/g).filter(Boolean);
@@ -41,9 +48,42 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
     });
   };
 
+  const handleCopyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(variation);
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: "Script copied to clipboard",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to copy script to clipboard",
+      });
+    }
+  };
+
   return (
     <Card className="p-6 space-y-3">
-      <h3 className="text-lg font-medium mb-4">Generated Script</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-medium">Generated Script</h3>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCopyToClipboard}
+          className="h-8"
+        >
+          {copied ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+          <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
+        </Button>
+      </div>
       <div className="space-y-2">
         <div className="bg-muted/50 p-4 rounded-md">
           {formatContent(variation)}
