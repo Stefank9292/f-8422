@@ -22,6 +22,8 @@ const ACCEPTED_FILE_TYPES = [
   'video/webm'
 ];
 
+const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB in bytes
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -30,6 +32,7 @@ serve(async (req) => {
 
   try {
     const { url, file, fileName, fileType } = await req.json();
+    console.log('Request received:', { hasUrl: !!url, hasFile: !!file, fileName, fileType });
 
     // Get OpenAI API key from environment
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
@@ -39,6 +42,7 @@ serve(async (req) => {
 
     let audioData: ArrayBuffer;
     let audioType: string;
+    let finalFileName: string;
 
     if (url) {
       console.log('Processing Instagram URL:', url);
@@ -75,6 +79,7 @@ serve(async (req) => {
       }
 
       const videoUrl = apifyData[0].videoUrl;
+      finalFileName = 'instagram_video.mp4';
 
       // Download video
       console.log('Downloading video from:', videoUrl);
@@ -88,9 +93,13 @@ serve(async (req) => {
       console.log('Video downloaded successfully, size:', audioData.byteLength, 'bytes');
     } else if (file) {
       console.log('Processing uploaded file:', fileName);
-      console.log('File type:', fileType);
       
-      // Convert base64 to ArrayBuffer if needed
+      // Validate file type
+      if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
+        throw new Error(`Invalid file type. Supported formats: ${ACCEPTED_FILE_TYPES.join(', ')}`);
+      }
+
+      // Convert file data to ArrayBuffer
       if (typeof file === 'string' && file.includes('base64,')) {
         console.log('Converting base64 to ArrayBuffer');
         const base64Data = file.split('base64,')[1];
@@ -101,20 +110,16 @@ serve(async (req) => {
         console.error('Invalid file data format:', typeof file);
         throw new Error('Invalid file data format');
       }
-      
-      audioType = fileType;
-      console.log('File processed, size:', audioData.byteLength, 'bytes');
 
-      // Validate file type
-      if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
-        throw new Error(`Invalid file type. Supported formats: ${ACCEPTED_FILE_TYPES.join(', ')}`);
-      }
+      audioType = fileType;
+      finalFileName = fileName || 'uploaded_audio.mp3';
+      console.log('File processed, size:', audioData.byteLength, 'bytes');
     } else {
       throw new Error('No URL or file provided');
     }
 
     // Check file size
-    if (audioData.byteLength > 25 * 1024 * 1024) {
+    if (audioData.byteLength > MAX_FILE_SIZE) {
       throw new Error('File size exceeds 25MB limit');
     }
 
@@ -123,7 +128,7 @@ serve(async (req) => {
     const formData = new FormData();
     const uint8Array = new Uint8Array(audioData);
     const blob = new Blob([uint8Array], { type: audioType });
-    formData.append('file', blob, fileName || 'video.mp4');
+    formData.append('file', blob, finalFileName);
     formData.append('model', 'whisper-1');
 
     // Send to Whisper API
