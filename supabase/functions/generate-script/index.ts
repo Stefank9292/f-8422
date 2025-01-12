@@ -30,7 +30,7 @@ serve(async (req) => {
         },
         {
           role: "user",
-          content: `Transform this text into an engaging social media video script:\n\n${text}\n\nInclude:\n1. Three different hook options\n2. A complete script example\n3. An explanation of why it works`
+          content: `${text}\n\nTake this Transcription and create me a new script with 3 Hooks, a Video script, a caption for this new script, a CTA and an explanation why this script can work. Here is a provided Output structure where to put what. Please use just text without any bold or else. Dont explain to me why you did what, just generate the pieces and give me the output in provided structure:\n\nHooks\n\n1. [First Hook]\n\n2. [Second Hook]\n\n3. [Third Hook]\n\nVideo Script:\n\n[Video script here]\n\nCaption\n\n[Caption Text]\n\nCTA\n\n[CTA Text]\n\nExplanation of Script\n\n[Explanation Text]`
         }
       ],
     });
