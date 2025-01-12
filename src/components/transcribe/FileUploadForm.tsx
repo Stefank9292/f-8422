@@ -50,8 +50,19 @@ export function FileUploadForm({ onSubmit, isLoading, stage }: FileUploadFormPro
 
   const handleSubmit = async (data: FormData) => {
     try {
+      toast({
+        title: "File Upload Started",
+        description: "Your file is being processed...",
+      });
+      
       await onSubmit(data.file);
       form.reset();
+      
+      toast({
+        title: "Success",
+        description: "File uploaded successfully! Starting transcription...",
+        variant: "success",
+      });
     } catch (error) {
       toast({
         variant: "destructive",
