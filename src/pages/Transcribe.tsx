@@ -5,13 +5,14 @@ import { useToast } from "@/hooks/use-toast";
 import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
 import { TextToScriptForm } from "@/components/transcribe/TextToScriptForm";
 import { PromptToScriptForm } from "@/components/transcribe/PromptToScriptForm";
+import { FileToScriptForm } from "@/components/transcribe/FileToScriptForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
 import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { VideoIcon, FileTextIcon, MessageSquareIcon } from "lucide-react";
+import { VideoIcon, FileTextIcon, MessageSquareIcon, FileIcon } from "lucide-react";
 
 type Script = Tables<"scripts">;
 
@@ -19,7 +20,7 @@ const Transcribe = () => {
   const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt">("video");
+  const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt" | "file">("video");
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
@@ -27,6 +28,7 @@ const Transcribe = () => {
   const [videoGeneratedScript, setVideoGeneratedScript] = useState<string | undefined>();
   const [textGeneratedScript, setTextGeneratedScript] = useState<string | undefined>();
   const [promptGeneratedScript, setPromptGeneratedScript] = useState<string | undefined>();
+  const [fileGeneratedScript, setFileGeneratedScript] = useState<string | undefined>();
   const [transcription, setTranscription] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -167,6 +169,33 @@ const Transcribe = () => {
     },
   });
 
+  const fileToScriptMutation = useMutation({
+    mutationFn: async (filePath: string) => {
+      const { data, error } = await supabase.functions.invoke('transcribe-file', {
+        body: { filePath }
+      });
+
+      if (error) throw error;
+
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: data.text,
+          script_type: 'transcription' as const
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setCurrentTranscriptionId(scriptData.id);
+      localStorage.setItem('currentTranscriptionId', scriptData.id);
+      setFileGeneratedScript(data.text);
+      return scriptData;
+    },
+  });
+
   const handleTranscribe = async (url: string) => {
     await transcribeMutation.mutateAsync(url);
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
@@ -194,9 +223,9 @@ const Transcribe = () => {
       <Tabs 
         defaultValue="video" 
         className="space-y-6"
-        onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt")}
+        onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt" | "file")}
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="video" className="space-x-2">
             <VideoIcon className="h-4 w-4" />
             <span>Video to Script</span>
@@ -208,6 +237,10 @@ const Transcribe = () => {
           <TabsTrigger value="prompt" className="space-x-2">
             <MessageSquareIcon className="h-4 w-4" />
             <span>Prompt to Script</span>
+          </TabsTrigger>
+          <TabsTrigger value="file" className="space-x-2">
+            <FileIcon className="h-4 w-4" />
+            <span>File to Script</span>
           </TabsTrigger>
         </TabsList>
 
@@ -243,6 +276,16 @@ const Transcribe = () => {
             isLoading={promptToScriptMutation.isPending}
             generatedScript={promptGeneratedScript}
           />
+        </TabsContent>
+
+        <TabsContent value="file" className="space-y-6">
+          <FileToScriptForm
+            onSubmit={fileToScriptMutation.mutateAsync}
+            isLoading={fileToScriptMutation.isPending}
+          />
+          {fileGeneratedScript && (
+            <ScriptVariation variation={fileGeneratedScript} />
+          )}
         </TabsContent>
       </Tabs>
     </div>
