@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
 import { TextToScriptForm } from "@/components/transcribe/TextToScriptForm";
+import { PromptToScriptForm } from "@/components/transcribe/PromptToScriptForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
 import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { VideoIcon, FileTextIcon } from "lucide-react";
+import { VideoIcon, FileTextIcon, MessageSquareIcon } from "lucide-react";
 
 type Script = Tables<"scripts">;
 
@@ -18,7 +19,7 @@ const Transcribe = () => {
   const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"video" | "text">("video");
+  const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt">("video");
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
@@ -89,71 +90,32 @@ const Transcribe = () => {
     },
   });
 
-  const generateVariationMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentTranscriptionId) throw new Error("No transcription selected");
-      
-      const { data, error } = await supabase.functions.invoke('generate-variation', {
-        body: { transcriptionId: currentTranscriptionId }
+  const promptToScriptMutation = useMutation({
+    mutationFn: async ({ prompt, text }: { prompt: string; text: string }) => {
+      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-prompt-script', {
+        body: { prompt, text }
       });
 
-      if (error) throw error;
-      
-      return data;
-    },
-  });
+      if (aiError) throw aiError;
 
-  const { data: scripts } = useQuery({
-    queryKey: ['scripts', currentTranscriptionId],
-    queryFn: async () => {
-      if (!currentTranscriptionId) return null;
-      
-      const { data, error } = await supabase
+      const { data: scriptData, error: scriptError } = await supabase
         .from('scripts')
-        .select('*')
-        .eq('id', currentTranscriptionId)
+        .insert({
+          user_id: session?.user.id,
+          original_text: text,
+          variation_text: aiResponse.text,
+          script_type: 'transcription' as const
+        })
+        .select()
         .single();
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load scripts. Please try again.",
-        });
-        throw error;
-      }
-      
-      return data;
-    },
-    enabled: !!currentTranscriptionId,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60,
-  });
 
-  const { data: variations } = useQuery({
-    queryKey: ['variations', currentTranscriptionId],
-    queryFn: async () => {
-      if (!currentTranscriptionId) return [];
+      if (scriptError) throw scriptError;
       
-      const { data, error } = await supabase
-        .from('scripts')
-        .select('*')
-        .eq('parent_script_id', currentTranscriptionId);
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load variations. Please try again.",
-        });
-        throw error;
-      }
-      
-      return data;
+      setCurrentTranscriptionId(scriptData.id);
+      localStorage.setItem('currentTranscriptionId', scriptData.id);
+      setGeneratedScript(aiResponse.text);
+      return scriptData;
     },
-    enabled: !!currentTranscriptionId,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60,
   });
 
   const handleTranscribe = async (url: string) => {
@@ -166,9 +128,9 @@ const Transcribe = () => {
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
-  const handleGenerateVariation = async () => {
-    await generateVariationMutation.mutateAsync();
-    queryClient.invalidateQueries({ queryKey: ['variations', currentTranscriptionId] });
+  const handlePromptToScript = async (prompt: string, text: string) => {
+    await promptToScriptMutation.mutateAsync({ prompt, text });
+    queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
   return (
@@ -183,9 +145,9 @@ const Transcribe = () => {
       <Tabs 
         defaultValue="video" 
         className="space-y-6"
-        onValueChange={(value) => setActiveTab(value as "video" | "text")}
+        onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt")}
       >
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="video" className="space-x-2">
             <VideoIcon className="h-4 w-4" />
             <span>Video to Script</span>
@@ -193,6 +155,10 @@ const Transcribe = () => {
           <TabsTrigger value="text" className="space-x-2">
             <FileTextIcon className="h-4 w-4" />
             <span>Text to Script</span>
+          </TabsTrigger>
+          <TabsTrigger value="prompt" className="space-x-2">
+            <MessageSquareIcon className="h-4 w-4" />
+            <span>Prompt to Script</span>
           </TabsTrigger>
         </TabsList>
 
@@ -202,36 +168,20 @@ const Transcribe = () => {
             isLoading={transcribeMutation.isPending}
             stage={transcriptionStage}
           />
-          
-          {scripts && activeTab === "video" && (
-            <div className="space-y-6">
-              <TranscriptionDisplay 
-                transcription={scripts.original_text}
-                onGenerateVariation={handleGenerateVariation}
-                isGenerating={generateVariationMutation.isPending}
-              />
-
-              {variations && variations.length > 0 && (
-                <div className="space-y-4">
-                  <h2 className="text-lg font-semibold">Generated Variations</h2>
-                  <div className="grid gap-4">
-                    {variations.map((variation) => (
-                      <ScriptVariation 
-                        key={variation.id}
-                        variation={variation.variation_text || variation.original_text}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
         </TabsContent>
 
         <TabsContent value="text" className="space-y-6">
           <TextToScriptForm 
             onSubmit={handleTextToScript}
             isLoading={textToScriptMutation.isPending}
+            generatedScript={generatedScript}
+          />
+        </TabsContent>
+
+        <TabsContent value="prompt" className="space-y-6">
+          <PromptToScriptForm 
+            onSubmit={handlePromptToScript}
+            isLoading={promptToScriptMutation.isPending}
             generatedScript={generatedScript}
           />
         </TabsContent>
