@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -44,6 +45,8 @@ serve(async (req) => {
       body: JSON.stringify({
         "addParentData": false,
         "directUrls": [url],
+        "expandVideo": true,
+        "includeVideoMetadata": true,
         "enhanceUserSearchWithFacebookPage": false,
         "isUserReelFeedURL": false,
         "isUserTaggedFeedURL": false,
@@ -55,6 +58,7 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error('Instagram API error:', await response.text());
       throw new Error(`Failed to fetch video details: ${response.statusText}`);
     }
 
