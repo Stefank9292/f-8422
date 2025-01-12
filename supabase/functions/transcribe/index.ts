@@ -7,8 +7,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -33,29 +31,40 @@ serve(async (req) => {
     // Convert video to audio using FFmpeg
     console.log('Converting video to audio...');
     const videoBuffer = await videoResponse.arrayBuffer();
-    const command = new Deno.Command("ffmpeg", {
+    
+    // Create a temporary file for the video
+    const tempVideoPath = await Deno.makeTempFile({ suffix: '.mp4' });
+    await Deno.writeFile(tempVideoPath, new Uint8Array(videoBuffer));
+
+    // Create a temporary file for the audio output
+    const tempAudioPath = await Deno.makeTempFile({ suffix: '.mp3' });
+
+    // Run FFmpeg command to convert video to audio
+    const ffmpegCommand = new Deno.Command("ffmpeg", {
       args: [
-        "-i", "pipe:0",        // Input from pipe
+        "-i", tempVideoPath,
         "-vn",                 // Disable video
         "-acodec", "libmp3lame", // Use MP3 codec
         "-ar", "44100",        // Audio rate
         "-ac", "2",            // Audio channels
-        "-f", "mp3",           // Force MP3 format
-        "pipe:1"               // Output to pipe
+        "-b:a", "192k",        // Audio bitrate
+        tempAudioPath
       ],
-      stdin: "piped",
-      stdout: "piped",
     });
 
-    // Create process and pipe video data
-    const process = command.spawn();
-    const writer = process.stdin.getWriter();
-    await writer.write(new Uint8Array(videoBuffer));
-    await writer.close();
+    const ffmpegResult = await ffmpegCommand.output();
+    console.log('FFmpeg conversion completed:', ffmpegResult.success);
 
-    // Get the audio output
-    const { stdout } = await process.output();
-    const audioBuffer = stdout;
+    if (!ffmpegResult.success) {
+      throw new Error('Failed to convert video to audio');
+    }
+
+    // Read the converted audio file
+    const audioBuffer = await Deno.readFile(tempAudioPath);
+
+    // Clean up temporary files
+    await Deno.remove(tempVideoPath);
+    await Deno.remove(tempAudioPath);
 
     // Prepare form data with audio file
     console.log('Preparing audio for transcription...');
@@ -68,7 +77,7 @@ serve(async (req) => {
     const transcriptionResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
       },
       body: formData,
     });
