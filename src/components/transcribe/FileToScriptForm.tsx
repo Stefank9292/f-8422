@@ -131,17 +131,19 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
           </Button>
 
           {uploadedFile && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-md text-sm">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-md transition-colors">
               {uploadedFile.type.startsWith('audio/') ? (
-                <FileAudio className="w-4 h-4" />
+                <FileAudio className="w-4 h-4 text-gray-500" />
               ) : (
-                <FileVideo className="w-4 h-4" />
+                <FileVideo className="w-4 h-4 text-gray-500" />
               )}
-              <span className="truncate max-w-[150px]">{uploadedFile.name}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-300 truncate max-w-[150px]">
+                {uploadedFile.name}
+              </span>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6 p-0.5 hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="h-6 w-6 p-0.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={handleRemoveFile}
               >
                 <X className="h-4 w-4" />
