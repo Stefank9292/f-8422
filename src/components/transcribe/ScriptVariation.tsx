@@ -12,6 +12,37 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
+  const calculateReadabilityScore = (text: string): number => {
+    // Simple readability score based on:
+    // - Average words per sentence (ideal: 15-20)
+    // - Average characters per word (ideal: 4-5)
+    // - Presence of common transition words
+    
+    const sentences = text.split(/[.!?]+/).filter(Boolean);
+    const words = text.split(/\s+/).filter(Boolean);
+    
+    const avgWordsPerSentence = words.length / sentences.length;
+    const avgCharsPerWord = text.length / words.length;
+    
+    // Normalize scores
+    const sentenceScore = Math.min(100, (avgWordsPerSentence / 20) * 100);
+    const wordScore = Math.min(100, (5 / avgCharsPerWord) * 100);
+    
+    // Calculate final score (0-100)
+    const finalScore = Math.round((sentenceScore + wordScore) / 2);
+    return Math.min(100, Math.max(0, finalScore));
+  };
+
+  const getScoreColor = (score: number): string => {
+    if (score >= 80) return "text-green-500";
+    if (score >= 60) return "text-green-400";
+    if (score >= 40) return "text-yellow-500";
+    if (score >= 20) return "text-orange-500";
+    return "text-red-500";
+  };
+
+  const readabilityScore = calculateReadabilityScore(variation);
+
   const formatContent = (text: string) => {
     const cleanText = text
       .replace(/\*\*/g, '')
@@ -127,7 +158,20 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   return (
     <Card className="p-3 md:p-4 space-y-3 md:space-y-4">
       <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-        <h3 className="text-base md:text-lg font-medium">Generated Script</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-base md:text-lg font-medium">Generated Script</h3>
+          <div className="flex items-center gap-2">
+            <span className={`text-sm font-medium ${getScoreColor(readabilityScore)}`}>
+              {readabilityScore}
+            </span>
+            <div className="h-2 w-16 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-300 ${getScoreColor(readabilityScore)}`}
+                style={{ width: `${readabilityScore}%` }}
+              />
+            </div>
+          </div>
+        </div>
         <Button
           onClick={handleCopyToClipboard}
           variant="outline"
