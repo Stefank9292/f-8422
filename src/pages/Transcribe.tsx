@@ -22,6 +22,7 @@ const Transcribe = () => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
+  const [generatedScript, setGeneratedScript] = useState<string | undefined>();
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
@@ -82,6 +83,7 @@ const Transcribe = () => {
       
       setCurrentTranscriptionId(scriptData.id);
       localStorage.setItem('currentTranscriptionId', scriptData.id);
+      setGeneratedScript(aiResponse.text);
       return scriptData;
     },
   });
@@ -201,6 +203,7 @@ const Transcribe = () => {
           <TextToScriptForm 
             onSubmit={handleTextToScript}
             isLoading={textToScriptMutation.isPending}
+            generatedScript={generatedScript}
           />
         </TabsContent>
       </Tabs>
