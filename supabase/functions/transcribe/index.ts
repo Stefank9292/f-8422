@@ -28,48 +28,13 @@ serve(async (req) => {
       throw new Error('Failed to fetch video content');
     }
 
-    // Convert video to audio using FFmpeg
-    console.log('Converting video to audio...');
     const videoBuffer = await videoResponse.arrayBuffer();
-    
-    // Create a temporary file for the video
-    const tempVideoPath = await Deno.makeTempFile({ suffix: '.mp4' });
-    await Deno.writeFile(tempVideoPath, new Uint8Array(videoBuffer));
+    console.log('Video downloaded, size:', videoBuffer.byteLength);
 
-    // Create a temporary file for the audio output
-    const tempAudioPath = await Deno.makeTempFile({ suffix: '.mp3' });
-
-    // Run FFmpeg command to convert video to audio
-    const ffmpegCommand = new Deno.Command("ffmpeg", {
-      args: [
-        "-i", tempVideoPath,
-        "-vn",                 // Disable video
-        "-acodec", "libmp3lame", // Use MP3 codec
-        "-ar", "44100",        // Audio rate
-        "-ac", "2",            // Audio channels
-        "-b:a", "192k",        // Audio bitrate
-        tempAudioPath
-      ],
-    });
-
-    const ffmpegResult = await ffmpegCommand.output();
-    console.log('FFmpeg conversion completed:', ffmpegResult.success);
-
-    if (!ffmpegResult.success) {
-      throw new Error('Failed to convert video to audio');
-    }
-
-    // Read the converted audio file
-    const audioBuffer = await Deno.readFile(tempAudioPath);
-
-    // Clean up temporary files
-    await Deno.remove(tempVideoPath);
-    await Deno.remove(tempAudioPath);
-
-    // Prepare form data with audio file
-    console.log('Preparing audio for transcription...');
+    // Prepare form data with video file directly
+    console.log('Preparing video for transcription...');
     const formData = new FormData();
-    formData.append('file', new Blob([audioBuffer], { type: 'audio/mp3' }), 'audio.mp3');
+    formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }), 'video.mp4');
     formData.append('model', 'whisper-1');
 
     // Transcribe using Whisper API
