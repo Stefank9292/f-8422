@@ -50,7 +50,10 @@ export function AppSidebar() {
 
   const handleSignOut = async () => {
     try {
-      // First invalidate all queries to clear the cache
+      // First close the sidebar on mobile
+      setOpen(false);
+      
+      // Then invalidate all queries to clear the cache
       queryClient.clear();
       
       // Then sign out from Supabase
