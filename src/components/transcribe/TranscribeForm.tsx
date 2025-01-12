@@ -40,22 +40,22 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       case 'downloading':
         return {
           text: "Downloading the video...",
-          icon: <Download className="h-4 w-4 animate-bounce" />
+          icon: <Download className="mr-2 h-4 w-4 animate-bounce" />
         };
       case 'transcribing':
         return {
           text: "Transcribing the audio...",
-          icon: <Mic className="h-4 w-4 animate-pulse" />
+          icon: <Mic className="mr-2 h-4 w-4 animate-pulse" />
         };
       case 'completed':
         return {
           text: "Transcription complete!",
-          icon: <CheckCircle2 className="h-4 w-4 text-white" />
+          icon: <CheckCircle2 className="mr-2 h-4 w-4 text-white" />
         };
       default:
         return {
           text: "Transcribe Video",
-          icon: isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null
+          icon: isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null
         };
     }
   };
@@ -103,7 +103,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
             className="w-full sm:w-auto"
           >
             {stageContent.icon}
-            {stageContent.text}
+            <span>{stageContent.text}</span>
           </Button>
         </form>
       </Form>

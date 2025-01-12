@@ -95,11 +95,13 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
     }
   };
 
+  const isProcessing = isUploading || isLoading;
+
   return (
     <Card className="p-6">
       <div className="space-y-4">
         <div className="flex items-center justify-center w-full">
-          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+          <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 dark:hover:bg-gray-800 dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}>
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <Upload className="w-8 h-8 mb-3 text-gray-400" />
               <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
@@ -114,7 +116,7 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
               className="hidden"
               accept=".wav,.mp3,.webm,.mp4,.mpeg"
               onChange={handleFileChange}
-              disabled={isUploading || isLoading}
+              disabled={isProcessing}
               multiple={false}
             />
           </label>
@@ -123,11 +125,22 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
         <div className="flex items-center gap-2">
           <Button
             onClick={handleUpload}
-            disabled={!uploadedFile || isUploading || isLoading}
+            disabled={!uploadedFile || isProcessing}
             className="w-full sm:w-auto"
           >
-            {(isUploading || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isUploading ? 'Uploading...' : isLoading ? 'Transcribing...' : 'Transcribe File'}
+            {isUploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading...
+              </>
+            ) : isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Transcribing...
+              </>
+            ) : (
+              'Transcribe File'
+            )}
           </Button>
 
           {uploadedFile && (
@@ -145,6 +158,7 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
                 size="icon"
                 className="h-6 w-6 p-0.5 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={handleRemoveFile}
+                disabled={isProcessing}
               >
                 <X className="h-4 w-4" />
               </Button>
