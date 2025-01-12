@@ -105,6 +105,34 @@ const Transcribe = () => {
     }
   };
 
+  const fileToScriptMutation = useMutation({
+    mutationFn: async (filePath: string) => {
+      const { data, error } = await supabase.functions.invoke('transcribe-file', {
+        body: { filePath }
+      });
+
+      if (error) throw error;
+
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: data.text,
+          script_type: 'transcription' as const
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setTranscription(data.text);
+      const newTranscriptionId = scriptData.id;
+      setCurrentTranscriptionId(newTranscriptionId);
+      localStorage.setItem('currentTranscriptionId', newTranscriptionId);
+      return scriptData;
+    },
+  });
+
   const textToScriptMutation = useMutation({
     mutationFn: async (text: string) => {
       const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
@@ -161,33 +189,6 @@ const Transcribe = () => {
     },
   });
 
-  const fileToScriptMutation = useMutation({
-    mutationFn: async (filePath: string) => {
-      const { data, error } = await supabase.functions.invoke('transcribe-file', {
-        body: { filePath }
-      });
-
-      if (error) throw error;
-
-      const { data: scriptData, error: scriptError } = await supabase
-        .from('scripts')
-        .insert({
-          user_id: session?.user.id,
-          original_text: data.text,
-          script_type: 'transcription' as const
-        })
-        .select()
-        .single();
-
-      if (scriptError) throw scriptError;
-      
-      setCurrentTranscriptionId(scriptData.id);
-      localStorage.setItem('currentTranscriptionId', scriptData.id);
-      setFileGeneratedScript(data.text);
-      return scriptData;
-    },
-  });
-
   const handleTranscribe = async (url: string) => {
     await transcribeMutation.mutateAsync(url);
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
@@ -204,7 +205,8 @@ const Transcribe = () => {
   };
 
   const handleFileToScript = async (filePath: string) => {
-    await fileToScriptMutation.mutateAsync(filePath);
+    const result = await fileToScriptMutation.mutateAsync(filePath);
+    setFileGeneratedScript(result.original_text);
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
@@ -281,7 +283,11 @@ const Transcribe = () => {
             isLoading={fileToScriptMutation.isPending}
           />
           {fileGeneratedScript && (
-            <ScriptVariation variation={fileGeneratedScript} />
+            <TranscriptionDisplay 
+              transcription={fileGeneratedScript}
+              onGenerateVariation={generateVariation}
+              isGenerating={isGenerating}
+            />
           )}
         </TabsContent>
       </Tabs>
