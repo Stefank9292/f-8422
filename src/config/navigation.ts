@@ -14,7 +14,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: History
   },
   {
-    title: "Video Transcriber",
+    title: "Script Generator",
     url: "/transcribe",
     icon: FileText,
     badge: "NEW"
