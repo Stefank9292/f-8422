@@ -48,20 +48,22 @@ serve(async (req) => {
       console.log('Processing Instagram URL:', url);
 
       // Process Instagram URL using Apify
-      const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
+      const apifyKey = Deno.env.get('APIFY_API_KEY');
+      if (!apifyKey) {
+        throw new Error('Missing Apify API key');
+      }
+
+      const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apifyKey}`,
         },
         body: JSON.stringify({
           "addParentData": false,
           "directUrls": [url],
-          "enhanceUserSearchWithFacebookPage": false,
-          "isUserReelFeedURL": false,
-          "isUserTaggedFeedURL": false,
           "resultsLimit": 1,
           "resultsType": "details",
-          "searchLimit": 1,
           "searchType": "user"
         })
       });
@@ -74,11 +76,14 @@ serve(async (req) => {
       const apifyData = await apifyResponse.json();
       console.log('Apify response:', apifyData);
 
-      if (!apifyData[0]?.videoUrl) {
+      // Extract video URL from Apify response
+      const videoUrl = apifyData[0]?.video_url || apifyData[0]?.videoUrl;
+      if (!videoUrl) {
+        console.error('No video URL found in response:', apifyData);
         throw new Error('No video URL found in Instagram post');
       }
 
-      const videoUrl = apifyData[0].videoUrl;
+      console.log('Found video URL:', videoUrl);
       finalFileName = 'instagram_video.mp4';
 
       // Download video
