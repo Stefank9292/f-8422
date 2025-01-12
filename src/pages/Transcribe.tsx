@@ -6,8 +6,10 @@ import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
+import { useSessionValidation } from "@/hooks/useSessionValidation";
 
 const Transcribe = () => {
+  const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(null);
@@ -29,11 +31,24 @@ const Transcribe = () => {
       setTranscriptionStage('transcribing');
       await new Promise(resolve => setTimeout(resolve, 2000));
       
+      // Store the transcription in the database
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: data.text,
+          script_type: 'transcription'
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
       setTranscriptionStage('completed');
-      return data;
+      setCurrentTranscriptionId(scriptData.id);
+      return scriptData;
     },
-    onSuccess: (data) => {
-      setCurrentTranscriptionId(data.id);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scripts'] });
       toast({
         title: "Success",
@@ -78,11 +93,14 @@ const Transcribe = () => {
   });
 
   const { data: scripts } = useQuery({
-    queryKey: ['scripts'],
+    queryKey: ['scripts', currentTranscriptionId],
     queryFn: async () => {
+      if (!currentTranscriptionId) return null;
+      
       const { data, error } = await supabase
         .from('scripts')
         .select('*')
+        .eq('id', currentTranscriptionId)
         .order('created_at', { ascending: false });
       
       if (error) {
@@ -94,53 +112,52 @@ const Transcribe = () => {
         throw error;
       }
       
-      return data;
+      return data[0];
     },
+    enabled: !!currentTranscriptionId
   });
 
-  const currentTranscription = scripts?.find(s => s.id === currentTranscriptionId);
+  const currentTranscription = scripts;
   const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
 
   return (
-    <div className="container py-8 space-y-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold tracking-tight">Video Transcriber</h1>
-          <p className="text-muted-foreground">
-            Transform your Instagram videos into text with our AI-powered transcription service.
-          </p>
-        </div>
-        
-        <TranscribeForm 
-          onSubmit={(url) => transcribeMutation.mutateAsync(url)}
-          isLoading={transcribeMutation.isPending}
-          stage={transcriptionStage}
-        />
-
-        {currentTranscription && (
-          <div className="space-y-6">
-            <TranscriptionDisplay 
-              transcription={currentTranscription.original_text}
-              onGenerateVariation={() => generateVariationMutation.mutateAsync()}
-              isGenerating={generateVariationMutation.isPending}
-            />
-
-            {variations && variations.length > 0 && (
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Generated Variations</h2>
-                <div className="grid gap-4">
-                  {variations.map((variation) => (
-                    <ScriptVariation 
-                      key={variation.id}
-                      variation={variation.original_text}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+    <div className="container max-w-4xl py-6 space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-xl font-semibold tracking-tight">Video Transcriber</h1>
+        <p className="text-sm text-muted-foreground">
+          Transform your Instagram videos into text with our AI-powered transcription service.
+        </p>
       </div>
+      
+      <TranscribeForm 
+        onSubmit={(url) => transcribeMutation.mutateAsync(url)}
+        isLoading={transcribeMutation.isPending}
+        stage={transcriptionStage}
+      />
+
+      {currentTranscription && (
+        <div className="space-y-6">
+          <TranscriptionDisplay 
+            transcription={currentTranscription.original_text}
+            onGenerateVariation={() => generateVariationMutation.mutateAsync()}
+            isGenerating={generateVariationMutation.isPending}
+          />
+
+          {variations && variations.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold">Generated Variations</h2>
+              <div className="grid gap-4">
+                {variations.map((variation) => (
+                  <ScriptVariation 
+                    key={variation.id}
+                    variation={variation.original_text}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
