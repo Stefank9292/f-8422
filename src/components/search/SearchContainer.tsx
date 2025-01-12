@@ -161,7 +161,7 @@ export const SearchContainer = ({
       {displayPosts.length > 0 && (
         <div ref={resultsRef} className="space-y-4">
           <div className="w-full max-w-[90rem]">
-            <div className="rounded-xl border border-border/50 overflow-hidden">
+            <div className="rounded-xl sm:border sm:border-border/50 overflow-hidden">
               <SearchFilters
                 filters={filters}
                 onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
@@ -173,7 +173,7 @@ export const SearchContainer = ({
             </div>
           </div>
           <div className="w-full max-w-[90rem]">
-            <div className="material-card overflow-hidden">
+            <div className="sm:material-card overflow-hidden">
               <SearchResults searchResults={displayPosts} />
             </div>
           </div>
