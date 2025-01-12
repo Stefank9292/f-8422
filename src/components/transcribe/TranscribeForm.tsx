@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
 
+const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
+
 const formSchema = z.object({
-  url: z.string().url("Please enter a valid Instagram URL")
+  url: z.string()
+    .url("Please enter a valid URL")
+    .regex(instagramUrlPattern, "Please enter a valid Instagram post URL (e.g., https://www.instagram.com/p/ABC123)")
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -39,7 +43,8 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to transcribe video"
+        description: error instanceof Error ? error.message : "Failed to transcribe video",
+        icon: <AlertCircle className="h-5 w-5" />
       });
     }
   };
@@ -57,7 +62,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                   <FormLabel>Instagram Video URL</FormLabel>
                   <FormControl>
                     <Input 
-                      placeholder="https://www.instagram.com/reel/..." 
+                      placeholder="https://www.instagram.com/p/..." 
                       className="h-10"
                       {...field}
                       disabled={isLoading}
