@@ -228,7 +228,7 @@ const Transcribe = () => {
   };
 
   return (
-    <div className="container max-w-4xl py-4 md:py-6 px-2 md:px-4 space-y-4 md:space-y-6">
+    <div className="container max-w-4xl py-4 md:py-6 px-4 md:px-4 space-y-4 md:space-y-6 mt-14 md:mt-0">
       <div className="space-y-2">
         <h1 className="text-lg md:text-xl font-semibold tracking-tight">Script Generator</h1>
         <p className="text-xs md:text-sm text-muted-foreground">
