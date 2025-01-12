@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Upload, FileAudio, FileVideo } from "lucide-react";
+import { Loader2, Upload, FileAudio, FileVideo, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -16,7 +16,19 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const files = event.target.files;
+    if (!files) return;
+
+    if (files.length > 1) {
+      toast({
+        variant: "destructive",
+        title: "Multiple files detected",
+        description: "Please upload only one file at a time."
+      });
+      return;
+    }
+
+    const file = files[0];
     if (!file) return;
 
     // Check file type
@@ -45,6 +57,10 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
     }
 
     setUploadedFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
   };
 
   const handleUpload = async () => {
@@ -99,29 +115,40 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
               accept=".wav,.mp3,.webm,.mp4,.mpeg"
               onChange={handleFileChange}
               disabled={isUploading || isLoading}
+              multiple={false}
             />
           </label>
         </div>
 
-        {uploadedFile && (
-          <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded">
-            {uploadedFile.type.startsWith('audio/') ? (
-              <FileAudio className="w-4 h-4" />
-            ) : (
-              <FileVideo className="w-4 h-4" />
-            )}
-            <span className="text-sm truncate">{uploadedFile.name}</span>
-          </div>
-        )}
+        <div className="flex items-center justify-between">
+          <Button
+            onClick={handleUpload}
+            disabled={!uploadedFile || isUploading || isLoading}
+            className="w-full"
+          >
+            {(isUploading || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isUploading ? 'Uploading...' : isLoading ? 'Transcribing...' : 'Transcribe File'}
+          </Button>
 
-        <Button
-          onClick={handleUpload}
-          disabled={!uploadedFile || isUploading || isLoading}
-          className="w-full"
-        >
-          {(isUploading || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {isUploading ? 'Uploading...' : isLoading ? 'Transcribing...' : 'Transcribe File'}
-        </Button>
+          {uploadedFile && (
+            <div className="flex items-center gap-2 ml-4 p-2 bg-gray-50 dark:bg-gray-800 rounded flex-shrink-0">
+              {uploadedFile.type.startsWith('audio/') ? (
+                <FileAudio className="w-4 h-4" />
+              ) : (
+                <FileVideo className="w-4 h-4" />
+              )}
+              <span className="text-sm truncate max-w-[200px]">{uploadedFile.name}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={handleRemoveFile}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </Card>
   );
