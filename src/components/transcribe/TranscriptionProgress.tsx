@@ -1,5 +1,5 @@
 import React from 'react';
-import { LoaderCircle, Download, Mic, CheckCircle } from 'lucide-react';
+import { LoaderCircle, Download, Mic, CheckCircle2 } from 'lucide-react';
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -15,22 +15,22 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
     { 
       key: 'preparing', 
       label: 'Setting things up to process your request. Hang tight!',
-      icon: <LoaderCircle className="h-6 w-6 animate-spin" />
+      icon: <LoaderCircle className="h-4 w-4 animate-spin" />
     },
     { 
       key: 'downloading', 
       label: 'Downloading the video from Instagram... This might take a moment.',
-      icon: <Download className="h-6 w-6 animate-bounce" />
+      icon: <Download className="h-4 w-4 animate-bounce" />
     },
     { 
       key: 'transcribing', 
-      label: 'Transcribing the audio using OpenAI\'s Whisper model... Just a few more seconds!',
-      icon: <Mic className="h-6 w-6 animate-pulse" />
+      label: "Transcribing the audio using OpenAI's Whisper model... Just a few more seconds!",
+      icon: <Mic className="h-4 w-4 animate-pulse" />
     },
     { 
       key: 'completed', 
       label: '✨ Transcription complete! Here\'s what the video says:',
-      icon: <CheckCircle className="h-6 w-6 text-green-500" />
+      icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
     }
   ];
 
@@ -38,10 +38,10 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
   const progress = ((currentStageIndex + 1) / stages.length) * 100;
 
   return (
-    <Card className="p-6 md:p-8 space-y-6">
-      <Progress value={progress} className="h-2" />
+    <Card className="p-4 space-y-4">
+      <Progress value={progress} className="h-1.5" />
       
-      <div className="space-y-4">
+      <div className="space-y-2">
         {stages.map((s, index) => {
           const isCurrentStage = s.key === stage;
           const isPastStage = stages.findIndex(st => st.key === stage) > index;
@@ -50,8 +50,8 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
             <div 
               key={s.key}
               className={cn(
-                "flex items-center gap-4 p-4 rounded-lg transition-colors",
-                isCurrentStage && "bg-primary/10",
+                "flex items-center gap-3 p-2 rounded-md transition-colors",
+                isCurrentStage && "bg-primary/5",
                 isPastStage && "opacity-50"
               )}
             >
@@ -59,7 +59,7 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
                 {s.icon}
               </div>
               <p className={cn(
-                "text-base md:text-lg",
+                "text-sm",
                 isCurrentStage && "font-medium"
               )}>
                 {s.label}

@@ -102,11 +102,11 @@ const Transcribe = () => {
   const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
 
   return (
-    <div className="container py-8 md:py-12 max-w-4xl mx-auto">
-      <div className="space-y-8">
+    <div className="container py-8 space-y-8">
+      <div className="max-w-2xl mx-auto space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Video Transcriber</h1>
-          <p className="text-muted-foreground text-base md:text-lg">
+          <h1 className="text-2xl font-semibold tracking-tight">Video Transcriber</h1>
+          <p className="text-muted-foreground">
             Transform your Instagram videos into text with our AI-powered transcription service.
           </p>
         </div>
@@ -118,7 +118,7 @@ const Transcribe = () => {
         />
 
         {currentTranscription && (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <TranscriptionDisplay 
               transcription={currentTranscription.original_text}
               onGenerateVariation={() => generateVariationMutation.mutateAsync()}
@@ -126,9 +126,9 @@ const Transcribe = () => {
             />
 
             {variations && variations.length > 0 && (
-              <div className="space-y-6">
-                <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Generated Variations</h2>
-                <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-4">
+                <h2 className="text-lg font-semibold">Generated Variations</h2>
+                <div className="grid gap-4">
                   {variations.map((variation) => (
                     <ScriptVariation 
                       key={variation.id}
