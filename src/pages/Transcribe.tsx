@@ -25,6 +25,7 @@ const Transcribe = () => {
   });
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
   const [generatedScript, setGeneratedScript] = useState<string | undefined>();
+  const [transcription, setTranscription] = useState<string | undefined>();
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
@@ -37,7 +38,12 @@ const Transcribe = () => {
         body: { url }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Transcription error:', error);
+        throw error;
+      }
+
+      console.log('Transcription response:', data);
       
       setTranscriptionStage('transcribing');
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -55,12 +61,42 @@ const Transcribe = () => {
       if (scriptError) throw scriptError;
       
       setTranscriptionStage('completed');
+      setTranscription(data.text);
       const newTranscriptionId = scriptData.id;
       setCurrentTranscriptionId(newTranscriptionId);
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
       return scriptData;
     },
+    onError: (error) => {
+      console.error('Mutation error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to transcribe video. Please try again.",
+        variant: "destructive",
+      });
+    }
   });
+
+  const generateVariation = async () => {
+    if (!transcription) return;
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-variation', {
+        body: { text: transcription }
+      });
+
+      if (error) throw error;
+
+      setGeneratedScript(data.text);
+    } catch (error) {
+      console.error('Error generating variation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate script variation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   const textToScriptMutation = useMutation({
     mutationFn: async (text: string) => {
@@ -168,6 +204,16 @@ const Transcribe = () => {
             isLoading={transcribeMutation.isPending}
             stage={transcriptionStage}
           />
+          {transcription && (
+            <TranscriptionDisplay 
+              transcription={transcription}
+              onGenerateVariation={generateVariation}
+              isGenerating={false}
+            />
+          )}
+          {generatedScript && (
+            <ScriptVariation script={generatedScript} />
+          )}
         </TabsContent>
 
         <TabsContent value="text" className="space-y-6">
