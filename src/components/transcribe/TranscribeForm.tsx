@@ -60,26 +60,31 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
   }, [selectedFile, toast]);
 
   const handleSubmit = async (data: FormData) => {
+    // If we have a file selected, use the file upload flow
     if (selectedFile) {
       await handleFileUpload();
-    } else if (!data.url.trim()) {
+      return;
+    }
+
+    // Otherwise, check URL and use the URL flow
+    if (!data.url.trim()) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Please either enter a URL or upload a file"
       });
       return;
-    } else {
-      try {
-        await onSubmit(data.url);
-        form.reset();
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to transcribe video"
-        });
-      }
+    }
+
+    try {
+      await onSubmit(data.url);
+      form.reset();
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to transcribe video"
+      });
     }
   };
 
