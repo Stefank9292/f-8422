@@ -30,15 +30,14 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "addParentData": false,
         "directUrls": [url],
-        "enhanceUserSearchWithFacebookPage": false,
-        "isUserReelFeedURL": false,
-        "isUserTaggedFeedURL": false,
-        "resultsLimit": 1,
         "resultsType": "details",
-        "searchLimit": 1,
-        "searchType": "user"
+        "searchType": "user",
+        "resultsLimit": 1,
+        "addParentData": false,
+        "proxy": {
+          "useApifyProxy": true
+        }
       })
     });
 
