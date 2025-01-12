@@ -6,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface FileToScriptFormProps {
-  onSubmit: (filePath: string) => Promise<void>;
+  onSubmit: (filePath: string) => void;
   isLoading: boolean;
 }
 
@@ -66,7 +66,7 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
         description: "Your file is ready to be transcribed."
       });
 
-      await onSubmit(filePath);
+      onSubmit(filePath);
     } catch (error) {
       console.error('Upload error:', error);
       toast({

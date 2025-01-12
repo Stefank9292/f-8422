@@ -72,14 +72,6 @@ const Transcribe = () => {
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
       return scriptData;
     },
-    onError: (error) => {
-      console.error('Mutation error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to transcribe video. Please try again.",
-        variant: "destructive",
-      });
-    }
   });
 
   const generateVariation = async () => {
@@ -211,6 +203,11 @@ const Transcribe = () => {
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
+  const handleFileToScript = async (filePath: string) => {
+    await fileToScriptMutation.mutateAsync(filePath);
+    queryClient.invalidateQueries({ queryKey: ['scripts'] });
+  };
+
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <div className="space-y-2">
@@ -280,7 +277,7 @@ const Transcribe = () => {
 
         <TabsContent value="file" className="space-y-6">
           <FileToScriptForm
-            onSubmit={fileToScriptMutation.mutateAsync}
+            onSubmit={handleFileToScript}
             isLoading={fileToScriptMutation.isPending}
           />
           {fileGeneratedScript && (
