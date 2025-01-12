@@ -50,29 +50,22 @@ serve(async (req) => {
         "resultsLimit": 1,
         "resultsType": "details",
         "searchLimit": 1,
-        "searchType": "user",
-        "expandVideo": true,
-        "includeVideoMetadata": true
+        "searchType": "user"
       })
     });
 
-    console.log('Instagram API response status:', response.status);
-    
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Instagram API error:', errorText);
       throw new Error(`Failed to fetch video details: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Instagram API response data:', data);
+    console.log('Instagram API response:', data);
 
     if (!data || data.length === 0) {
       throw new Error('No video data found');
     }
 
-    // For now, return a mock transcription
-    // In a real implementation, you would process the video and generate a transcription
+    // Mock transcription for now
     const transcriptionText = "This is a mock transcription of the video content.";
 
     return new Response(
