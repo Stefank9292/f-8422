@@ -99,7 +99,7 @@ export function FilteredResultsSection({
 
       <div
         className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out rounded-lg border border-border/50",
+          "overflow-hidden transition-all duration-300 ease-in-out md:rounded-lg md:border md:border-border/50",
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
       >
