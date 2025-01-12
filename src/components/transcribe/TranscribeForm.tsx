@@ -50,7 +50,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       case 'completed':
         return {
           text: "Transcription complete!",
-          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
+          icon: <CheckCircle2 className="h-4 w-4 text-white" />
         };
       default:
         return {
