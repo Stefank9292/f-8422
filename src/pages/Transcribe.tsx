@@ -73,7 +73,7 @@ const Transcribe = () => {
     },
   });
 
-  const generateVariationMutation = useMutation({
+  const generateVariationMutation = useMutation<Script>({
     mutationFn: async () => {
       if (!currentTranscriptionId) throw new Error("No transcription selected");
       
