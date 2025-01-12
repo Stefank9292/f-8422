@@ -24,7 +24,9 @@ const Transcribe = () => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
-  const [generatedScript, setGeneratedScript] = useState<string | undefined>();
+  const [videoGeneratedScript, setVideoGeneratedScript] = useState<string | undefined>();
+  const [textGeneratedScript, setTextGeneratedScript] = useState<string | undefined>();
+  const [promptGeneratedScript, setPromptGeneratedScript] = useState<string | undefined>();
   const [transcription, setTranscription] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -96,7 +98,7 @@ const Transcribe = () => {
 
       if (error) throw error;
 
-      setGeneratedScript(data.variation_text);
+      setVideoGeneratedScript(data.variation_text);
     } catch (error) {
       console.error('Error generating variation:', error);
       toast({
@@ -132,7 +134,7 @@ const Transcribe = () => {
       
       setCurrentTranscriptionId(scriptData.id);
       localStorage.setItem('currentTranscriptionId', scriptData.id);
-      setGeneratedScript(aiResponse.text);
+      setTextGeneratedScript(aiResponse.text);
       return scriptData;
     },
   });
@@ -160,7 +162,7 @@ const Transcribe = () => {
       
       setCurrentTranscriptionId(scriptData.id);
       localStorage.setItem('currentTranscriptionId', scriptData.id);
-      setGeneratedScript(aiResponse.text);
+      setPromptGeneratedScript(aiResponse.text);
       return scriptData;
     },
   });
@@ -222,8 +224,8 @@ const Transcribe = () => {
               isGenerating={isGenerating}
             />
           )}
-          {generatedScript && (
-            <ScriptVariation variation={generatedScript} />
+          {videoGeneratedScript && (
+            <ScriptVariation variation={videoGeneratedScript} />
           )}
         </TabsContent>
 
@@ -231,7 +233,7 @@ const Transcribe = () => {
           <TextToScriptForm 
             onSubmit={handleTextToScript}
             isLoading={textToScriptMutation.isPending}
-            generatedScript={generatedScript}
+            generatedScript={textGeneratedScript}
           />
         </TabsContent>
 
@@ -239,7 +241,7 @@ const Transcribe = () => {
           <PromptToScriptForm 
             onSubmit={handlePromptToScript}
             isLoading={promptToScriptMutation.isPending}
-            generatedScript={generatedScript}
+            generatedScript={promptGeneratedScript}
           />
         </TabsContent>
       </Tabs>
