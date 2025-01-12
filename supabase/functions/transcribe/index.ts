@@ -6,24 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const ACCEPTED_FILE_TYPES = [
-  'audio/flac',
-  'audio/m4a',
-  'audio/mp3',
-  'audio/mp4',
-  'audio/mpeg',
-  'audio/mpga',
-  'audio/oga',
-  'audio/ogg',
-  'audio/wav',
-  'audio/webm',
-  'video/mp4',
-  'video/mpeg',
-  'video/webm'
-];
-
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB in bytes
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -31,8 +13,8 @@ serve(async (req) => {
   }
 
   try {
-    const { url, file, fileName, fileType } = await req.json();
-    console.log('Request received:', { hasUrl: !!url, hasFile: !!file, fileName, fileType });
+    const { url } = await req.json();
+    console.log('Processing Instagram URL:', url);
 
     // Get OpenAI API key from environment
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
@@ -40,98 +22,64 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key');
     }
 
-    let audioData: ArrayBuffer;
-    let audioType: string;
-    let finalFileName: string;
+    // 1. Extract video URL using Apify with the provided endpoint
+    console.log('Fetching video URL from Apify...');
+    const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "addParentData": false,
+        "directUrls": [url],
+        "enhanceUserSearchWithFacebookPage": false,
+        "isUserReelFeedURL": false,
+        "isUserTaggedFeedURL": false,
+        "resultsLimit": 1,
+        "resultsType": "details",
+        "searchLimit": 1,
+        "searchType": "user"
+      })
+    });
 
-    if (url) {
-      console.log('Processing Instagram URL:', url);
-
-      // Process Instagram URL using Apify with direct endpoint
-      const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          "addParentData": false,
-          "directUrls": [url],
-          "enhanceUserSearchWithFacebookPage": false,
-          "isUserReelFeedURL": false,
-          "isUserTaggedFeedURL": false,
-          "resultsLimit": 1,
-          "resultsType": "details",
-          "searchLimit": 1,
-          "searchType": "user"
-        })
-      });
-
-      if (!apifyResponse.ok) {
-        console.error('Apify API error:', await apifyResponse.text());
-        throw new Error(`Apify API error: ${apifyResponse.statusText}`);
-      }
-
-      const apifyData = await apifyResponse.json();
-      console.log('Apify response:', apifyData);
-
-      if (!apifyData[0]?.videoUrl) {
-        throw new Error('No video URL found in Instagram post');
-      }
-
-      const videoUrl = apifyData[0].videoUrl;
-      finalFileName = 'instagram_video.mp4';
-
-      // Download video
-      console.log('Downloading video from:', videoUrl);
-      const videoResponse = await fetch(videoUrl);
-      if (!videoResponse.ok) {
-        throw new Error('Failed to download video');
-      }
-
-      audioData = await videoResponse.arrayBuffer();
-      audioType = videoResponse.headers.get('content-type') || 'video/mp4';
-      console.log('Video downloaded successfully, size:', audioData.byteLength, 'bytes');
-    } else if (file) {
-      console.log('Processing uploaded file:', fileName);
-      
-      // Validate file type
-      if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
-        throw new Error(`Invalid file type. Supported formats: ${ACCEPTED_FILE_TYPES.join(', ')}`);
-      }
-
-      // Convert file data to ArrayBuffer
-      if (typeof file === 'string' && file.includes('base64,')) {
-        console.log('Converting base64 to ArrayBuffer');
-        const base64Data = file.split('base64,')[1];
-        audioData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)).buffer;
-      } else if (file instanceof ArrayBuffer) {
-        audioData = file;
-      } else {
-        console.error('Invalid file data format:', typeof file);
-        throw new Error('Invalid file data format');
-      }
-
-      audioType = fileType;
-      finalFileName = fileName || 'uploaded_audio.mp3';
-      console.log('File processed, size:', audioData.byteLength, 'bytes');
-    } else {
-      throw new Error('No URL or file provided');
+    if (!apifyResponse.ok) {
+      throw new Error(`Apify API error: ${apifyResponse.statusText}`);
     }
 
-    // Check file size
-    if (audioData.byteLength > MAX_FILE_SIZE) {
-      throw new Error('File size exceeds 25MB limit');
+    const apifyData = await apifyResponse.json();
+    console.log('Apify response:', apifyData);
+
+    if (!apifyData[0]?.videoUrl) {
+      throw new Error('No video URL found in Instagram post');
     }
 
-    // Prepare form data for Whisper API
-    console.log('Preparing audio for transcription...');
+    const videoUrl = apifyData[0].videoUrl;
+
+    // 2. Download video
+    console.log('Downloading video...');
+    const videoResponse = await fetch(videoUrl);
+    if (!videoResponse.ok) {
+      throw new Error('Failed to download video');
+    }
+
+    const contentType = videoResponse.headers.get('content-type');
+    if (!contentType?.includes('video')) {
+      throw new Error('Invalid content type: ' + contentType);
+    }
+
+    const videoBuffer = await videoResponse.arrayBuffer();
+    const MAX_SIZE = 25 * 1024 * 1024; // 25MB
+    if (videoBuffer.byteLength > MAX_SIZE) {
+      throw new Error('Video file too large (max 25MB)');
+    }
+
+    // 3. Prepare form data for Whisper API
+    console.log('Preparing video for transcription...');
     const formData = new FormData();
-    const uint8Array = new Uint8Array(audioData);
-    const blob = new Blob([uint8Array], { type: audioType });
-    formData.append('file', blob, finalFileName);
+    formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }), 'video.mp4');
     formData.append('model', 'whisper-1');
 
-    // Send to Whisper API
+    // 4. Send to Whisper API
     console.log('Sending to Whisper API...');
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -143,7 +91,6 @@ serve(async (req) => {
 
     if (!whisperResponse.ok) {
       const error = await whisperResponse.text();
-      console.error('Whisper API error:', error);
       throw new Error(`Whisper API error: ${error}`);
     }
 
