@@ -14,9 +14,12 @@ import { supabase } from "@/integrations/supabase/client";
 const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
 
 const formSchema = z.object({
-  url: z.string()
-    .url("Please enter a valid URL")
-    .regex(instagramUrlPattern, "Please enter a valid Instagram post URL (e.g., https://www.instagram.com/p/ABC123)")
+  url: z.string().refine((val) => {
+    // If empty, that's okay - we might be using file upload
+    if (!val) return true;
+    // If not empty, must be valid Instagram URL
+    return instagramUrlPattern.test(val);
+  }, "Please enter a valid Instagram post URL (e.g., https://www.instagram.com/p/ABC123)")
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -59,6 +62,13 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
   const handleSubmit = async (data: FormData) => {
     if (selectedFile) {
       await handleFileUpload();
+    } else if (!data.url.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please either enter a URL or upload a file"
+      });
+      return;
     } else {
       try {
         await onSubmit(data.url);
