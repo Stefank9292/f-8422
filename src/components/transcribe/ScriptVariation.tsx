@@ -19,7 +19,6 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
       .replace(/\*\*/g, '')  // Remove ** characters
       .replace(/###/g, '')   // Remove ### characters
       .replace(/\n{3,}/g, '\n\n')  // Replace 3+ newlines with 2
-      .replace(/^\s+|\s+$/gm, '')  // Remove leading/trailing spaces from each line
       .trim();
 
     const sections = cleanText.split(/(?=\d\. |\n\n)/g).filter(Boolean);

@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key');
     }
 
-    // 1. Extract video URL using Apify
+    // 1. Extract video URL using Apify with the provided endpoint
     console.log('Fetching video URL from Apify...');
     const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
       method: 'POST',
@@ -43,7 +43,6 @@ serve(async (req) => {
     });
 
     if (!apifyResponse.ok) {
-      console.error('Apify API error:', await apifyResponse.text());
       throw new Error(`Apify API error: ${apifyResponse.statusText}`);
     }
 
@@ -51,27 +50,20 @@ serve(async (req) => {
     console.log('Apify response:', apifyData);
 
     if (!apifyData[0]?.videoUrl) {
-      console.error('No video URL found in response:', apifyData);
       throw new Error('No video URL found in Instagram post');
     }
 
     const videoUrl = apifyData[0].videoUrl;
-    console.log('Found video URL:', videoUrl);
 
     // 2. Download video
     console.log('Downloading video...');
     const videoResponse = await fetch(videoUrl);
     if (!videoResponse.ok) {
-      console.error('Video download error:', videoResponse.statusText);
       throw new Error('Failed to download video');
     }
 
     const contentType = videoResponse.headers.get('content-type');
-    console.log('Content type:', contentType);
-
-    // Accept both video and audio content types
-    if (!contentType?.includes('video') && !contentType?.includes('audio')) {
-      console.error('Invalid content type:', contentType);
+    if (!contentType?.includes('video')) {
       throw new Error('Invalid content type: ' + contentType);
     }
 
@@ -82,19 +74,13 @@ serve(async (req) => {
     }
 
     // 3. Prepare form data for Whisper API
-    console.log('Preparing audio for transcription...');
+    console.log('Preparing video for transcription...');
     const formData = new FormData();
-    
-    // Create a Blob with the video data and explicitly set the MIME type
-    const blob = new Blob([videoBuffer], { type: 'audio/mp4' });
-    formData.append('file', blob, 'video.mp4');
+    formData.append('file', new Blob([videoBuffer], { type: 'video/mp4' }), 'video.mp4');
     formData.append('model', 'whisper-1');
-    formData.append('response_format', 'json');
 
-    // 4. Send to Whisper API with detailed error handling
+    // 4. Send to Whisper API
     console.log('Sending to Whisper API...');
-    console.log('Request size:', videoBuffer.byteLength, 'bytes');
-    
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
@@ -104,9 +90,8 @@ serve(async (req) => {
     });
 
     if (!whisperResponse.ok) {
-      const errorText = await whisperResponse.text();
-      console.error('Whisper API error response:', errorText);
-      throw new Error(`Whisper API error: ${errorText}`);
+      const error = await whisperResponse.text();
+      throw new Error(`Whisper API error: ${error}`);
     }
 
     const transcription = await whisperResponse.json();
