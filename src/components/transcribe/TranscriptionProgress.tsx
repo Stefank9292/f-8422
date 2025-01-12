@@ -38,7 +38,7 @@ export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
   const progress = ((currentStageIndex + 1) / stages.length) * 100;
 
   return (
-    <Card className="p-6 space-y-6">
+    <Card className="p-6 md:p-8 space-y-6">
       <Progress value={progress} className="h-2" />
       
       <div className="space-y-4">

@@ -102,43 +102,45 @@ const Transcribe = () => {
   const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <div className="space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Video Transcriber</h1>
-        <p className="text-muted-foreground">
-          Transform your Instagram videos into text with our AI-powered transcription service.
-        </p>
-      </div>
-      
-      <TranscribeForm 
-        onSubmit={(url) => transcribeMutation.mutateAsync(url)}
-        isLoading={transcribeMutation.isPending}
-        stage={transcriptionStage}
-      />
-
-      {currentTranscription && (
-        <div className="space-y-8">
-          <TranscriptionDisplay 
-            transcription={currentTranscription.original_text}
-            onGenerateVariation={() => generateVariationMutation.mutateAsync()}
-            isGenerating={generateVariationMutation.isPending}
-          />
-
-          {variations && variations.length > 0 && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold tracking-tight">Generated Variations</h2>
-              <div className="grid gap-4 md:grid-cols-2">
-                {variations.map((variation) => (
-                  <ScriptVariation 
-                    key={variation.id}
-                    variation={variation.original_text}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+    <div className="container py-8 md:py-12">
+      <div className="touch-spacing">
+        <div className="space-y-4">
+          <h1>Video Transcriber</h1>
+          <p className="text-muted-foreground">
+            Transform your Instagram videos into text with our AI-powered transcription service.
+          </p>
         </div>
-      )}
+        
+        <TranscribeForm 
+          onSubmit={(url) => transcribeMutation.mutateAsync(url)}
+          isLoading={transcribeMutation.isPending}
+          stage={transcriptionStage}
+        />
+
+        {currentTranscription && (
+          <div className="touch-spacing">
+            <TranscriptionDisplay 
+              transcription={currentTranscription.original_text}
+              onGenerateVariation={() => generateVariationMutation.mutateAsync()}
+              isGenerating={generateVariationMutation.isPending}
+            />
+
+            {variations && variations.length > 0 && (
+              <div className="touch-spacing">
+                <h2>Generated Variations</h2>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {variations.map((variation) => (
+                    <ScriptVariation 
+                      key={variation.id}
+                      variation={variation.original_text}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

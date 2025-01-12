@@ -14,7 +14,7 @@ export function TranscriptionDisplay({
   isGenerating 
 }: TranscriptionDisplayProps) {
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-6 md:p-8 space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <h3 className="text-2xl font-semibold tracking-tight">Original Transcription</h3>
         <Button
@@ -22,6 +22,7 @@ export function TranscriptionDisplay({
           disabled={isGenerating}
           variant="outline"
           size="lg"
+          className="material-button-secondary"
         >
           {isGenerating ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -31,7 +32,7 @@ export function TranscriptionDisplay({
           Generate Variation
         </Button>
       </div>
-      <div className="bg-muted/50 p-6 rounded-lg">
+      <div className="bg-muted/50 p-6 md:p-8 rounded-lg">
         <p className="whitespace-pre-wrap text-base md:text-lg leading-relaxed">{transcription}</p>
       </div>
     </Card>
