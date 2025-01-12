@@ -12,47 +12,41 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
-  // Split the content into sections based on numbered lists and headers
   const formatContent = (text: string) => {
-    // Clean up the text by removing markdown characters and extra spaces
     const cleanText = text
-      .replace(/\*\*/g, '')  // Remove ** characters
-      .replace(/###/g, '')   // Remove ### characters
-      .replace(/\n{3,}/g, '\n\n')  // Replace 3+ newlines with 2
-      .replace(/^\s+|\s+$/gm, '')  // Remove leading/trailing spaces from each line
+      .replace(/\*\*/g, '')
+      .replace(/###/g, '')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/^\s+|\s+$/gm, '')
       .trim();
 
     const sections = cleanText.split(/(?=\d\. |\n\n)/g).filter(Boolean);
     
     return sections.map((section, index) => {
-      // Clean up the section text
       const cleanedSection = section.trim();
-      
-      // Check if the section is a numbered item
       const isNumbered = /^\d\. /.test(cleanedSection);
       
       if (isNumbered) {
         return (
-          <div key={index} className="mb-2">
-            <p className="text-sm leading-relaxed">{cleanedSection}</p>
+          <div key={index} className="mb-1.5 md:mb-2">
+            <p className="text-xs md:text-sm leading-relaxed">{cleanedSection}</p>
           </div>
         );
       }
       
-      // Check if it might be a header (all caps or followed by colon)
       const isHeader = /^[A-Z\s]{4,}:|^[A-Z\s]{4,}$/.test(cleanedSection);
       
       if (isHeader) {
         return (
-          <div key={index} className="mt-4 mb-2">
-            <h4 className="text-md font-semibold text-foreground/80">{cleanedSection}</h4>
+          <div key={index} className="mt-3 md:mt-4 mb-1.5 md:mb-2">
+            <h4 className="text-sm md:text-md font-semibold text-foreground/80">{cleanedSection}</h4>
           </div>
         );
       }
       
       return (
-        <div key={index} className="mb-2">
-          <p className="text-sm leading-relaxed">{cleanedSection}</p>
+        <div key={index} className="mb-1.5 md:mb-2">
+          <p className="text-xs md:text-sm leading-relaxed">{cleanedSection}</p>
         </div>
       );
     });
@@ -77,25 +71,25 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   };
 
   return (
-    <Card className="p-6 space-y-2">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-medium">Generated Script</h3>
+    <Card className="p-3 md:p-4 space-y-2 md:space-y-3">
+      <div className="flex items-center justify-between mb-2 md:mb-3">
+        <h3 className="text-base md:text-lg font-medium">Generated Script</h3>
         <Button
+          onClick={handleCopyToClipboard}
           variant="outline"
           size="sm"
-          onClick={handleCopyToClipboard}
-          className="h-8"
+          className="h-7 md:h-8 text-xs md:text-sm"
         >
           {copied ? (
-            <Check className="h-4 w-4" />
+            <Check className="h-3 w-3 md:h-4 md:w-4" />
           ) : (
-            <Copy className="h-4 w-4" />
+            <Copy className="h-3 w-3 md:h-4 md:w-4" />
           )}
-          <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
+          <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
       <div>
-        <div className="bg-muted/50 p-4 rounded-md">
+        <div className="bg-muted/50 p-2 md:p-4 rounded-md">
           {formatContent(variation)}
         </div>
       </div>

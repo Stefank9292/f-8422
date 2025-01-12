@@ -13,6 +13,7 @@ import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { VideoIcon, FileTextIcon, MessageSquareIcon, FileIcon } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type Script = Tables<"scripts">;
 
@@ -20,6 +21,7 @@ const Transcribe = () => {
   const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt" | "file">("video");
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
@@ -221,39 +223,39 @@ const Transcribe = () => {
   };
 
   return (
-    <div className="container max-w-4xl py-6 space-y-6">
+    <div className="container max-w-4xl py-4 md:py-6 px-2 md:px-4 space-y-4 md:space-y-6">
       <div className="space-y-2">
-        <h1 className="text-xl font-semibold tracking-tight">Script Generator</h1>
-        <p className="text-sm text-muted-foreground">
+        <h1 className="text-lg md:text-xl font-semibold tracking-tight">Script Generator</h1>
+        <p className="text-xs md:text-sm text-muted-foreground">
           Transform your videos or text content into engaging social media scripts.
         </p>
       </div>
       
       <Tabs 
         defaultValue="video" 
-        className="space-y-6"
+        className="space-y-4 md:space-y-6"
         onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt" | "file")}
       >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="video" className="space-x-2">
-            <VideoIcon className="h-4 w-4" />
-            <span>Video to Script</span>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+          <TabsTrigger value="video" className="space-x-1 md:space-x-2 px-2 md:px-4">
+            <VideoIcon className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">Video to Script</span>
           </TabsTrigger>
-          <TabsTrigger value="text" className="space-x-2">
-            <FileTextIcon className="h-4 w-4" />
-            <span>Text to Script</span>
+          <TabsTrigger value="text" className="space-x-1 md:space-x-2 px-2 md:px-4">
+            <FileTextIcon className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">Text to Script</span>
           </TabsTrigger>
-          <TabsTrigger value="prompt" className="space-x-2">
-            <MessageSquareIcon className="h-4 w-4" />
-            <span>Prompt to Script</span>
+          <TabsTrigger value="prompt" className="space-x-1 md:space-x-2 px-2 md:px-4">
+            <MessageSquareIcon className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">Prompt to Script</span>
           </TabsTrigger>
-          <TabsTrigger value="file" className="space-x-2">
-            <FileIcon className="h-4 w-4" />
-            <span>File to Script</span>
+          <TabsTrigger value="file" className="space-x-1 md:space-x-2 px-2 md:px-4">
+            <FileIcon className="h-3 w-3 md:h-4 md:w-4" />
+            <span className="text-xs md:text-sm">File to Script</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="video" className="space-y-6">
+        <TabsContent value="video" className="space-y-4 md:space-y-6">
           <TranscribeForm 
             onSubmit={handleTranscribe}
             isLoading={transcribeMutation.isPending}
@@ -271,7 +273,7 @@ const Transcribe = () => {
           )}
         </TabsContent>
 
-        <TabsContent value="text" className="space-y-6">
+        <TabsContent value="text" className="space-y-4 md:space-y-6">
           <TextToScriptForm 
             onSubmit={handleTextToScript}
             isLoading={textToScriptMutation.isPending}
@@ -279,7 +281,7 @@ const Transcribe = () => {
           />
         </TabsContent>
 
-        <TabsContent value="prompt" className="space-y-6">
+        <TabsContent value="prompt" className="space-y-4 md:space-y-6">
           <PromptToScriptForm 
             onSubmit={handlePromptToScript}
             isLoading={promptToScriptMutation.isPending}
@@ -287,7 +289,7 @@ const Transcribe = () => {
           />
         </TabsContent>
 
-        <TabsContent value="file" className="space-y-6">
+        <TabsContent value="file" className="space-y-4 md:space-y-6">
           <FileToScriptForm
             onSubmit={handleFileToScript}
             isLoading={fileToScriptMutation.isPending}
