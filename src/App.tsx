@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -18,6 +18,18 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 
 const queryClient = new QueryClient();
 
+// Create a wrapper component to handle the conditional rendering of SidebarTrigger
+const SidebarTriggerWrapper = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/auth' || location.pathname === '/confirm-email';
+  
+  if (isAuthPage) {
+    return null;
+  }
+  
+  return <SidebarTrigger />;
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -26,7 +38,7 @@ function App() {
           <Router>
             <div className="flex min-h-screen w-full">
               <AppSidebar />
-              <SidebarTrigger />
+              <SidebarTriggerWrapper />
               <main className="flex-1">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
