@@ -18,9 +18,10 @@ serve(async (req) => {
 
   try {
     // Get user ID from auth context
-    const userId = req.auth?.uid;
-    if (!userId) {
-      throw new Error('Unauthorized');
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('No authorization header found');
+      throw new Error('No authorization header');
     }
 
     // Create Supabase client
@@ -29,53 +30,48 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get user's subscription tier
-    const { data: tier, error: tierError } = await supabaseClient.rpc(
-      'get_user_subscription_tier',
-      { user_id: userId }
+    // Verify the JWT token
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
     );
 
-    if (tierError) {
-      console.error('Error getting subscription tier:', tierError);
-      throw tierError;
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      throw new Error('Unauthorized');
     }
 
-    // Get user's request count for today
-    const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const endOfDay = new Date(startOfDay);
-    endOfDay.setDate(endOfDay.getDate() + 1);
+    console.log('Authenticated user:', user.id);
 
-    const { count, error: countError } = await supabaseClient
-      .from('user_requests')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('request_type', 'transcription')
-      .gte('created_at', startOfDay.toISOString())
-      .lt('created_at', endOfDay.toISOString());
+    // Get subscription status from hooks table
+    const { data: subscriptionData, error: subscriptionError } = await supabaseClient
+      .from('subscription_logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    if (countError) {
-      console.error('Error getting request count:', countError);
-      throw countError;
+    if (subscriptionError) {
+      console.error('Error fetching subscription:', subscriptionError);
+      throw subscriptionError;
     }
 
-    // Define limits based on tier
-    const limits = {
-      free: 5,
-      premium: 50,
-      ultra: 200
-    };
+    const subscription = subscriptionData?.[0];
+    const isSubscribed = subscription?.status === 'active';
+    const priceId = subscription?.details?.price_id;
+    const canceled = subscription?.status === 'canceled';
 
-    const currentCount = count || 0;
-    const tierLimit = limits[tier as keyof typeof limits] || limits.free;
-    const canMakeRequest = currentCount < tierLimit;
+    console.log('Subscription status:', {
+      subscribed: isSubscribed,
+      priceId,
+      canceled
+    });
 
     return new Response(
       JSON.stringify({
-        canMakeRequest,
-        currentCount,
-        limit: tierLimit,
-        tier
+        subscribed: isSubscribed,
+        priceId,
+        canceled,
+        maxClicks: isSubscribed ? 25 : 3
       }),
       { 
         status: 200,
