@@ -22,7 +22,7 @@ serve(async (req) => {
     console.log('Generating script for text:', text);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

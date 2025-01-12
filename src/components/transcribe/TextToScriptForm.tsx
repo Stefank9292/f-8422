@@ -33,6 +33,10 @@ export function TextToScriptForm({ onSubmit, isLoading }: TextToScriptFormProps)
     try {
       await onSubmit(data.text);
       form.reset();
+      toast({
+        title: "Success",
+        description: "Script generated successfully!",
+      });
     } catch (error) {
       toast({
         variant: "destructive",
