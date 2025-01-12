@@ -1,4 +1,10 @@
+# project_id must be first
 project_id = "uubpxlhfkxqjrsgnwlzh"
 
-[functions.transcribe]
-verify_jwt = true
+[global]
+maxDuration = 300
+
+[[experimental.workflows]]
+slug = "transcribe"
+max_jobs = 10
+version = "v0"
