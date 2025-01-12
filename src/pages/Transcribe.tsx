@@ -212,7 +212,7 @@ const Transcribe = () => {
             />
           )}
           {generatedScript && (
-            <ScriptVariation script={generatedScript} />
+            <ScriptVariation variation={generatedScript} />
           )}
         </TabsContent>
 
