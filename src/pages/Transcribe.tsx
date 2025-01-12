@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
+import { FileUploadForm } from "@/components/transcribe/FileUploadForm";
 import { TextToScriptForm } from "@/components/transcribe/TextToScriptForm";
 import { PromptToScriptForm } from "@/components/transcribe/PromptToScriptForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
@@ -11,7 +12,7 @@ import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgres
 import { useSessionValidation } from "@/hooks/useSessionValidation";
 import { Tables } from "@/integrations/supabase/types";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { VideoIcon, FileTextIcon, MessageSquareIcon } from "lucide-react";
+import { VideoIcon, FileTextIcon, MessageSquareIcon, UploadIcon } from "lucide-react";
 
 type Script = Tables<"scripts">;
 
@@ -19,7 +20,7 @@ const Transcribe = () => {
   const { session } = useSessionValidation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt">("video");
+  const [activeTab, setActiveTab] = useState<"video" | "text" | "prompt" | "upload">("video");
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
     return localStorage.getItem('currentTranscriptionId') || null;
   });
@@ -41,6 +42,40 @@ const Transcribe = () => {
       
       setTranscriptionStage('transcribing');
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      const { data: scriptData, error: scriptError } = await supabase
+        .from('scripts')
+        .insert({
+          user_id: session?.user.id,
+          original_text: data.text,
+          script_type: 'transcription' as const
+        })
+        .select()
+        .single();
+
+      if (scriptError) throw scriptError;
+      
+      setTranscriptionStage('completed');
+      const newTranscriptionId = scriptData.id;
+      setCurrentTranscriptionId(newTranscriptionId);
+      localStorage.setItem('currentTranscriptionId', newTranscriptionId);
+      return scriptData;
+    },
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: async (file: File) => {
+      setTranscriptionStage('preparing');
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      setTranscriptionStage('transcribing');
+      const { data, error } = await supabase.functions.invoke('transcribe', {
+        body: { file: await file.arrayBuffer(), fileName: file.name, fileType: file.type }
+      });
+
+      if (error) throw error;
       
       const { data: scriptData, error: scriptError } = await supabase
         .from('scripts')
@@ -133,6 +168,11 @@ const Transcribe = () => {
     queryClient.invalidateQueries({ queryKey: ['scripts'] });
   };
 
+  const handleFileUpload = async (file: File) => {
+    await uploadMutation.mutateAsync(file);
+    queryClient.invalidateQueries({ queryKey: ['scripts'] });
+  };
+
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <div className="space-y-2">
@@ -145,9 +185,9 @@ const Transcribe = () => {
       <Tabs 
         defaultValue="video" 
         className="space-y-6"
-        onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt")}
+        onValueChange={(value) => setActiveTab(value as "video" | "text" | "prompt" | "upload")}
       >
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="video" className="space-x-2">
             <VideoIcon className="h-4 w-4" />
             <span>Video to Script</span>
@@ -159,6 +199,10 @@ const Transcribe = () => {
           <TabsTrigger value="prompt" className="space-x-2">
             <MessageSquareIcon className="h-4 w-4" />
             <span>Prompt to Script</span>
+          </TabsTrigger>
+          <TabsTrigger value="upload" className="space-x-2">
+            <UploadIcon className="h-4 w-4" />
+            <span>Upload File</span>
           </TabsTrigger>
         </TabsList>
 
@@ -183,6 +227,14 @@ const Transcribe = () => {
             onSubmit={handlePromptToScript}
             isLoading={promptToScriptMutation.isPending}
             generatedScript={generatedScript}
+          />
+        </TabsContent>
+
+        <TabsContent value="upload" className="space-y-6">
+          <FileUploadForm 
+            onSubmit={handleFileUpload}
+            isLoading={uploadMutation.isPending}
+            stage={transcriptionStage}
           />
         </TabsContent>
       </Tabs>
