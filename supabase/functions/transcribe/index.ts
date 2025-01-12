@@ -63,6 +63,7 @@ serve(async (req) => {
       });
 
       if (!apifyResponse.ok) {
+        console.error('Apify API error:', await apifyResponse.text());
         throw new Error(`Apify API error: ${apifyResponse.statusText}`);
       }
 
@@ -76,7 +77,7 @@ serve(async (req) => {
       const videoUrl = apifyData[0].videoUrl;
 
       // Download video
-      console.log('Downloading video...');
+      console.log('Downloading video from:', videoUrl);
       const videoResponse = await fetch(videoUrl);
       if (!videoResponse.ok) {
         throw new Error('Failed to download video');
@@ -84,11 +85,13 @@ serve(async (req) => {
 
       audioData = await videoResponse.arrayBuffer();
       audioType = videoResponse.headers.get('content-type') || 'video/mp4';
+      console.log('Video downloaded successfully, size:', audioData.byteLength, 'bytes');
     } else if (file) {
       console.log('Processing uploaded file:', fileName);
       
       // Convert base64 to ArrayBuffer if needed
       if (typeof file === 'string' && file.includes('base64,')) {
+        console.log('Converting base64 to ArrayBuffer');
         const base64Data = file.split('base64,')[1];
         audioData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)).buffer;
       } else if (file instanceof ArrayBuffer) {
@@ -98,6 +101,7 @@ serve(async (req) => {
       }
       
       audioType = fileType;
+      console.log('File processed, size:', audioData.byteLength, 'bytes');
 
       // Validate file type
       if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
@@ -132,6 +136,7 @@ serve(async (req) => {
 
     if (!whisperResponse.ok) {
       const error = await whisperResponse.text();
+      console.error('Whisper API error:', error);
       throw new Error(`Whisper API error: ${error}`);
     }
 
