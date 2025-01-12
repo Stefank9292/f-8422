@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +36,25 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       url: ""
     }
   });
+
+  // Cleanup file after 2 minutes
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (selectedFile) {
+      timeoutId = setTimeout(() => {
+        setSelectedFile(null);
+        toast({
+          title: "File removed",
+          description: "The uploaded file has been removed for security reasons. Please upload again if needed.",
+        });
+      }, 2 * 60 * 1000); // 2 minutes
+    }
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [selectedFile, toast]);
 
   const handleSubmit = async (data: FormData) => {
     if (selectedFile) {
