@@ -16,40 +16,94 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
     const cleanText = text
       .replace(/\*\*/g, '')
       .replace(/###/g, '')
-      .replace(/\n{3,}/g, '\n\n')
-      .replace(/^\s+|\s+$/gm, '')
       .trim();
 
-    const sections = cleanText.split(/(?=\d\. |\n\n)/g).filter(Boolean);
-    
-    return sections.map((section, index) => {
-      const cleanedSection = section.trim();
-      const isNumbered = /^\d\. /.test(cleanedSection);
+    const sections = {
+      hooks: [] as string[],
+      videoScript: '',
+      caption: '',
+      cta: '',
+      explanation: ''
+    };
+
+    // Split the text into lines
+    const lines = cleanText.split('\n');
+    let currentSection = '';
+
+    lines.forEach((line) => {
+      const trimmedLine = line.trim();
       
-      if (isNumbered) {
-        return (
-          <div key={index} className="mb-2 md:mb-3">
-            <p className="text-sm md:text-base leading-relaxed">{cleanedSection}</p>
-          </div>
-        );
+      // Identify sections
+      if (trimmedLine === 'Hooks') {
+        currentSection = 'hooks';
+      } else if (trimmedLine === 'Video Script:') {
+        currentSection = 'videoScript';
+      } else if (trimmedLine === 'Caption') {
+        currentSection = 'caption';
+      } else if (trimmedLine === 'CTA') {
+        currentSection = 'cta';
+      } else if (trimmedLine === 'Explanation of Script') {
+        currentSection = 'explanation';
+      } else if (trimmedLine) {
+        // Process content based on current section
+        if (currentSection === 'hooks' && /^\d\./.test(trimmedLine)) {
+          sections.hooks.push(trimmedLine.replace(/^\d\.\s*/, '').trim());
+        } else if (currentSection === 'videoScript') {
+          sections.videoScript += (sections.videoScript ? '\n' : '') + trimmedLine;
+        } else if (currentSection === 'caption') {
+          sections.caption += (sections.caption ? '\n' : '') + trimmedLine;
+        } else if (currentSection === 'cta') {
+          sections.cta += (sections.cta ? '\n' : '') + trimmedLine;
+        } else if (currentSection === 'explanation') {
+          sections.explanation += (sections.explanation ? '\n' : '') + trimmedLine;
+        }
       }
-      
-      const isHeader = /^[A-Z\s]{4,}:|^[A-Z\s]{4,}$/.test(cleanedSection);
-      
-      if (isHeader) {
-        return (
-          <div key={index} className="mt-4 md:mt-5 mb-2 md:mb-3">
-            <h4 className="text-base md:text-lg font-semibold text-foreground/80">{cleanedSection}</h4>
-          </div>
-        );
-      }
-      
-      return (
-        <div key={index} className="mb-2 md:mb-3">
-          <p className="text-sm md:text-base leading-relaxed">{cleanedSection}</p>
-        </div>
-      );
     });
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground/80 mb-3">Hooks</h4>
+          <div className="space-y-2">
+            {sections.hooks.map((hook, index) => (
+              <div key={index} className="bg-muted p-3 rounded-md">
+                <p className="text-sm md:text-base leading-relaxed">
+                  <span className="font-medium text-foreground/70">Hook {index + 1}:</span> {hook}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground/80 mb-3">Video Script</h4>
+          <div className="bg-muted p-3 rounded-md">
+            <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap">{sections.videoScript}</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground/80 mb-3">Caption</h4>
+          <div className="bg-muted p-3 rounded-md">
+            <p className="text-sm md:text-base leading-relaxed">{sections.caption}</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground/80 mb-3">Call to Action</h4>
+          <div className="bg-muted p-3 rounded-md">
+            <p className="text-sm md:text-base leading-relaxed">{sections.cta}</p>
+          </div>
+        </div>
+
+        <div>
+          <h4 className="text-base md:text-lg font-semibold text-foreground/80 mb-3">Explanation</h4>
+          <div className="bg-muted p-3 rounded-md">
+            <p className="text-sm md:text-base leading-relaxed">{sections.explanation}</p>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const handleCopyToClipboard = async () => {
@@ -88,7 +142,7 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
           <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
-      <div className="bg-muted/50 p-3 md:p-4 rounded-md">
+      <div className="bg-background rounded-md">
         {formatContent(variation)}
       </div>
     </Card>
