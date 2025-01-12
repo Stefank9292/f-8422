@@ -3,6 +3,20 @@
   to = "/index.html"
   status = 200
 
+# Force non-www to www
+[[redirects]]
+  from = "https://example.com/*"
+  to = "https://www.example.com/:splat"
+  status = 301
+  force = true
+
+# Also handle http
+[[redirects]]
+  from = "http://example.com/*"
+  to = "https://www.example.com/:splat"
+  status = 301
+  force = true
+
 [build]
   command = "npm run build"
   publish = "dist"
