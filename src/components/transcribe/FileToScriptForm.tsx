@@ -124,7 +124,7 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
           <Button
             onClick={handleUpload}
             disabled={!uploadedFile || isUploading || isLoading}
-            className="w-full"
+            className="w-full sm:w-auto"
           >
             {(isUploading || isLoading) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isUploading ? 'Uploading...' : isLoading ? 'Transcribing...' : 'Transcribe File'}
