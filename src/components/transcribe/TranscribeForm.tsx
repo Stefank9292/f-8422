@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Upload } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
@@ -28,6 +28,7 @@ interface TranscribeFormProps {
 
 export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormProps) {
   const { toast } = useToast();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,6 +47,55 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
         description: error instanceof Error ? error.message : "Failed to transcribe video"
       });
     }
+  };
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select a file first"
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      const { data, error } = await supabase.functions.invoke('transcribe-file', {
+        body: formData
+      });
+
+      if (error) throw error;
+
+      // Call onSubmit with the transcribed text
+      await onSubmit(data.text);
+      setSelectedFile(null);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to transcribe file"
+      });
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (25MB)
+    if (file.size > 25 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "File size must be less than 25MB"
+      });
+      return;
+    }
+
+    setSelectedFile(file);
   };
 
   return (
@@ -71,14 +121,48 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                 </FormItem>
               )}
             />
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="w-full sm:w-auto"
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Transcribe Video
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full sm:w-auto"
+              >
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Transcribe Video
+              </Button>
+
+              <div className="flex gap-2 items-center">
+                <Input
+                  type="file"
+                  accept="audio/*,video/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="file-upload"
+                  disabled={isLoading}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  disabled={isLoading}
+                  className="w-full sm:w-auto"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload File
+                </Button>
+                {selectedFile && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleFileUpload}
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Transcribe File
+                  </Button>
+                )}
+              </div>
+            </div>
           </form>
         </Form>
       </Card>
