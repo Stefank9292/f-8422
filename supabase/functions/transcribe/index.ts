@@ -84,13 +84,17 @@ serve(async (req) => {
     // 3. Prepare form data for Whisper API
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
-    // Use .mp3 extension and audio/mpeg type as it's more widely supported
-    formData.append('file', new Blob([videoBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
+    
+    // Create a Blob with the video data
+    const blob = new Blob([videoBuffer], { type: 'audio/mpeg' });
+    formData.append('file', blob, 'audio.mp3');
     formData.append('model', 'whisper-1');
     formData.append('language', 'en');
 
     // 4. Send to Whisper API with detailed error handling
     console.log('Sending to Whisper API...');
+    console.log('Request size:', videoBuffer.byteLength, 'bytes');
+    
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
       headers: {
