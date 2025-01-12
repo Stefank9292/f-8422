@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
 import { supabase } from "@/integrations/supabase/client";
 
-const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
+// Updated pattern to match Apify's requirements
+const instagramUrlPattern = /^https:\/\/(www\.)?instagram\.com\/.+$/;
 
 const formSchema = z.object({
   url: z.string().refine((val) => {
@@ -19,7 +20,7 @@ const formSchema = z.object({
     if (!val) return true;
     // If not empty, must be valid Instagram URL
     return instagramUrlPattern.test(val);
-  }, "Please enter a valid Instagram post URL (e.g., https://www.instagram.com/p/ABC123)")
+  }, "Please enter a valid Instagram URL (e.g., https://www.instagram.com/p/ABC123)")
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -77,7 +78,18 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
     }
 
     try {
-      await onSubmit(data.url);
+      // Ensure URL starts with https://
+      let url = data.url;
+      if (!url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+      
+      // Ensure www. is present if not already
+      if (!url.includes('www.')) {
+        url = url.replace('https://', 'https://www.');
+      }
+
+      await onSubmit(url);
       form.reset();
     } catch (error) {
       toast({
