@@ -85,11 +85,10 @@ serve(async (req) => {
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
     
-    // Create a Blob with the video data
+    // Create a Blob with the video data and explicitly set the MIME type to audio/mpeg
     const blob = new Blob([videoBuffer], { type: 'audio/mpeg' });
     formData.append('file', blob, 'audio.mp3');
     formData.append('model', 'whisper-1');
-    formData.append('language', 'en');
 
     // 4. Send to Whisper API with detailed error handling
     console.log('Sending to Whisper API...');
