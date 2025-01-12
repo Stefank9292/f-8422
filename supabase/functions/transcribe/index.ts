@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key');
     }
 
-    // 1. Extract video URL using Apify
+    // 1. Extract video URL using Apify with detailed error handling
     console.log('Fetching video URL from Apify...');
     const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
       method: 'POST',
@@ -45,7 +45,7 @@ serve(async (req) => {
     if (!apifyResponse.ok) {
       const errorText = await apifyResponse.text();
       console.error('Apify API error:', errorText);
-      throw new Error(`Apify API error: ${apifyResponse.statusText}`);
+      throw new Error(`Apify API error: ${errorText}`);
     }
 
     const apifyData = await apifyResponse.json();
@@ -59,7 +59,7 @@ serve(async (req) => {
     const videoUrl = apifyData[0].videoUrl;
     console.log('Found video URL:', videoUrl);
 
-    // 2. Download video with proper error handling
+    // 2. Download video with comprehensive error handling
     console.log('Downloading video...');
     const videoResponse = await fetch(videoUrl);
     if (!videoResponse.ok) {
@@ -82,7 +82,7 @@ serve(async (req) => {
       throw new Error('Video file too large (max 25MB)');
     }
 
-    // 3. Prepare form data for Whisper API with proper content type
+    // 3. Prepare form data for Whisper API with correct content type
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
     
