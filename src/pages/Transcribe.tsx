@@ -74,37 +74,6 @@ const Transcribe = () => {
     },
   });
 
-  const generateVariation = async () => {
-    if (!currentTranscriptionId) {
-      toast({
-        title: "Error",
-        description: "No transcription available. Please transcribe a video first.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      setIsGenerating(true);
-      const { data, error } = await supabase.functions.invoke('generate-variation', {
-        body: { transcriptionId: currentTranscriptionId }
-      });
-
-      if (error) throw error;
-
-      setVideoGeneratedScript(data.variation_text);
-    } catch (error) {
-      console.error('Error generating variation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate script variation. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const fileToScriptMutation = useMutation({
     mutationFn: async (filePath: string) => {
       const { data, error } = await supabase.functions.invoke('transcribe-file', {
@@ -133,10 +102,20 @@ const Transcribe = () => {
     },
   });
 
-  const textToScriptMutation = useMutation({
-    mutationFn: async (text: string) => {
+  const generateFileVariation = async () => {
+    if (!fileGeneratedScript) {
+      toast({
+        title: "Error",
+        description: "No transcription available. Please transcribe a file first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setIsGenerating(true);
       const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-script', {
-        body: { text }
+        body: { text: fileGeneratedScript }
       });
 
       if (aiError) throw aiError;
@@ -145,49 +124,28 @@ const Transcribe = () => {
         .from('scripts')
         .insert({
           user_id: session?.user.id,
-          original_text: text,
+          original_text: fileGeneratedScript,
           variation_text: aiResponse.text,
-          script_type: 'transcription' as const
+          script_type: 'variation' as const,
+          parent_script_id: currentTranscriptionId
         })
         .select()
         .single();
 
       if (scriptError) throw scriptError;
       
-      setCurrentTranscriptionId(scriptData.id);
-      localStorage.setItem('currentTranscriptionId', scriptData.id);
-      setTextGeneratedScript(aiResponse.text);
-      return scriptData;
-    },
-  });
-
-  const promptToScriptMutation = useMutation({
-    mutationFn: async ({ prompt, text }: { prompt: string; text: string }) => {
-      const { data: aiResponse, error: aiError } = await supabase.functions.invoke('generate-prompt-script', {
-        body: { prompt, text }
+      setFileGeneratedScript(aiResponse.text);
+    } catch (error) {
+      console.error('Error generating variation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate script variation. Please try again.",
+        variant: "destructive",
       });
-
-      if (aiError) throw aiError;
-
-      const { data: scriptData, error: scriptError } = await supabase
-        .from('scripts')
-        .insert({
-          user_id: session?.user.id,
-          original_text: text,
-          variation_text: aiResponse.text,
-          script_type: 'transcription' as const
-        })
-        .select()
-        .single();
-
-      if (scriptError) throw scriptError;
-      
-      setCurrentTranscriptionId(scriptData.id);
-      localStorage.setItem('currentTranscriptionId', scriptData.id);
-      setPromptGeneratedScript(aiResponse.text);
-      return scriptData;
-    },
-  });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleTranscribe = async (url: string) => {
     await transcribeMutation.mutateAsync(url);
@@ -283,11 +241,16 @@ const Transcribe = () => {
             isLoading={fileToScriptMutation.isPending}
           />
           {fileGeneratedScript && (
-            <TranscriptionDisplay 
-              transcription={fileGeneratedScript}
-              onGenerateVariation={generateVariation}
-              isGenerating={isGenerating}
-            />
+            <>
+              <TranscriptionDisplay 
+                transcription={fileGeneratedScript}
+                onGenerateVariation={generateFileVariation}
+                isGenerating={isGenerating}
+              />
+              {promptGeneratedScript && (
+                <ScriptVariation variation={promptGeneratedScript} />
+              )}
+            </>
           )}
         </TabsContent>
       </Tabs>
