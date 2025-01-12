@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -53,7 +54,7 @@ serve(async (req) => {
           },
           {
             role: 'user',
-            content: `Create a variation of this script that maintains the core message but presents it in a more engaging way. Original script: "${originalScript.original_text}"`
+            content: `Create a new script variation with 3 hook options based on this original script: "${originalScript.original_text}". Include a complete script example and explanation of why it works. Format it with clear sections for Hook Options, Full Script Example, and Why This Works.`
           }
         ],
         temperature: 0.7,
