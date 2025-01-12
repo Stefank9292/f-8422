@@ -1,4 +1,4 @@
-import { PanelLeft } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -21,7 +21,7 @@ export function SidebarTrigger() {
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
       )}
     >
-      <PanelLeft className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
+      <Menu className={cn("h-4 w-4 transition-transform", isCollapsed && "rotate-180")} />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

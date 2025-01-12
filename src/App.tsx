@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppSidebar } from "@/components/AppSidebar";
+import { SidebarTrigger } from "@/components/sidebar/SidebarTrigger";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
@@ -25,6 +26,7 @@ function App() {
           <Router>
             <div className="flex min-h-screen w-full">
               <AppSidebar />
+              <SidebarTrigger />
               <main className="flex-1">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
