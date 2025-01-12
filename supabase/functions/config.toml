@@ -1,7 +1,18 @@
 project_id = "uubpxlhfkxqjrsgnwlzh"
 
-[functions.transcribe]
-verify_jwt = true
+[global.env]
+OPENAI_API_KEY = "env"
+SUPABASE_URL = "env"
+SUPABASE_ANON_KEY = "env"
+SUPABASE_SERVICE_ROLE_KEY = "env"
+SUPABASE_DB_URL = "env"
 
-[functions.generate-variation]
+[[edge_functions]]
+name = "transcribe"
 verify_jwt = true
+import_map = "import_map.json"
+
+[[edge_functions]]
+name = "generate-variation"
+verify_jwt = true
+import_map = "import_map.json"
