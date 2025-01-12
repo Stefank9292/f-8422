@@ -86,7 +86,7 @@ export const SearchFilters = ({
 
   return (
     <div className="space-y-0 animate-in fade-in">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="md:hidden">
         <FilterHeader
           totalResults={totalResults}
           filteredResults={filteredResults}
