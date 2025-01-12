@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
+import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
 
 const formSchema = z.object({
   url: z.string().url("Please enter a valid Instagram URL")
@@ -18,9 +19,10 @@ type FormData = z.infer<typeof formSchema>;
 interface TranscribeFormProps {
   onSubmit: (url: string) => Promise<void>;
   isLoading: boolean;
+  stage?: TranscriptionStage;
 }
 
-export function TranscribeForm({ onSubmit, isLoading }: TranscribeFormProps) {
+export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormProps) {
   const { toast } = useToast();
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -43,32 +45,38 @@ export function TranscribeForm({ onSubmit, isLoading }: TranscribeFormProps) {
   };
 
   return (
-    <Card className="p-6">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="url"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Instagram Video URL</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="https://www.instagram.com/reel/..." 
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Transcribe Video
-          </Button>
-        </form>
-      </Form>
-    </Card>
+    <div className="space-y-6">
+      <Card className="p-6">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="url"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Instagram Video URL</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="https://www.instagram.com/reel/..." 
+                      {...field}
+                      disabled={isLoading}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Transcribe Video
+            </Button>
+          </form>
+        </Form>
+      </Card>
+
+      {isLoading && stage && (
+        <TranscriptionProgress stage={stage} />
+      )}
+    </div>
   );
 }

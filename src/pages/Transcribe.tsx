@@ -5,40 +5,31 @@ import { useToast } from "@/hooks/use-toast";
 import { TranscribeForm } from "@/components/transcribe/TranscribeForm";
 import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDisplay";
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
+import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
 
 const Transcribe = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(null);
-
-  const { data: scripts, isLoading: isLoadingScripts } = useQuery({
-    queryKey: ['scripts'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('scripts')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load scripts. Please try again.",
-        });
-        throw error;
-      }
-      
-      return data;
-    },
-  });
+  const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
+      setTranscriptionStage('preparing');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate preparation time
+      setTranscriptionStage('downloading');
+      
       const { data, error } = await supabase.functions.invoke('transcribe', {
         body: { url }
       });
 
       if (error) throw error;
+      
+      setTranscriptionStage('transcribing');
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate transcription time
+      
+      setTranscriptionStage('completed');
       return data;
     },
     onSuccess: (data) => {
@@ -50,6 +41,7 @@ const Transcribe = () => {
       });
     },
     onError: (error) => {
+      setTranscriptionStage(undefined);
       toast({
         variant: "destructive",
         title: "Error",
@@ -85,6 +77,27 @@ const Transcribe = () => {
     },
   });
 
+  const { data: scripts, isLoading: isLoadingScripts } = useQuery({
+    queryKey: ['scripts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('scripts')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load scripts. Please try again.",
+        });
+        throw error;
+      }
+      
+      return data;
+    },
+  });
+
   const currentTranscription = scripts?.find(s => s.id === currentTranscriptionId);
   const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
 
@@ -95,6 +108,7 @@ const Transcribe = () => {
       <TranscribeForm 
         onSubmit={(url) => transcribeMutation.mutateAsync(url)}
         isLoading={transcribeMutation.isPending}
+        stage={transcriptionStage}
       />
 
       {currentTranscription && (
