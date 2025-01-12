@@ -7,6 +7,9 @@ import { TranscriptionDisplay } from "@/components/transcribe/TranscriptionDispl
 import { ScriptVariation } from "@/components/transcribe/ScriptVariation";
 import { TranscriptionStage } from "@/components/transcribe/TranscriptionProgress";
 import { useSessionValidation } from "@/hooks/useSessionValidation";
+import { Tables } from "@/integrations/supabase/types";
+
+type Script = Tables<"scripts">;
 
 const Transcribe = () => {
   const { session } = useSessionValidation();
@@ -46,7 +49,6 @@ const Transcribe = () => {
       
       setTranscriptionStage('completed');
       setCurrentTranscriptionId(scriptData.id);
-      return scriptData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scripts'] });
@@ -74,7 +76,6 @@ const Transcribe = () => {
       });
 
       if (error) throw error;
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scripts'] });
@@ -101,7 +102,7 @@ const Transcribe = () => {
         .from('scripts')
         .select('*')
         .eq('id', currentTranscriptionId)
-        .order('created_at', { ascending: false });
+        .single();
       
       if (error) {
         toast({
@@ -112,13 +113,34 @@ const Transcribe = () => {
         throw error;
       }
       
-      return data[0];
+      return data;
     },
     enabled: !!currentTranscriptionId
   });
 
-  const currentTranscription = scripts;
-  const variations = scripts?.filter(s => s.parent_script_id === currentTranscriptionId);
+  const { data: variations } = useQuery({
+    queryKey: ['variations', currentTranscriptionId],
+    queryFn: async () => {
+      if (!currentTranscriptionId) return [];
+      
+      const { data, error } = await supabase
+        .from('scripts')
+        .select('*')
+        .eq('parent_script_id', currentTranscriptionId);
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to load variations. Please try again.",
+        });
+        throw error;
+      }
+      
+      return data;
+    },
+    enabled: !!currentTranscriptionId
+  });
 
   return (
     <div className="container max-w-4xl py-6 space-y-6">
@@ -135,10 +157,10 @@ const Transcribe = () => {
         stage={transcriptionStage}
       />
 
-      {currentTranscription && (
+      {scripts && (
         <div className="space-y-6">
           <TranscriptionDisplay 
-            transcription={currentTranscription.original_text}
+            transcription={scripts.original_text}
             onGenerateVariation={() => generateVariationMutation.mutateAsync()}
             isGenerating={generateVariationMutation.isPending}
           />
