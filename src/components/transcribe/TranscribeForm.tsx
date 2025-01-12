@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, Download, Mic, CheckCircle2 } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
-import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
+import { TranscriptionStage } from "./TranscriptionProgress";
 
 const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
 
@@ -35,6 +35,31 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
     }
   });
 
+  const getStageContent = (stage: TranscriptionStage) => {
+    switch (stage) {
+      case 'downloading':
+        return {
+          text: "Downloading the video...",
+          icon: <Download className="h-4 w-4 animate-bounce" />
+        };
+      case 'transcribing':
+        return {
+          text: "Transcribing the audio...",
+          icon: <Mic className="h-4 w-4 animate-pulse" />
+        };
+      case 'completed':
+        return {
+          text: "Transcription complete!",
+          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
+        };
+      default:
+        return {
+          text: "Transcribe Video",
+          icon: isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null
+        };
+    }
+  };
+
   const handleSubmit = async (data: FormData) => {
     try {
       await onSubmit(data.url);
@@ -48,44 +73,40 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
     }
   };
 
-  return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram Video URL</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="https://www.instagram.com/p/..." 
-                      className="h-10"
-                      {...field}
-                      disabled={isLoading}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="w-full sm:w-auto"
-            >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Transcribe Video
-            </Button>
-          </form>
-        </Form>
-      </Card>
+  const stageContent = stage ? getStageContent(stage) : getStageContent('preparing');
 
-      {isLoading && stage && (
-        <TranscriptionProgress stage={stage} />
-      )}
-    </div>
+  return (
+    <Card className="p-6">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Instagram Video URL</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="https://www.instagram.com/p/..." 
+                    className="h-10"
+                    {...field}
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
+            {stageContent.icon}
+            {stageContent.text}
+          </Button>
+        </form>
+      </Form>
+    </Card>
   );
 }

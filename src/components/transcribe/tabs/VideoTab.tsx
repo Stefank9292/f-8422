@@ -38,9 +38,6 @@ export function VideoTab() {
 
   const transcribeMutation = useMutation({
     mutationFn: async (url: string) => {
-      setTranscriptionStage('preparing');
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
       setTranscriptionStage('downloading');
       
       const { data, error } = await supabase.functions.invoke('transcribe', {
