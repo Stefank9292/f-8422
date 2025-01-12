@@ -44,7 +44,7 @@ const Transcribe = () => {
         .insert({
           user_id: session?.user.id,
           original_text: data.text,
-          script_type: 'transcription'
+          script_type: 'transcription' as const
         })
         .select()
         .single();
@@ -57,21 +57,6 @@ const Transcribe = () => {
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
       return scriptData;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scripts'] });
-      toast({
-        title: "Success",
-        description: "Video transcribed successfully!",
-      });
-    },
-    onError: (error) => {
-      setTranscriptionStage(undefined);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to transcribe video",
-      });
-    },
   });
 
   const textToScriptMutation = useMutation({
@@ -81,7 +66,7 @@ const Transcribe = () => {
         .insert({
           user_id: session?.user.id,
           original_text: text,
-          script_type: 'text'
+          script_type: 'transcription' as const
         })
         .select()
         .single();
@@ -91,20 +76,6 @@ const Transcribe = () => {
       setCurrentTranscriptionId(scriptData.id);
       localStorage.setItem('currentTranscriptionId', scriptData.id);
       return scriptData;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scripts'] });
-      toast({
-        title: "Success",
-        description: "Text converted to script successfully!",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to convert text to script",
-      });
     },
   });
 
@@ -119,20 +90,6 @@ const Transcribe = () => {
       if (error) throw error;
       
       return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['variations', currentTranscriptionId] });
-      toast({
-        title: "Success",
-        description: "Script variation generated successfully!",
-      });
-    },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to generate variation",
-      });
     },
   });
 
@@ -189,6 +146,21 @@ const Transcribe = () => {
     gcTime: 1000 * 60 * 60,
   });
 
+  const handleTranscribe = async (url: string) => {
+    await transcribeMutation.mutateAsync(url);
+    queryClient.invalidateQueries({ queryKey: ['scripts'] });
+  };
+
+  const handleTextToScript = async (text: string) => {
+    await textToScriptMutation.mutateAsync(text);
+    queryClient.invalidateQueries({ queryKey: ['scripts'] });
+  };
+
+  const handleGenerateVariation = async () => {
+    await generateVariationMutation.mutateAsync();
+    queryClient.invalidateQueries({ queryKey: ['variations', currentTranscriptionId] });
+  };
+
   return (
     <div className="container max-w-4xl py-6 space-y-6">
       <div className="space-y-2">
@@ -212,7 +184,7 @@ const Transcribe = () => {
 
         <TabsContent value="video" className="space-y-6">
           <TranscribeForm 
-            onSubmit={(url) => transcribeMutation.mutateAsync(url)}
+            onSubmit={handleTranscribe}
             isLoading={transcribeMutation.isPending}
             stage={transcriptionStage}
           />
@@ -220,7 +192,7 @@ const Transcribe = () => {
 
         <TabsContent value="text" className="space-y-6">
           <TextToScriptForm 
-            onSubmit={(text) => textToScriptMutation.mutateAsync(text)}
+            onSubmit={handleTextToScript}
             isLoading={textToScriptMutation.isPending}
           />
         </TabsContent>
@@ -230,7 +202,7 @@ const Transcribe = () => {
         <div className="space-y-6">
           <TranscriptionDisplay 
             transcription={scripts.original_text}
-            onGenerateVariation={() => generateVariationMutation.mutateAsync()}
+            onGenerateVariation={handleGenerateVariation}
             isGenerating={generateVariationMutation.isPending}
           />
 
