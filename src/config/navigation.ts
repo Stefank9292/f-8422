@@ -1,4 +1,4 @@
-import { Search, History } from "lucide-react";
+import { Search, History, FileText } from "lucide-react";
 import { NavItem } from "@/types/navigation";
 
 export const NAV_ITEMS: NavItem[] = [
@@ -12,5 +12,11 @@ export const NAV_ITEMS: NavItem[] = [
     title: "Search History",
     url: "/history",
     icon: History
+  },
+  {
+    title: "Video Transcriber",
+    url: "/transcribe",
+    icon: FileText,
+    badge: "NEW"
   }
 ];

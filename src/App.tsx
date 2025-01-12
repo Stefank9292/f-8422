@@ -14,6 +14,7 @@ import FAQ from "@/pages/FAQ";
 import HelpCenter from "@/pages/HelpCenter";
 import ConfirmEmail from "@/pages/ConfirmEmail";
 import { Profile } from "@/pages/Profile";
+import Transcribe from "@/pages/Transcribe";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 const queryClient = new QueryClient();
@@ -96,6 +97,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <HelpCenter />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/transcribe"
+                    element={
+                      <ProtectedRoute>
+                        <Transcribe />
                       </ProtectedRoute>
                     }
                   />

@@ -60,6 +60,47 @@ export type Database = {
         }
         Relationships: []
       }
+      scripts: {
+        Row: {
+          created_at: string
+          id: string
+          original_text: string
+          parent_script_id: string | null
+          script_type: Database["public"]["Enums"]["script_type"]
+          updated_at: string
+          user_id: string
+          variation_text: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          original_text: string
+          parent_script_id?: string | null
+          script_type: Database["public"]["Enums"]["script_type"]
+          updated_at?: string
+          user_id: string
+          variation_text?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          original_text?: string
+          parent_script_id?: string | null
+          script_type?: Database["public"]["Enums"]["script_type"]
+          updated_at?: string
+          user_id?: string
+          variation_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scripts_parent_script_id_fkey"
+            columns: ["parent_script_id"]
+            isOneToOne: false
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       search_history: {
         Row: {
           bulk_search_urls: string[] | null
@@ -193,6 +234,7 @@ export type Database = {
     }
     Enums: {
       invite_code_status: "active" | "expired"
+      script_type: "transcription" | "variation"
       subscription_event:
         | "subscription_check"
         | "subscription_created"
