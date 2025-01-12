@@ -43,7 +43,8 @@ serve(async (req) => {
     });
 
     if (!apifyResponse.ok) {
-      console.error('Apify API error:', await apifyResponse.text());
+      const errorText = await apifyResponse.text();
+      console.error('Apify API error:', errorText);
       throw new Error(`Apify API error: ${apifyResponse.statusText}`);
     }
 
@@ -58,7 +59,7 @@ serve(async (req) => {
     const videoUrl = apifyData[0].videoUrl;
     console.log('Found video URL:', videoUrl);
 
-    // 2. Download video
+    // 2. Download video with proper error handling
     console.log('Downloading video...');
     const videoResponse = await fetch(videoUrl);
     if (!videoResponse.ok) {
@@ -81,7 +82,7 @@ serve(async (req) => {
       throw new Error('Video file too large (max 25MB)');
     }
 
-    // 3. Prepare form data for Whisper API
+    // 3. Prepare form data for Whisper API with proper content type
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
     
