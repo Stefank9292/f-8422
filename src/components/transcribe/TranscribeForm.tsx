@@ -1,26 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, Upload, Link, File } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { TranscriptionProgress, TranscriptionStage } from "./TranscriptionProgress";
-import { supabase } from "@/integrations/supabase/client";
 
-// Updated pattern to match Apify's requirements
-const instagramUrlPattern = /^https:\/\/(www\.)?instagram\.com\/.+$/;
+const instagramUrlPattern = /^https:\/\/(?:www\.)?instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/;
 
 const formSchema = z.object({
-  url: z.string().refine((val) => {
-    // If empty, that's okay - we might be using file upload
-    if (!val) return true;
-    // If not empty, must be valid Instagram URL
-    return instagramUrlPattern.test(val);
-  }, "Please enter a valid Instagram URL (e.g., https://www.instagram.com/p/ABC123)")
+  url: z.string()
+    .url("Please enter a valid URL")
+    .regex(instagramUrlPattern, "Please enter a valid Instagram post URL (e.g., https://www.instagram.com/p/ABC123)")
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -33,7 +28,6 @@ interface TranscribeFormProps {
 
 export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormProps) {
   const { toast } = useToast();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,55 +35,9 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
     }
   });
 
-  // Cleanup file after 2 minutes
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    if (selectedFile) {
-      timeoutId = setTimeout(() => {
-        setSelectedFile(null);
-        toast({
-          title: "File removed",
-          description: "The uploaded file has been removed for security reasons. Please upload again if needed.",
-        });
-      }, 2 * 60 * 1000); // 2 minutes
-    }
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [selectedFile, toast]);
-
   const handleSubmit = async (data: FormData) => {
-    // If we have a file selected, use the file upload flow
-    if (selectedFile) {
-      await handleFileUpload();
-      return;
-    }
-
-    // Otherwise, check URL and use the URL flow
-    if (!data.url.trim()) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please either enter a URL or upload a file"
-      });
-      return;
-    }
-
     try {
-      // Ensure URL starts with https://
-      let url = data.url;
-      if (!url.startsWith('https://')) {
-        url = `https://${url}`;
-      }
-      
-      // Ensure www. is present if not already
-      if (!url.includes('www.')) {
-        url = url.replace('https://', 'https://www.');
-      }
-
-      await onSubmit(url);
+      await onSubmit(data.url);
       form.reset();
     } catch (error) {
       toast({
@@ -98,56 +46,6 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
         description: error instanceof Error ? error.message : "Failed to transcribe video"
       });
     }
-  };
-
-  const handleFileUpload = async () => {
-    if (!selectedFile) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please select a file first"
-      });
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-
-      const { data, error } = await supabase.functions.invoke('transcribe-file', {
-        body: formData
-      });
-
-      if (error) throw error;
-
-      // Call onSubmit with the transcribed text
-      await onSubmit(data.text);
-      setSelectedFile(null);
-      form.reset();
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to transcribe file"
-      });
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Check file size (25MB)
-    if (file.size > 25 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "File size must be less than 25MB"
-      });
-      return;
-    }
-
-    setSelectedFile(file);
   };
 
   return (
@@ -166,63 +64,27 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
                       placeholder="https://www.instagram.com/p/..." 
                       className="h-10"
                       {...field}
-                      disabled={isLoading || !!selectedFile}
+                      disabled={isLoading}
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex gap-2">
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full sm:w-auto"
-              >
-                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {selectedFile ? (
-                  <>
-                    <File className="mr-2 h-4 w-4" />
-                    Transcribe File
-                  </>
-                ) : (
-                  <>
-                    <Link className="mr-2 h-4 w-4" />
-                    Transcribe Video
-                  </>
-                )}
-              </Button>
-
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="file"
-                  accept="audio/*,video/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                  disabled={isLoading}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('file-upload')?.click()}
-                  disabled={isLoading}
-                  className="w-full sm:w-auto"
-                >
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload File
-                </Button>
-              </div>
-            </div>
+            <Button 
+              type="submit" 
+              disabled={isLoading}
+              className="w-full sm:w-auto"
+            >
+              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Transcribe Video
+            </Button>
           </form>
         </Form>
       </Card>
 
       {isLoading && stage && (
-        <TranscriptionProgress 
-          stage={stage} 
-          isFileUpload={!!selectedFile} 
-        />
+        <TranscriptionProgress stage={stage} />
       )}
     </div>
   );

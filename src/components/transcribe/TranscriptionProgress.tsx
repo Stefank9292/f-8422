@@ -8,56 +8,32 @@ export type TranscriptionStage = 'preparing' | 'downloading' | 'transcribing' | 
 
 interface TranscriptionProgressProps {
   stage: TranscriptionStage;
-  isFileUpload?: boolean;
 }
 
-export function TranscriptionProgress({ stage, isFileUpload = false }: TranscriptionProgressProps) {
-  const getStages = () => {
-    if (isFileUpload) {
-      return [
-        { 
-          key: 'preparing', 
-          label: 'Processing your uploaded file. Hang tight!',
-          icon: <LoaderCircle className="h-4 w-4 animate-spin" />
-        },
-        { 
-          key: 'transcribing', 
-          label: "Transcribing the audio using OpenAI's Whisper model... Just a few more seconds!",
-          icon: <Mic className="h-4 w-4 animate-pulse" />
-        },
-        { 
-          key: 'completed', 
-          label: '✨ Transcription complete! Here\'s what the video says:',
-          icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
-        }
-      ];
+export function TranscriptionProgress({ stage }: TranscriptionProgressProps) {
+  const stages: { key: TranscriptionStage; label: string; icon: React.ReactNode }[] = [
+    { 
+      key: 'preparing', 
+      label: 'Setting things up to process your request. Hang tight!',
+      icon: <LoaderCircle className="h-4 w-4 animate-spin" />
+    },
+    { 
+      key: 'downloading', 
+      label: 'Downloading the video from Instagram... This might take a moment.',
+      icon: <Download className="h-4 w-4 animate-bounce" />
+    },
+    { 
+      key: 'transcribing', 
+      label: "Transcribing the audio using OpenAI's Whisper model... Just a few more seconds!",
+      icon: <Mic className="h-4 w-4 animate-pulse" />
+    },
+    { 
+      key: 'completed', 
+      label: '✨ Transcription complete! Here\'s what the video says:',
+      icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
     }
+  ];
 
-    return [
-      { 
-        key: 'preparing', 
-        label: 'Setting things up to process your request. Hang tight!',
-        icon: <LoaderCircle className="h-4 w-4 animate-spin" />
-      },
-      { 
-        key: 'downloading', 
-        label: 'Downloading the video from Instagram... This might take a moment.',
-        icon: <Download className="h-4 w-4 animate-bounce" />
-      },
-      { 
-        key: 'transcribing', 
-        label: "Transcribing the audio using OpenAI's Whisper model... Just a few more seconds!",
-        icon: <Mic className="h-4 w-4 animate-pulse" />
-      },
-      { 
-        key: 'completed', 
-        label: '✨ Transcription complete! Here\'s what the video says:',
-        icon: <CheckCircle2 className="h-4 w-4 text-green-500" />
-      }
-    ];
-  };
-
-  const stages = getStages();
   const currentStageIndex = stages.findIndex(s => s.key === stage);
   const progress = ((currentStageIndex + 1) / stages.length) * 100;
 
