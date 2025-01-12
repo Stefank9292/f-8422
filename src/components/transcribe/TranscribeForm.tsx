@@ -45,20 +45,20 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
   };
 
   return (
-    <div className="touch-spacing">
-      <Card className="p-6 md:p-8">
+    <div className="space-y-6">
+      <Card className="p-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-base">Instagram Video URL</FormLabel>
+                  <FormLabel>Instagram Video URL</FormLabel>
                   <FormControl>
                     <Input 
                       placeholder="https://www.instagram.com/reel/..." 
-                      className="material-input"
+                      className="h-10"
                       {...field}
                       disabled={isLoading}
                     />
@@ -70,8 +70,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
             <Button 
               type="submit" 
               disabled={isLoading}
-              size="lg"
-              className="material-button-primary w-full sm:w-auto"
+              className="w-full sm:w-auto"
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Transcribe Video
