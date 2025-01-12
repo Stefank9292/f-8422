@@ -163,14 +163,8 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
           <h3 className="text-base md:text-lg font-medium">Generated Script</h3>
           <div className="flex items-center gap-2">
             <span className={`text-sm font-medium ${getScoreColor(readabilityScore)}`}>
-              {readabilityScore}
+              {readabilityScore}/100
             </span>
-            <div className="h-2 w-16 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className={`h-full transition-all duration-300 ${getScoreColor(readabilityScore)}`}
-                style={{ width: `${readabilityScore}%` }}
-              />
-            </div>
             <HoverCard>
               <HoverCardTrigger asChild>
                 <Info className="h-4 w-4 text-muted-foreground cursor-help" />
