@@ -6,6 +6,22 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const ACCEPTED_FILE_TYPES = [
+  'audio/flac',
+  'audio/m4a',
+  'audio/mp3',
+  'audio/mp4',
+  'audio/mpeg',
+  'audio/mpga',
+  'audio/oga',
+  'audio/ogg',
+  'audio/wav',
+  'audio/webm',
+  'video/mp4',
+  'video/mpeg',
+  'video/webm'
+];
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -72,6 +88,11 @@ serve(async (req) => {
       console.log('Processing uploaded file:', fileName);
       audioData = file;
       audioType = fileType;
+
+      // Validate file type
+      if (!ACCEPTED_FILE_TYPES.includes(fileType)) {
+        throw new Error(`Invalid file type. Supported formats: ${ACCEPTED_FILE_TYPES.join(', ')}`);
+      }
     } else {
       throw new Error('No URL or file provided');
     }
@@ -84,7 +105,8 @@ serve(async (req) => {
     // Prepare form data for Whisper API
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
-    formData.append('file', new Blob([audioData], { type: audioType }), fileName || 'video.mp4');
+    const blob = new Blob([audioData], { type: audioType });
+    formData.append('file', blob, fileName || 'video.mp4');
     formData.append('model', 'whisper-1');
 
     // Send to Whisper API
