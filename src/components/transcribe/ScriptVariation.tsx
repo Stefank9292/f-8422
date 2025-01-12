@@ -28,8 +28,8 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
       
       if (isNumbered) {
         return (
-          <div key={index} className="mb-1.5 md:mb-2">
-            <p className="text-xs md:text-sm leading-relaxed">{cleanedSection}</p>
+          <div key={index} className="mb-2 md:mb-3">
+            <p className="text-sm md:text-base leading-relaxed">{cleanedSection}</p>
           </div>
         );
       }
@@ -38,15 +38,15 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
       
       if (isHeader) {
         return (
-          <div key={index} className="mt-3 md:mt-4 mb-1.5 md:mb-2">
-            <h4 className="text-sm md:text-md font-semibold text-foreground/80">{cleanedSection}</h4>
+          <div key={index} className="mt-4 md:mt-5 mb-2 md:mb-3">
+            <h4 className="text-base md:text-lg font-semibold text-foreground/80">{cleanedSection}</h4>
           </div>
         );
       }
       
       return (
-        <div key={index} className="mb-1.5 md:mb-2">
-          <p className="text-xs md:text-sm leading-relaxed">{cleanedSection}</p>
+        <div key={index} className="mb-2 md:mb-3">
+          <p className="text-sm md:text-base leading-relaxed">{cleanedSection}</p>
         </div>
       );
     });
@@ -71,27 +71,25 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   };
 
   return (
-    <Card className="p-3 md:p-4 space-y-2 md:space-y-3">
-      <div className="flex items-center justify-between mb-2 md:mb-3">
+    <Card className="p-3 md:p-4 space-y-3 md:space-y-4">
+      <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
         <h3 className="text-base md:text-lg font-medium">Generated Script</h3>
         <Button
           onClick={handleCopyToClipboard}
           variant="outline"
           size="sm"
-          className="h-7 md:h-8 text-xs md:text-sm"
+          className="h-8 md:h-9 text-xs md:text-sm flex-1 sm:flex-none"
         >
           {copied ? (
-            <Check className="h-3 w-3 md:h-4 md:w-4" />
+            <Check className="h-3.5 w-3.5 md:h-4 md:w-4" />
           ) : (
-            <Copy className="h-3 w-3 md:h-4 md:w-4" />
+            <Copy className="h-3.5 w-3.5 md:h-4 md:w-4" />
           )}
           <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
-      <div>
-        <div className="bg-muted/50 p-2 md:p-4 rounded-md">
-          {formatContent(variation)}
-        </div>
+      <div className="bg-muted/50 p-3 md:p-4 rounded-md">
+        {formatContent(variation)}
       </div>
     </Card>
   );

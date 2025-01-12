@@ -39,19 +39,19 @@ export function TranscriptionDisplay({
   return (
     <Card className="p-3 md:p-4">
       <div className="space-y-3 md:space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+        <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <h3 className="text-base md:text-lg font-medium">Original Transcription</h3>
           <div className="flex items-center gap-2">
             <Button
               onClick={handleCopyToClipboard}
               variant="outline"
               size="sm"
-              className="h-7 md:h-8 text-xs md:text-sm"
+              className="h-8 md:h-9 text-xs md:text-sm flex-1 sm:flex-none"
             >
               {copied ? (
-                <Check className="h-3 w-3 md:h-4 md:w-4" />
+                <Check className="h-3.5 w-3.5 md:h-4 md:w-4" />
               ) : (
-                <Copy className="h-3 w-3 md:h-4 md:w-4" />
+                <Copy className="h-3.5 w-3.5 md:h-4 md:w-4" />
               )}
               <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
             </Button>
@@ -60,19 +60,19 @@ export function TranscriptionDisplay({
               disabled={isGenerating}
               variant="secondary"
               size="sm"
-              className="h-7 md:h-8 text-xs md:text-sm"
+              className="h-8 md:h-9 text-xs md:text-sm flex-1 sm:flex-none whitespace-nowrap"
             >
               {isGenerating ? (
-                <Loader2 className="mr-1.5 md:mr-2 h-3 w-3 md:h-4 md:w-4 animate-spin" />
+                <Loader2 className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4 animate-spin" />
               ) : (
-                <Wand2 className="mr-1.5 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
+                <Wand2 className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
               )}
               Create New Script
             </Button>
           </div>
         </div>
-        <div className="bg-muted/50 p-2 md:p-3 rounded-md">
-          <p className="text-xs md:text-sm leading-relaxed whitespace-pre-wrap">{transcription}</p>
+        <div className="bg-muted/50 p-3 md:p-4 rounded-md">
+          <p className="text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">{transcription}</p>
         </div>
       </div>
     </Card>
