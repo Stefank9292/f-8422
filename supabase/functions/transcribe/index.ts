@@ -16,21 +16,18 @@ serve(async (req) => {
     const { url } = await req.json();
     console.log('Processing Instagram URL:', url);
 
-    // Get API keys from environment
-    const apifyKey = Deno.env.get('APIFY_API_KEY');
+    // Get OpenAI API key from environment
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
-
-    if (!apifyKey || !openaiKey) {
-      throw new Error('Missing required API keys');
+    if (!openaiKey) {
+      throw new Error('Missing OpenAI API key');
     }
 
-    // 1. Extract video URL using Apify
+    // 1. Extract video URL using Apify with the provided endpoint
     console.log('Fetching video URL from Apify...');
-    const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
+    const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apifyKey}`,
       },
       body: JSON.stringify({
         "directUrls": [url],
