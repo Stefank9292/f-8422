@@ -83,7 +83,7 @@ export function FilteredResultsSection({
   const totalPages = Math.ceil(sortedResults.length / pageSize);
 
   return (
-    <div className="mt-3 space-y-4 animate-fade-in px-4 sm:px-6 md:px-8">
+    <div className="mt-3 space-y-4 animate-fade-in">
       <div className="flex flex-col space-y-4">
         <div className="w-full">
           <SearchFilters
@@ -103,7 +103,7 @@ export function FilteredResultsSection({
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
       >
-        <div className="rounded-lg overflow-hidden">
+        <div className="rounded-lg overflow-hidden border border-border/50">
           <TableContent
             currentPosts={currentPosts}
             handleSort={handleSort}
