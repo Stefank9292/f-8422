@@ -14,7 +14,7 @@ serve(async (req) => {
 
   try {
     const { url } = await req.json();
-    console.log('Processing Instagram URL:', url);
+    console.log('Processing URL:', url);
 
     // Get OpenAI API key from environment
     const openaiKey = Deno.env.get('OPENAI_API_KEY');
@@ -22,38 +22,48 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key');
     }
 
-    // 1. Extract video URL using Apify with the provided endpoint
+    // Get Apify API key from environment
+    const apifyKey = Deno.env.get('APIFY_API_KEY');
+    if (!apifyKey) {
+      throw new Error('Missing Apify API key');
+    }
+
+    // 1. Extract video URL using Apify
     console.log('Fetching video URL from Apify...');
-    const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
+    const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apifyKey}`,
       },
       body: JSON.stringify({
-        "addParentData": false,
         "directUrls": [url],
-        "enhanceUserSearchWithFacebookPage": false,
-        "isUserReelFeedURL": false,
-        "isUserTaggedFeedURL": false,
-        "resultsLimit": 1,
         "resultsType": "details",
+        "searchType": "user",
         "searchLimit": 1,
-        "searchType": "user"
+        "proxy": {
+          "useApifyProxy": true,
+          "apifyProxyGroups": ["RESIDENTIAL"]
+        }
       })
     });
 
     if (!apifyResponse.ok) {
-      throw new Error(`Apify API error: ${apifyResponse.statusText}`);
+      const errorText = await apifyResponse.text();
+      console.error('Apify API error:', errorText);
+      throw new Error(`Apify API error: ${apifyResponse.statusText} - ${errorText}`);
     }
 
     const apifyData = await apifyResponse.json();
     console.log('Apify response:', apifyData);
 
     if (!apifyData[0]?.videoUrl) {
+      console.error('No video URL found in response:', apifyData);
       throw new Error('No video URL found in Instagram post');
     }
 
     const videoUrl = apifyData[0].videoUrl;
+    console.log('Found video URL:', videoUrl);
 
     // 2. Download video
     console.log('Downloading video...');
@@ -64,6 +74,7 @@ serve(async (req) => {
 
     const contentType = videoResponse.headers.get('content-type');
     if (!contentType?.includes('video')) {
+      console.error('Invalid content type:', contentType);
       throw new Error('Invalid content type: ' + contentType);
     }
 
@@ -91,6 +102,7 @@ serve(async (req) => {
 
     if (!whisperResponse.ok) {
       const error = await whisperResponse.text();
+      console.error('Whisper API error:', error);
       throw new Error(`Whisper API error: ${error}`);
     }
 
