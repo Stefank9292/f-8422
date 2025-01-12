@@ -16,7 +16,6 @@ const Transcribe = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [currentTranscriptionId, setCurrentTranscriptionId] = useState<string | null>(() => {
-    // Initialize from localStorage if available
     return localStorage.getItem('currentTranscriptionId') || null;
   });
   const [transcriptionStage, setTranscriptionStage] = useState<TranscriptionStage | undefined>();
@@ -52,7 +51,6 @@ const Transcribe = () => {
       setTranscriptionStage('completed');
       const newTranscriptionId = scriptData.id;
       setCurrentTranscriptionId(newTranscriptionId);
-      // Store in localStorage
       localStorage.setItem('currentTranscriptionId', newTranscriptionId);
       return scriptData;
     },
@@ -124,8 +122,8 @@ const Transcribe = () => {
       return data;
     },
     enabled: !!currentTranscriptionId,
-    staleTime: Infinity, // Keep data fresh indefinitely
-    gcTime: 1000 * 60 * 60, // Cache for 1 hour (formerly cacheTime)
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60,
   });
 
   const { data: variations } = useQuery({
@@ -150,8 +148,8 @@ const Transcribe = () => {
       return data;
     },
     enabled: !!currentTranscriptionId,
-    staleTime: Infinity, // Keep data fresh indefinitely
-    gcTime: 1000 * 60 * 60, // Cache for 1 hour (formerly cacheTime)
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 60,
   });
 
   return (
