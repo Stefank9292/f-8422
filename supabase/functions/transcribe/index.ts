@@ -22,7 +22,7 @@ serve(async (req) => {
       throw new Error('Missing OpenAI API key');
     }
 
-    // 1. Extract video URL using Apify with the provided endpoint
+    // 1. Extract video URL using Apify
     console.log('Fetching video URL from Apify...');
     const apifyResponse = await fetch('https://api.apify.com/v2/acts/apify~instagram-api-scraper/run-sync-get-dataset-items?token=apify_api_HVxy5jbYLGjOZJQHhPwziipY7WRhVQ3oulop', {
       method: 'POST',
@@ -84,12 +84,12 @@ serve(async (req) => {
     // 3. Prepare form data for Whisper API
     console.log('Preparing audio for transcription...');
     const formData = new FormData();
-    formData.append('file', new Blob([videoBuffer], { type: 'audio/mp4' }), 'audio.mp4');
+    // Use .mp3 extension and audio/mpeg type as it's more widely supported
+    formData.append('file', new Blob([videoBuffer], { type: 'audio/mpeg' }), 'audio.mp3');
     formData.append('model', 'whisper-1');
     formData.append('language', 'en');
-    formData.append('response_format', 'json');
 
-    // 4. Send to Whisper API
+    // 4. Send to Whisper API with detailed error handling
     console.log('Sending to Whisper API...');
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -100,9 +100,9 @@ serve(async (req) => {
     });
 
     if (!whisperResponse.ok) {
-      const error = await whisperResponse.text();
-      console.error('Whisper API error:', error);
-      throw new Error(`Whisper API error: ${error}`);
+      const errorText = await whisperResponse.text();
+      console.error('Whisper API error response:', errorText);
+      throw new Error(`Whisper API error: ${errorText}`);
     }
 
     const transcription = await whisperResponse.json();
