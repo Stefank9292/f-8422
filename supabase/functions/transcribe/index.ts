@@ -43,6 +43,7 @@ serve(async (req) => {
     });
 
     if (!apifyResponse.ok) {
+      console.error('Apify API error:', await apifyResponse.text());
       throw new Error(`Apify API error: ${apifyResponse.statusText}`);
     }
 
@@ -50,20 +51,24 @@ serve(async (req) => {
     console.log('Apify response:', apifyData);
 
     if (!apifyData[0]?.videoUrl) {
+      console.error('No video URL found in response:', apifyData);
       throw new Error('No video URL found in Instagram post');
     }
 
     const videoUrl = apifyData[0].videoUrl;
+    console.log('Found video URL:', videoUrl);
 
     // 2. Download video
     console.log('Downloading video...');
     const videoResponse = await fetch(videoUrl);
     if (!videoResponse.ok) {
+      console.error('Video download error:', videoResponse.statusText);
       throw new Error('Failed to download video');
     }
 
     const contentType = videoResponse.headers.get('content-type');
     if (!contentType?.includes('video')) {
+      console.error('Invalid content type:', contentType);
       throw new Error('Invalid content type: ' + contentType);
     }
 
@@ -91,6 +96,7 @@ serve(async (req) => {
 
     if (!whisperResponse.ok) {
       const error = await whisperResponse.text();
+      console.error('Whisper API error:', error);
       throw new Error(`Whisper API error: ${error}`);
     }
 
