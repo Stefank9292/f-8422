@@ -14,35 +14,44 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
 
   // Split the content into sections based on numbered lists and headers
   const formatContent = (text: string) => {
-    const sections = text.split(/(?=\d\. |\n\n)/g).filter(Boolean);
+    // Clean up the text by removing markdown characters and extra spaces
+    const cleanText = text
+      .replace(/\*\*/g, '')  // Remove ** characters
+      .replace(/###/g, '')   // Remove ### characters
+      .replace(/\n{3,}/g, '\n\n')  // Replace 3+ newlines with 2
+      .trim();
+
+    const sections = cleanText.split(/(?=\d\. |\n\n)/g).filter(Boolean);
     
     return sections.map((section, index) => {
-      // Check if the section is a numbered item
-      const isNumbered = /^\d\. /.test(section);
+      // Clean up the section text
+      const cleanedSection = section.trim();
       
-      // Add appropriate styling based on content type
+      // Check if the section is a numbered item
+      const isNumbered = /^\d\. /.test(cleanedSection);
+      
       if (isNumbered) {
         return (
-          <div key={index} className="mb-4">
-            <p className="text-sm leading-relaxed">{section}</p>
+          <div key={index} className="mb-2">
+            <p className="text-sm leading-relaxed">{cleanedSection}</p>
           </div>
         );
       }
       
       // Check if it might be a header (all caps or followed by colon)
-      const isHeader = /^[A-Z\s]{4,}:|^[A-Z\s]{4,}$/.test(section.trim());
+      const isHeader = /^[A-Z\s]{4,}:|^[A-Z\s]{4,}$/.test(cleanedSection);
       
       if (isHeader) {
         return (
-          <div key={index} className="mt-6 mb-3">
-            <h4 className="text-md font-semibold text-foreground/80">{section.trim()}</h4>
+          <div key={index} className="mt-4 mb-2">
+            <h4 className="text-md font-semibold text-foreground/80">{cleanedSection}</h4>
           </div>
         );
       }
       
       return (
-        <div key={index} className="mb-4">
-          <p className="text-sm leading-relaxed whitespace-pre-wrap">{section}</p>
+        <div key={index} className="mb-2">
+          <p className="text-sm leading-relaxed">{cleanedSection}</p>
         </div>
       );
     });
@@ -67,8 +76,8 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   };
 
   return (
-    <Card className="p-6 space-y-3">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-6 space-y-2">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-medium">Generated Script</h3>
         <Button
           variant="outline"
@@ -84,7 +93,7 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
           <span className="ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
-      <div className="space-y-2">
+      <div>
         <div className="bg-muted/50 p-4 rounded-md">
           {formatContent(variation)}
         </div>
