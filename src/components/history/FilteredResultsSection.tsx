@@ -85,7 +85,7 @@ export function FilteredResultsSection({
   return (
     <div className="mt-3 space-y-4 animate-fade-in px-4 sm:px-6 md:px-8">
       <div className="flex flex-col space-y-4">
-        <div className="w-full">
+        <div className="w-full rounded-lg border border-border/50 overflow-hidden">
           <SearchFilters
             filters={filters}
             onFilterChange={onFilterChange}
@@ -126,4 +126,4 @@ export function FilteredResultsSection({
       </div>
     </div>
   );
-};
+}
