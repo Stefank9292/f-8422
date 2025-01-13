@@ -48,6 +48,15 @@ export const TikTokSearchSettings = ({
     },
   });
 
+  // Update local number of videos when subscription changes
+  useEffect(() => {
+    const maxVideos = getMaxVideos();
+    if (localNumberOfVideos > maxVideos) {
+      setLocalNumberOfVideos(maxVideos);
+      setNumberOfVideos(maxVideos);
+    }
+  }, [subscriptionStatus?.priceId]);
+
   const getMaxVideos = () => {
     if (!subscriptionStatus?.priceId) return 5;
     if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
@@ -59,19 +68,23 @@ export const TikTokSearchSettings = ({
 
   const maxVideos = getMaxVideos();
 
-  useEffect(() => {
-    if (localNumberOfVideos > maxVideos) {
-      setLocalNumberOfVideos(maxVideos);
-      setNumberOfVideos(maxVideos);
-    }
-  }, [subscriptionStatus?.priceId]);
-
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);
   };
 
+  // Only update parent state when user finishes dragging
   const handleSliderPointerUp = () => {
     setNumberOfVideos(localNumberOfVideos);
+  };
+
+  // Debounce date range changes
+  const handleDateRangeChange = (value: string) => {
+    setDateRange(value);
+  };
+
+  // Debounce location changes
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
   };
 
   const dateRangeOptions = [
@@ -133,7 +146,7 @@ export const TikTokSearchSettings = ({
             </div>
             <Select
               value={dateRange}
-              onValueChange={setDateRange}
+              onValueChange={handleDateRangeChange}
               disabled={disabled}
             >
               <SelectTrigger className="w-full h-8 text-[11px]">
@@ -160,7 +173,7 @@ export const TikTokSearchSettings = ({
             </div>
             <Select
               value={location}
-              onValueChange={setLocation}
+              onValueChange={handleLocationChange}
               disabled={disabled}
             >
               <SelectTrigger className="w-full h-8 text-[11px]">
