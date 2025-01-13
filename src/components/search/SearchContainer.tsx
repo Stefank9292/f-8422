@@ -1,19 +1,15 @@
 import { SearchHeader } from "./SearchHeader";
-import { SearchBar } from "./SearchBar";
 import { SearchSettings } from "./SearchSettings";
 import { SearchResults } from "./SearchResults";
 import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
-import { Button } from "@/components/ui/button";
-import { Loader2, Search, Lock } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useState, useRef, useEffect } from "react";
+import { SearchInput } from "./SearchInput";
+import { SearchButton } from "./SearchButton";
+import { useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
 import { usePlatformStore } from "@/store/platformStore";
-import { TikTokSearchBar } from "./tiktok/TikTokSearchBar";
 import { TikTokSearchSettings } from "./tiktok/TikTokSearchSettings";
 
 interface SearchContainerProps {
@@ -61,7 +57,6 @@ export const SearchContainer = ({
   } = useSearchStore();
 
   const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
-  const setUsername = platform === 'instagram' ? setInstagramUsername : setTiktokUsername;
 
   useEffect(() => {
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
@@ -101,10 +96,6 @@ export const SearchContainer = ({
     }
   };
 
-  const hasNoSearchesLeft = requestCount >= maxRequests;
-  const isButtonEnabled = currentUsername && !hasReachedLimit && !hasNoSearchesLeft && !isLoading && !isBulkSearching;
-  const isSearchDisabled = isLoading || isBulkSearching || !currentUsername.trim() || hasReachedLimit || hasNoSearchesLeft;
-
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <AnnouncementBar />
@@ -116,62 +107,27 @@ export const SearchContainer = ({
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
-        {platform === 'instagram' ? (
-          <SearchBar
-            username={instagramUsername}
-            onSearch={onSearchClick}
-            onBulkSearch={handleBulkSearch}
-            isLoading={isLoading || isBulkSearching}
-            onUsernameChange={setInstagramUsername}
-            hasReachedLimit={hasReachedLimit}
-          />
-        ) : (
-          <TikTokSearchBar
-            username={tiktokUsername}
-            onSearch={onSearchClick}
-            isLoading={isLoading}
-            onUsernameChange={setTiktokUsername}
-            hasReachedLimit={hasReachedLimit}
-          />
-        )}
+        <SearchInput
+          instagramUsername={instagramUsername}
+          tiktokUsername={tiktokUsername}
+          onSearch={onSearchClick}
+          onBulkSearch={handleBulkSearch}
+          isLoading={isLoading}
+          isBulkSearching={isBulkSearching}
+          setInstagramUsername={setInstagramUsername}
+          setTiktokUsername={setTiktokUsername}
+          hasReachedLimit={hasReachedLimit}
+        />
 
-        <Button 
+        <SearchButton
+          isLoading={isLoading}
+          isBulkSearching={isBulkSearching}
+          hasReachedLimit={hasReachedLimit}
+          requestCount={requestCount}
+          maxRequests={maxRequests}
+          currentUsername={currentUsername}
           onClick={onSearchClick}
-          disabled={isSearchDisabled}
-          className={cn(
-            "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            isButtonEnabled
-              ? platform === 'instagram' 
-                ? "instagram-gradient"
-                : "tiktok-gradient text-white"
-              : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
-            "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
-            (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
-          )}
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
-              <span>This can take up to a minute...</span>
-            </>
-          ) : hasReachedLimit || hasNoSearchesLeft ? (
-            <div className="flex items-center gap-2">
-              <Lock className="h-3.5 w-3.5" />
-              <span>Monthly Limit Reached ({requestCount}/{maxRequests})</span>
-              <Link 
-                to="/subscribe" 
-                className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded hover:bg-white/30 transition-colors"
-              >
-                Upgrade
-              </Link>
-            </div>
-          ) : (
-            <>
-              <Search className="mr-2 h-3.5 w-3.5" />
-              Search Viral Videos
-            </>
-          )}
-        </Button>
+        />
 
         {platform === 'instagram' ? (
           <SearchSettings
@@ -197,7 +153,7 @@ export const SearchContainer = ({
           />
         )}
 
-        <RecentSearches onSelect={setUsername} />
+        <RecentSearches onSelect={platform === 'instagram' ? setInstagramUsername : setTiktokUsername} />
       </div>
 
       {displayPosts.length > 0 && (
