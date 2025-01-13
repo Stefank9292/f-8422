@@ -42,7 +42,7 @@ export const SearchContainer = ({
   const [hasScrolled, setHasScrolled] = useState(false);
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
-  const { platform, currentUsername } = usePlatformState();
+  const { platform, currentUsername, setUsername } = usePlatformState();
   const { filters, handleFilterChange, resetFilters } = useFilterState();
   
   const { 
@@ -105,7 +105,7 @@ export const SearchContainer = ({
         return (
           <InstagramSearchBar
             username={currentUsername}
-            onUsernameChange={() => {}}
+            onUsernameChange={setUsername}
             onSearch={onSearchClick}
             onBulkSearch={handleBulkSearch}
             isLoading={isLoading}
@@ -116,7 +116,7 @@ export const SearchContainer = ({
         return (
           <TikTokSearchBar
             username={currentUsername}
-            onUsernameChange={() => {}}
+            onUsernameChange={setUsername}
             onSearch={onSearchClick}
             isLoading={isLoading}
             hasReachedLimit={hasReachedLimit}
@@ -186,7 +186,7 @@ export const SearchContainer = ({
         {renderPlatformSearchSettings()}
 
         <RecentSearches 
-          onSelect={() => {}}
+          onSelect={setUsername}
           onSearch={onSearchClick}
         />
       </div>
