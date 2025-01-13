@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
-import { LucideProps } from "lucide-react";
+import { LucideIcon, LucideProps } from "lucide-react";
 
-export const TikTokIcon = forwardRef<SVGSVGElement, LucideProps>(
+export const TikTokIcon: LucideIcon = forwardRef<SVGSVGElement, LucideProps>(
   ({ size = 24, ...props }, ref) => (
     <svg
       ref={ref}
