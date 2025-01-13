@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { TikTokSearchSettings } from "./TikTokSearchSettings";
+import { TikTokRecentSearches } from "./TikTokRecentSearches";
 
 export const TikTokSearchForm = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +15,10 @@ export const TikTokSearchForm = () => {
     console.log("TikTok search query:", searchQuery);
     console.log("Number of videos to fetch:", numberOfVideos);
     // Future implementation will go here
+  };
+
+  const handleSelectRecentSearch = (username: string) => {
+    setSearchQuery(username);
   };
 
   return (
@@ -45,6 +50,8 @@ export const TikTokSearchForm = () => {
           </Button>
         </div>
       </form>
+
+      <TikTokRecentSearches onSelect={handleSelectRecentSearch} />
     </div>
   );
 };
