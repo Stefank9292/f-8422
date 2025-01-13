@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { Loader2, Download, Mic, CheckCircle2 } from "lucide-react";
+import { Loader2, Download, Mic, CheckCircle2, VideoIcon } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +55,7 @@ export function TranscribeForm({ onSubmit, isLoading, stage }: TranscribeFormPro
       default:
         return {
           text: "Transcribe Video",
-          icon: isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null
+          icon: isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <VideoIcon className="mr-2 h-4 w-4" />
         };
     }
   };
