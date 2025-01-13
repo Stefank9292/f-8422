@@ -28,13 +28,7 @@ export const SearchInput = ({
 }: SearchInputProps) => {
   const { platform } = usePlatformStore();
 
-  // Auto-trigger search when platform changes and there's a username
-  useEffect(() => {
-    const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
-    if (currentUsername && !isLoading && !isBulkSearching && !hasReachedLimit) {
-      onSearch();
-    }
-  }, [platform]);
+  // Remove the auto-trigger effect that was causing searches on platform changes
 
   return platform === 'instagram' ? (
     <SearchBar
