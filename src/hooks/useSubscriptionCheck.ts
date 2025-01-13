@@ -30,14 +30,16 @@ export const useSubscriptionCheck = (session: Session | null) => {
       
       try {
         // First check if session is valid
-        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
           console.error('Session check error:', sessionError);
           throw sessionError;
         }
 
-        if (!currentSession) {
+        let activeSession = initialSession;
+
+        if (!activeSession) {
           console.log('No active session, attempting to refresh...');
           const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
           if (refreshError || !refreshData.session) {
@@ -56,13 +58,13 @@ export const useSubscriptionCheck = (session: Session | null) => {
               maxClicks: 3
             };
           }
-          currentSession = refreshData.session;
+          activeSession = refreshData.session;
         }
 
-        console.log('Using session token for subscription check:', currentSession.access_token.substring(0, 20) + '...');
+        console.log('Using session token for subscription check:', activeSession.access_token.substring(0, 20) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
-            Authorization: `Bearer ${currentSession.access_token}`,
+            Authorization: `Bearer ${activeSession.access_token}`,
             'Content-Type': 'application/json'
           }
         });
