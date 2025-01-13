@@ -17,7 +17,6 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
 
   // Apply filters to search results
   const filteredPosts = filterResults(searchResults, filters);
-
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const indexOfLastPost = currentPage * pageSize;
   const indexOfFirstPost = indexOfLastPost - pageSize;

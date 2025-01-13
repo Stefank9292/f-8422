@@ -18,37 +18,18 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleSessionError = async () => {
-      const sessionErrors = [
-        'refresh_token_not_found',
-        'Invalid user session',
-        'Session from session_id claim in JWT does not exist',
-        'session_not_found'
-      ];
-
-      if (error && sessionErrors.some(e => error.toString().includes(e))) {
+      if (error?.toString().includes('refresh_token_not_found') || 
+          error?.toString().includes('Invalid user session')) {
         console.log('Session error detected, signing out...', error);
-        try {
-          // First try to refresh the session
-          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-          if (refreshError || !refreshData.session) {
-            // If refresh fails, clear cache and sign out
-            console.log('Session refresh failed, signing out completely');
-            queryClient.clear();
-            await supabase.auth.signOut();
-            toast({
-              title: "Session Expired",
-              description: "Please sign in again to continue.",
-              variant: "destructive",
-            });
-          } else {
-            console.log('Session refreshed successfully');
-            // Invalidate queries to refetch with new session
-            queryClient.invalidateQueries();
-          }
-        } catch (signOutError) {
-          console.error('Error during sign out:', signOutError);
-          window.location.href = '/auth';
-        }
+        // Clear query cache
+        queryClient.clear();
+        // Sign out
+        await supabase.auth.signOut();
+        toast({
+          title: "Session Expired",
+          description: "Please sign in again to continue.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -60,17 +41,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (subscriptionError) {
       console.log('Subscription check error:', subscriptionError);
-      if (subscriptionError.status === 401 || 
-          (subscriptionError.message && subscriptionError.message.includes('session'))) {
-        // Try to refresh the session first
-        supabase.auth.refreshSession().then(({ data, error: refreshError }) => {
-          if (refreshError || !data.session) {
-            queryClient.invalidateQueries({ queryKey: ['session'] });
-          } else {
-            // Retry subscription check with new session
-            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
-          }
-        });
+      if (subscriptionError.status === 401) {
+        queryClient.invalidateQueries({ queryKey: ['session'] });
       }
     }
   }, [subscriptionError, queryClient]);
@@ -80,38 +52,35 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    const sessionErrors = [
-      'refresh_token_not_found',
-      'Invalid user session',
-      'Session from session_id claim in JWT does not exist',
-      'session_not_found'
-    ];
-
-    if (sessionErrors.some(e => error.toString().includes(e))) {
+    // If we have an auth error, redirect to login
+    if (error.toString().includes('refresh_token_not_found') || 
+        error.toString().includes('Invalid user session')) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
     }
     return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
   }
 
+  // Handle undefined session state
   if (session === undefined) {
     return <UndefinedSessionState onRefresh={() => window.location.reload()} />;
   }
 
+  // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Allow access to subscribe page without subscription check
+  // If on subscribe page or auth page, allow access regardless of subscription status
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 
-  // Only check subscription for non-subscribe pages
-  if (isLoadingSubscription) {
+  // Show loading state for initial subscription check
+  if (isLoadingSubscription && !subscriptionStatus) {
     return <LoadingState />;
   }
 
-  // Check for active subscription based on price IDs
+  // Check if user has an active subscription by checking the priceId
   const hasActiveSubscription = subscriptionStatus?.priceId && [
     "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
     "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
@@ -119,14 +88,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
-  console.log('Current session:', session);
   console.log('Subscription status:', subscriptionStatus);
   console.log('Has active subscription:', hasActiveSubscription);
   console.log('Current price ID:', subscriptionStatus?.priceId);
-  console.log('Current pathname:', location.pathname);
 
-  // Redirect to subscribe page if no active subscription
-  if (!hasActiveSubscription && location.pathname !== '/subscribe') {
+  // If no active subscription and not on subscribe page, redirect to subscribe
+  if (!hasActiveSubscription) {
     console.log('No active subscription found, redirecting to subscribe page');
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }

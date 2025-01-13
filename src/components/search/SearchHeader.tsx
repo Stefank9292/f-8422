@@ -4,12 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-import { usePlatformStore } from "@/store/platformStore";
-import { cn } from "@/lib/utils";
 
 export const SearchHeader = () => {
-  const { platform, setPlatform } = usePlatformStore();
-  
   const copyDiscountCode = () => {
     navigator.clipboard.writeText("VYRAL25");
     toast.success("Discount code copied to clipboard!");
@@ -57,26 +53,20 @@ export const SearchHeader = () => {
         </span>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mt-6">
-        <button
-          onClick={() => setPlatform('instagram')}
-          className={cn(
-            "flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm transition-all",
-            platform === 'instagram' && "ring-2 ring-[#E1306C] ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
-          )}
+        <a
+          href="#"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
         >
           <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
           <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200">Instagram</span>
-        </button>
-        <button
-          onClick={() => setPlatform('tiktok')}
-          className={cn(
-            "flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm transition-all",
-            platform === 'tiktok' && "ring-2 ring-black dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-gray-900"
-          )}
+        </a>
+        <div
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
         >
-          <TikTokIcon className="w-3.5 h-3.5" />
-          <span className="text-[11px] font-medium text-gray-800 dark:text-gray-200">TikTok</span>
-        </button>
+          <TikTokIcon className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-[11px] font-medium text-gray-400">TikTok</span>
+          <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
+        </div>
         <div
           className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
         >

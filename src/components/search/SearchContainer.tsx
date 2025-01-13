@@ -1,20 +1,17 @@
 import { SearchHeader } from "./SearchHeader";
+import { SearchBar } from "./SearchBar";
 import { SearchSettings } from "./SearchSettings";
 import { SearchResults } from "./SearchResults";
 import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
-import { InstagramSearchBar } from "./instagram/InstagramSearchBar";
-import { TikTokSearchBar } from "./tiktok/TikTokSearchBar";
-import { InstagramSearchSettings } from "./instagram/InstagramSearchSettings";
-import { TikTokSearchSettings } from "./tiktok/TikTokSearchSettings";
-import { SearchButton } from "./SearchButton";
-import { useRef, useEffect, useState } from "react";
-import { useSearchState } from "@/hooks/search/useSearchState";
-import { useFilterState } from "@/hooks/search/useFilterState";
-import { usePlatformState } from "@/hooks/search/usePlatformState";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Loader2, Search, Lock } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface SearchContainerProps {
   username: string;
@@ -29,6 +26,7 @@ interface SearchContainerProps {
 }
 
 export const SearchContainer = ({
+  username,
   isLoading,
   isBulkSearching,
   hasReachedLimit,
@@ -39,44 +37,35 @@ export const SearchContainer = ({
   displayPosts
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [hasScrolled, setHasScrolled] = useState(false);
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
-  const { platform, currentUsername, setUsername } = usePlatformState();
-  const { filters, handleFilterChange, resetFilters } = useFilterState();
-  
   const { 
-    numberOfVideos, 
+    setUsername,
+    numberOfVideos,
     setNumberOfVideos,
     selectedDate,
     setSelectedDate,
-    dateRange,
-    setDateRange,
-    location,
-    setLocation
+    filters,
+    setFilters,
+    resetFilters
   } = useSearchStore();
-  
+
   useEffect(() => {
-    if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current && !hasScrolled) {
+    if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ 
           behavior: 'smooth',
           block: 'start'
         });
-        setHasScrolled(true);
       }, 100);
     }
-    
-    if (displayPosts.length === 0) {
-      setHasScrolled(false);
-    }
-  }, [displayPosts, isLoading, isBulkSearching, hasScrolled]);
+  }, [displayPosts, isLoading, isBulkSearching]);
 
   const onSearchClick = () => {
-    if (!currentUsername.trim()) {
+    if (!username.trim()) {
       toast({
         title: "Error",
-        description: "Please enter a username",
+        description: "Please enter an Instagram username",
         variant: "destructive",
       });
       return;
@@ -99,66 +88,8 @@ export const SearchContainer = ({
     }
   };
 
-  const renderPlatformSearchBar = () => {
-    switch (platform) {
-      case 'instagram':
-        return (
-          <InstagramSearchBar
-            username={currentUsername}
-            onUsernameChange={setUsername}
-            onSearch={onSearchClick}
-            onBulkSearch={handleBulkSearch}
-            isLoading={isLoading}
-            hasReachedLimit={hasReachedLimit}
-          />
-        );
-      case 'tiktok':
-        return (
-          <TikTokSearchBar
-            username={currentUsername}
-            onUsernameChange={setUsername}
-            onSearch={onSearchClick}
-            isLoading={isLoading}
-            hasReachedLimit={hasReachedLimit}
-          />
-        );
-      default:
-        return null;
-    }
-  };
-
-  const renderPlatformSearchSettings = () => {
-    switch (platform) {
-      case 'instagram':
-        return (
-          <InstagramSearchSettings
-            isSettingsOpen={isSettingsOpen}
-            setIsSettingsOpen={setIsSettingsOpen}
-            numberOfVideos={numberOfVideos}
-            setNumberOfVideos={setNumberOfVideos}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            disabled={isLoading || isBulkSearching}
-          />
-        );
-      case 'tiktok':
-        return (
-          <TikTokSearchSettings
-            isSettingsOpen={isSettingsOpen}
-            setIsSettingsOpen={setIsSettingsOpen}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            location={location}
-            setLocation={setLocation}
-            numberOfVideos={numberOfVideos}
-            setNumberOfVideos={setNumberOfVideos}
-            disabled={isLoading || isBulkSearching}
-          />
-        );
-      default:
-        return null;
-    }
-  };
+  const hasNoSearchesLeft = requestCount >= maxRequests;
+  const isSearchDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || hasNoSearchesLeft;
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -171,24 +102,60 @@ export const SearchContainer = ({
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
-        {renderPlatformSearchBar()}
-
-        <SearchButton
-          isLoading={isLoading}
-          isBulkSearching={isBulkSearching}
-          hasReachedLimit={hasReachedLimit}
-          requestCount={requestCount}
-          maxRequests={maxRequests}
-          currentUsername={currentUsername}
-          onClick={onSearchClick}
-        />
-
-        {renderPlatformSearchSettings()}
-
-        <RecentSearches 
-          onSelect={setUsername}
+        <SearchBar
+          username={username}
           onSearch={onSearchClick}
+          onBulkSearch={handleBulkSearch}
+          isLoading={isLoading || isBulkSearching}
+          onUsernameChange={setUsername}
+          hasReachedLimit={hasReachedLimit}
         />
+
+        <Button 
+          onClick={onSearchClick}
+          disabled={isSearchDisabled}
+          className={cn(
+            "w-full h-10 text-[11px] font-medium transition-all duration-300",
+            username && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
+            (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
+          )}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />
+              <span>This can take up to a minute...</span>
+            </>
+          ) : hasReachedLimit || hasNoSearchesLeft ? (
+            <div className="flex items-center gap-2">
+              <Lock className="h-3.5 w-3.5" />
+              <span>Monthly Limit Reached ({requestCount}/{maxRequests})</span>
+              <Link 
+                to="/subscribe" 
+                className="ml-2 text-[10px] bg-white/20 px-2 py-0.5 rounded hover:bg-white/30 transition-colors"
+              >
+                Upgrade
+              </Link>
+            </div>
+          ) : (
+            <>
+              <Search className="mr-2 h-3.5 w-3.5" />
+              Search Viral Videos
+            </>
+          )}
+        </Button>
+
+        <SearchSettings
+          isSettingsOpen={isSettingsOpen}
+          setIsSettingsOpen={setIsSettingsOpen}
+          numberOfVideos={numberOfVideos}
+          setNumberOfVideos={setNumberOfVideos}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          disabled={isLoading || isBulkSearching}
+        />
+
+        <RecentSearches onSelect={setUsername} />
       </div>
 
       {displayPosts.length > 0 && (
@@ -197,7 +164,7 @@ export const SearchContainer = ({
             <div className="rounded-xl sm:border sm:border-border/50 overflow-hidden">
               <SearchFilters
                 filters={filters}
-                onFilterChange={handleFilterChange}
+                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
                 onReset={resetFilters}
                 totalResults={displayPosts.length}
                 filteredResults={displayPosts.length}

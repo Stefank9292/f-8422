@@ -75,7 +75,6 @@ export const BulkSearchSettings = ({
     setLocalNumberOfVideos(value[0]);
   };
 
-  // Only update parent state when user finishes dragging
   const handleSliderPointerUp = () => {
     setNumberOfVideos(localNumberOfVideos);
   };

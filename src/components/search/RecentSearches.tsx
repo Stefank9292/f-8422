@@ -1,5 +1,4 @@
-import { X, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
-import { Instagram } from "lucide-react";
+import { X, Instagram, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import {
   HoverCard,
   HoverCardContent,
@@ -16,12 +14,9 @@ import {
 
 interface RecentSearchesProps {
   onSelect: (username: string) => void;
-  onSearch: () => void;
 }
 
-type SearchType = 'instagram_search' | 'tiktok_search' | 'bulk_instagram_search' | 'bulk_tiktok_search';
-
-export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
+export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem('recentSearchesCollapsed');
@@ -55,10 +50,6 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
-  const handleSelect = (query: string) => {
-    onSelect(query);
-  };
-
   useEffect(() => {
     if (!isSteroidsUser) return;
 
@@ -86,14 +77,7 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
     localStorage.setItem('recentSearchesCollapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
-  const extractUsername = (query: string, searchType: string): string => {
-    if (searchType.includes('tiktok')) {
-      if (query.includes('tiktok.com/@')) {
-        return query.split('@')[1]?.split('/')[0] || query;
-      }
-      return query.replace('@', '');
-    }
-    
+  const extractUsername = (query: string): string => {
     if (query.includes('instagram.com/')) {
       return query.split('instagram.com/')[1]?.split('/')[0] || query;
     }
@@ -108,10 +92,9 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
 
-      console.log('Fetching recent searches...');
       const { data, error } = await supabase
         .from('search_history')
-        .select('id, search_query, search_type, bulk_search_urls')
+        .select('id, search_query, bulk_search_urls')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -121,10 +104,9 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
         throw error;
       }
 
-      console.log('Recent searches data:', data);
       return data.map(item => ({
         ...item,
-        search_query: extractUsername(item.search_query, item.search_type)
+        search_query: extractUsername(item.search_query)
       })) || [];
     },
     enabled: isSteroidsUser,
@@ -141,15 +123,6 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
         description: "URLs copied to clipboard",
       });
     }
-  };
-
-  const getSearchIcon = (searchType: string) => {
-    const isTikTok = searchType.includes('tiktok');
-    return isTikTok ? (
-      <TikTokIcon className="h-3 w-3 text-muted-foreground" />
-    ) : (
-      <Instagram className="h-3 w-3 text-primary" />
-    );
   };
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
@@ -205,12 +178,12 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
               key={search.id}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
+              <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => handleSelect(search.search_query)}
+                  onClick={() => onSelect(search.search_query)}
                   className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
                 >
-                  {getSearchIcon(search.search_type)}
                   {search.search_query}
                   {search.bulk_search_urls?.length > 0 && (
                     <HoverCard>
