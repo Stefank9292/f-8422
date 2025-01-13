@@ -38,7 +38,7 @@ serve(async (req) => {
 
     console.log('Processing request with auth token:', authHeader.substring(0, 20) + '...');
 
-    // Create Supabase client with service role key
+    // Create Supabase admin client
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -59,7 +59,7 @@ serve(async (req) => {
       console.error('Auth error:', authError);
       return new Response(
         JSON.stringify({ 
-          error: 'Invalid or expired token',
+          error: authError?.message || 'Invalid or expired token',
           details: authError?.message,
           message: 'Please sign in again'
         }),
@@ -81,7 +81,8 @@ serve(async (req) => {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .limit(1);
+      .limit(1)
+      .single();
 
     if (subscriptionError) {
       console.error('Error fetching subscription:', subscriptionError);
@@ -101,10 +102,9 @@ serve(async (req) => {
       );
     }
 
-    const subscription = subscriptionData?.[0];
-    const isSubscribed = subscription?.status === 'active';
-    const priceId = subscription?.details?.price_id;
-    const canceled = subscription?.status === 'canceled';
+    const isSubscribed = subscriptionData?.status === 'active';
+    const priceId = subscriptionData?.details?.price_id;
+    const canceled = subscriptionData?.status === 'canceled';
 
     console.log('Subscription status:', {
       subscribed: isSubscribed,
