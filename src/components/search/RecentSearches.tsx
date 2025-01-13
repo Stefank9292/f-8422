@@ -79,7 +79,6 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   }, [isCollapsed]);
 
   const extractUsername = (query: string, searchType: string): string => {
-    console.log("Search Type:", searchType); // Added logging
     if (searchType === 'tiktok_search' || searchType === 'bulk_tiktok_search') {
       // Handle TikTok URL format
       if (query.includes('tiktok.com/@')) {
