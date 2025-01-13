@@ -52,12 +52,15 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
-  const handleSelect = (query: string) => {
+  const handleSelect = async (query: string) => {
+    // First update the username
     onSelect(query);
-    // Trigger search after a short delay to ensure the username is set
-    setTimeout(() => {
-      onSearch();
-    }, 100);
+    
+    // Wait for next render cycle to ensure username state is updated
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    
+    // Now trigger the search
+    onSearch();
   };
 
   useEffect(() => {
