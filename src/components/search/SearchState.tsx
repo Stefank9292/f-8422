@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { fetchInstagramPosts } from "@/utils/instagram/services/apifyService";
-import { fetchTikTokPosts } from "@/utils/tiktok/services/apifyService";
-import { isTikTokUrl } from "@/utils/tiktok/validation";
+import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
@@ -40,9 +38,9 @@ export const useSearchState = () => {
   } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['social-posts', username, numberOfVideos, selectedDate],
+    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
     queryFn: async () => {
-      console.log('Starting social media search with params:', {
+      console.log('Starting Instagram search with params:', {
         username,
         numberOfVideos,
         selectedDate,
@@ -56,9 +54,10 @@ export const useSearchState = () => {
       }
 
       if (!username.trim()) {
-        throw new Error('Please enter a valid username or URL');
+        throw new Error('Please enter a valid Instagram username');
       }
 
+      // Enforce video limit based on subscription
       const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
       const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
       
@@ -70,15 +69,8 @@ export const useSearchState = () => {
       }
       
       try {
-        console.log('Fetching social media posts...');
-        let results;
-        
-        if (isTikTokUrl(username)) {
-          results = await fetchTikTokPosts(username, adjustedNumberOfVideos, selectedDate);
-        } else {
-          results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
-        }
-        
+        console.log('Fetching Instagram posts...');
+        const results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
         console.log('Received results:', results);
         
         if (results.length > 0) {
@@ -88,7 +80,7 @@ export const useSearchState = () => {
         setShouldFetch(false);
         return results;
       } catch (error) {
-        console.error('Error fetching posts:', error);
+        console.error('Error fetching Instagram posts:', error);
         throw error;
       }
     },
@@ -109,7 +101,7 @@ export const useSearchState = () => {
         });
         toast({
           title: "Search Failed",
-          description: error.message || "Failed to fetch posts",
+          description: error.message || "Failed to fetch Instagram posts",
           variant: "destructive",
         });
         setShouldFetch(false);
@@ -175,21 +167,17 @@ export const useSearchState = () => {
 
     setIsBulkSearching(true);
     try {
-      const allResults: InstagramPost[] = [];
+      const results = await fetchBulkInstagramPosts(urls, adjustedNumVideos, date);
       
       for (const url of urls) {
-        const results = isTikTokUrl(url) 
-          ? await fetchTikTokPosts(url, adjustedNumVideos, date)
-          : await fetchInstagramPosts(url, adjustedNumVideos, date);
-          
-        if (results.length > 0) {
-          await saveSearchHistory(url, results);
-          allResults.push(...results);
+        const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
+        if (urlResults.length > 0) {
+          await saveSearchHistory(url, urlResults);
         }
       }
       
-      setBulkSearchResults(allResults);
-      return allResults;
+      setBulkSearchResults(results);
+      return results;
     } catch (error) {
       console.error('Bulk search error:', error);
       throw error;

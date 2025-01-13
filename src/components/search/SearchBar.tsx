@@ -6,7 +6,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlaceholderAnimation } from "./PlaceholderAnimation";
 import { BulkSearchButton } from "./BulkSearchButton";
-import { isTikTokUrl } from "@/utils/tiktok/validation";
 
 interface SearchBarProps {
   username: string;
@@ -28,7 +27,6 @@ export const SearchBar = ({
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const placeholder = usePlaceholderAnimation();
   const queryClient = useQueryClient();
-  const isTikTok = isTikTokUrl(username);
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -83,7 +81,7 @@ export const SearchBar = ({
         />
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
         <BulkSearchButton 
-          isEnabled={isBulkSearchEnabled && !isTikTok}
+          isEnabled={isBulkSearchEnabled}
           isLoading={isLoading}
           hasReachedLimit={hasReachedLimit}
           onClick={() => setIsBulkSearchOpen(true)}
