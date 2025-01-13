@@ -29,10 +29,14 @@ export const UserProfileInfo = ({
   hasReachedLimit,
 }: UserProfileInfoProps) => {
   return (
-    <div className="w-full p-3 bg-card/50 rounded-xl border border-border/50">
+    <div className="w-full p-4 bg-card/50 rounded-xl border border-border/50 backdrop-blur-sm">
       <div className="flex flex-col gap-4">
-        <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <UserAvatar isSteroidsUser={isSteroidsUser} isProUser={isProUser} />
+        <Link to="/profile" className="flex items-center gap-3 hover:opacity-80 transition-all duration-200 group">
+          <UserAvatar 
+            isSteroidsUser={isSteroidsUser} 
+            isProUser={isProUser} 
+            className="transition-transform duration-200 group-hover:scale-105"
+          />
           <div className="flex flex-col">
             <span className={`text-[10px] ${
               isSteroidsUser 
@@ -52,7 +56,7 @@ export const UserProfileInfo = ({
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser} 
-              className="bg-muted border border-border"
+              className="bg-muted/50 border border-border/50 backdrop-blur-sm"
             >
               <Infinity className="h-4 w-4 text-foreground" />
             </UserAvatar>
@@ -72,7 +76,7 @@ export const UserProfileInfo = ({
             <UserAvatar 
               isSteroidsUser={isSteroidsUser} 
               isProUser={isProUser}
-              className="bg-muted border border-border"
+              className="bg-muted/50 border border-border/50 backdrop-blur-sm"
             >
               <div className="flex flex-col items-center justify-center">
                 <span className="text-[10px] font-medium text-foreground">

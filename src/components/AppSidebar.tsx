@@ -131,13 +131,13 @@ export function AppSidebar() {
 
                 {/* Always show sign out button if there's a session */}
                 <SidebarMenuItem>
-                  <div className="px-2 py-2">
+                  <div className="px-3 py-2">
                     <button
                       onClick={handleSignOut}
-                      className="w-full px-2 py-1 rounded-full flex items-center justify-center gap-1.5 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/20 transition-colors"
+                      className="w-full px-3 py-2 rounded-lg flex items-center justify-center gap-2 text-[10px] text-sidebar-foreground/70 hover:bg-sidebar-accent/10 transition-all duration-200 group"
                     >
-                      <LogOut className="h-3 w-3" />
-                      <span>Sign out</span>
+                      <LogOut className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110" />
+                      <span className="font-medium">Sign out</span>
                     </button>
                   </div>
                 </SidebarMenuItem>
