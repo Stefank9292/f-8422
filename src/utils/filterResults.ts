@@ -59,8 +59,9 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState, plat
         if (post.viewsCount < minViews) return false;
       }
 
-      if (filters.minShares && post.sharesCount !== undefined) {
+      if (filters.minShares && typeof post.sharesCount === 'number') {
         const minShares = parseFormattedNumber(filters.minShares);
+        console.log('Filtering shares:', { minShares, postShares: post.sharesCount, post });
         if (post.sharesCount < minShares) return false;
       }
     }
