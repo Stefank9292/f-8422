@@ -1,4 +1,4 @@
-import { Instagram } from "lucide-react";
+import { Instagram, Facebook, Twitter, Youtube } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -52,7 +52,7 @@ export const SearchHeader = () => {
           Video Research on Steroids
         </span>
       </div>
-      <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-3 mt-6">
+      <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mt-6">
         <a
           href="#"
           className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
@@ -65,6 +65,27 @@ export const SearchHeader = () => {
         >
           <TikTokIcon className="w-3.5 h-3.5 text-gray-400" />
           <span className="text-[11px] font-medium text-gray-400">TikTok</span>
+          <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
+        </div>
+        <div
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
+        >
+          <Youtube className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-[11px] font-medium text-gray-400">YouTube</span>
+          <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
+        </div>
+        <div
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
+        >
+          <Facebook className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-[11px] font-medium text-gray-400">Facebook</span>
+          <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
+        </div>
+        <div
+          className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm cursor-not-allowed"
+        >
+          <Twitter className="w-3.5 h-3.5 text-gray-400" />
+          <span className="text-[11px] font-medium text-gray-400">Twitter</span>
           <span className="text-[11px] text-gray-400 ml-1">Coming Soon</span>
         </div>
       </div>
