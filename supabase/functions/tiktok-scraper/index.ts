@@ -1,90 +1,88 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { corsHeaders } from "../_shared/cors.ts"
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+console.log("TikTok scraper function started")
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { username, numberOfVideos, dateRange, location } = await req.json()
-    console.log('Processing request for:', { username, numberOfVideos, dateRange, location })
+    const { username, numberOfVideos = 3, dateRange = 'DEFAULT', location = 'US' } = await req.json()
 
     if (!username) {
-      throw new Error('No username provided')
+      throw new Error('Username is required')
     }
 
-    const apiKey = Deno.env.get('TIKTOK_APIFY_API_KEY')
-    if (!apiKey) {
-      throw new Error('Apify API key not configured')
+    console.log('Received request with params:', {
+      username,
+      numberOfVideos,
+      dateRange,
+      location
+    })
+
+    const APIFY_API_KEY = Deno.env.get('TIKTOK_APIFY_API_KEY')
+    if (!APIFY_API_KEY) {
+      throw new Error('TIKTOK_APIFY_API_KEY is not configured')
     }
 
-    // Format username to profile URL if needed
-    const formattedUrl = username.startsWith('http') 
-      ? username 
-      : `https://www.tiktok.com/@${username.replace('@', '')}`
+    const endpoint = `https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=${APIFY_API_KEY}`
 
-    const requestBody = {
-      "profiles": [formattedUrl],
-      "resultsPerProfile": numberOfVideos || 3,
-      "dateRange": dateRange || "DEFAULT",
-      "location": location || "US"
-    }
-
-    console.log('Sending request to Apify:', requestBody)
-
-    const response = await fetch('https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items', {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify(requestBody)
+      body: JSON.stringify({
+        "username": username,
+        "maxResults": numberOfVideos,
+        "shouldDownloadCovers": false,
+        "shouldDownloadSlideshowImages": false,
+        "shouldDownloadVideos": false
+      })
     })
 
     if (!response.ok) {
-      const error = await response.text()
-      console.error('Apify API error:', error)
-      throw new Error(`Apify API error: ${error}`)
+      const errorText = await response.text()
+      console.error('Apify API error:', errorText)
+      throw new Error(`Apify API error: ${errorText}`)
     }
 
-    const posts = await response.json()
-    console.log(`Retrieved ${posts.length} posts from Apify`)
+    const data = await response.json()
+    console.log('Received TikTok data:', data)
 
-    const formattedPosts = posts.map((post: any) => ({
-      id: post.id,
-      shortcode: post.webVideoUrl,
-      caption: post.description,
-      timestamp: post.createTime,
-      date: new Date(post.createTime).toISOString(),
-      dimensions: {
-        height: post.videoMeta?.height || 0,
-        width: post.videoMeta?.width || 0
-      },
-      displayUrl: post.videoUrl,
-      videoUrl: post.videoUrl,
+    // Transform the data to match our expected format
+    const transformedData = data.map((post: any) => ({
+      ownerUsername: post.authorMeta?.name || username,
+      caption: post.text || '',
+      date: post.createTime || '',
+      timestamp: post.createTimeISO || '',
       playsCount: post.playCount || 0,
-      viewsCount: post.playCount || 0,
+      viewsCount: post.playCount || 0, // TikTok uses playCount for views
       likesCount: post.diggCount || 0,
       commentsCount: post.commentCount || 0,
-      sharesCount: post.shareCount || 0,
-      ownerUsername: username.replace('@', ''),
-      engagement: ((post.diggCount || 0) + (post.commentCount || 0) + (post.shareCount || 0)) / (post.playCount || 1) * 100,
-      url: post.webVideoUrl,
-      duration: post.duration || 0
+      engagement: calculateEngagement(post.playCount || 0, post.diggCount || 0, post.commentCount || 0),
+      url: post.webVideoUrl || '',
+      videoUrl: post.videoUrl || '',
+      thumbnailUrl: post.covers?.[0] || '',
+      type: 'video'
     }))
 
+    console.log('Transformed data:', transformedData)
+
     return new Response(
-      JSON.stringify(formattedPosts),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      JSON.stringify(transformedData),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: 200,
+      },
     )
   } catch (error) {
-    console.error('Error in tiktok-scraper:', error)
+    console.error('Error:', error)
     return new Response(
       JSON.stringify({ 
         error: error.message,
@@ -92,9 +90,18 @@ serve(async (req) => {
         requestId: crypto.randomUUID()
       }),
       { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        status: 500,
       },
     )
   }
 })
+
+function calculateEngagement(plays: number, likes: number, comments: number): string {
+  if (plays === 0) return '0'
+  const engagement = ((likes + comments) / plays) * 100
+  return engagement.toFixed(2)
+}
