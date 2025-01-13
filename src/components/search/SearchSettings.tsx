@@ -49,6 +49,15 @@ export const SearchSettings = ({
     },
   });
 
+  // Update local number of videos when subscription changes
+  useEffect(() => {
+    const maxVideos = getMaxVideos();
+    if (localNumberOfVideos > maxVideos) {
+      setLocalNumberOfVideos(maxVideos);
+      setNumberOfVideos(maxVideos);
+    }
+  }, [subscriptionStatus?.priceId]);
+
   const isFreeUser = !subscriptionStatus?.subscribed;
 
   const getMaxVideos = () => {
@@ -62,20 +71,9 @@ export const SearchSettings = ({
 
   const maxVideos = getMaxVideos();
 
-  // Update local number of videos when subscription changes
-  useEffect(() => {
-    if (localNumberOfVideos > maxVideos) {
-      setLocalNumberOfVideos(maxVideos);
-      setNumberOfVideos(maxVideos);
-    }
-  }, [subscriptionStatus?.priceId]);
-
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);
-  };
-
-  const handleSliderPointerUp = () => {
-    setNumberOfVideos(localNumberOfVideos);
+    setNumberOfVideos(value[0]); // Update parent state immediately
   };
 
   return (
@@ -107,7 +105,6 @@ export const SearchSettings = ({
             <Slider
               value={[localNumberOfVideos]}
               onValueChange={handleSliderChange}
-              onPointerUp={handleSliderPointerUp}
               min={1}
               max={maxVideos}
               step={1}
