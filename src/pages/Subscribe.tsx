@@ -1,6 +1,9 @@
 import { PricingCard } from "@/components/pricing/PricingCard";
+import { useState } from "react";
 
 const Subscribe = () => {
+  const [isAnnual, setIsAnnual] = useState(true);
+
   return (
     <div className="min-h-screen bg-background md:pt-12 pt-24 pb-8 md:pb-12">
       <div className="container max-w-6xl mx-auto px-4 md:px-6">
@@ -14,43 +17,44 @@ const Subscribe = () => {
         </div>
         <div className="grid gap-6 mt-8 md:mt-12 lg:grid-cols-3">
           <PricingCard
-            title="Free"
+            name="Free"
             description="Basic features for personal use"
-            price="$0"
-            features={[
-              "Limited searches per day",
-              "Basic analytics",
-              "Standard support"
-            ]}
-            buttonText="Get Started"
+            price={{
+              monthly: "0",
+              annual: {
+                total: "0",
+                perMonth: "0"
+              }
+            }}
+            isAnnual={isAnnual}
             priceId=""
           />
           <PricingCard
-            title="Premium"
+            name="Premium"
             description="Advanced features for creators"
-            price="$9.99"
-            features={[
-              "Unlimited searches",
-              "Advanced analytics",
-              "Priority support",
-              "Export data"
-            ]}
-            buttonText="Subscribe Now"
-            priceId="price_1QdBd2DoPDXfOSZFnG8aWuIq"
-            popular
+            price={{
+              monthly: "9.99",
+              annual: {
+                total: "99.99",
+                perMonth: "8.33"
+              }
+            }}
+            isAnnual={isAnnual}
+            priceId="price_1QfKMGGX13ZRG2XiFyskXyJo"
+            isPopular={true}
           />
           <PricingCard
-            title="Ultra"
+            name="Ultra"
             description="Ultimate features for power users"
-            price="$19.99"
-            features={[
-              "Everything in Premium",
-              "API access",
-              "Custom analytics",
-              "24/7 support"
-            ]}
-            buttonText="Subscribe Now"
-            priceId="price_1QdC54DoPDXfOSZFXHBO4yB3"
+            price={{
+              monthly: "19.99",
+              annual: {
+                total: "199.99",
+                perMonth: "16.67"
+              }
+            }}
+            isAnnual={isAnnual}
+            priceId="price_1QfKMYGX13ZRG2XioPYKCe7h"
           />
         </div>
       </div>
