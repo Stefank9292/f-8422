@@ -48,9 +48,6 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     enabled: !!session?.access_token,
   });
 
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
-
   useEffect(() => {
     if (!isSteroidsUser) return;
 
@@ -79,7 +76,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   }, [isCollapsed]);
 
   const extractUsername = (query: string, searchType: string): string => {
-    if (searchType === 'tiktok_search') {
+    if (searchType === 'tiktok_search' || searchType === 'bulk_tiktok_search') {
       // Handle TikTok URL format
       if (query.includes('tiktok.com/@')) {
         return query.split('@')[1]?.split('/')[0] || query;
@@ -104,6 +101,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user?.id) return [];
 
+      console.log('Fetching recent searches...');
       const { data, error } = await supabase
         .from('search_history')
         .select('id, search_query, search_type, bulk_search_urls')
@@ -116,6 +114,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         throw error;
       }
 
+      console.log('Recent searches data:', data);
       return data.map(item => ({
         ...item,
         search_query: extractUsername(item.search_query, item.search_type)
@@ -138,6 +137,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   };
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
+
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
   if (!isSteroidsUser) {
     return (
@@ -190,7 +192,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               key={search.id}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
-              {search.search_type === 'tiktok_search' ? (
+              {(search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search') ? (
                 <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
               ) : (
                 <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
