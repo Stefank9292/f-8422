@@ -9,7 +9,7 @@ import { validatePassword } from "@/utils/auth/validation";
 import { PasswordStrengthIndicator } from "@/components/auth/PasswordStrengthIndicator";
 import { checkPasswordStrength } from "@/utils/auth/validation";
 
-export const Profile = () => {
+const Profile = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -139,3 +139,5 @@ export const Profile = () => {
     </div>
   );
 };
+
+export default Profile;
