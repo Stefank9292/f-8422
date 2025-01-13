@@ -17,21 +17,27 @@ serve(async (req) => {
   }
 
   try {
-    // Get user ID from auth context
+    // Get authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('No authorization header found');
       throw new Error('No authorization header');
     }
 
-    // Create Supabase client
-    const supabaseClient = createClient(
+    // Create Supabase client with service role key
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
     );
 
-    // Verify the JWT token
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
+    // Verify the JWT token and get user
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
@@ -42,8 +48,8 @@ serve(async (req) => {
 
     console.log('Authenticated user:', user.id);
 
-    // Get subscription status from hooks table
-    const { data: subscriptionData, error: subscriptionError } = await supabaseClient
+    // Get subscription status from subscription_logs table
+    const { data: subscriptionData, error: subscriptionError } = await supabaseAdmin
       .from('subscription_logs')
       .select('*')
       .eq('user_id', user.id)
