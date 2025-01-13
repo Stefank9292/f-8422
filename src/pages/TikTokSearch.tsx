@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Search, Lock } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { TikTokSearchHeader } from "@/components/tiktok/TikTokSearchHeader";
 import { TikTokSearchBar } from "@/components/tiktok/TikTokSearchBar";
 import { TikTokSearchSettings } from "@/components/tiktok/TikTokSearchSettings";
@@ -13,7 +13,6 @@ import { cn } from "@/lib/utils";
 import { useTikTokSearchStore } from "@/store/tiktokSearchStore";
 import { useToast } from "@/hooks/use-toast";
 import { TikTokPost } from "@/types/tiktok";
-import { Link } from "react-router-dom";
 
 const TikTokSearch = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -123,9 +122,6 @@ const TikTokSearch = () => {
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <div className="space-y-4 sm:space-y-6 w-full max-w-md">
         <TikTokSearchHeader />
-        <p className="text-[11px] text-muted-foreground text-center max-w-xl mx-auto">
-          Save time finding viral TikTok content
-        </p>
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
