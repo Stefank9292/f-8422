@@ -57,17 +57,6 @@ export function SidebarNavigation() {
           Video Research on Steroids
         </div>
       </div>
-      <div className={cn(
-        "mt-2 flex justify-center gap-2 flex-wrap",
-        isCollapsed ? "hidden" : "flex"
-      )}>
-        <Badge variant="outline" className="text-[10px] bg-transparent">
-          Instagram
-        </Badge>
-        <Badge variant="outline" className="text-[10px] bg-transparent">
-          TikTok
-        </Badge>
-      </div>
     </div>
   );
 }
