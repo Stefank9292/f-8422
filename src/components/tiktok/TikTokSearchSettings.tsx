@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Settings2, HelpCircle } from "lucide-react";
+import { Settings2, HelpCircle, Calendar, MapPin, SlidersHorizontal } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TikTokSearchSettingsProps {
   isSettingsOpen: boolean;
@@ -47,6 +54,7 @@ export const TikTokSearchSettings = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
+                <SlidersHorizontal className="w-3.5 h-3.5" />
                 <span className="text-[11px] font-medium">Number of Videos per Profile</span>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -71,6 +79,42 @@ export const TikTokSearchSettings = ({
               disabled={disabled}
               className="w-full"
             />
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-medium">Date Filter</span>
+            </div>
+            <Select disabled={disabled}>
+              <SelectTrigger className="w-full h-9 text-xs border border-border/50">
+                <SelectValue placeholder="Select date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">Past Week</SelectItem>
+                <SelectItem value="month">Past Month</SelectItem>
+                <SelectItem value="year">Past Year</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-medium">Location</span>
+            </div>
+            <Select disabled={disabled}>
+              <SelectTrigger className="w-full h-9 text-xs border border-border/50">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="worldwide">Worldwide</SelectItem>
+                <SelectItem value="us">United States</SelectItem>
+                <SelectItem value="eu">Europe</SelectItem>
+                <SelectItem value="asia">Asia</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}
