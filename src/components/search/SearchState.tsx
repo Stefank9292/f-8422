@@ -43,9 +43,10 @@ export const useSearchState = () => {
   } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['instagram-posts', currentUsername, numberOfVideos, selectedDate],
+    queryKey: ['instagram-posts', currentUsername, numberOfVideos, selectedDate, platform],
     queryFn: async () => {
-      console.log('Starting Instagram search with params:', {
+      console.log('Starting search with params:', {
+        platform,
         username: currentUsername,
         numberOfVideos,
         selectedDate,
@@ -62,34 +63,41 @@ export const useSearchState = () => {
         throw new Error('Please enter a valid username');
       }
 
-      // Enforce video limit based on subscription
-      const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
-      const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
-      
-      if (numberOfVideos > maxVideosPerSearch) {
-        toast({
-          title: "Video Limit Applied",
-          description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
-        });
-      }
-      
-      try {
-        console.log('Fetching Instagram posts...');
-        const results = await fetchInstagramPosts(currentUsername, adjustedNumberOfVideos, selectedDate);
-        console.log('Received results:', results);
+      // Only proceed with Instagram search if platform is Instagram
+      if (platform === 'instagram') {
+        // Enforce video limit based on subscription
+        const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
+        const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
         
-        if (results.length > 0) {
-          await saveSearchHistory(currentUsername, results);
+        if (numberOfVideos > maxVideosPerSearch) {
+          toast({
+            title: "Video Limit Applied",
+            description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
+          });
         }
         
-        setShouldFetch(false);
-        return results;
-      } catch (error) {
-        console.error('Error fetching Instagram posts:', error);
-        throw error;
+        try {
+          console.log('Fetching Instagram posts...');
+          const results = await fetchInstagramPosts(currentUsername, adjustedNumberOfVideos, selectedDate);
+          console.log('Received results:', results);
+          
+          if (results.length > 0) {
+            await saveSearchHistory(currentUsername, results);
+          }
+          
+          setShouldFetch(false);
+          return results;
+        } catch (error) {
+          console.error('Error fetching Instagram posts:', error);
+          throw error;
+        }
+      } else {
+        // Return empty array for TikTok for now
+        // TikTok search will be implemented separately
+        return [];
       }
     },
-    enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests,
+    enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests && platform === 'instagram',
     retry: false,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 5,
@@ -100,6 +108,7 @@ export const useSearchState = () => {
         console.error('Search error details:', {
           error: error.message,
           stack: error.stack,
+          platform,
           username: currentUsername,
           numberOfVideos,
           selectedDate
