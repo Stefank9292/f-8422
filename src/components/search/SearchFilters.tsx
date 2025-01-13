@@ -28,8 +28,8 @@ export const SearchFilters = ({
 
   const FilterComponent = platform === 'instagram' ? InstagramFilters : TikTokFilters;
 
-  return (
-    <Collapsible>
+  const filterContent = (
+    <>
       <FilterHeader
         totalResults={totalResults}
         filteredResults={filteredResults}
@@ -37,12 +37,22 @@ export const SearchFilters = ({
         currentPosts={currentPosts}
         isMobile={isMobile}
       />
-      <CollapsibleContent>
+      <div className={isMobile ? "" : "border-t border-border/50"}>
         <FilterComponent
           filters={filters}
           onFilterChange={onFilterChange}
         />
-      </CollapsibleContent>
-    </Collapsible>
+      </div>
+    </>
   );
+
+  if (isMobile) {
+    return (
+      <Collapsible>
+        {filterContent}
+      </Collapsible>
+    );
+  }
+
+  return filterContent;
 };
