@@ -32,27 +32,25 @@ function App() {
       <ErrorBoundary>
         <Router>
           <SidebarProvider>
-            <div className="flex min-h-screen w-full">
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route
-                  path="/"
-                  element={
-                    <ProtectedRoute>
-                      <AppSidebar />
-                    </ProtectedRoute>
-                  }
-                >
-                  <Route index element={<Index />} />
-                  <Route path="subscribe" element={<Subscribe />} />
-                  <Route path="success" element={<Success />} />
-                  <Route path="history" element={<SearchHistory />} />
-                  <Route path="profile" element={<Profile />} />
-                  <Route path="transcribe" element={<Transcribe />} />
-                  <Route path="tiktok" element={<TikTokSearch />} />
-                </Route>
-              </Routes>
-            </div>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppSidebar />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<Index />} />
+                <Route path="subscribe" element={<Subscribe />} />
+                <Route path="success" element={<Success />} />
+                <Route path="history" element={<SearchHistory />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="transcribe" element={<Transcribe />} />
+                <Route path="tiktok" element={<TikTokSearch />} />
+              </Route>
+            </Routes>
           </SidebarProvider>
         </Router>
         <Toaster />
