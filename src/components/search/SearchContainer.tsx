@@ -4,7 +4,10 @@ import { SearchResults } from "./SearchResults";
 import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
-import { SearchInput } from "./SearchInput";
+import { InstagramSearchBar } from "./instagram/InstagramSearchBar";
+import { TikTokSearchBar } from "./tiktok/TikTokSearchBar";
+import { InstagramSearchSettings } from "./instagram/InstagramSearchSettings";
+import { TikTokSearchSettings } from "./tiktok/TikTokSearchSettings";
 import { SearchButton } from "./SearchButton";
 import { useRef, useEffect, useState } from "react";
 import { useSearchState } from "@/hooks/search/useSearchState";
@@ -42,12 +45,15 @@ export const SearchContainer = ({
   const { platform, currentUsername } = usePlatformState();
   const { filters, handleFilterChange, resetFilters } = useFilterState();
   
-  // Get search settings from the store
   const { 
     numberOfVideos, 
     setNumberOfVideos,
     selectedDate,
-    setSelectedDate 
+    setSelectedDate,
+    dateRange,
+    setDateRange,
+    location,
+    setLocation
   } = useSearchStore();
   
   useEffect(() => {
@@ -93,6 +99,67 @@ export const SearchContainer = ({
     }
   };
 
+  const renderPlatformSearchBar = () => {
+    switch (platform) {
+      case 'instagram':
+        return (
+          <InstagramSearchBar
+            username={currentUsername}
+            onUsernameChange={() => {}}
+            onSearch={onSearchClick}
+            onBulkSearch={handleBulkSearch}
+            isLoading={isLoading}
+            hasReachedLimit={hasReachedLimit}
+          />
+        );
+      case 'tiktok':
+        return (
+          <TikTokSearchBar
+            username={currentUsername}
+            onUsernameChange={() => {}}
+            onSearch={onSearchClick}
+            isLoading={isLoading}
+            hasReachedLimit={hasReachedLimit}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderPlatformSearchSettings = () => {
+    switch (platform) {
+      case 'instagram':
+        return (
+          <InstagramSearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            disabled={isLoading || isBulkSearching}
+          />
+        );
+      case 'tiktok':
+        return (
+          <TikTokSearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            location={location}
+            setLocation={setLocation}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            disabled={isLoading || isBulkSearching}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <AnnouncementBar />
@@ -104,17 +171,7 @@ export const SearchContainer = ({
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
-        <SearchInput
-          instagramUsername={currentUsername}
-          tiktokUsername={currentUsername}
-          onSearch={onSearchClick}
-          onBulkSearch={handleBulkSearch}
-          isLoading={isLoading}
-          isBulkSearching={isBulkSearching}
-          setInstagramUsername={() => {}}
-          setTiktokUsername={() => {}}
-          hasReachedLimit={hasReachedLimit}
-        />
+        {renderPlatformSearchBar()}
 
         <SearchButton
           isLoading={isLoading}
@@ -126,15 +183,7 @@ export const SearchContainer = ({
           onClick={onSearchClick}
         />
 
-        <SearchSettings
-          isSettingsOpen={isSettingsOpen}
-          setIsSettingsOpen={setIsSettingsOpen}
-          numberOfVideos={numberOfVideos}
-          setNumberOfVideos={setNumberOfVideos}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching}
-        />
+        {renderPlatformSearchSettings()}
 
         <RecentSearches 
           onSelect={() => {}}
