@@ -169,8 +169,15 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
               <HoverCardTrigger asChild>
                 <Info className="h-4 w-4 text-muted-foreground cursor-help" />
               </HoverCardTrigger>
-              <HoverCardContent className="text-sm">
-                Score based on sentence length and word complexity - higher scores indicate better readability.
+              <HoverCardContent className="text-sm space-y-2">
+                <p>Score based on sentence length and word complexity - higher scores indicate better readability.</p>
+                <div className="space-y-1">
+                  <p className="text-green-500">80-100: Very readable</p>
+                  <p className="text-green-400">60-79: Good readability</p>
+                  <p className="text-yellow-500">40-59: Moderate readability</p>
+                  <p className="text-orange-500">20-39: Poor readability</p>
+                  <p className="text-red-500">0-19: Very poor readability</p>
+                </div>
               </HoverCardContent>
             </HoverCard>
           </div>
