@@ -66,7 +66,10 @@ export function SidebarSection({
                     {item.badge && (
                       <Badge 
                         variant="secondary" 
-                        className="ml-1 text-[8px] text-primary font-medium bg-transparent border-0 p-0"
+                        className={cn(
+                          "ml-1 text-[8px] font-medium bg-transparent border-0 p-0",
+                          item.badge === "LIVE" ? "text-emerald-500" : "text-primary"
+                        )}
                       >
                         {item.badge}
                       </Badge>
