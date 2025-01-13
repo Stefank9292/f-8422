@@ -1,5 +1,5 @@
 import { X, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
-import { instagram } from "lucide-react";
+import { Instagram } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -202,7 +202,7 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
                   {search.search_type.includes('tiktok') ? (
                     <TikTokIcon className="h-3 w-3 text-muted-foreground" />
                   ) : (
-                    <instagram className="h-3 w-3 text-muted-foreground" />
+                    <Instagram className="h-3 w-3 text-muted-foreground" />
                   )}
                   {search.search_query}
                   {search.bulk_search_urls?.length > 0 && (
