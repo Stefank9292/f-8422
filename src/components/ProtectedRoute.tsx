@@ -101,14 +101,17 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
+  // Allow access to subscribe page without subscription check
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 
-  if (isLoadingSubscription && !subscriptionStatus) {
+  // Only check subscription for non-subscribe pages
+  if (isLoadingSubscription) {
     return <LoadingState />;
   }
 
+  // Check for active subscription based on price IDs
   const hasActiveSubscription = subscriptionStatus?.priceId && [
     "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
     "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
@@ -116,11 +119,14 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
+  console.log('Current session:', session);
   console.log('Subscription status:', subscriptionStatus);
   console.log('Has active subscription:', hasActiveSubscription);
   console.log('Current price ID:', subscriptionStatus?.priceId);
+  console.log('Current pathname:', location.pathname);
 
-  if (!hasActiveSubscription) {
+  // Redirect to subscribe page if no active subscription
+  if (!hasActiveSubscription && location.pathname !== '/subscribe') {
     console.log('No active subscription found, redirecting to subscribe page');
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }

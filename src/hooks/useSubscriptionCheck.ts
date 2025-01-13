@@ -38,23 +38,28 @@ export const useSubscriptionCheck = (session: Session | null) => {
         }
 
         if (!currentSession) {
-          console.log('No active session, redirecting to auth...');
-          await supabase.auth.signOut();
-          queryClient.clear();
-          toast({
-            title: "Session Expired",
-            description: "Please sign in again to continue.",
-            variant: "destructive",
-          });
-          return {
-            subscribed: false,
-            priceId: null,
-            canceled: false,
-            maxClicks: 3
-          };
+          console.log('No active session, attempting to refresh...');
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError || !refreshData.session) {
+            console.log('Session refresh failed, redirecting to auth...');
+            await supabase.auth.signOut();
+            queryClient.clear();
+            toast({
+              title: "Session Expired",
+              description: "Please sign in again to continue.",
+              variant: "destructive",
+            });
+            return {
+              subscribed: false,
+              priceId: null,
+              canceled: false,
+              maxClicks: 3
+            };
+          }
+          currentSession = refreshData.session;
         }
 
-        console.log('Using session token for subscription check:', currentSession.access_token);
+        console.log('Using session token for subscription check:', currentSession.access_token.substring(0, 20) + '...');
         const { data, error } = await supabase.functions.invoke('check-subscription', {
           headers: {
             Authorization: `Bearer ${currentSession.access_token}`,
