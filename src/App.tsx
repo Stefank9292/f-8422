@@ -11,7 +11,7 @@ import Index from "@/pages/Index";
 import Subscribe from "@/pages/Subscribe";
 import Success from "@/pages/Success";
 import SearchHistory from "@/pages/SearchHistory";
-import { Profile } from "@/pages/Profile";
+import Profile from "@/pages/Profile";
 import Transcribe from "@/pages/Transcribe";
 import TikTokSearch from "@/pages/TikTokSearch";
 
