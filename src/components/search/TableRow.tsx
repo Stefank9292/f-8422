@@ -72,7 +72,10 @@ export const PostTableRow = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {truncateCaption(displayValues.caption)}
+                {platform === 'tiktok' 
+                  ? `${displayValues.caption.slice(0, 15)}${displayValues.caption.length > 15 ? '...' : ''}`
+                  : truncateCaption(displayValues.caption)
+                }
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
