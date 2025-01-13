@@ -34,7 +34,7 @@ export const SearchButton = ({
       className={cn(
         "w-full h-10 text-[11px] font-medium transition-all duration-300",
         {
-          'instagram-gradient': isButtonEnabled && platform === 'instagram',
+          'instagram-gradient hover:opacity-90': isButtonEnabled && platform === 'instagram',
           'bg-black hover:bg-black/90': isButtonEnabled && platform === 'tiktok',
           'bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800': !isButtonEnabled
         },
