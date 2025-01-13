@@ -51,7 +51,7 @@ const faqItems = [
 
 const HelpCenter = () => {
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
+    <div className="min-h-screen bg-background pt-20 md:pt-6 pb-6 md:pb-8">
       <div className="container max-w-4xl mx-auto px-4 space-y-6 md:space-y-8">
         <div className="space-y-2">
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Help Center</h1>
