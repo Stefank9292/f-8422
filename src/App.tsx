@@ -15,6 +15,7 @@ import HelpCenter from "@/pages/HelpCenter";
 import ConfirmEmail from "@/pages/ConfirmEmail";
 import { Profile } from "@/pages/Profile";
 import Transcribe from "@/pages/Transcribe";
+import TikTokSearch from "@/pages/TikTokSearch";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 const queryClient = new QueryClient();
@@ -105,6 +106,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Transcribe />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/tiktok"
+                    element={
+                      <ProtectedRoute>
+                        <TikTokSearch />
                       </ProtectedRoute>
                     }
                   />

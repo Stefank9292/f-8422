@@ -22,9 +22,9 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     title: "TikTok Search",
-    url: "#",
+    url: "/tiktok",
     icon: TikTokIcon,
-    className: "opacity-60 cursor-not-allowed"
+    badge: "BETA"
   },
   {
     title: "Facebook Search",
