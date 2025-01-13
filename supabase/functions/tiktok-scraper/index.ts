@@ -24,6 +24,13 @@ serve(async (req) => {
 
     const { directUrls, maxPosts, onlyPostsNewerThan } = await req.json()
     
+    console.log('Making request to Apify API with params:', {
+      directUrls,
+      maxPosts,
+      onlyPostsNewerThan,
+      apiKeyLength: apiKey.length // Log key length for debugging
+    });
+    
     const response = await fetch('https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items', {
       method: 'POST',
       headers: {
