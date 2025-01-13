@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { Session } from "@supabase/supabase-js";
 
 interface SubscriptionStatus {
   subscribed: boolean;
@@ -39,11 +39,13 @@ export const useSubscriptionCheck = (session: Session | null) => {
 
         let activeSession = initialSession;
 
-        if (!activeSession) {
-          console.log('No active session, attempting to refresh...');
+        // If no active session or session mismatch, try to refresh
+        if (!activeSession || activeSession.access_token !== session.access_token) {
+          console.log('Session mismatch or no active session, attempting to refresh...');
           const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          
           if (refreshError || !refreshData.session) {
-            console.log('Session refresh failed, redirecting to auth...');
+            console.log('Session refresh failed, signing out...');
             await supabase.auth.signOut();
             queryClient.clear();
             toast({
@@ -58,7 +60,12 @@ export const useSubscriptionCheck = (session: Session | null) => {
               maxClicks: 3
             };
           }
+          
+          console.log('Session refreshed successfully');
           activeSession = refreshData.session;
+          
+          // Update query cache with new session
+          queryClient.setQueryData(['session'], refreshData.session);
         }
 
         console.log('Using session token for subscription check:', activeSession.access_token.substring(0, 20) + '...');
@@ -72,6 +79,7 @@ export const useSubscriptionCheck = (session: Session | null) => {
         if (error) {
           console.error('Subscription check error:', error);
           if (error.status === 401) {
+            // Clear session and redirect to auth
             await supabase.auth.signOut();
             queryClient.clear();
             toast({
