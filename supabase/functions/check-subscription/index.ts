@@ -43,7 +43,16 @@ serve(async (req) => {
 
     if (authError || !user) {
       console.error('Auth error:', authError);
-      throw new Error('Unauthorized');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { 
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
     }
 
     console.log('Authenticated user:', user.id);
