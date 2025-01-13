@@ -34,12 +34,12 @@ export function SearchHistoryHeader({
 }: SearchHistoryHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 p-1">
-      <div className="space-y-1.5">
+      <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-tight">Search History</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Search History</h1>
           <HoverCard>
             <HoverCardTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button variant="ghost" size="icon" className="h-7 w-7">
                 <Info className="h-4 w-4" />
                 <span className="sr-only">Search history info</span>
               </Button>
@@ -61,7 +61,7 @@ export function SearchHistoryHeader({
             <Button 
               variant="destructive" 
               disabled={isDeletingAll}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto h-10 px-6"
             >
               {isDeletingAll ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />

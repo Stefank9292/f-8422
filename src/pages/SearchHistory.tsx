@@ -183,8 +183,8 @@ const SearchHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
-      <div className="container max-w-5xl mx-auto px-4 space-y-6 md:space-y-8">
+    <div className="min-h-screen bg-background pt-24 md:pt-28 pb-8 md:pb-12">
+      <div className="container max-w-5xl mx-auto px-4 md:px-6 space-y-6 md:space-y-8">
         <SearchHistoryHeader 
           onDeleteAll={handleDeleteAll}
           isDeletingAll={isDeletingAll}
@@ -200,9 +200,9 @@ const SearchHistory = () => {
               placeholder="Search by username..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10"
+              className="pl-10 h-12 rounded-xl"
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           </div>
         )}
         
