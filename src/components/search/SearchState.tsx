@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { fetchInstagramPosts, fetchBulkInstagramPosts } from "@/utils/instagram/services/apifyService";
+import { fetchTikTokPosts } from "@/utils/tiktok/services/apifyService";
 import { supabase } from "@/integrations/supabase/client";
 import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
@@ -15,6 +16,8 @@ export const useSearchState = () => {
     tiktokUsername,
     numberOfVideos,
     selectedDate,
+    dateRange,
+    location,
   } = useSearchStore();
   
   const { platform } = usePlatformStore();
@@ -43,13 +46,15 @@ export const useSearchState = () => {
   } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['instagram-posts', currentUsername, numberOfVideos, selectedDate, platform],
+    queryKey: ['social-posts', currentUsername, numberOfVideos, selectedDate, platform, dateRange, location],
     queryFn: async () => {
       console.log('Starting search with params:', {
         platform,
         username: currentUsername,
         numberOfVideos,
         selectedDate,
+        dateRange,
+        location,
         requestCount,
         maxRequests
       });
@@ -63,41 +68,45 @@ export const useSearchState = () => {
         throw new Error('Please enter a valid username');
       }
 
-      // Only proceed with Instagram search if platform is Instagram
-      if (platform === 'instagram') {
-        // Enforce video limit based on subscription
-        const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
-        const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
-        
-        if (numberOfVideos > maxVideosPerSearch) {
-          toast({
-            title: "Video Limit Applied",
-            description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
-          });
-        }
-        
-        try {
+      try {
+        if (platform === 'instagram') {
+          const maxVideosPerSearch = isSteroidsUser ? Infinity : isProUser ? 25 : 3;
+          const adjustedNumberOfVideos = Math.min(numberOfVideos, maxVideosPerSearch);
+          
+          if (numberOfVideos > maxVideosPerSearch) {
+            toast({
+              title: "Video Limit Applied",
+              description: `Your plan allows up to ${maxVideosPerSearch} videos per search. Adjusting your request accordingly.`,
+            });
+          }
+          
           console.log('Fetching Instagram posts...');
           const results = await fetchInstagramPosts(currentUsername, adjustedNumberOfVideos, selectedDate);
-          console.log('Received results:', results);
+          console.log('Received Instagram results:', results);
           
           if (results.length > 0) {
             await saveSearchHistory(currentUsername, results);
           }
           
-          setShouldFetch(false);
           return results;
-        } catch (error) {
-          console.error('Error fetching Instagram posts:', error);
-          throw error;
+        } else if (platform === 'tiktok') {
+          console.log('Fetching TikTok posts...');
+          const results = await fetchTikTokPosts(currentUsername, numberOfVideos, dateRange, location);
+          console.log('Received TikTok results:', results);
+          
+          if (results.length > 0) {
+            await saveSearchHistory(currentUsername, results, undefined, 'tiktok');
+          }
+          
+          return results;
         }
-      } else {
-        // Return empty array for TikTok for now
-        // TikTok search will be implemented separately
         return [];
+      } catch (error) {
+        console.error(`Error fetching ${platform} posts:`, error);
+        throw error;
       }
     },
-    enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests && platform === 'instagram',
+    enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests,
     retry: false,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 5,
@@ -111,7 +120,9 @@ export const useSearchState = () => {
           platform,
           username: currentUsername,
           numberOfVideos,
-          selectedDate
+          selectedDate,
+          dateRange,
+          location
         });
         toast({
           title: "Search Failed",
