@@ -22,7 +22,10 @@ serve(async (req) => {
     if (!authHeader) {
       console.error('No authorization header found');
       return new Response(
-        JSON.stringify({ error: 'No authorization header' }),
+        JSON.stringify({ 
+          error: 'No authorization header',
+          message: 'Please provide a valid authorization token'
+        }),
         { 
           status: 401,
           headers: {
@@ -33,7 +36,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Received request with auth header:', authHeader.substring(0, 20) + '...');
+    console.log('Processing request with auth token:', authHeader.substring(0, 20) + '...');
 
     // Create Supabase client with service role key
     const supabaseAdmin = createClient(
@@ -56,8 +59,9 @@ serve(async (req) => {
       console.error('Auth error:', authError);
       return new Response(
         JSON.stringify({ 
-          error: 'Unauthorized',
-          details: authError?.message 
+          error: 'Invalid or expired token',
+          details: authError?.message,
+          message: 'Please sign in again'
         }),
         { 
           status: 401,
@@ -84,7 +88,8 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ 
           error: 'Failed to fetch subscription data',
-          details: subscriptionError.message 
+          details: subscriptionError.message,
+          message: 'Unable to verify subscription status'
         }),
         { 
           status: 500,
@@ -129,10 +134,11 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'An unexpected error occurred',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
+        message: 'An error occurred while checking subscription status'
       }),
       { 
-        status: error instanceof Error && error.message === 'Unauthorized' ? 401 : 500,
+        status: error instanceof Error && error.message.includes('Unauthorized') ? 401 : 500,
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
