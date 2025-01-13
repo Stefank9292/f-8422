@@ -4,7 +4,6 @@ import { parse, isAfter } from "date-fns";
 export interface FilterState {
   postsNewerThan: string;
   minViews: string;
-  minPlays: string;
   minShares: string;
   minLikes: string;
   minComments: string;
@@ -46,11 +45,6 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState, plat
       if (filters.minViews) {
         const minViews = parseFormattedNumber(filters.minViews);
         if (post.viewsCount < minViews) return false;
-      }
-
-      if (filters.minPlays) {
-        const minPlays = parseFormattedNumber(filters.minPlays);
-        if (post.playsCount < minPlays) return false;
       }
     } else {
       // TikTok-specific filters
