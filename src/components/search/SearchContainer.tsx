@@ -102,6 +102,7 @@ export const SearchContainer = ({
   };
 
   const hasNoSearchesLeft = requestCount >= maxRequests;
+  const isButtonEnabled = currentUsername && !hasReachedLimit && !hasNoSearchesLeft && !isLoading && !isBulkSearching;
   const isSearchDisabled = isLoading || isBulkSearching || !currentUsername.trim() || hasReachedLimit || hasNoSearchesLeft;
 
   return (
@@ -139,7 +140,7 @@ export const SearchContainer = ({
           disabled={isSearchDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            !isSearchDisabled && currentUsername
+            isButtonEnabled
               ? platform === 'instagram' 
                 ? "instagram-gradient"
                 : "tiktok-gradient"
