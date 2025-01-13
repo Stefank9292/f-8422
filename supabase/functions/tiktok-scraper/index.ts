@@ -30,18 +30,28 @@ serve(async (req) => {
 
     const endpoint = `https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=${APIFY_API_KEY}`
 
+    // Clean up username to get just the handle
+    const cleanUsername = username.replace('https://www.tiktok.com/@', '').replace('@', '')
+
+    const requestBody = {
+      startUrls: [`https://www.tiktok.com/@${cleanUsername}`],
+      maxItems: numberOfVideos,
+      dateRange: dateRange,
+      location: location,
+      customMapFunction: "(object) => { return {...object} }",
+      scrapeType: "posts",
+      shouldDownloadVideos: false,
+      shouldDownloadCovers: false
+    }
+
+    console.log('Sending request to Apify with body:', requestBody)
+
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        "username": username,
-        "maxResults": numberOfVideos,
-        "shouldDownloadCovers": false,
-        "shouldDownloadSlideshowImages": false,
-        "shouldDownloadVideos": false
-      })
+      body: JSON.stringify(requestBody)
     })
 
     if (!response.ok) {
@@ -55,7 +65,7 @@ serve(async (req) => {
 
     // Transform the data to match our expected format
     const transformedData = data.map((post: any) => ({
-      ownerUsername: post.authorMeta?.name || username,
+      ownerUsername: post.authorMeta?.name || cleanUsername,
       caption: post.text || '',
       date: post.createTime || '',
       timestamp: post.createTimeISO || '',
