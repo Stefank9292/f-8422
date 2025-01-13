@@ -5,6 +5,7 @@ import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 
 const SearchHistory = () => {
   const [searchHistory, setSearchHistory] = useState([]);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -33,11 +34,35 @@ const SearchHistory = () => {
     fetchSearchHistory();
   }, [session]);
 
+  const handleDelete = async (id: string) => {
+    setIsDeleting(true);
+    try {
+      const { error } = await supabase
+        .from('search_history')
+        .delete()
+        .eq('id', id);
+      
+      if (error) throw error;
+      
+      setSearchHistory(prevHistory => 
+        prevHistory.filter(item => item.id !== id)
+      );
+    } catch (error) {
+      console.error("Error deleting search history:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pt-20 md:pt-6 pb-6 md:pb-8">
       <div className="container max-w-7xl mx-auto px-4">
         <h1 className="text-2xl font-semibold">Search History</h1>
-        <SearchHistoryList history={searchHistory} />
+        <SearchHistoryList 
+          searchHistory={searchHistory}
+          onDelete={handleDelete}
+          isDeleting={isDeleting}
+        />
       </div>
     </div>
   );
