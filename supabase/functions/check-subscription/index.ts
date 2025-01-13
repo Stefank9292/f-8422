@@ -21,8 +21,19 @@ serve(async (req) => {
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       console.error('No authorization header found');
-      throw new Error('No authorization header');
+      return new Response(
+        JSON.stringify({ error: 'No authorization header' }),
+        { 
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
     }
+
+    console.log('Received request with auth header:', authHeader.substring(0, 20) + '...');
 
     // Create Supabase client with service role key
     const supabaseAdmin = createClient(
@@ -44,7 +55,10 @@ serve(async (req) => {
     if (authError || !user) {
       console.error('Auth error:', authError);
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ 
+          error: 'Unauthorized',
+          details: authError?.message 
+        }),
         { 
           status: 401,
           headers: {
@@ -67,7 +81,19 @@ serve(async (req) => {
 
     if (subscriptionError) {
       console.error('Error fetching subscription:', subscriptionError);
-      throw subscriptionError;
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to fetch subscription data',
+          details: subscriptionError.message 
+        }),
+        { 
+          status: 500,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
     }
 
     const subscription = subscriptionData?.[0];
@@ -102,7 +128,8 @@ serve(async (req) => {
     
     return new Response(
       JSON.stringify({
-        error: error instanceof Error ? error.message : 'An unexpected error occurred'
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        details: error instanceof Error ? error.stack : undefined
       }),
       { 
         status: error instanceof Error && error.message === 'Unauthorized' ? 401 : 500,
