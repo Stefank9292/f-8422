@@ -13,6 +13,11 @@ export interface InstagramPost {
   videoUrl?: string;
   timestamp?: string;
   productType?: string;
+  type?: string;  // Added to support different post types
+  hashtags?: string[];  // Added to match transformer
+  mentions?: string[];  // Added to match transformer
+  ownerId?: string;    // Added to match transformer
+  locationName?: string; // Added to match transformer
 }
 
 export interface SearchResultItem {
