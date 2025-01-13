@@ -183,7 +183,7 @@ const SearchHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pt-24 md:pt-28 pb-8 md:pb-12">
+    <div className="min-h-screen bg-background md:pt-12 pt-24 pb-8 md:pb-12">
       <div className="container max-w-5xl mx-auto px-4 md:px-6 space-y-6 md:space-y-8">
         <SearchHistoryHeader 
           onDeleteAll={handleDeleteAll}
