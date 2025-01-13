@@ -1,138 +1,107 @@
-import { BookOpen, AlertCircle, CheckCircle, Mail } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+
+const faqItems = [
+  {
+    category: "general",
+    question: "Do you need access to my Account?",
+    answer: "No, all features are available without the need of logging in your Instagram account."
+  },
+  {
+    category: "billing",
+    question: "What is your cancellation policy?",
+    answer: "Our goal is to make you happy. You can cancel at any time and won't be billed for subsequent months. No hard feelings."
+  },
+  {
+    category: "billing",
+    question: "What are my payment options?",
+    answer: "We accept all major credit cards."
+  },
+  {
+    category: "billing",
+    question: "What currency are your prices in?",
+    answer: "Our prices are in USD."
+  },
+  {
+    category: "billing",
+    question: "Can I change my plan?",
+    answer: "You can change your plan at any time!"
+  },
+  {
+    category: "features",
+    question: "Do you have a referral plan?",
+    answer: "We currently do not have a referral program, but plan to add one in the near future."
+  },
+  {
+    category: "technical",
+    question: "Can I use VyralSearch on my phone?",
+    answer: "Yes! Our platform supports all common devices with a web browser."
+  },
+  {
+    category: "technical",
+    question: "My search came up with no results. What happened?",
+    answer: "Although our software is incredibly awesome, it has its limits. We aren't able to search private accounts, so please make sure you are only searching public profiles."
+  },
+  {
+    category: "features",
+    question: "Do I need to give credit to the owner of content I'm reposting?",
+    answer: "Some accounts get away with doing this. We highly advise against it. Our platform will provide you with all the users tagged in the content. Sometimes there will be multiple users on that list. You can feel free to only tag the original poster in those cases."
+  }
+];
 
 const HelpCenter = () => {
-  const { data: session } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
-    },
-  });
-
-  const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status'],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`
-        }
-      });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.access_token,
-  });
-
-  const showSupport = subscriptionStatus?.subscribed;
-
   return (
-    <div className="min-h-screen py-6 md:py-8 px-4 bg-background">
-      <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
+      <div className="container max-w-4xl mx-auto px-4 space-y-6 md:space-y-8">
         <div className="space-y-2">
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Help Center</h1>
           <p className="text-sm text-muted-foreground">
-            Find guides and tutorials to help you get the most out of VyralSearch
+            Get help with using our platform
           </p>
         </div>
 
-        <div className="relative rounded-xl overflow-hidden border">
-          <AspectRatio ratio={16 / 9}>
-            <iframe
-              src="https://www.youtube.com/embed/vag-IdUeWyk"
-              title="VyralSearch Tutorial Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-              aria-label="VyralSearch tutorial video showing how to use the application"
-            />
-          </AspectRatio>
-        </div>
-
-        <Accordion type="single" collapsible className="w-full space-y-2">
-          <AccordionItem value="getting-started" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-sm font-medium">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                Getting Started
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground">
-              <div className="space-y-4">
-                <p className="font-medium text-foreground">Welcome to VyralSearch</p>
-                <div className="space-y-2">
-                  <p>Get started with our platform in three simple steps:</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>Enter an Instagram username or profile URL</li>
-                    <li>Configure your search settings (optional)</li>
-                    <li>Click "Search Viral Videos" to start analyzing</li>
-                  </ul>
-                </div>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="known-issues" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-destructive" />
-                Known Issues
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-2">
-                <p className="font-medium text-foreground">Make sure to search properly:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Private Instagram accounts cannot be searched</li>
-                  <li>Some videos may have limited metadata available</li>
-                  <li>Historical data beyond 90 days may be incomplete</li>
-                </ul>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="best-practices" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                Best Practices
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-2">
-                <p className="font-medium text-foreground">Try these tips to get the best results:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Use specific usernames rather than broad searches</li>
-                  <li>Filter results by engagement rates for better insights</li>
-                  <li>Regularly monitor successful accounts</li>
-                </ul>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-
-        {showSupport && (
-          <div className="border rounded-lg p-6 space-y-4">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold">Need More Help?</h2>
-              <p className="text-sm text-muted-foreground">
-                Our support team is here to help. Get in touch with us directly.
-              </p>
-            </div>
-            <Button 
-              variant="default" 
-              onClick={() => window.location.href = 'mailto:support@vyralsearch.com'}
-              className="w-full sm:w-auto"
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-2 bg-transparent h-auto p-0 mb-6 md:mb-8">
+            <TabsTrigger 
+              value="all" 
+              className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <Mail className="mr-2 h-4 w-4" />
-              Contact Support
-            </Button>
-          </div>
-        )}
+              All Questions
+            </TabsTrigger>
+            {["general", "billing", "features", "technical"].map((category) => (
+              <TabsTrigger
+                key={category}
+                value={category}
+                className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
+              >
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+
+          {["all", "general", "billing", "features", "technical"].map((tab) => (
+            <TabsContent key={tab} value={tab} className="mt-0">
+              <Accordion type="single" collapsible className="w-full space-y-2">
+                {faqItems
+                  .filter((item) => tab === "all" || item.category === tab)
+                  .map((item, index) => (
+                    <AccordionItem 
+                      key={index} 
+                      value={`item-${index}`} 
+                      className="border rounded-lg px-4"
+                    >
+                      <AccordionTrigger className="text-sm font-medium text-left">
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground text-left">
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+              </Accordion>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );

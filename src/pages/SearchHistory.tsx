@@ -183,33 +183,35 @@ const SearchHistory = () => {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto py-6 md:py-8 px-4 space-y-6 md:space-y-8">
-      <SearchHistoryHeader 
-        onDeleteAll={handleDeleteAll}
-        isDeletingAll={isDeletingAll}
-        hasHistory={searchHistory && searchHistory.length > 0}
-        isSteroidsUser={isSteroidsUser}
-        totalSearches={searchHistory?.length || 0}
-      />
-      
-      {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
-        <div className="relative w-full max-w-md mx-auto mb-6">
-          <Input
-            type="text"
-            placeholder="Search by username..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-10"
-          />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
-      )}
-      
-      <SearchHistoryList 
-        searchHistory={filteredHistory || []}
-        onDelete={handleDelete}
-        isDeleting={isDeleting}
-      />
+    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
+      <div className="container max-w-5xl mx-auto px-4 space-y-6 md:space-y-8">
+        <SearchHistoryHeader 
+          onDeleteAll={handleDeleteAll}
+          isDeletingAll={isDeletingAll}
+          hasHistory={searchHistory && searchHistory.length > 0}
+          isSteroidsUser={isSteroidsUser}
+          totalSearches={searchHistory?.length || 0}
+        />
+        
+        {searchHistory && searchHistory.length > 0 && isSteroidsUser && (
+          <div className="relative w-full max-w-md mx-auto">
+            <Input
+              type="text"
+              placeholder="Search by username..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-10"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          </div>
+        )}
+        
+        <SearchHistoryList 
+          searchHistory={filteredHistory || []}
+          onDelete={handleDelete}
+          isDeleting={isDeleting}
+        />
+      </div>
     </div>
   );
 };

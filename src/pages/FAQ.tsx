@@ -51,8 +51,8 @@ const faqItems = [
 
 const FAQ = () => {
   return (
-    <div className="min-h-screen py-6 md:py-8 px-4 bg-background">
-      <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
+      <div className="container max-w-3xl mx-auto px-4 space-y-6 md:space-y-8">
         <div className="space-y-2">
           <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Frequently Asked Questions</h1>
           <p className="text-sm text-muted-foreground">
