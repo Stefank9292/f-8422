@@ -4,7 +4,7 @@ import { TikTokRecentSearches } from "./TikTokRecentSearches";
 
 export const TikTokSearchGroup = () => {
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <TikTokSearchSettings
         isSettingsOpen={false}
         setIsSettingsOpen={() => {}}
