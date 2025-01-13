@@ -68,10 +68,10 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
           <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
-      <div className="bg-background rounded-md p-4">
-        <pre className="whitespace-pre-wrap text-sm md:text-base">
+      <div className="bg-muted rounded-lg p-4">
+        <div className="text-sm md:text-base leading-relaxed">
           {variation}
-        </pre>
+        </div>
       </div>
     </Card>
   );
