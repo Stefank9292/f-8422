@@ -37,14 +37,19 @@ export function SidebarSection({
 
   return (
     <div className="space-y-2 py-2">
-      <div className={cn("flex items-center justify-between px-4 py-2", isCollapsed ? "h-auto" : "h-[40px]")}>
-        <span className={cn("text-[11px] text-sidebar-foreground/70 transition-all duration-200", isCollapsed ? "opacity-0 hidden" : "opacity-100")}>
+      <div className={cn(
+        "flex items-center px-5 py-2",
+        isCollapsed ? "h-auto" : "h-[40px]"
+      )}>
+        <span className={cn(
+          "text-[11px] font-medium text-sidebar-foreground/60 transition-all duration-200",
+          isCollapsed ? "opacity-0 hidden" : "opacity-100"
+        )}>
           {title}
         </span>
       </div>
-      <nav className="space-y-1 px-2">
+      <nav className="space-y-1 px-3">
         {items.map((item) => {
-          // Skip rendering if showWhen condition is defined and returns false
           if (item.showWhen && !item.showWhen(subscriptionStatus)) {
             return null;
           }
@@ -57,12 +62,12 @@ export function SidebarSection({
                     onClick={item.onClick || (item.url ? () => onNavigate(item.url!) : undefined)}
                     isActive={item.url ? currentPath === item.url : false}
                     className={cn(
-                      "w-full px-2 py-1.5 rounded-md flex items-center gap-2 text-[11px] transition-colors group relative",
+                      "w-full px-3 py-2 rounded-lg flex items-center gap-3 text-[11px] transition-all duration-200 group relative hover:bg-sidebar-accent/10",
                       item.className
                     )}
                   >
-                    <item.icon className="h-3.5 w-3.5" />
-                    <span>{item.title}</span>
+                    <item.icon className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                    <span className="font-medium">{item.title}</span>
                     {item.badge && (
                       <Badge 
                         variant="secondary" 
@@ -78,7 +83,7 @@ export function SidebarSection({
                 </TooltipTrigger>
                 <TooltipContent 
                   side="right" 
-                  className="text-xs"
+                  className="text-xs font-medium"
                   hidden={!isCollapsed}
                 >
                   {item.title}
