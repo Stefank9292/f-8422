@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ReadabilityScore } from "./components/ReadabilityScore";
-import { ContentSection } from "./components/ContentSection";
 
 interface ScriptVariationProps {
   variation: string;
@@ -26,62 +25,6 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
     
     const finalScore = Math.round((sentenceScore + wordScore) / 2);
     return Math.min(100, Math.max(0, finalScore));
-  };
-
-  const formatContent = (text: string) => {
-    const cleanText = text
-      .replace(/\*\*/g, '')
-      .replace(/###/g, '')
-      .trim();
-
-    const sections = {
-      hooks: [] as string[],
-      videoScript: '',
-      caption: '',
-      cta: '',
-      explanation: ''
-    };
-
-    const lines = cleanText.split('\n');
-    let currentSection = '';
-
-    lines.forEach((line) => {
-      const trimmedLine = line.trim();
-      
-      if (trimmedLine === 'Hooks') {
-        currentSection = 'hooks';
-      } else if (trimmedLine === 'Video Script:') {
-        currentSection = 'videoScript';
-      } else if (trimmedLine === 'Caption') {
-        currentSection = 'caption';
-      } else if (trimmedLine === 'CTA') {
-        currentSection = 'cta';
-      } else if (trimmedLine === 'Explanation of Script') {
-        currentSection = 'explanation';
-      } else if (trimmedLine) {
-        if (currentSection === 'hooks' && /^\d\./.test(trimmedLine)) {
-          sections.hooks.push(trimmedLine.replace(/^\d\.\s*/, '').trim());
-        } else if (currentSection === 'videoScript') {
-          sections.videoScript += (sections.videoScript ? '\n' : '') + trimmedLine;
-        } else if (currentSection === 'caption') {
-          sections.caption += (sections.caption ? '\n' : '') + trimmedLine;
-        } else if (currentSection === 'cta') {
-          sections.cta += (sections.cta ? '\n' : '') + trimmedLine;
-        } else if (currentSection === 'explanation') {
-          sections.explanation += (sections.explanation ? '\n' : '') + trimmedLine;
-        }
-      }
-    });
-
-    return (
-      <div className="space-y-6">
-        <ContentSection title="Hooks" content={sections.hooks} type="hooks" />
-        <ContentSection title="Video Script" content={sections.videoScript} />
-        <ContentSection title="Caption" content={sections.caption} />
-        <ContentSection title="Call to Action" content={sections.cta} />
-        <ContentSection title="Explanation" content={sections.explanation} />
-      </div>
-    );
   };
 
   const handleCopyToClipboard = async () => {
@@ -125,8 +68,10 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
           <span className="ml-1.5 md:ml-2">{copied ? "Copied!" : "Copy"}</span>
         </Button>
       </div>
-      <div className="bg-background rounded-md">
-        {formatContent(variation)}
+      <div className="bg-background rounded-md p-4">
+        <pre className="whitespace-pre-wrap text-sm md:text-base">
+          {variation}
+        </pre>
       </div>
     </Card>
   );
