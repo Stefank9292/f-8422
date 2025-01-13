@@ -12,6 +12,9 @@ import { useState, useRef, useEffect } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { usePlatformStore } from "@/store/platformStore";
+import { TikTokSearchBar } from "./tiktok/TikTokSearchBar";
+import { TikTokSearchSettings } from "./tiktok/TikTokSearchSettings";
 
 interface SearchContainerProps {
   username: string;
@@ -39,6 +42,7 @@ export const SearchContainer = ({
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
+  const { platform } = usePlatformStore();
   const { 
     setUsername,
     numberOfVideos,
@@ -47,7 +51,11 @@ export const SearchContainer = ({
     setSelectedDate,
     filters,
     setFilters,
-    resetFilters
+    resetFilters,
+    dateRange,
+    setDateRange,
+    location,
+    setLocation,
   } = useSearchStore();
 
   useEffect(() => {
@@ -65,7 +73,7 @@ export const SearchContainer = ({
     if (!username.trim()) {
       toast({
         title: "Error",
-        description: "Please enter an Instagram username",
+        description: "Please enter a username",
         variant: "destructive",
       });
       return;
@@ -102,14 +110,24 @@ export const SearchContainer = ({
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
-        <SearchBar
-          username={username}
-          onSearch={onSearchClick}
-          onBulkSearch={handleBulkSearch}
-          isLoading={isLoading || isBulkSearching}
-          onUsernameChange={setUsername}
-          hasReachedLimit={hasReachedLimit}
-        />
+        {platform === 'instagram' ? (
+          <SearchBar
+            username={username}
+            onSearch={onSearchClick}
+            onBulkSearch={handleBulkSearch}
+            isLoading={isLoading || isBulkSearching}
+            onUsernameChange={setUsername}
+            hasReachedLimit={hasReachedLimit}
+          />
+        ) : (
+          <TikTokSearchBar
+            username={username}
+            onSearch={onSearchClick}
+            isLoading={isLoading}
+            onUsernameChange={setUsername}
+            hasReachedLimit={hasReachedLimit}
+          />
+        )}
 
         <Button 
           onClick={onSearchClick}
@@ -145,15 +163,27 @@ export const SearchContainer = ({
           )}
         </Button>
 
-        <SearchSettings
-          isSettingsOpen={isSettingsOpen}
-          setIsSettingsOpen={setIsSettingsOpen}
-          numberOfVideos={numberOfVideos}
-          setNumberOfVideos={setNumberOfVideos}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
-          disabled={isLoading || isBulkSearching}
-        />
+        {platform === 'instagram' ? (
+          <SearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            disabled={isLoading || isBulkSearching}
+          />
+        ) : (
+          <TikTokSearchSettings
+            isSettingsOpen={isSettingsOpen}
+            setIsSettingsOpen={setIsSettingsOpen}
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            location={location}
+            setLocation={setLocation}
+            disabled={isLoading}
+          />
+        )}
 
         <RecentSearches onSelect={setUsername} />
       </div>
