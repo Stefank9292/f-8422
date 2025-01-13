@@ -1,5 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders } from "../_shared/cors.ts"
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 console.log("TikTok scraper function started")
 
@@ -86,7 +90,7 @@ serve(async (req) => {
         likesCount: likes,
         commentsCount: comments,
         sharesCount: shares,
-        engagement: engagement,
+        engagement: `${engagement}%`,
         url: post.postPage || `https://www.tiktok.com/@${cleanUsername}/video/${post.id}`,
         videoUrl: post["video.url"] || '',
         thumbnailUrl: post["video.cover"] || post["video.thumbnail"] || '',
