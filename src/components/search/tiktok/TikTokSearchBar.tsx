@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { usePlaceholderAnimation } from "../PlaceholderAnimation";
+import { useToast } from "@/hooks/use-toast";
 
 interface TikTokSearchBarProps {
   username: string;
@@ -19,12 +20,57 @@ export const TikTokSearchBar = ({
   hasReachedLimit = false
 }: TikTokSearchBarProps) => {
   const placeholder = usePlaceholderAnimation();
+  const { toast } = useToast();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !isLoading && username.trim() && !hasReachedLimit) {
       e.preventDefault();
       onSearch();
     }
+  };
+
+  const validateTikTokUsername = (input: string) => {
+    // Remove @ symbol if present
+    const cleanInput = input.replace('@', '');
+    
+    // Check if it's a URL
+    if (input.includes('http') || input.includes('www.')) {
+      // Check if it's a TikTok URL
+      if (!input.includes('tiktok.com')) {
+        toast({
+          title: "Invalid URL",
+          description: "Please enter a TikTok URL (e.g., https://tiktok.com/@username) or just the username",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      const urlPattern = /^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@?([a-zA-Z0-9._]+)\/?$/;
+      const match = input.match(urlPattern);
+      if (!match) {
+        toast({
+          title: "Invalid TikTok URL",
+          description: "Please enter a valid TikTok profile URL",
+          variant: "destructive",
+        });
+        return false;
+      }
+      onUsernameChange(match[1]); // Extract username from URL
+      return true;
+    }
+    
+    // If it's just a username
+    const usernamePattern = /^[a-zA-Z0-9._]+$/;
+    if (!usernamePattern.test(cleanInput)) {
+      toast({
+        title: "Invalid Username",
+        description: "Username can only contain letters, numbers, dots, and underscores",
+        variant: "destructive",
+      });
+      return false;
+    }
+    onUsernameChange(cleanInput);
+    return true;
   };
 
   return (
@@ -36,7 +82,7 @@ export const TikTokSearchBar = ({
                  focus:border-[#D946EF] shadow-sm
                  placeholder:text-gray-400 dark:placeholder:text-gray-600"
         value={username}
-        onChange={(e) => onUsernameChange(e.target.value)}
+        onChange={(e) => validateTikTokUsername(e.target.value)}
         onKeyDown={handleKeyDown}
         disabled={isLoading || hasReachedLimit}
       />
