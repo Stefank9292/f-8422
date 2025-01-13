@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Copy, Download, ExternalLink } from "lucide-react";
 import { usePlatformStore } from "@/store/platformStore";
+import { format } from "date-fns";
 
 interface PostTableRowProps {
   post: any;
@@ -41,7 +42,7 @@ export const PostTableRow = ({
         likes: post.likesCount || 0,
         shares: post.sharesCount || 0,
         comments: post.commentsCount || 0,
-        date: post.date || '',
+        date: post.date ? format(new Date(post.date), 'dd-MM-yyyy') : '',
         externalUrl: post.url || '',
         downloadUrl: post.videoUrl || '',
         plays: post.playsCount || post.viewsCount || 0 // TikTok uses viewsCount
@@ -54,7 +55,7 @@ export const PostTableRow = ({
       likes: post.likesCount || 0,
       plays: post.playsCount || 0,
       comments: post.commentsCount || 0,
-      date: post.date || '',
+      date: post.date ? format(new Date(post.date), 'dd-MM-yyyy') : '',
       externalUrl: post.url || '',
       downloadUrl: post.videoUrl || ''
     };
