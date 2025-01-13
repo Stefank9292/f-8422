@@ -1,13 +1,7 @@
-import { format } from "date-fns";
-import { ChevronDown, ChevronUp, Trash2, List, Copy } from "lucide-react";
+import { Instagram, TikTok, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { isTikTokUrl } from "@/utils/tiktok/validation";
+import { formatDistanceToNow } from "date-fns";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -30,108 +24,49 @@ export function SearchHistoryItemHeader({
   onDelete,
   isDeleting,
   isBulkSearch,
-  urls = []
+  urls
 }: SearchHistoryItemHeaderProps) {
-  const { toast } = useToast();
-  
-  // Extract username from Instagram URL
-  const extractUsername = (url: string): string => {
-    try {
-      const username = url.split('instagram.com/')[1]?.split('/')[0];
-      return username ? username.replace('@', '') : query;
-    } catch {
-      return query;
-    }
-  };
-
-  const handleCopyUrls = () => {
-    if (urls.length) {
-      navigator.clipboard.writeText(urls.join('\n'));
-      toast({
-        description: "URLs copied to clipboard",
-      });
-    }
-  };
-
-  // Clean up the query to display as username
-  const cleanQuery = query.replace('https://www.instagram.com/', '').replace('https://instagram.com/', '').replace('/', '');
-  const displayQuery = cleanQuery.startsWith('@') ? cleanQuery : `@${cleanQuery}`;
+  const timeAgo = formatDistanceToNow(new Date(date), { addSuffix: true });
+  const isTikTok = isTikTokUrl(query);
 
   return (
-    <div className="p-4 rounded-lg border bg-card text-card-foreground hover:bg-accent/50 transition-colors">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          {isBulkSearch && (
-            <HoverCard>
-              <HoverCardTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <List className="h-4 w-4 text-muted-foreground" />
-                  <span className="sr-only">View bulk search URLs</span>
-                </Button>
-              </HoverCardTrigger>
-              <HoverCardContent className="w-80 p-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-semibold">Bulk Search URLs ({urls.length})</h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={handleCopyUrls}
-                    >
-                      <Copy className="h-4 w-4" />
-                      <span className="sr-only">Copy URLs</span>
-                    </Button>
-                  </div>
-                  <div className="space-y-0.5">
-                    {urls.map((url, index) => (
-                      <p key={index} className="text-xs text-muted-foreground">
-                        @{extractUsername(url)}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-              </HoverCardContent>
-            </HoverCard>
+    <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border/50">
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleExpand}
+          className="flex items-center gap-3 hover:opacity-70 transition-opacity"
+        >
+          {isTikTok ? (
+            <TikTok className="w-4 h-4 text-[#ff0050]" />
+          ) : (
+            <Instagram className="w-4 h-4 text-[#E1306C]" />
           )}
-          <div className="font-medium truncate flex items-center">
-            <span className="inline-flex items-center">
-              {displayQuery}
-            </span>
-          </div>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            {format(new Date(date), 'MMM d, HH:mm')}
+          <span className="text-sm font-medium">
+            {query}
           </span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
-            ({resultsCount})
+          <span className="text-xs text-muted-foreground">
+            {timeAgo}
           </span>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleExpand}
-            className={cn(
-              "h-8 w-8 p-0 transition-transform duration-200",
-              isExpanded && "bg-accent"
-            )}
-          >
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onDelete}
-            disabled={isDeleting}
-            className="h-8 w-8 p-0"
-          >
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
+          <span className="text-xs text-muted-foreground">
+            {resultsCount} results
+          </span>
+        </button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8"
+          onClick={onDelete}
+          disabled={isDeleting}
+        >
+          {isDeleting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive transition-colors" />
+          )}
+        </Button>
       </div>
     </div>
   );
