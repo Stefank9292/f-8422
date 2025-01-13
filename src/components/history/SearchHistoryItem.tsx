@@ -27,10 +27,11 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const [filters, setFilters] = useState<FilterState>({
     postsNewerThan: "",
     minViews: "",
+    minPlays: "",
     minLikes: "",
     minComments: "",
     minEngagement: "",
-    minShares: "",
+    minShares: "",  // Added this field
   });
 
   // Filter for valid clips only
@@ -58,10 +59,11 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     setFilters({
       postsNewerThan: "",
       minViews: "",
+      minPlays: "",
       minLikes: "",
       minComments: "",
       minEngagement: "",
-      minShares: "",
+      minShares: "",  // Added this field
     });
     setCurrentPage(1);
   };

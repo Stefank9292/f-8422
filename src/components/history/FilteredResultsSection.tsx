@@ -64,9 +64,6 @@ export function FilteredResultsSection({
     } else if (sortKey === 'engagement') {
       valueA = parseFloat((valueA as string).replace('%', ''));
       valueB = parseFloat((valueB as string).replace('%', ''));
-    } else if (sortKey === 'shares' && platform === 'tiktok') {
-      valueA = Number(valueA) || 0;
-      valueB = Number(valueB) || 0;
     } else if (typeof valueA === 'number' && typeof valueB === 'number') {
       // No conversion needed for numbers
     } else {

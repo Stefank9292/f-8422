@@ -1,4 +1,4 @@
-import { Calendar, Eye, Heart, MessageCircle, Zap } from "lucide-react";
+import { Calendar, Eye, Play, Heart, MessageCircle, Zap } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
@@ -6,11 +6,11 @@ import { useState } from "react";
 
 interface FiltersType {
   minViews: string;
+  minPlays: string;
   minLikes: string;
   minComments: string;
   minEngagement: string;
   postsNewerThan: string;
-  minShares: string;
 }
 
 interface SearchFiltersProps {
@@ -48,6 +48,14 @@ export const SearchFilters = ({
       value: filters.minViews,
       onChange: (value: string) => onFilterChange('minViews', value),
       placeholder: "e.g. 10000",
+      type: "number"
+    },
+    {
+      icon: Play,
+      label: "Min. Plays",
+      value: filters.minPlays,
+      onChange: (value: string) => onFilterChange('minPlays', value),
+      placeholder: "e.g. 5000",
       type: "number"
     },
     {
