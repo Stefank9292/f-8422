@@ -50,12 +50,12 @@ export function SidebarNavigation() {
         </TooltipProvider>
       </div>
       <div className={cn(
-        "mt-2",
+        "mt-2 px-1",
         isCollapsed ? "hidden" : "block"
       )}>
-        <span className="inline-block px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D]">
+        <div className="instagram-gradient text-[13px] font-medium text-white rounded-lg py-1.5 px-3 text-center shadow-sm hover:opacity-95 transition-opacity">
           Video Research on Steroids
-        </span>
+        </div>
       </div>
     </div>
   );
