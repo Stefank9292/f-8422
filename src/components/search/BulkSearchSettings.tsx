@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock } from "lucide-react";
+import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock, MapPin } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
@@ -9,6 +9,8 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { isTikTokUrl } from "@/utils/tiktok/validation";
 
 interface BulkSearchSettingsProps {
   isSettingsOpen: boolean;
@@ -18,7 +20,10 @@ interface BulkSearchSettingsProps {
   selectedDate: Date | undefined;
   setSelectedDate: (date: Date | undefined) => void;
   disabled?: boolean;
+  urls?: string[];
 }
+
+type DateRange = "DEFAULT" | "ALL_TIME" | "YESTERDAY" | "THIS_WEEK" | "THIS_MONTH" | "LAST_THREE_MONTHS";
 
 export const BulkSearchSettings = ({
   isSettingsOpen,
@@ -28,10 +33,15 @@ export const BulkSearchSettings = ({
   selectedDate,
   setSelectedDate,
   disabled = false,
+  urls = [],
 }: BulkSearchSettingsProps) => {
   const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
+  const [dateRange, setDateRange] = useState<DateRange>("DEFAULT");
+  const [location, setLocation] = useState("US");
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  const isTikTok = urls.some(url => isTikTokUrl(url));
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -49,7 +59,6 @@ export const BulkSearchSettings = ({
     },
   });
 
-  // Update local number of videos when subscription changes
   useEffect(() => {
     const maxVideos = getMaxVideos();
     if (localNumberOfVideos > maxVideos) {
@@ -77,6 +86,14 @@ export const BulkSearchSettings = ({
 
   const handleSliderPointerUp = () => {
     setNumberOfVideos(localNumberOfVideos);
+  };
+
+  const handleDateRangeChange = (value: DateRange) => {
+    setDateRange(value);
+    // Clear the calendar date when using predefined ranges for TikTok
+    if (isTikTok) {
+      setSelectedDate(undefined);
+    }
   };
 
   return (
@@ -127,7 +144,7 @@ export const BulkSearchSettings = ({
           <div className="space-y-2">
             <div className="flex items-center gap-1">
               <CalendarIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500" />
-              <span className="text-[10px] sm:text-[11px] font-medium">Posts newer than</span>
+              <span className="text-[10px] sm:text-[11px] font-medium">Date Range</span>
               {isFreeUser && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -138,47 +155,79 @@ export const BulkSearchSettings = ({
                   </TooltipContent>
                 </Tooltip>
               )}
-              {!isFreeUser && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[9px] sm:text-[10px]">Limited to posts from the last 90 days</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full h-8 justify-start text-[10px] sm:text-[11px] font-normal",
-                    !selectedDate && "text-muted-foreground",
-                    isFreeUser && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={disabled || isFreeUser}
-                >
-                  {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              {!isFreeUser && (
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) =>
-                      date > new Date() || date < ninetyDaysAgo
-                    }
-                    initialFocus
-                    className="rounded-lg border shadow-sm"
-                  />
-                </PopoverContent>
-              )}
-            </Popover>
+            {isTikTok ? (
+              <Select
+                value={dateRange}
+                onValueChange={(value) => handleDateRangeChange(value as DateRange)}
+                disabled={disabled || isFreeUser}
+              >
+                <SelectTrigger className="w-full h-8 text-[10px] sm:text-[11px]">
+                  <SelectValue placeholder="Select date range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DEFAULT">Default</SelectItem>
+                  <SelectItem value="ALL_TIME">All Time</SelectItem>
+                  <SelectItem value="YESTERDAY">Yesterday</SelectItem>
+                  <SelectItem value="THIS_WEEK">This Week</SelectItem>
+                  <SelectItem value="THIS_MONTH">This Month</SelectItem>
+                  <SelectItem value="LAST_THREE_MONTHS">Last Three Months</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-8 justify-start text-[10px] sm:text-[11px] font-normal",
+                      !selectedDate && "text-muted-foreground",
+                      isFreeUser && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={disabled || isFreeUser}
+                  >
+                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                {!isFreeUser && (
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) =>
+                        date > new Date() || date < ninetyDaysAgo
+                      }
+                      initialFocus
+                      className="rounded-lg border shadow-sm"
+                    />
+                  </PopoverContent>
+                )}
+              </Popover>
+            )}
           </div>
+
+          {isTikTok && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500" />
+                <span className="text-[10px] sm:text-[11px] font-medium">Location</span>
+              </div>
+              <Select
+                value={location}
+                onValueChange={setLocation}
+                disabled={disabled}
+              >
+                <SelectTrigger className="w-full h-8 text-[10px] sm:text-[11px]">
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="US">United States</SelectItem>
+                  <SelectItem value="DE">Germany</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
       )}
     </div>
