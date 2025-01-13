@@ -1,5 +1,4 @@
-import { X, Instagram, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
-import { TikTokIcon } from "@/components/icons/TikTokIcon";
+import { X, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -80,19 +79,15 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
   const extractUsername = (query: string, searchType: string): string => {
     if (searchType === 'tiktok_search' || searchType === 'bulk_tiktok_search') {
-      // Handle TikTok URL format
       if (query.includes('tiktok.com/@')) {
         return query.split('@')[1]?.split('/')[0] || query;
       }
-      // Handle plain TikTok username
       return query.replace('@', '');
     }
     
-    // Handle Instagram URL format
     if (query.includes('instagram.com/')) {
       return query.split('instagram.com/')[1]?.split('/')[0] || query;
     }
-    // Handle plain Instagram username
     return query;
   };
 
@@ -193,18 +188,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               query: search.search_query
             });
             
-            const isTikTokSearch = search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search';
-            
             return (
               <div
                 key={search.id}
                 className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
               >
-                {isTikTokSearch ? (
-                  <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
-                ) : (
-                  <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-                )}
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => onSelect(search.search_query)}
