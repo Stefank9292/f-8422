@@ -6,7 +6,7 @@ import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { SearchInput } from "./SearchInput";
 import { SearchButton } from "./SearchButton";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useSearchStore } from "@/store/searchStore";
 import { useToast } from "@/hooks/use-toast";
 import { usePlatformStore } from "@/store/platformStore";
