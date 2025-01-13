@@ -1,10 +1,7 @@
-import { Table, TableBody } from "@/components/ui/table";
-import { PostTableHeader } from "./TableHeader";
-import { PostTableRow } from "./TableRow";
-import { MobilePostRow } from "./MobilePostRow";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
+import { DesktopTableView } from "./table/DesktopTableView";
+import { MobileTableView } from "./table/MobileTableView";
 
 export type SortDirection = "asc" | "desc";
 
@@ -64,7 +61,6 @@ export const TableContent = ({
     }
     
     if (sortKey === 'engagement') {
-      // Convert engagement percentage strings to numbers for comparison
       const engagementA = parseFloat(a[sortKey].replace('%', ''));
       const engagementB = parseFloat(b[sortKey].replace('%', ''));
       return sortDirection === 'asc' ? engagementA - engagementB : engagementB - engagementA;
@@ -80,46 +76,24 @@ export const TableContent = ({
     return 0;
   });
 
-  if (isMobile) {
-    return (
-      <div className="space-y-4">
-        {sortedPosts.map((post, index) => (
-          <MobilePostRow
-            key={index}
-            post={post}
-            onCopyCaption={handleCopyCaption}
-            onDownload={handleDownload}
-            formatNumber={formatNumber}
-            truncateCaption={truncateCaption}
-          />
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <TooltipProvider>
-      <div className="rounded-xl overflow-hidden border border-border">
-        <Table>
-          <PostTableHeader 
-            onSort={handleSortInternal}
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-          />
-          <TableBody>
-            {sortedPosts.map((post, index) => (
-              <PostTableRow
-                key={index}
-                post={post}
-                onCopyCaption={handleCopyCaption}
-                onDownload={handleDownload}
-                formatNumber={formatNumber}
-                truncateCaption={truncateCaption}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </TooltipProvider>
+  return isMobile ? (
+    <MobileTableView
+      posts={sortedPosts}
+      handleCopyCaption={handleCopyCaption}
+      handleDownload={handleDownload}
+      formatNumber={formatNumber}
+      truncateCaption={truncateCaption}
+    />
+  ) : (
+    <DesktopTableView
+      posts={sortedPosts}
+      handleSort={handleSortInternal}
+      handleCopyCaption={handleCopyCaption}
+      handleDownload={handleDownload}
+      formatNumber={formatNumber}
+      truncateCaption={truncateCaption}
+      sortKey={sortKey}
+      sortDirection={sortDirection}
+    />
   );
 };
