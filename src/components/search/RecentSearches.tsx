@@ -1,4 +1,5 @@
 import { X, Instagram, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -77,10 +78,21 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     localStorage.setItem('recentSearchesCollapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
-  const extractUsername = (query: string): string => {
+  const extractUsername = (query: string, searchType: string): string => {
+    if (searchType === 'tiktok_search') {
+      // Handle TikTok URL format
+      if (query.includes('tiktok.com/@')) {
+        return query.split('@')[1]?.split('/')[0] || query;
+      }
+      // Handle plain TikTok username
+      return query.replace('@', '');
+    }
+    
+    // Handle Instagram URL format
     if (query.includes('instagram.com/')) {
       return query.split('instagram.com/')[1]?.split('/')[0] || query;
     }
+    // Handle plain Instagram username
     return query;
   };
 
@@ -94,7 +106,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       const { data, error } = await supabase
         .from('search_history')
-        .select('id, search_query, bulk_search_urls')
+        .select('id, search_query, search_type, bulk_search_urls')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(5);
@@ -106,7 +118,7 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
 
       return data.map(item => ({
         ...item,
-        search_query: extractUsername(item.search_query)
+        search_query: extractUsername(item.search_query, item.search_type)
       })) || [];
     },
     enabled: isSteroidsUser,
@@ -178,7 +190,11 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               key={search.id}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
-              <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+              {search.search_type === 'tiktok_search' ? (
+                <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
+              ) : (
+                <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+              )}
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onSelect(search.search_query)}
