@@ -148,7 +148,7 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
     return isTikTok ? (
       <TikTokIcon className="h-3 w-3 text-muted-foreground" />
     ) : (
-      <Instagram className="h-3 w-3 text-muted-foreground" />
+      <Instagram className="h-3 w-3 text-primary" />
     );
   };
 
