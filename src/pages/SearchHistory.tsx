@@ -1,17 +1,29 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { SearchHistoryHeader } from "@/components/history/SearchHistoryHeader";
 import { SearchHistoryList } from "@/components/history/SearchHistoryList";
+import { InstagramPost } from "@/types/instagram";
 import { Input } from "@/components/ui/input";
-import { useSearchHistory } from "@/hooks/useSearchHistory";
-import { useSearchHistoryActions } from "@/hooks/useSearchHistoryActions";
+import { transformSearchResults } from "@/utils/transformSearchResults";
+
+interface SearchHistoryResult {
+  id: string;
+  search_query: string;
+  created_at: string;
+  search_results?: Array<{ results: InstagramPost[] }>;
+}
 
 const SearchHistory = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Get session
+  // First, get the session
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -20,7 +32,6 @@ const SearchHistory = () => {
     },
   });
 
-  // Get subscription status
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status', session?.access_token],
     queryFn: async () => {
@@ -36,10 +47,125 @@ const SearchHistory = () => {
     enabled: !!session?.access_token,
   });
 
-  const { searchHistory, isLoading } = useSearchHistory(session?.user?.id);
-  const { isDeleting, isDeletingAll, handleDelete, handleDeleteAll } = 
-    useSearchHistoryActions(session?.user?.id);
+  useEffect(() => {
+    const channel = supabase
+      .channel('search_history_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'search_history'
+        },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['search-history'] });
+        }
+      )
+      .subscribe();
 
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
+  const { data: searchHistory, isLoading } = useQuery({
+    queryKey: ['search-history'],
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
+
+      const { data: historyData, error: historyError } = await supabase
+        .from('search_history')
+        .select(`
+          id,
+          search_query,
+          created_at,
+          search_results (
+            results
+          )
+        `)
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (historyError) {
+        console.error('Error fetching search history:', historyError);
+        throw historyError;
+      }
+
+      return historyData?.map(item => ({
+        id: item.id,
+        search_query: item.search_query,
+        created_at: item.created_at,
+        search_results: item.search_results?.map(sr => ({
+          results: transformSearchResults(sr as any).results
+        }))
+      })) as SearchHistoryResult[];
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!session?.user?.id) return;
+
+    try {
+      setIsDeleting(true);
+      const { error } = await supabase
+        .from('search_history')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', session.user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      
+      toast({
+        title: "Success",
+        description: "Search history item deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting search history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete search history item",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!session?.user?.id) return;
+
+    try {
+      setIsDeletingAll(true);
+      const { error } = await supabase
+        .from('search_history')
+        .delete()
+        .eq('user_id', session.user.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['search-history'] });
+      
+      toast({
+        title: "Success",
+        description: "All search history deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting all search history:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete all search history",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
+  // Update the isSteroidsUser check to use the correct price ID
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9";
 
   const filteredHistory = searchHistory?.filter(item =>

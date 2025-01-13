@@ -20,6 +20,8 @@ interface SearchHistoryItemProps {
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
+  const [sortKey, setSortKey] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState<FilterState>({
@@ -95,6 +97,15 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     }
   };
 
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+    } else {
+      setSortKey(key);
+      setSortDirection("desc");
+    }
+  };
+
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value));
     setCurrentPage(1);
@@ -103,6 +114,13 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   const filteredResults = filterResults(results, filters);
 
   const isBulkSearch = item.bulk_search_urls && item.bulk_search_urls.length > 0;
+
+  // Add console.log before the return statement
+  console.log('SearchHistoryItem data:', { 
+    query: item.search_query,
+    bulk_search_urls: item.bulk_search_urls,
+    isBulkSearch
+  });
 
   return (
     <div className="animate-fade-in">
@@ -133,6 +151,9 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
           handleDownload={handleDownload}
           formatNumber={(num) => num.toLocaleString()}
           truncateCaption={(caption) => caption.length > 15 ? `${caption.slice(0, 15)}...` : caption}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          handleSort={handleSort}
         />
       )}
     </div>

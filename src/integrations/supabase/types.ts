@@ -184,62 +184,6 @@ export type Database = {
         }
         Relationships: []
       }
-      tiktok_search_history: {
-        Row: {
-          created_at: string
-          id: string
-          location: string | null
-          search_query: string
-          search_type: Database["public"]["Enums"]["tiktok_search_type"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          location?: string | null
-          search_query: string
-          search_type?: Database["public"]["Enums"]["tiktok_search_type"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          location?: string | null
-          search_query?: string
-          search_type?: Database["public"]["Enums"]["tiktok_search_type"]
-          user_id?: string
-        }
-        Relationships: []
-      }
-      tiktok_search_results: {
-        Row: {
-          created_at: string
-          id: string
-          results: Json
-          search_history_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          results: Json
-          search_history_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          results?: Json
-          search_history_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tiktok_search_results_search_history_id_fkey"
-            columns: ["search_history_id"]
-            isOneToOne: false
-            referencedRelation: "tiktok_search_history"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_requests: {
         Row: {
           created_at: string
@@ -297,7 +241,6 @@ export type Database = {
         | "subscription_updated"
         | "subscription_cancelled"
       subscription_tier: "free" | "premium" | "ultra"
-      tiktok_search_type: "user_search" | "hashtag_search"
     }
     CompositeTypes: {
       [_ in never]: never
