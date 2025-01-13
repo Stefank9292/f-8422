@@ -7,10 +7,10 @@ import { AnnouncementBar } from "./AnnouncementBar";
 import { SearchInput } from "./SearchInput";
 import { SearchButton } from "./SearchButton";
 import { useRef, useEffect, useState } from "react";
-import { useSearchStore } from "@/store/searchStore";
+import { useSearchState } from "@/hooks/search/useSearchState";
+import { useFilterState } from "@/hooks/search/useFilterState";
+import { usePlatformState } from "@/hooks/search/usePlatformState";
 import { useToast } from "@/hooks/use-toast";
-import { usePlatformStore } from "@/store/platformStore";
-import { TikTokSearchSettings } from "./tiktok/TikTokSearchSettings";
 
 interface SearchContainerProps {
   username: string;
@@ -38,40 +38,20 @@ export const SearchContainer = ({
   const [hasScrolled, setHasScrolled] = useState(false);
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
-  const { platform } = usePlatformStore();
-  const { 
-    instagramUsername,
-    tiktokUsername,
-    setInstagramUsername,
-    setTiktokUsername,
-    numberOfVideos,
-    setNumberOfVideos,
-    selectedDate,
-    setSelectedDate,
-    filters,
-    setFilters,
-    resetFilters,
-    dateRange,
-    setDateRange,
-    location,
-    setLocation,
-  } = useSearchStore();
-
-  const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
-
+  const { platform, currentUsername } = usePlatformState();
+  const { filters, handleFilterChange, resetFilters } = useFilterState();
+  
   useEffect(() => {
-    // Only scroll if we have results, aren't loading, and haven't scrolled yet
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current && !hasScrolled) {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ 
           behavior: 'smooth',
           block: 'start'
         });
-        setHasScrolled(true); // Mark that we've scrolled
+        setHasScrolled(true);
       }, 100);
     }
     
-    // Reset the scroll flag when there are no results
     if (displayPosts.length === 0) {
       setHasScrolled(false);
     }
@@ -116,14 +96,14 @@ export const SearchContainer = ({
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         <SearchInput
-          instagramUsername={instagramUsername}
-          tiktokUsername={tiktokUsername}
+          instagramUsername={currentUsername}
+          tiktokUsername={currentUsername}
           onSearch={onSearchClick}
           onBulkSearch={handleBulkSearch}
           isLoading={isLoading}
           isBulkSearching={isBulkSearching}
-          setInstagramUsername={setInstagramUsername}
-          setTiktokUsername={setTiktokUsername}
+          setInstagramUsername={() => {}}
+          setTiktokUsername={() => {}}
           hasReachedLimit={hasReachedLimit}
         />
 
@@ -137,32 +117,14 @@ export const SearchContainer = ({
           onClick={onSearchClick}
         />
 
-        {platform === 'instagram' ? (
-          <SearchSettings
-            isSettingsOpen={isSettingsOpen}
-            setIsSettingsOpen={setIsSettingsOpen}
-            numberOfVideos={numberOfVideos}
-            setNumberOfVideos={setNumberOfVideos}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-            disabled={isLoading || isBulkSearching}
-          />
-        ) : (
-          <TikTokSearchSettings
-            isSettingsOpen={isSettingsOpen}
-            setIsSettingsOpen={setIsSettingsOpen}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            location={location}
-            setLocation={setLocation}
-            numberOfVideos={numberOfVideos}
-            setNumberOfVideos={setNumberOfVideos}
-            disabled={isLoading}
-          />
-        )}
+        <SearchSettings
+          isSettingsOpen={isSettingsOpen}
+          setIsSettingsOpen={setIsSettingsOpen}
+          disabled={isLoading || isBulkSearching}
+        />
 
         <RecentSearches 
-          onSelect={platform === 'instagram' ? setInstagramUsername : setTiktokUsername} 
+          onSelect={() => {}}
           onSearch={onSearchClick}
         />
       </div>
@@ -173,7 +135,7 @@ export const SearchContainer = ({
             <div className="rounded-xl sm:border sm:border-border/50 overflow-hidden">
               <SearchFilters
                 filters={filters}
-                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+                onFilterChange={handleFilterChange}
                 onReset={resetFilters}
                 totalResults={displayPosts.length}
                 filteredResults={displayPosts.length}
