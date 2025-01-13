@@ -51,7 +51,7 @@ export function SidebarNavigation() {
       </div>
       <div className={cn(
         "mt-1 flex justify-center",
-        isCollapsed ? "hidden" : "block"
+        isCollapsed ? "hidden" : "flex"
       )}>
         <div className="instagram-gradient text-[10px] font-medium text-white rounded-md py-0.5 px-2 inline-block shadow-sm hover:opacity-95 transition-opacity">
           Video Research on Steroids
