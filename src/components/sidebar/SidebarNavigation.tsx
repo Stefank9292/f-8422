@@ -13,12 +13,12 @@ export function SidebarNavigation() {
   return (
     <div className="px-2 py-4">
       <div className={cn(
-        "relative flex items-center",
-        isCollapsed ? "justify-center" : "justify-start"
+        "relative flex items-center justify-center",
+        isCollapsed ? "justify-center" : "justify-center"
       )}>
         <h1 className={cn(
           "text-xl font-bold bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] bg-clip-text text-transparent",
-          isCollapsed ? "text-center" : "text-left"
+          isCollapsed ? "text-center" : "text-center"
         )}>
           VyralSearch
         </h1>
@@ -28,8 +28,8 @@ export function SidebarNavigation() {
               <Badge 
                 variant="secondary" 
                 className={cn(
-                  "text-[11px] bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-2 py-0.5 rounded-lg font-medium cursor-help",
-                  isCollapsed ? "absolute -top-1 right-0" : "ml-2"
+                  "text-[9px] bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 shadow-sm border-none px-1.5 py-0 rounded-lg font-medium cursor-help",
+                  isCollapsed ? "absolute -top-1 right-0" : "ml-1.5"
                 )}
               >
                 BETA
@@ -50,10 +50,10 @@ export function SidebarNavigation() {
         </TooltipProvider>
       </div>
       <div className={cn(
-        "mt-1",
+        "mt-1 flex justify-center",
         isCollapsed ? "hidden" : "block"
       )}>
-        <div className="instagram-gradient text-[11px] font-medium text-white rounded-md py-0.5 px-2 inline-block shadow-sm hover:opacity-95 transition-opacity">
+        <div className="instagram-gradient text-[10px] font-medium text-white rounded-md py-0.5 px-2 inline-block shadow-sm hover:opacity-95 transition-opacity">
           Video Research on Steroids
         </div>
       </div>
