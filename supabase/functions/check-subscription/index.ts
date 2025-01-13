@@ -50,10 +50,11 @@ serve(async (req) => {
       }
     );
 
+    // Get the JWT token from the Authorization header
+    const token = authHeader.replace('Bearer ', '');
+
     // Verify the JWT token and get user
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !user) {
       console.error('Auth error:', authError);
