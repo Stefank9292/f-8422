@@ -125,10 +125,6 @@
     @apply bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] hover:opacity-90;
   }
 
-  .tiktok-button-primary {
-    @apply bg-black hover:bg-black/90 !important;
-  }
-
   .card-hover {
     @apply hover:scale-[1.02] transition-all duration-300 ease-spring;
   }
