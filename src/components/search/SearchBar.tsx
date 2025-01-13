@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlaceholderAnimation } from "./PlaceholderAnimation";
 import { BulkSearchButton } from "./BulkSearchButton";
+import { useToast } from "@/hooks/use-toast";
 
 interface SearchBarProps {
   username: string;
@@ -27,6 +28,7 @@ export const SearchBar = ({
   const [isBulkSearchOpen, setIsBulkSearchOpen] = useState(false);
   const placeholder = usePlaceholderAnimation();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: session } = useQuery({
     queryKey: ['session'],
@@ -58,6 +60,45 @@ export const SearchBar = ({
     }
   };
 
+  const validateInstagramUsername = (input: string) => {
+    // Remove @ symbol if present
+    const cleanInput = input.replace('@', '');
+    
+    // Check if it's a URL
+    if (input.includes('instagram.com')) {
+      const urlPattern = /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([a-zA-Z0-9._]+)\/?$/;
+      const match = input.match(urlPattern);
+      if (!match) {
+        toast({
+          title: "Invalid Instagram URL",
+          description: "Please enter a valid Instagram profile URL",
+          variant: "destructive",
+        });
+        return false;
+      }
+      onUsernameChange(match[1]); // Extract username from URL
+      return true;
+    }
+    
+    // If it's just a username
+    const usernamePattern = /^[a-zA-Z0-9._]+$/;
+    if (!usernamePattern.test(cleanInput)) {
+      toast({
+        title: "Invalid Username",
+        description: "Username can only contain letters, numbers, dots, and underscores",
+        variant: "destructive",
+      });
+      return false;
+    }
+    onUsernameChange(cleanInput);
+    return true;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    validateInstagramUsername(value);
+  };
+
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
     subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
     subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" || // Creator on Steroids Annual
@@ -75,7 +116,7 @@ export const SearchBar = ({
                    focus:border-[#D946EF] shadow-sm
                    placeholder:text-gray-400 dark:placeholder:text-gray-600"
           value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           disabled={isLoading || hasReachedLimit}
         />
