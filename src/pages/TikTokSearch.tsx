@@ -1,7 +1,7 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { SearchBar } from "@/components/search/SearchBar";
+import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 export default function TikTokSearch() {
@@ -9,33 +9,39 @@ export default function TikTokSearch() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = () => {
-    // Search functionality will be implemented later
+    // This will be implemented later when the TikTok search functionality is ready
     console.log("TikTok search for:", username);
+  };
+
+  const handleUsernameChange = (value: string) => {
+    setUsername(value);
   };
 
   return (
     <div className="container max-w-screen-xl mx-auto p-4 pt-20 md:pt-6 space-y-4">
       <Card className="p-6">
-        <div className="flex flex-col space-y-4">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <SearchBar
-                username={username}
-                onUsernameChange={setUsername}
-                onSearch={handleSearch}
-                isLoading={isLoading}
-              />
-            </div>
+        <h1 className="text-2xl font-bold mb-4">TikTok Search</h1>
+        <div className="max-w-xl mx-auto space-y-4">
+          <SearchBar
+            username={username}
+            onUsernameChange={handleUsernameChange}
+            onSearch={handleSearch}
+            isLoading={isLoading}
+          />
+          <div className="flex justify-center">
             <Button
               onClick={handleSearch}
               disabled={!username.trim() || isLoading}
-              className="w-full md:w-auto"
+              className="w-full max-w-[200px]"
             >
               <Search className="w-4 h-4 mr-2" />
               Search
             </Button>
           </div>
         </div>
+        <p className="text-muted-foreground mt-4 text-center">
+          Coming soon! This feature is currently under development.
+        </p>
       </Card>
     </div>
   );
