@@ -48,6 +48,9 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
     enabled: !!session?.access_token,
   });
 
+  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
+
   useEffect(() => {
     if (!isSteroidsUser) return;
 
@@ -137,9 +140,6 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
   };
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
-
-  const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
-                        subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
   if (!isSteroidsUser) {
     return (
