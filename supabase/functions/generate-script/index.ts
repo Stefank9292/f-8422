@@ -30,7 +30,44 @@ serve(async (req) => {
         },
         {
           role: "user",
-          content: `${text}\n\nTake this Transcription and create me a new script with 3 Hooks, a Video script, a caption for this new script, a CTA and an explanation why this script can work. Here is a provided Output structure where to put what. Please use just text without any bold or else. Dont explain to me why you did what, just generate the pieces and give me the output in provided structure:\n\nHooks\n\n1. [First Hook]\n\n2. [Second Hook]\n\n3. [Third Hook]\n\nVideo Script:\n\n[Video script here]\n\nCaption\n\n[Caption Text]\n\nCTA\n\n[CTA Text]\n\nExplanation of Script\n\n[Explanation Text]`
+          content: `Create a 30-second social media video script that feels like you're talking to a friend. The first sentence should spark curiosity, address self-interest, or provide new information. Use short, punchy sentences (10 words or less). Include as many imagery words (like tree, car, house) as possible. Connect ideas with linking words (like and, but, because). The script must follow this structure:
+
+Problem: Introduce an issue that the audience can relate to.
+Agitation: Dig deeper into the subconscious problem behind the issue.
+Solution: Offer a clear, easy solution to the problem.
+Call to Action (CTA): Encourage the audience to act or learn more.
+
+The tone should be friendly and human, as if you're chatting with a close friend. Avoid sounding like a sales pitch. Make it feel personal, warm, and relatable.
+
+Here is the content to transform:
+
+${text}
+
+Please provide the output in this structure:
+
+Hooks
+
+1. [First Hook]
+
+2. [Second Hook]
+
+3. [Third Hook]
+
+Video Script:
+
+[Video script here]
+
+Caption
+
+[Caption Text]
+
+CTA
+
+[CTA Text]
+
+Explanation of Script
+
+[Explanation Text]`
         }
       ],
     });
