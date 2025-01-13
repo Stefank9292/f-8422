@@ -14,7 +14,8 @@ serve(async (req) => {
   try {
     const apiKey = Deno.env.get('TIKTOK_APIFY_API_KEY')
     if (!apiKey) {
-      throw new Error('TIKTOK_APIFY_API_KEY is not set')
+      console.error('TIKTOK_APIFY_API_KEY is not set')
+      throw new Error('TIKTOK_APIFY_API_KEY is not configured')
     }
 
     const { directUrls, maxPosts, onlyPostsNewerThan } = await req.json()
@@ -23,7 +24,7 @@ serve(async (req) => {
       urls: directUrls,
       maxPosts,
       onlyPostsNewerThan
-    });
+    })
 
     if (!directUrls || !Array.isArray(directUrls) || directUrls.length === 0) {
       throw new Error('No valid URLs provided')
@@ -48,13 +49,14 @@ serve(async (req) => {
       ...requestBody,
       maxItems: requestBody.maxItems,
       urlCount: requestBody.startUrls.length
-    });
+    })
 
     // Set timeout for fetch request
     const controller = new AbortController()
     const timeout = setTimeout(() => controller.abort(), 29000) // 29s timeout (Edge functions have 30s limit)
 
     try {
+      console.log('Using Apify API key:', apiKey.substring(0, 5) + '...')
       const response = await fetch('https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items', {
         method: 'POST',
         headers: {
@@ -90,7 +92,7 @@ serve(async (req) => {
           ...data[0],
           caption: data[0].caption?.substring(0, 50) + '...' // Truncate for logging
         } : null
-      });
+      })
 
       return new Response(
         JSON.stringify({ data }),
