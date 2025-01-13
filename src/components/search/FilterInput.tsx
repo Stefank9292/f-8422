@@ -11,6 +11,7 @@ interface FilterInputProps {
   type?: string;
   isDatePicker?: boolean;
   helpText?: string;
+  step?: string;
 }
 
 export const FilterInput = ({
@@ -21,6 +22,7 @@ export const FilterInput = ({
   placeholder,
   type = "text",
   isDatePicker,
+  step,
 }: FilterInputProps) => {
   if (isDatePicker) {
     return (
@@ -41,6 +43,7 @@ export const FilterInput = ({
       onChange={onChange}
       placeholder={placeholder}
       type={type}
+      step={step}
     />
   );
 };

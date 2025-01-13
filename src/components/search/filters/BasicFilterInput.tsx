@@ -9,6 +9,7 @@ interface BasicFilterInputProps {
   onChange: (value: string) => void;
   placeholder?: string;
   type?: string;
+  step?: string;
 }
 
 export const BasicFilterInput = ({
@@ -18,6 +19,7 @@ export const BasicFilterInput = ({
   onChange,
   placeholder,
   type = "text",
+  step,
 }: BasicFilterInputProps) => {
   const handleNumericInput = (inputValue: string) => {
     const numericValue = inputValue.replace(/[^0-9]/g, '');
@@ -42,6 +44,7 @@ export const BasicFilterInput = ({
         }}
         placeholder={placeholder}
         className="h-9 text-xs border border-border/50"
+        step={step}
       />
     </div>
   );

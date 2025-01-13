@@ -27,7 +27,15 @@ export function FilteredResultsSection(props: FilteredResultsSectionProps) {
   const { platform } = usePlatformStore();
 
   if (platform === 'tiktok') {
-    return <TikTokFilteredResultsSection {...props} />;
+    return (
+      <TikTokFilteredResultsSection
+        filters={props.filters}
+        onFilterChange={props.onFilterChange}
+        onReset={props.onResetFilters}
+        totalResults={props.results.length}
+        filteredResults={props.filteredResults.length}
+      />
+    );
   }
 
   return (
@@ -37,10 +45,6 @@ export function FilteredResultsSection(props: FilteredResultsSectionProps) {
           <InstagramFilters
             filters={props.filters}
             onFilterChange={props.onFilterChange}
-            onReset={props.onResetFilters}
-            totalResults={props.results.length}
-            filteredResults={props.filteredResults.length}
-            currentPosts={props.filteredResults}
           />
         </div>
       </div>
