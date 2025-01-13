@@ -61,26 +61,40 @@ serve(async (req) => {
     }
 
     const data = await response.json()
-    console.log('Received TikTok data:', data)
+    console.log('Received raw TikTok data:', data)
 
     // Transform the data to match our expected format
-    const transformedData = data.map((post: any) => ({
-      ownerUsername: post.authorMeta?.name || cleanUsername,
-      caption: post.text || '',
-      date: post.createTime || '',
-      timestamp: post.createTimeISO || '',
-      playsCount: post.playCount || 0,
-      viewsCount: post.playCount || 0, // TikTok uses playCount for views
-      likesCount: post.diggCount || 0,
-      commentsCount: post.commentCount || 0,
-      engagement: calculateEngagement(post.playCount || 0, post.diggCount || 0, post.commentCount || 0),
-      url: post.webVideoUrl || '',
-      videoUrl: post.videoUrl || '',
-      thumbnailUrl: post.covers?.[0] || '',
-      type: 'video'
-    }))
+    const transformedData = data.map((post: any) => {
+      // Calculate engagement rate
+      const plays = post.playCount || 0
+      const likes = post.diggCount || 0
+      const comments = post.commentCount || 0
+      const shares = post.shareCount || 0
+      const engagement = plays > 0 ? ((likes + comments + shares) / plays * 100).toFixed(2) : '0'
 
-    console.log('Transformed data:', transformedData)
+      // Format date
+      const createDate = post.createTime ? new Date(post.createTime * 1000) : new Date()
+      const formattedDate = createDate.toLocaleDateString()
+
+      return {
+        ownerUsername: post.authorMeta?.name || cleanUsername,
+        caption: post.text || post.desc || '',
+        date: formattedDate,
+        timestamp: post.createTimeISO || createDate.toISOString(),
+        playsCount: plays,
+        viewsCount: plays, // TikTok uses playCount for views
+        likesCount: likes,
+        commentsCount: comments,
+        sharesCount: shares,
+        engagement: engagement,
+        url: post.webVideoUrl || `https://www.tiktok.com/@${cleanUsername}/video/${post.id}`,
+        videoUrl: post.videoUrl || post.downloadAddr || '',
+        thumbnailUrl: post.covers?.[0] || post.dynamicCover || '',
+        type: 'video'
+      }
+    })
+
+    console.log('Transformed TikTok data:', transformedData)
 
     return new Response(
       JSON.stringify(transformedData),
@@ -110,9 +124,3 @@ serve(async (req) => {
     )
   }
 })
-
-function calculateEngagement(plays: number, likes: number, comments: number): string {
-  if (plays === 0) return '0'
-  const engagement = ((likes + comments) / plays) * 100
-  return engagement.toFixed(2)
-}
