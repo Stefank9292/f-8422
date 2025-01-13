@@ -61,6 +61,12 @@ export const SearchBar = ({
   };
 
   const validateInstagramUsername = (input: string) => {
+    // Skip validation if input is empty
+    if (!input.trim()) {
+      onUsernameChange('');
+      return true;
+    }
+
     // Remove @ symbol if present
     const cleanInput = input.replace('@', '');
     
