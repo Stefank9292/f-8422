@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Loader2, Upload, FileAudio, FileVideo, X } from "lucide-react";
+import { Loader2, Upload, FileAudio, FileVideo, X, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -139,7 +139,10 @@ export function FileToScriptForm({ onSubmit, isLoading }: FileToScriptFormProps)
                 Transcribing...
               </>
             ) : (
-              'Transcribe File'
+              <>
+                <FileText className="h-4 w-4" />
+                Transcribe File
+              </>
             )}
           </Button>
 
