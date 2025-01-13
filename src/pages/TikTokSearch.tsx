@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, Search, Lock } from "lucide-react";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTikTokSearchStore } from "@/store/tiktokSearchStore";
 import { useToast } from "@/hooks/use-toast";
+import { TikTokPost } from "@/types/tiktok";
 import { Link } from "react-router-dom";
 
 const TikTokSearch = () => {
