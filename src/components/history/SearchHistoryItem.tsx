@@ -123,7 +123,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
   });
 
   return (
-    <div className="animate-fade-in space-y-3">
+    <div className="animate-fade-in">
       <SearchHistoryItemHeader
         query={item.search_query}
         date={item.created_at}
@@ -137,26 +137,24 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       />
       
       {isExpanded && results.length > 0 && (
-        <div className="rounded-lg overflow-hidden">
-          <FilteredResultsSection
-            results={results}
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onResetFilters={handleResetFilters}
-            filteredResults={filteredResults}
-            currentPage={currentPage}
-            pageSize={pageSize}
-            onPageChange={setCurrentPage}
-            onPageSizeChange={handlePageSizeChange}
-            handleCopyCaption={handleCopyCaption}
-            handleDownload={handleDownload}
-            formatNumber={(num) => num.toLocaleString()}
-            truncateCaption={(caption) => caption.length > 15 ? `${caption.slice(0, 15)}...` : caption}
-            sortKey={sortKey}
-            sortDirection={sortDirection}
-            handleSort={handleSort}
-          />
-        </div>
+        <FilteredResultsSection
+          results={results}
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onResetFilters={handleResetFilters}
+          filteredResults={filteredResults}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={handlePageSizeChange}
+          handleCopyCaption={handleCopyCaption}
+          handleDownload={handleDownload}
+          formatNumber={(num) => num.toLocaleString()}
+          truncateCaption={(caption) => caption.length > 15 ? `${caption.slice(0, 15)}...` : caption}
+          sortKey={sortKey}
+          sortDirection={sortDirection}
+          handleSort={handleSort}
+        />
       )}
     </div>
   );

@@ -54,16 +54,16 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
   })();
 
   return (
-    <div className="p-4 md:p-5 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
-      <div className="flex flex-col space-y-4">
+    <div className="p-4 rounded-lg border bg-card text-card-foreground shadow-sm hover:bg-accent/50 transition-colors">
+      <div className="flex flex-col space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-2.5">
             <Instagram className="w-4 h-4 flex-shrink-0" />
             <a
               href={result.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium hover:underline truncate max-w-[150px] sm:max-w-none"
+              className="text-sm font-medium hover:underline truncate"
             >
               @{result.ownerUsername}
             </a>
@@ -100,7 +100,7 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
           </Button>
         </div>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+        <div className="grid grid-cols-3 gap-3 text-xs">
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export function SearchResultDetails({ result }: SearchResultDetailsProps) {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
+              <div className="flex items-center gap-2">
                 <Zap className="w-3.5 h-3.5 text-yellow-500" />
                 <span>{formattedEngagement}</span>
               </div>
