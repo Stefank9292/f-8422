@@ -5,10 +5,10 @@ export interface FilterState {
   postsNewerThan: string;
   minViews: string;
   minPlays: string;
-  minShares: string;
   minLikes: string;
   minComments: string;
   minEngagement: string;
+  minShares: string;
 }
 
 const parseFormattedNumber = (value: string): number => {
