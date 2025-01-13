@@ -24,28 +24,24 @@ export const NAV_ITEMS: NavItem[] = [
     title: "TikTok Search",
     url: "#",
     icon: TikTokIcon,
-    badge: "COMING SOON",
     className: "opacity-60 cursor-not-allowed"
   },
   {
     title: "Facebook Search",
     url: "#",
     icon: Facebook,
-    badge: "COMING SOON",
     className: "opacity-60 cursor-not-allowed"
   },
   {
     title: "Twitter Search",
     url: "#",
     icon: Twitter,
-    badge: "COMING SOON",
     className: "opacity-60 cursor-not-allowed"
   },
   {
     title: "YouTube Search",
     url: "#",
     icon: Youtube,
-    badge: "COMING SOON",
     className: "opacity-60 cursor-not-allowed"
   }
 ];

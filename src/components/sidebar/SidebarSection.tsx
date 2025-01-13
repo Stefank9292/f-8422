@@ -60,8 +60,6 @@ export function SidebarSection({
                 return 'text-emerald-500';
               case 'NEW':
                 return 'text-primary';
-              case 'COMING SOON':
-                return 'text-muted-foreground/60';
               default:
                 return 'text-primary';
             }
