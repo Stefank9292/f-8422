@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Settings2, HelpCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +14,8 @@ interface TikTokSearchSettingsProps {
   setDateRange: (range: string) => void;
   location: string;
   setLocation: (location: string) => void;
+  numberOfVideos: number;
+  setNumberOfVideos: (num: number) => void;
   disabled?: boolean;
 }
 
@@ -23,8 +26,54 @@ export const TikTokSearchSettings = ({
   setDateRange,
   location,
   setLocation,
+  numberOfVideos,
+  setNumberOfVideos,
   disabled = false,
 }: TikTokSearchSettingsProps) => {
+  const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
+
+  const { data: subscriptionStatus } = useQuery({
+    queryKey: ['subscription-status'],
+    queryFn: async () => {
+      const { data: session } = await supabase.auth.getSession();
+      if (!session?.session?.access_token) return null;
+
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.session.access_token}`
+        }
+      });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getMaxVideos = () => {
+    if (!subscriptionStatus?.priceId) return 5;
+    if (subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
+        subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") return 50;
+    if (subscriptionStatus.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+        subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h") return 25;
+    return 5;
+  };
+
+  const maxVideos = getMaxVideos();
+
+  useEffect(() => {
+    if (localNumberOfVideos > maxVideos) {
+      setLocalNumberOfVideos(maxVideos);
+      setNumberOfVideos(maxVideos);
+    }
+  }, [subscriptionStatus?.priceId]);
+
+  const handleSliderChange = (value: number[]) => {
+    setLocalNumberOfVideos(value[0]);
+  };
+
+  const handleSliderPointerUp = () => {
+    setNumberOfVideos(localNumberOfVideos);
+  };
+
   const dateRangeOptions = [
     { label: "Default", value: "DEFAULT" },
     { label: "All Time", value: "ALL_TIME" },
@@ -55,6 +104,28 @@ export const TikTokSearchSettings = ({
         <div className="mt-2 p-3 space-y-4 bg-white dark:bg-gray-800 rounded-lg 
                       border border-gray-200/80 dark:border-gray-800/80 animate-in fade-in duration-200
                       w-full max-w-md mx-auto">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-medium">Number of Videos</span>
+                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
+              </div>
+              <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                {localNumberOfVideos}
+              </span>
+            </div>
+            <Slider
+              value={[localNumberOfVideos]}
+              onValueChange={handleSliderChange}
+              onPointerUp={handleSliderPointerUp}
+              min={1}
+              max={maxVideos}
+              step={1}
+              disabled={disabled}
+              className="w-full"
+            />
+          </div>
+
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-medium">Date Range</span>

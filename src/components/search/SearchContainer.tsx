@@ -181,6 +181,8 @@ export const SearchContainer = ({
             setDateRange={setDateRange}
             location={location}
             setLocation={setLocation}
+            numberOfVideos={numberOfVideos}
+            setNumberOfVideos={setNumberOfVideos}
             disabled={isLoading}
           />
         )}
