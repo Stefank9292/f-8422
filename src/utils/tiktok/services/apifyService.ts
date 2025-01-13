@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { ApifyClient } from 'apify-client';
+import { TikTokPost, TikTokApifyRequestBody } from '../types/TikTokTypes';
 
 let apifyClient: ApifyClient | null = null;
 
@@ -26,7 +27,7 @@ export async function fetchTikTokPosts(
   numberOfVideos: number = 3,
   dateRange: string = 'DEFAULT',
   location: string = 'US'
-) {
+): Promise<TikTokPost[]> {
   try {
     console.log('Starting TikTok search with params:', {
       username,
@@ -37,13 +38,19 @@ export async function fetchTikTokPosts(
 
     const client = await getApifyClient();
     
-    // Run the TikTok scraper actor
-    const run = await client.actor("clockworks/tiktok-profile-scraper").call({
+    const requestBody: TikTokApifyRequestBody = {
       username: username.replace('@', ''),
       maxPostCount: numberOfVideos,
       dateFilter: dateRange,
       region: location,
-    });
+      proxy: {
+        useApifyProxy: true,
+        apifyProxyGroups: ['RESIDENTIAL']
+      }
+    };
+    
+    // Run the TikTok scraper actor
+    const run = await client.actor("clockworks/tiktok-profile-scraper").call(requestBody);
 
     // Fetch and process the results
     const { items: posts } = await client.dataset(run.defaultDatasetId).listItems();
