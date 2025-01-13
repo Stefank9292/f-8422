@@ -14,22 +14,15 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
   const { toast } = useToast();
 
   const calculateReadabilityScore = (text: string): number => {
-    // Simple readability score based on:
-    // - Average words per sentence (ideal: 15-20)
-    // - Average characters per word (ideal: 4-5)
-    // - Presence of common transition words
-    
     const sentences = text.split(/[.!?]+/).filter(Boolean);
     const words = text.split(/\s+/).filter(Boolean);
     
     const avgWordsPerSentence = words.length / sentences.length;
     const avgCharsPerWord = text.length / words.length;
     
-    // Normalize scores
     const sentenceScore = Math.min(100, (avgWordsPerSentence / 20) * 100);
     const wordScore = Math.min(100, (5 / avgCharsPerWord) * 100);
     
-    // Calculate final score (0-100)
     const finalScore = Math.round((sentenceScore + wordScore) / 2);
     return Math.min(100, Math.max(0, finalScore));
   };
@@ -58,14 +51,12 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
       explanation: ''
     };
 
-    // Split the text into lines
     const lines = cleanText.split('\n');
     let currentSection = '';
 
     lines.forEach((line) => {
       const trimmedLine = line.trim();
       
-      // Identify sections
       if (trimmedLine === 'Hooks') {
         currentSection = 'hooks';
       } else if (trimmedLine === 'Video Script:') {
@@ -77,7 +68,6 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
       } else if (trimmedLine === 'Explanation of Script') {
         currentSection = 'explanation';
       } else if (trimmedLine) {
-        // Process content based on current section
         if (currentSection === 'hooks' && /^\d\./.test(trimmedLine)) {
           sections.hooks.push(trimmedLine.replace(/^\d\.\s*/, '').trim());
         } else if (currentSection === 'videoScript') {
@@ -169,7 +159,7 @@ export function ScriptVariation({ variation }: ScriptVariationProps) {
               <HoverCardTrigger asChild>
                 <Info className="h-4 w-4 text-muted-foreground cursor-help" />
               </HoverCardTrigger>
-              <HoverCardContent className="text-sm space-y-2">
+              <HoverCardContent className="text-xs space-y-2">
                 <p>Score based on sentence length and word complexity - higher scores indicate better readability.</p>
                 <div className="space-y-1">
                   <p className="text-green-500">80-100: Very readable</p>
