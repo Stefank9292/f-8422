@@ -95,7 +95,7 @@ export const useSearchState = () => {
           console.log('Received TikTok results:', results);
           
           if (results.length > 0) {
-            await saveSearchHistory(currentUsername, results, 'tiktok');
+            await saveSearchHistory(currentUsername, results as unknown as InstagramPost[]);
           }
           
           return results;
@@ -211,8 +211,6 @@ export const useSearchState = () => {
       setShouldFetch(false);
     }
   };
-
-  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return {
     username: currentUsername,
