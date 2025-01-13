@@ -1,6 +1,7 @@
 import { usePlatformStore } from "@/store/platformStore";
 import { SearchBar } from "./SearchBar";
 import { TikTokSearchBar } from "./tiktok/TikTokSearchBar";
+import { useEffect } from "react";
 
 interface SearchInputProps {
   instagramUsername: string;
@@ -26,6 +27,14 @@ export const SearchInput = ({
   hasReachedLimit
 }: SearchInputProps) => {
   const { platform } = usePlatformStore();
+
+  // Auto-trigger search when platform changes and there's a username
+  useEffect(() => {
+    const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
+    if (currentUsername && !isLoading && !isBulkSearching && !hasReachedLimit) {
+      onSearch();
+    }
+  }, [platform]);
 
   return platform === 'instagram' ? (
     <SearchBar

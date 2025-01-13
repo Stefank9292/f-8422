@@ -161,7 +161,10 @@ export const SearchContainer = ({
           />
         )}
 
-        <RecentSearches onSelect={platform === 'instagram' ? setInstagramUsername : setTiktokUsername} />
+        <RecentSearches 
+          onSelect={platform === 'instagram' ? setInstagramUsername : setTiktokUsername} 
+          onSearch={onSearchClick}
+        />
       </div>
 
       {displayPosts.length > 0 && (
