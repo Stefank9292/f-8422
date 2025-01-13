@@ -143,7 +143,7 @@ export const SearchContainer = ({
             isButtonEnabled
               ? platform === 'instagram' 
                 ? "instagram-gradient"
-                : "tiktok-gradient"
+                : "tiktok-gradient text-white"
               : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
