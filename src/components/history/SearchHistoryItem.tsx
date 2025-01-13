@@ -115,13 +115,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
 
   const isBulkSearch = item.bulk_search_urls && item.bulk_search_urls.length > 0;
 
-  // Add console.log before the return statement
-  console.log('SearchHistoryItem data:', { 
-    query: item.search_query,
-    bulk_search_urls: item.bulk_search_urls,
-    isBulkSearch
-  });
-
   return (
     <div className="animate-fade-in">
       <SearchHistoryItemHeader

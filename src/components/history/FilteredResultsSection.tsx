@@ -126,4 +126,4 @@ export function FilteredResultsSection({
       </div>
     </div>
   );
-};
+}
