@@ -50,12 +50,15 @@ export function SidebarNavigation() {
         </TooltipProvider>
       </div>
       <div className={cn(
-        "mt-1 flex justify-center",
+        "mt-1 flex flex-col items-center space-y-2",
         isCollapsed ? "hidden" : "flex"
       )}>
         <div className="instagram-gradient text-[10px] font-medium text-white rounded-md py-0.5 px-2 inline-block shadow-sm hover:opacity-95 transition-opacity">
           Video Research on Steroids
         </div>
+        <p className="text-[9px] text-sidebar-foreground/70 text-center max-w-[140px] leading-tight">
+          Save Time Finding Viral Content for Social Media
+        </p>
       </div>
     </div>
   );
