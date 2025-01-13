@@ -4,6 +4,7 @@ import { corsHeaders } from "../_shared/cors.ts"
 console.log("TikTok scraper function started")
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
