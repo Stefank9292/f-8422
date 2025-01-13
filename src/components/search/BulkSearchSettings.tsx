@@ -73,7 +73,11 @@ export const BulkSearchSettings = ({
 
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);
-    setNumberOfVideos(value[0]); // Update parent state immediately
+  };
+
+  // Only update parent state when user finishes dragging
+  const handleSliderPointerUp = () => {
+    setNumberOfVideos(localNumberOfVideos);
   };
 
   return (
@@ -112,6 +116,7 @@ export const BulkSearchSettings = ({
             <Slider
               value={[localNumberOfVideos]}
               onValueChange={handleSliderChange}
+              onPointerUp={handleSliderPointerUp}
               min={1}
               max={maxVideos}
               step={1}
