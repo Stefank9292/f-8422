@@ -82,7 +82,7 @@ export const TableContent = ({
 
   if (isMobile) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-3">
         {sortedPosts.map((post, index) => (
           <MobilePostRow
             key={index}
@@ -99,7 +99,8 @@ export const TableContent = ({
 
   return (
     <TooltipProvider>
-      <div className="rounded-xl overflow-hidden border border-border">
+      <div className="rounded-xl overflow-hidden border border-gray-200/80 dark:border-gray-700/80 
+                    bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
         <Table>
           <PostTableHeader 
             onSort={handleSortInternal}

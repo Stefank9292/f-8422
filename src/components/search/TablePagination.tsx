@@ -32,13 +32,14 @@ export const TablePagination = ({
   onPageSizeChange,
   totalResults,
 }: TablePaginationProps) => {
-  // Only show pagination if there are more than 25 results
   if (totalResults <= 25) {
     return null;
   }
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-card rounded-lg border border-border/50">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4 
+                  bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/80 dark:border-gray-700/80 
+                  backdrop-blur-sm shadow-lg">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span>Show</span>
         <Select
@@ -64,7 +65,7 @@ export const TablePagination = ({
               onClick={() => onPageChange(currentPage - 1)}
               className={cn(
                 "h-8 min-w-8 px-2 text-xs transition-colors hover:bg-accent",
-                "border border-border/50",
+                "border border-gray-200/80 dark:border-gray-700/80",
                 currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
               )}
             />
@@ -76,7 +77,7 @@ export const TablePagination = ({
                 onClick={() => onPageChange(page)}
                 isActive={currentPage === page}
                 className={cn(
-                  "h-8 min-w-8 px-3 text-xs transition-colors border border-border/50",
+                  "h-8 min-w-8 px-3 text-xs transition-colors border border-gray-200/80 dark:border-gray-700/80",
                   currentPage === page 
                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                     : "hover:bg-accent"
@@ -92,7 +93,7 @@ export const TablePagination = ({
               onClick={() => onPageChange(currentPage + 1)}
               className={cn(
                 "h-8 min-w-8 px-2 text-xs transition-colors hover:bg-accent",
-                "border border-border/50",
+                "border border-gray-200/80 dark:border-gray-700/80",
                 currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
               )}
             />

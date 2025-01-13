@@ -1,7 +1,7 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { BulkSearch } from "./BulkSearch";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { usePlaceholderAnimation } from "./PlaceholderAnimation";
@@ -71,15 +71,15 @@ export const SearchBar = ({
         <Input
           type="text"
           placeholder={placeholder}
-          className="pl-12 pr-32 h-10 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
-                   focus:border-[#D946EF] shadow-sm
-                   placeholder:text-gray-400 dark:placeholder:text-gray-600"
+          className="pl-12 pr-32 h-12 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
+                   focus:border-[#D946EF] shadow-sm hover:shadow-md transition-all duration-200
+                   placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading || hasReachedLimit}
         />
-        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
+        <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <BulkSearchButton 
           isEnabled={isBulkSearchEnabled}
           isLoading={isLoading}

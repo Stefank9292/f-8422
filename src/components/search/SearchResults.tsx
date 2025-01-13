@@ -59,7 +59,7 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       <TableContent 
         currentPosts={currentPosts}
         handleCopyCaption={handleCopyCaption}
