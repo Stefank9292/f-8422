@@ -37,15 +37,16 @@ serve(async (req) => {
       token: apiKey,
     })
 
-    // Prepare Actor input
+    // Prepare Actor input according to the correct structure
     const input = {
-      startUrls: directUrls.map((url: string) => ({ url })),
+      startUrls: directUrls,
       maxItems: maxPosts || 3,
       dateRange: onlyPostsNewerThan ? "CUSTOM" : "DEFAULT",
       location: "US",
-      scrapeType: "posts", // Ensure we're scraping posts
-      shouldDownloadVideos: false, // We don't need to download videos
-      shouldDownloadCovers: false, // We don't need to download covers
+      customMapFunction: "(object) => { return {...object} }",
+      scrapeType: "posts",
+      shouldDownloadVideos: false,
+      shouldDownloadCovers: false
     }
 
     console.log('Prepared actor input:', {
