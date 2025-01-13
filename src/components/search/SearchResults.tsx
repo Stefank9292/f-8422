@@ -15,11 +15,8 @@ export const SearchResults = ({ searchResults }: SearchResultsProps) => {
   const { filters } = useSearchStore();
   const { toast } = useToast();
 
-  // Apply filters to search results with the updated FilterState type
-  const filteredPosts = filterResults(searchResults, {
-    ...filters,
-    minShares: filters.minShares || "",  // Added this field
-  });
+  // Apply filters to search results
+  const filteredPosts = filterResults(searchResults, filters);
 
   const totalPages = Math.ceil(filteredPosts.length / pageSize);
   const indexOfLastPost = currentPage * pageSize;

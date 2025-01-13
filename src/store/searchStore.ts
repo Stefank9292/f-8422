@@ -7,6 +7,7 @@ interface SearchFilters {
   minComments: string;
   minEngagement: string;
   postsNewerThan: string;
+  minShares: string; // Added this field
 }
 
 interface SearchState {
@@ -40,7 +41,8 @@ export const useSearchStore = create<SearchState>((set) => ({
     minLikes: "",
     minComments: "",
     minEngagement: "",
-    postsNewerThan: ""
+    postsNewerThan: "",
+    minShares: "" // Added this field with default empty string
   },
   setInstagramUsername: (instagramUsername) => set({ instagramUsername }),
   setTiktokUsername: (tiktokUsername) => set({ tiktokUsername }),
@@ -56,7 +58,8 @@ export const useSearchStore = create<SearchState>((set) => ({
       minLikes: "",
       minComments: "",
       minEngagement: "",
-      postsNewerThan: ""
+      postsNewerThan: "",
+      minShares: "" // Added this field
     }
   })
 }));
