@@ -95,10 +95,10 @@ export const SearchContainer = ({
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       <AnnouncementBar />
       <div className="space-y-4 sm:space-y-6 w-full max-w-md">
-        <SearchHeader />
         <h1 className="text-xl md:text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 max-w-xl mx-auto">
-          Save Time Finding Viral Content for Instagram
+          Save Time Finding Viral Content for
         </h1>
+        <SearchHeader />
       </div>
 
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
