@@ -1,4 +1,5 @@
-import { Search, History, FileText, TikTok } from "lucide-react";
+import { Search, History, FileText } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { NavItem } from "@/types/navigation";
 
 export const NAV_ITEMS: NavItem[] = [
@@ -11,7 +12,7 @@ export const NAV_ITEMS: NavItem[] = [
   {
     title: "TikTok Search",
     url: "/tiktok",
-    icon: TikTok,
+    icon: TikTokIcon,
     badge: "NEW"
   },
   {
