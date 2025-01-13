@@ -22,7 +22,26 @@ export const BasicFilterInput = ({
   step,
 }: BasicFilterInputProps) => {
   const handleNumericInput = (inputValue: string) => {
-    const numericValue = inputValue.replace(/[^0-9]/g, '');
+    // Allow empty string
+    if (inputValue === '') {
+      onChange('');
+      return;
+    }
+    
+    // For engagement rate, allow decimal points
+    if (step) {
+      const numericValue = inputValue.replace(/[^\d.]/g, '');
+      // Ensure only one decimal point
+      const parts = numericValue.split('.');
+      if (parts.length > 2) {
+        return;
+      }
+      onChange(numericValue);
+      return;
+    }
+    
+    // For other numeric inputs, only allow integers
+    const numericValue = inputValue.replace(/\D/g, '');
     onChange(numericValue);
   };
 

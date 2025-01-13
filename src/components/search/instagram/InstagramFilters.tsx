@@ -16,6 +16,7 @@ export const InstagramFilters = ({ filters, onFilterChange }: InstagramFiltersPr
         value={filters.minViews}
         onChange={(value) => onFilterChange('minViews', value)}
         placeholder="e.g., 1.000"
+        type="number"
       />
       <FilterInput
         icon={Play}
@@ -23,6 +24,7 @@ export const InstagramFilters = ({ filters, onFilterChange }: InstagramFiltersPr
         value={filters.minPlays}
         onChange={(value) => onFilterChange('minPlays', value)}
         placeholder="e.g., 1.000"
+        type="number"
       />
       <FilterInput
         icon={Heart}
@@ -30,6 +32,7 @@ export const InstagramFilters = ({ filters, onFilterChange }: InstagramFiltersPr
         value={filters.minLikes}
         onChange={(value) => onFilterChange('minLikes', value)}
         placeholder="e.g., 1.000"
+        type="number"
       />
       <FilterInput
         icon={MessageCircle}
@@ -37,6 +40,7 @@ export const InstagramFilters = ({ filters, onFilterChange }: InstagramFiltersPr
         value={filters.minComments}
         onChange={(value) => onFilterChange('minComments', value)}
         placeholder="e.g., 100"
+        type="number"
       />
       <FilterInput
         icon={TrendingUp}
