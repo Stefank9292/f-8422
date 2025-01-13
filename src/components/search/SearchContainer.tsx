@@ -35,6 +35,7 @@ export const SearchContainer = ({
   displayPosts
 }: SearchContainerProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
   const { toast } = useToast();
   const resultsRef = useRef<HTMLDivElement>(null);
   const { platform } = usePlatformStore();
@@ -59,15 +60,22 @@ export const SearchContainer = ({
   const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
 
   useEffect(() => {
-    if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
+    // Only scroll if we have results, aren't loading, and haven't scrolled yet
+    if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current && !hasScrolled) {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ 
           behavior: 'smooth',
           block: 'start'
         });
+        setHasScrolled(true); // Mark that we've scrolled
       }, 100);
     }
-  }, [displayPosts, isLoading, isBulkSearching]);
+    
+    // Reset the scroll flag when there are no results
+    if (displayPosts.length === 0) {
+      setHasScrolled(false);
+    }
+  }, [displayPosts, isLoading, isBulkSearching, hasScrolled]);
 
   const onSearchClick = () => {
     if (!currentUsername.trim()) {
