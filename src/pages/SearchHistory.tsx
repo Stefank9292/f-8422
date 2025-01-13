@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { SearchHistoryList } from "@/components/SearchHistoryList";
+import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 
 const SearchHistory = () => {
   const [searchHistory, setSearchHistory] = useState([]);
