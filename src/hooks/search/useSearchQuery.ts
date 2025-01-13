@@ -41,12 +41,12 @@ export const useSearchQuery = ({
   const { data: posts = [], isLoading, error } = useQuery({
     queryKey: [
       'social-posts', 
-      currentUsername, 
       platform,
+      currentUsername,
       numberOfVideos,
-      selectedDate?.toISOString(),
       dateRange,
-      location
+      location,
+      shouldFetch // Add shouldFetch to query key to prevent auto-refetch
     ],
     queryFn: async () => {
       if (requestCount >= maxRequests) {
