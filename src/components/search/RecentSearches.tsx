@@ -52,15 +52,9 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
-  const handleSelect = async (query: string) => {
-    // First update the username
+  // Modified to only update the username without triggering search
+  const handleSelect = (query: string) => {
     onSelect(query);
-    
-    // Wait for next render cycle to ensure username state is updated
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    
-    // Now trigger the search
-    onSearch();
   };
 
   useEffect(() => {
