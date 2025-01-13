@@ -193,12 +193,14 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
               query: search.search_query
             });
             
+            const isTikTokSearch = search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search';
+            
             return (
               <div
                 key={search.id}
                 className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
               >
-                {(search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search') ? (
+                {isTikTokSearch ? (
                   <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
                 ) : (
                   <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
