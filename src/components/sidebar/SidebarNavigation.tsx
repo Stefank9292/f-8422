@@ -56,8 +56,8 @@ export function SidebarNavigation() {
         <div className="instagram-gradient text-[10px] font-medium text-white/95 rounded-md py-1 px-3 inline-block shadow-sm hover:opacity-90 transition-all duration-200 backdrop-blur-sm">
           Video Research on Steroids
         </div>
-        <p className="text-[9px] text-sidebar-foreground/70 text-center max-w-[140px] leading-relaxed">
-          Save Time Finding Viral Content for Social Media
+        <p className="text-[9px] text-sidebar-foreground/70 text-center max-w-[180px] leading-relaxed">
+          Save Time Finding Viral Content
         </p>
       </div>
     </div>
