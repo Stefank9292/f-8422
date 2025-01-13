@@ -3,6 +3,8 @@ import { TikTokFilteredResultsSection } from "../search/tiktok/TikTokFilteredRes
 import { FilterState } from "@/utils/filterResults";
 import { InstagramPost } from "@/types/instagram";
 import { usePlatformStore } from "@/store/platformStore";
+import { TableContent } from "../search/TableContent";
+import { TablePagination } from "../search/TablePagination";
 
 interface FilteredResultsSectionProps {
   results: InstagramPost[];
@@ -25,6 +27,10 @@ interface FilteredResultsSectionProps {
 
 export function FilteredResultsSection(props: FilteredResultsSectionProps) {
   const { platform } = usePlatformStore();
+  const totalPages = Math.ceil(props.filteredResults.length / props.pageSize);
+  const startIndex = (props.currentPage - 1) * props.pageSize;
+  const endIndex = startIndex + props.pageSize;
+  const currentPosts = props.filteredResults.slice(startIndex, endIndex);
 
   if (platform === 'tiktok') {
     return (
@@ -47,6 +53,28 @@ export function FilteredResultsSection(props: FilteredResultsSectionProps) {
             onFilterChange={props.onFilterChange}
           />
         </div>
+
+        <div className="w-full">
+          <TableContent
+            currentPosts={currentPosts}
+            handleCopyCaption={props.handleCopyCaption}
+            handleDownload={props.handleDownload}
+            formatNumber={props.formatNumber}
+            truncateCaption={props.truncateCaption}
+            sortKey={props.sortKey}
+            sortDirection={props.sortDirection}
+            handleSort={props.handleSort}
+          />
+        </div>
+
+        <TablePagination
+          currentPage={props.currentPage}
+          totalPages={totalPages}
+          pageSize={props.pageSize}
+          onPageChange={props.onPageChange}
+          onPageSizeChange={props.onPageSizeChange}
+          totalResults={props.filteredResults.length}
+        />
       </div>
     </div>
   );
