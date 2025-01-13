@@ -54,12 +54,25 @@ export function SidebarSection({
             return null;
           }
 
+          const getBadgeColor = (badge: string) => {
+            switch (badge) {
+              case 'LIVE':
+                return 'text-emerald-500';
+              case 'NEW':
+                return 'text-primary';
+              case 'COMING SOON':
+                return 'text-muted-foreground/60';
+              default:
+                return 'text-primary';
+            }
+          };
+
           return (
-            <TooltipProvider key={item.url} delayDuration={0}>
+            <TooltipProvider key={item.title} delayDuration={0}>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <SidebarMenuButton
-                    onClick={item.onClick || (item.url ? () => onNavigate(item.url!) : undefined)}
+                    onClick={item.onClick || (item.url && item.url !== "#" ? () => onNavigate(item.url!) : undefined)}
                     isActive={item.url ? currentPath === item.url : false}
                     className={cn(
                       "w-full px-3 py-2 rounded-lg flex items-center gap-3 text-[11px] transition-all duration-200 group relative hover:bg-sidebar-accent/10",
@@ -73,7 +86,7 @@ export function SidebarSection({
                         variant="secondary" 
                         className={cn(
                           "ml-1 text-[8px] font-medium bg-transparent border-0 p-0",
-                          item.badge === "LIVE" ? "text-emerald-500" : "text-primary"
+                          getBadgeColor(item.badge)
                         )}
                       >
                         {item.badge}

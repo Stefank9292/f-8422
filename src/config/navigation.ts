@@ -1,4 +1,5 @@
-import { Instagram, History, FileText } from "lucide-react";
+import { Instagram, History, FileText, Facebook, Twitter, Youtube } from "lucide-react";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { NavItem } from "@/types/navigation";
 
 export const NAV_ITEMS: NavItem[] = [
@@ -18,5 +19,33 @@ export const NAV_ITEMS: NavItem[] = [
     url: "/transcribe",
     icon: FileText,
     badge: "NEW"
+  },
+  {
+    title: "TikTok Search",
+    url: "#",
+    icon: TikTokIcon,
+    badge: "COMING SOON",
+    className: "opacity-60 cursor-not-allowed"
+  },
+  {
+    title: "Facebook Search",
+    url: "#",
+    icon: Facebook,
+    badge: "COMING SOON",
+    className: "opacity-60 cursor-not-allowed"
+  },
+  {
+    title: "Twitter Search",
+    url: "#",
+    icon: Twitter,
+    badge: "COMING SOON",
+    className: "opacity-60 cursor-not-allowed"
+  },
+  {
+    title: "YouTube Search",
+    url: "#",
+    icon: Youtube,
+    badge: "COMING SOON",
+    className: "opacity-60 cursor-not-allowed"
   }
 ];
