@@ -6,6 +6,7 @@ export interface InstagramPost {
   viewsCount: number;
   likesCount: number;
   commentsCount: number;
+  sharesCount?: number;  // Added for TikTok
   duration: string;
   engagement: string;
   url: string;
@@ -26,4 +27,14 @@ export interface SupabaseSearchResult {
   search_history_id: string;
   results: unknown;
   created_at: string;
+}
+
+export interface FilterState {
+  postsNewerThan: string;
+  minViews: string;
+  minPlays: string;
+  minLikes: string;
+  minComments: string;
+  minEngagement: string;
+  minShares: string;
 }

@@ -45,23 +45,23 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState, plat
       // Instagram-specific filters
       if (filters.minViews) {
         const minViews = parseFormattedNumber(filters.minViews);
-        if (post.playsCount < minViews) return false;
+        if (post.viewsCount < minViews) return false;
       }
 
       if (filters.minPlays) {
         const minPlays = parseFormattedNumber(filters.minPlays);
-        if (post.viewsCount < minPlays) return false;
+        if (post.playsCount < minPlays) return false;
       }
     } else {
       // TikTok-specific filters
       if (filters.minViews) {
         const minViews = parseFormattedNumber(filters.minViews);
-        if (post.views < minViews) return false;
+        if (post.viewsCount < minViews) return false;
       }
 
-      if (filters.minShares) {
+      if (filters.minShares && post.sharesCount !== undefined) {
         const minShares = parseFormattedNumber(filters.minShares);
-        if (post.shares < minShares) return false;
+        if (post.sharesCount < minShares) return false;
       }
     }
 

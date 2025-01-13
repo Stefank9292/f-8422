@@ -31,6 +31,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     minLikes: "",
     minComments: "",
     minEngagement: "",
+    minShares: "",  // Added this field
   });
 
   // Filter for valid clips only
@@ -62,6 +63,7 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
       minLikes: "",
       minComments: "",
       minEngagement: "",
+      minShares: "",  // Added this field
     });
     setCurrentPage(1);
   };
