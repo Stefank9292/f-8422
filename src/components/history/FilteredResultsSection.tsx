@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SearchFilters } from "../search/SearchFilters";
 import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
@@ -48,30 +48,32 @@ export function FilteredResultsSection({
     return saved ? JSON.parse(saved) : false;
   });
 
-  const sortedResults = [...unfilteredResults].sort((a, b) => {
-    if (!sortKey) return 0;
+  const sortedResults = useCallback(() => {
+    return [...unfilteredResults].sort((a, b) => {
+      if (!sortKey) return 0;
 
-    let valueA = a[sortKey as keyof typeof a];
-    let valueB = b[sortKey as keyof typeof b];
+      let valueA = a[sortKey as keyof typeof a];
+      let valueB = b[sortKey as keyof typeof b];
 
-    if (sortKey === 'date' || sortKey === 'timestamp') {
-      valueA = new Date(valueA as string).getTime();
-      valueB = new Date(valueB as string).getTime();
-    } else if (sortKey === 'engagement') {
-      valueA = parseFloat((valueA as string).replace('%', ''));
-      valueB = parseFloat((valueB as string).replace('%', ''));
-    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-      // No conversion needed for numbers
-    } else {
-      valueA = String(valueA);
-      valueB = String(valueB);
-    }
+      if (sortKey === 'date' || sortKey === 'timestamp') {
+        valueA = new Date(valueA as string).getTime();
+        valueB = new Date(valueB as string).getTime();
+      } else if (sortKey === 'engagement') {
+        valueA = parseFloat((valueA as string).replace('%', ''));
+        valueB = parseFloat((valueB as string).replace('%', ''));
+      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+        // No conversion needed for numbers
+      } else {
+        valueA = String(valueA);
+        valueB = String(valueB);
+      }
 
-    if (sortDirection === 'asc') {
-      return valueA > valueB ? 1 : -1;
-    }
-    return valueA < valueB ? 1 : -1;
-  });
+      if (sortDirection === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      }
+      return valueA < valueB ? 1 : -1;
+    });
+  }, [unfilteredResults, sortKey, sortDirection]);
 
   useEffect(() => {
     localStorage.setItem("filterResultsCollapsed", JSON.stringify(isCollapsed));
@@ -79,8 +81,8 @@ export function FilteredResultsSection({
 
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
-  const currentPosts = sortedResults.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(sortedResults.length / pageSize);
+  const currentPosts = sortedResults().slice(startIndex, endIndex);
+  const totalPages = Math.ceil(sortedResults().length / pageSize);
 
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
@@ -91,8 +93,8 @@ export function FilteredResultsSection({
             onFilterChange={onFilterChange}
             onReset={onResetFilters}
             totalResults={results.length}
-            filteredResults={sortedResults.length}
-            currentPosts={sortedResults}
+            filteredResults={sortedResults().length}
+            currentPosts={sortedResults()}
           />
         </div>
       </div>
@@ -102,6 +104,7 @@ export function FilteredResultsSection({
           "overflow-hidden transition-all duration-300 ease-in-out md:rounded-lg md:border md:border-border/50",
           isCollapsed ? "max-h-0 opacity-0" : "max-h-[2000px] opacity-100"
         )}
+        style={{ willChange: 'max-height, opacity' }}
       >
         <div className="overflow-hidden">
           <TableContent
@@ -121,9 +124,9 @@ export function FilteredResultsSection({
           pageSize={pageSize}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
-          totalResults={sortedResults.length}
+          totalResults={sortedResults().length}
         />
       </div>
     </div>
   );
-};
+}
