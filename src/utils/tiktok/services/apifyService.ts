@@ -22,6 +22,18 @@ async function getApifyClient() {
   return apifyClient;
 }
 
+function formatTikTokUrl(input: string): string {
+  // If it's already a full URL, return it
+  if (input.startsWith('https://www.tiktok.com/@')) {
+    return input;
+  }
+  
+  // If it starts with @, remove it before creating the URL
+  const username = input.startsWith('@') ? input.slice(1) : input;
+  
+  return `https://www.tiktok.com/@${username}`;
+}
+
 export async function fetchTikTokPosts(
   username: string,
   numberOfVideos: number = 3,
@@ -39,15 +51,14 @@ export async function fetchTikTokPosts(
     const client = await getApifyClient();
     
     const requestBody: TikTokApifyRequestBody = {
-      username: username.replace('@', ''),
-      maxPostCount: numberOfVideos,
-      dateFilter: dateRange,
-      region: location,
-      proxy: {
-        useApifyProxy: true,
-        apifyProxyGroups: ['RESIDENTIAL']
-      }
+      customMapFunction: "(object) => { return {...object} }",
+      dateRange: dateRange,
+      location: location,
+      maxItems: numberOfVideos,
+      startUrls: [formatTikTokUrl(username)]
     };
+    
+    console.log('TikTok API request body:', requestBody);
     
     // Run the TikTok scraper actor
     const run = await client.actor("clockworks/tiktok-profile-scraper").call(requestBody);

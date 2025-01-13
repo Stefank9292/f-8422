@@ -1,3 +1,5 @@
+import { Json } from "@/integrations/supabase/types";
+
 export interface TikTokPost {
   id: string;
   shortcode: string;
@@ -20,12 +22,9 @@ export interface TikTokPost {
 }
 
 export interface TikTokApifyRequestBody {
-  username: string;
-  maxPostCount: number;
-  dateFilter: string;
-  region: string;
-  proxy?: {
-    useApifyProxy?: boolean;
-    apifyProxyGroups?: string[];
-  };
+  customMapFunction?: string;
+  dateRange: string;
+  location: string;
+  maxItems: number;
+  startUrls: string[];
 }
