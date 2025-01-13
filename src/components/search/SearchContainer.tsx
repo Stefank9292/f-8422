@@ -11,6 +11,7 @@ import { useSearchState } from "@/hooks/search/useSearchState";
 import { useFilterState } from "@/hooks/search/useFilterState";
 import { usePlatformState } from "@/hooks/search/usePlatformState";
 import { useToast } from "@/hooks/use-toast";
+import { useSearchStore } from "@/store/searchStore";
 
 interface SearchContainerProps {
   username: string;
@@ -40,6 +41,14 @@ export const SearchContainer = ({
   const resultsRef = useRef<HTMLDivElement>(null);
   const { platform, currentUsername } = usePlatformState();
   const { filters, handleFilterChange, resetFilters } = useFilterState();
+  
+  // Get search settings from the store
+  const { 
+    numberOfVideos, 
+    setNumberOfVideos,
+    selectedDate,
+    setSelectedDate 
+  } = useSearchStore();
   
   useEffect(() => {
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current && !hasScrolled) {
@@ -120,6 +129,10 @@ export const SearchContainer = ({
         <SearchSettings
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
+          numberOfVideos={numberOfVideos}
+          setNumberOfVideos={setNumberOfVideos}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
           disabled={isLoading || isBulkSearching}
         />
 
