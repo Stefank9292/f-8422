@@ -18,9 +18,10 @@ serve(async (req) => {
       throw new Error('TIKTOK_APIFY_API_KEY is not configured')
     }
 
+    console.log('Starting TikTok scraper with API key:', apiKey.substring(0, 5) + '...')
+
     const { directUrls, maxPosts, onlyPostsNewerThan } = await req.json()
-    
-    console.log('Processing request with params:', {
+    console.log('Received request:', {
       urls: directUrls,
       maxPosts,
       onlyPostsNewerThan
@@ -30,22 +31,24 @@ serve(async (req) => {
       throw new Error('No valid URLs provided')
     }
 
-    // Prepare request body according to Apify API structure
     const requestBody = {
-      dateRange: onlyPostsNewerThan ? "CUSTOM" : "DEFAULT",
-      location: "US",
-      maxItems: maxPosts || 1000,
-      startUrls: directUrls.map((url: string) => {
-        // Handle both username and full URL formats
-        if (!url.startsWith('https://')) {
-          const username = url.replace('@', '').trim()
-          return `https://www.tiktok.com/@${username}`
+      startUrls: directUrls.map(url => ({ url })),
+      maxItems: maxPosts || 3,
+      extendOutputFunction: `($) => {
+        return {
+          caption: $('meta[property="og:description"]').attr('content'),
+          videoUrl: $('meta[property="og:video:secure_url"]').attr('content'),
+          timestamp: $('meta[property="article:published_time"]').attr('content'),
+          likesCount: parseInt($('[data-e2e="like-count"]').text().replace(/[^0-9]/g, '')) || 0,
+          commentsCount: parseInt($('[data-e2e="comment-count"]').text().replace(/[^0-9]/g, '')) || 0,
+          viewsCount: parseInt($('[data-e2e="video-views"]').text().replace(/[^0-9]/g, '')) || 0,
+          playsCount: parseInt($('[data-e2e="video-views"]').text().replace(/[^0-9]/g, '')) || 0,
+          ownerUsername: $('meta[property="og:video:tag"]').attr('content'),
         }
-        return url.trim()
-      })
+      }`
     }
 
-    console.log('Making request to Apify API with body:', {
+    console.log('Prepared request body:', {
       ...requestBody,
       maxItems: requestBody.maxItems,
       urlCount: requestBody.startUrls.length
@@ -56,12 +59,11 @@ serve(async (req) => {
     const timeout = setTimeout(() => controller.abort(), 29000) // 29s timeout (Edge functions have 30s limit)
 
     try {
-      console.log('Using Apify API key:', apiKey.substring(0, 5) + '...')
       const response = await fetch('https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify(requestBody),
         signal: controller.signal
@@ -74,20 +76,20 @@ serve(async (req) => {
         console.error('Apify API error:', {
           status: response.status,
           statusText: response.statusText,
-          body: errorText
+          error: errorText
         })
         throw new Error(`Apify API request failed: ${response.statusText}\nResponse: ${errorText}`)
       }
 
       const data = await response.json()
       
-      if (!data || !Array.isArray(data)) {
-        console.error('Invalid response format from Apify:', data)
-        throw new Error('Invalid response format from Apify API')
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        console.warn('No data returned from Apify API')
+        throw new Error('No data found for the provided URLs')
       }
-      
-      console.log('Successfully received response from Apify:', {
-        dataLength: data.length,
+
+      console.log('Successfully fetched data:', {
+        count: data.length,
         firstItem: data[0] ? {
           ...data[0],
           caption: data[0].caption?.substring(0, 50) + '...' // Truncate for logging
@@ -103,17 +105,16 @@ serve(async (req) => {
           }
         }
       )
-    } catch (fetchError) {
-      clearTimeout(timeout)
-      if (fetchError.name === 'AbortError') {
-        throw new Error('Request timeout: The Apify API took too long to respond')
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request timed out after 29 seconds')
       }
-      throw fetchError
+      throw error
     }
   } catch (error) {
     console.error('Error in TikTok scraper:', error)
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message,
         timestamp: new Date().toISOString(),
         requestId: crypto.randomUUID()
