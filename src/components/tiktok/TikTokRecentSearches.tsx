@@ -29,16 +29,17 @@ export function TikTokRecentSearches({ onSelect }: TikTokRecentSearchesProps) {
   if (recentSearches.length === 0) return null;
 
   return (
-    <div className="w-full flex flex-wrap justify-center gap-2">
+    <div className="w-full flex flex-wrap justify-center gap-2 animate-in fade-in duration-300">
       {recentSearches.map((search) => (
         <div
           key={search.id}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm
+                   hover:shadow-md transition-all duration-200"
         >
           <History className="w-3.5 h-3.5 text-[#FF0050]" />
           <button
             onClick={() => onSelect(search.search_query)}
-            className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
+            className="text-[11px] font-medium text-gray-800 dark:text-gray-200 hover:text-[#FF0050] transition-colors"
           >
             {search.search_query}
           </button>

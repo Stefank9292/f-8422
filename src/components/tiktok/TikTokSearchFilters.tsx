@@ -65,14 +65,14 @@ export function TikTokSearchFilters({
   ];
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-4 space-y-4 animate-in fade-in duration-300">
       <div className="flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
           Showing {filteredResults} of {totalResults} results
         </span>
         <button
           onClick={onReset}
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-[#FF0050] hover:underline"
         >
           Reset Filters
         </button>

@@ -22,7 +22,7 @@ export function TikTokSearchBar({
   };
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full animate-in fade-in duration-300">
       <Input
         type="text"
         placeholder="Enter TikTok username..."
