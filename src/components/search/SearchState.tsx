@@ -46,8 +46,8 @@ export const useSearchState = () => {
   } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    // Remove numberOfVideos from queryKey to prevent auto-refetch
-    queryKey: ['social-posts', currentUsername, platform, dateRange, location],
+    // Remove location and dateRange from queryKey to prevent auto-refetch
+    queryKey: ['social-posts', currentUsername, platform],
     queryFn: async () => {
       console.log('Starting search with params:', {
         platform,
