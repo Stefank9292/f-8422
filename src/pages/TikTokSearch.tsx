@@ -170,8 +170,8 @@ const TikTokSearch = () => {
       </div>
 
       {displayPosts.length > 0 && (
-        <div ref={resultsRef} className="space-y-4">
-          <div className="w-full max-w-[90rem]">
+        <div ref={resultsRef} className="space-y-4 w-full">
+          <div className="w-full max-w-[90rem] mx-auto">
             <div className="rounded-xl sm:border sm:border-border/50 overflow-hidden">
               <TikTokSearchFilters
                 filters={filters}
@@ -183,7 +183,7 @@ const TikTokSearch = () => {
               />
             </div>
           </div>
-          <div className="w-full max-w-[90rem]">
+          <div className="w-full max-w-[90rem] mx-auto">
             <div className="sm:material-card overflow-hidden">
               <TikTokSearchResults searchResults={displayPosts} />
             </div>
