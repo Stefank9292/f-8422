@@ -1,4 +1,4 @@
-import { Calendar, Eye, Play, Heart, MessageCircle, Zap } from "lucide-react";
+import { Calendar, Eye, Play, Heart, MessageCircle, Zap, Share2 } from "lucide-react";
 import { FilterHeader } from "./FilterHeader";
 import { FilterInput } from "./FilterInput";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
@@ -11,6 +11,7 @@ interface FiltersType {
   minComments: string;
   minEngagement: string;
   postsNewerThan: string;
+  minShares: string;
 }
 
 interface SearchFiltersProps {
@@ -75,6 +76,14 @@ export const SearchFilters = ({
       type: "number"
     },
     {
+      icon: Share2,
+      label: "Min. Shares",
+      value: filters.minShares,
+      onChange: (value: string) => onFilterChange('minShares', value),
+      placeholder: "e.g. 50",
+      type: "number"
+    },
+    {
       icon: Zap,
       label: "Min. Engagement",
       value: filters.minEngagement,
@@ -115,7 +124,7 @@ export const SearchFilters = ({
           isMobile={false}
         />
         <div className="bg-card/50 border-x border-b border-border/50">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-6 p-6">
             {filterInputs.map((input, index) => (
               <div key={index} className="w-full">
                 <FilterInput {...input} />
