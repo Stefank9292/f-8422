@@ -13,11 +13,6 @@ export const SearchHeader = () => {
 
   return (
     <div className="text-center space-y-4 w-full max-w-2xl mx-auto">
-      <div className="mt-2">
-        <span className="px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D]">
-          Video Research on Steroids
-        </span>
-      </div>
       <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mt-6">
         <a
           href="#"

@@ -49,6 +49,14 @@ export function SidebarNavigation() {
           </Tooltip>
         </TooltipProvider>
       </div>
+      <div className={cn(
+        "mt-2",
+        isCollapsed ? "hidden" : "block"
+      )}>
+        <span className="inline-block px-4 py-1.5 text-[13px] font-medium text-white rounded-full bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D]">
+          Video Research on Steroids
+        </span>
+      </div>
     </div>
   );
 }
