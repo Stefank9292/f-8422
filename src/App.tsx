@@ -4,6 +4,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppSidebar } from "@/components/AppSidebar";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Pages
 import Auth from "@/pages/Auth";
@@ -30,25 +31,29 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <Router>
-          <Routes>
-            <Route path="/auth" element={<Auth />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <AppSidebar />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Index />} />
-              <Route path="subscribe" element={<Subscribe />} />
-              <Route path="success" element={<Success />} />
-              <Route path="history" element={<SearchHistory />} />
-              <Route path="profile" element={<Profile />} />
-              <Route path="transcribe" element={<Transcribe />} />
-              <Route path="tiktok" element={<TikTokSearch />} />
-            </Route>
-          </Routes>
+          <SidebarProvider>
+            <div className="flex min-h-screen w-full">
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <AppSidebar />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Index />} />
+                  <Route path="subscribe" element={<Subscribe />} />
+                  <Route path="success" element={<Success />} />
+                  <Route path="history" element={<SearchHistory />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="transcribe" element={<Transcribe />} />
+                  <Route path="tiktok" element={<TikTokSearch />} />
+                </Route>
+              </Routes>
+            </div>
+          </SidebarProvider>
         </Router>
         <Toaster />
       </ErrorBoundary>
