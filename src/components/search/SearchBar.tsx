@@ -53,7 +53,7 @@ export const SearchBar = ({
     enabled: !!session?.access_token,
   });
 
-  const validateInstagramUsername = (input: string) => {
+  const validateInstagramUsername = (input: string, shouldToast: boolean = true) => {
     // Skip validation if input is empty
     if (!input.trim()) {
       onUsernameChange('');
@@ -67,22 +67,26 @@ export const SearchBar = ({
     if (input.includes('http') || input.includes('www.')) {
       // Check if it's an Instagram URL
       if (!input.includes('instagram.com')) {
-        toast({
-          title: "Invalid URL",
-          description: "Please enter an Instagram URL (e.g., https://instagram.com/username) or just the username",
-          variant: "destructive",
-        });
+        if (shouldToast) {
+          toast({
+            title: "Invalid URL",
+            description: "Please enter an Instagram URL (e.g., https://instagram.com/username) or just the username",
+            variant: "destructive",
+          });
+        }
         return false;
       }
 
       const urlPattern = /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([a-zA-Z0-9._]+)\/?$/;
       const match = input.match(urlPattern);
       if (!match) {
-        toast({
-          title: "Invalid Instagram URL",
-          description: "Please enter a valid Instagram profile URL",
-          variant: "destructive",
-        });
+        if (shouldToast) {
+          toast({
+            title: "Invalid Instagram URL",
+            description: "Please enter a valid Instagram profile URL",
+            variant: "destructive",
+          });
+        }
         return false;
       }
       onUsernameChange(match[1]); // Extract username from URL
@@ -92,11 +96,13 @@ export const SearchBar = ({
     // If it's just a username
     const usernamePattern = /^[a-zA-Z0-9._]+$/;
     if (!usernamePattern.test(cleanInput)) {
-      toast({
-        title: "Invalid Username",
-        description: "Username can only contain letters, numbers, dots, and underscores",
-        variant: "destructive",
-      });
+      if (shouldToast) {
+        toast({
+          title: "Invalid Username",
+          description: "Username can only contain letters, numbers, dots, and underscores",
+          variant: "destructive",
+        });
+      }
       return false;
     }
     onUsernameChange(cleanInput);
@@ -112,8 +118,15 @@ export const SearchBar = ({
     subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
     subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" || // Creator on Steroids Annual
     subscriptionStatus.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || // Creator Pro Monthly
-    subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h"    // Creator Pro Annual
+    subscriptionStatus.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7j"    // Creator Pro Annual
   );
+
+  // Add effect to validate username when it changes from external updates (recent searches)
+  useEffect(() => {
+    if (username) {
+      validateInstagramUsername(username, false);
+    }
+  }, [username]);
 
   return (
     <>

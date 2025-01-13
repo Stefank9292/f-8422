@@ -22,7 +22,7 @@ export const TikTokSearchBar = ({
   const placeholder = usePlaceholderAnimation();
   const { toast } = useToast();
 
-  const validateTikTokUsername = (input: string) => {
+  const validateTikTokUsername = (input: string, shouldToast: boolean = true) => {
     // Skip validation if input is empty
     if (!input.trim()) {
       onUsernameChange('');
@@ -36,22 +36,26 @@ export const TikTokSearchBar = ({
     if (input.includes('http') || input.includes('www.')) {
       // Check if it's a TikTok URL
       if (!input.includes('tiktok.com')) {
-        toast({
-          title: "Invalid URL",
-          description: "Please enter a TikTok URL (e.g., https://tiktok.com/@username) or just the username",
-          variant: "destructive",
-        });
+        if (shouldToast) {
+          toast({
+            title: "Invalid URL",
+            description: "Please enter a TikTok URL (e.g., https://tiktok.com/@username) or just the username",
+            variant: "destructive",
+          });
+        }
         return false;
       }
 
       const urlPattern = /^(?:https?:\/\/)?(?:www\.)?tiktok\.com\/@?([a-zA-Z0-9._]+)\/?$/;
       const match = input.match(urlPattern);
       if (!match) {
-        toast({
-          title: "Invalid TikTok URL",
-          description: "Please enter a valid TikTok profile URL",
-          variant: "destructive",
-        });
+        if (shouldToast) {
+          toast({
+            title: "Invalid TikTok URL",
+            description: "Please enter a valid TikTok profile URL",
+            variant: "destructive",
+          });
+        }
         return false;
       }
       onUsernameChange(match[1]); // Extract username from URL
@@ -61,16 +65,25 @@ export const TikTokSearchBar = ({
     // If it's just a username
     const usernamePattern = /^[a-zA-Z0-9._]+$/;
     if (!usernamePattern.test(cleanInput)) {
-      toast({
-        title: "Invalid Username",
-        description: "Username can only contain letters, numbers, dots, and underscores",
-        variant: "destructive",
-      });
+      if (shouldToast) {
+        toast({
+          title: "Invalid Username",
+          description: "Username can only contain letters, numbers, dots, and underscores",
+          variant: "destructive",
+        });
+      }
       return false;
     }
     onUsernameChange(cleanInput);
     return true;
   };
+
+  // Add effect to validate username when it changes from external updates (recent searches)
+  useEffect(() => {
+    if (username) {
+      validateTikTokUsername(username, false);
+    }
+  }, [username]);
 
   return (
     <div className="relative w-full">
