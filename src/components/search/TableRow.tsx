@@ -35,20 +35,25 @@ export const PostTableRow = ({
   const getDisplayValues = () => {
     if (platform === 'tiktok') {
       return {
-        caption: post.title || '',
-        views: post.views || 0,
-        likes: post.likes || 0,
-        shares: post.shares || 0,
-        date: post.uploadedAtFormatted || '',
-        externalUrl: post.postPage || '',
-        downloadUrl: post.video?.url || ''
+        username: post.ownerUsername || '',
+        caption: post.caption || '',
+        views: post.viewsCount || 0,
+        likes: post.likesCount || 0,
+        shares: post.sharesCount || 0,
+        comments: post.commentsCount || 0,
+        date: post.date || '',
+        externalUrl: post.url || '',
+        downloadUrl: post.videoUrl || '',
+        plays: post.playsCount || post.viewsCount || 0 // TikTok uses viewsCount
       };
     }
     return {
+      username: post.ownerUsername || '',
       caption: post.caption || '',
       views: post.viewsCount || 0,
       likes: post.likesCount || 0,
       plays: post.playsCount || 0,
+      comments: post.commentsCount || 0,
       date: post.date || '',
       externalUrl: post.url || '',
       downloadUrl: post.videoUrl || ''
@@ -60,14 +65,14 @@ export const PostTableRow = ({
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post.ownerUsername}
+        @{displayValues.username}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {displayValues.caption.slice(0, 15)}...
+                {truncateCaption(displayValues.caption)}
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
@@ -103,7 +108,7 @@ export const PostTableRow = ({
         {formatNumberWithDots(displayValues.likes)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
-        {formatNumberWithDots(post.commentsCount || 0)}
+        {formatNumberWithDots(displayValues.comments)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
         {formattedEngagement}
