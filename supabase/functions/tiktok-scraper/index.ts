@@ -16,7 +16,7 @@ serve(async (req) => {
     console.log('Processing request for:', { username, numberOfVideos, dateRange, location })
 
     if (!username) {
-      throw new Error('No valid URLs provided')
+      throw new Error('No username provided')
     }
 
     const apiKey = Deno.env.get('TIKTOK_APIFY_API_KEY')
@@ -24,17 +24,16 @@ serve(async (req) => {
       throw new Error('Apify API key not configured')
     }
 
-    // Format username to URL if needed
+    // Format username to profile URL if needed
     const formattedUrl = username.startsWith('http') 
       ? username 
       : `https://www.tiktok.com/@${username.replace('@', '')}`
 
     const requestBody = {
-      customMapFunction: "(object) => { return {...object} }",
-      dateRange: dateRange || "DEFAULT",
-      location: location || "US",
-      maxItems: numberOfVideos || 3,
-      startUrls: [formattedUrl]
+      "profiles": [formattedUrl],
+      "resultsPerProfile": numberOfVideos || 3,
+      "dateRange": dateRange || "DEFAULT",
+      "location": location || "US"
     }
 
     console.log('Sending request to Apify:', requestBody)
@@ -76,8 +75,8 @@ serve(async (req) => {
       sharesCount: post.shareCount || 0,
       ownerUsername: username.replace('@', ''),
       engagement: ((post.diggCount || 0) + (post.commentCount || 0) + (post.shareCount || 0)) / (post.playCount || 1) * 100,
-      url: post.webVideoUrl, // Added to match InstagramPost type
-      duration: 0 // Added to match InstagramPost type
+      url: post.webVideoUrl,
+      duration: post.duration || 0
     }))
 
     return new Response(
