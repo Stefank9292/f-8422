@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { SearchFilters } from "../search/SearchFilters";
+import { InstagramFilters } from "../search/instagram/InstagramFilters";
+import { TikTokFilters } from "../search/tiktok/TikTokFilters";
 import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
 import { FilterState } from "@/utils/filterResults";
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
+import { usePlatformStore } from "@/store/platformStore";
 
 interface FilteredResultsSectionProps {
   results: InstagramPost[];
@@ -48,6 +50,8 @@ export function FilteredResultsSection({
     return saved ? JSON.parse(saved) : false;
   });
 
+  const { platform } = usePlatformStore();
+
   const sortedResults = [...unfilteredResults].sort((a, b) => {
     if (!sortKey) return 0;
 
@@ -82,11 +86,13 @@ export function FilteredResultsSection({
   const currentPosts = sortedResults.slice(startIndex, endIndex);
   const totalPages = Math.ceil(sortedResults.length / pageSize);
 
+  const FilterComponent = platform === 'instagram' ? InstagramFilters : TikTokFilters;
+
   return (
     <div className="mt-3 space-y-4 animate-fade-in">
       <div className="flex flex-col space-y-4">
         <div className="w-full">
-          <SearchFilters
+          <FilterComponent
             filters={filters}
             onFilterChange={onFilterChange}
             onReset={onResetFilters}
@@ -126,4 +132,4 @@ export function FilteredResultsSection({
       </div>
     </div>
   );
-};
+}

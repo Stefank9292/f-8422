@@ -5,6 +5,7 @@ export interface FilterState {
   postsNewerThan: string;
   minViews: string;
   minPlays: string;
+  minShares: string;
   minLikes: string;
   minComments: string;
   minEngagement: string;
@@ -12,16 +13,14 @@ export interface FilterState {
 
 const parseFormattedNumber = (value: string): number => {
   if (!value) return 0;
-  // Remove dots (thousand separators) and replace comma with dot for decimal
   return parseInt(value.replace(/\./g, '').replace(',', '.'));
 };
 
 const parseEngagement = (engagement: string): number => {
-  // Remove the '%' symbol and convert to number
   return parseFloat(engagement.replace('%', ''));
 };
 
-export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
+export const filterResults = (posts: InstagramPost[], filters: FilterState, platform: 'instagram' | 'tiktok' = 'instagram') => {
   if (!posts || !Array.isArray(posts)) {
     console.warn('No posts provided to filter');
     return [];
@@ -42,45 +41,45 @@ export const filterResults = (posts: InstagramPost[], filters: FilterState) => {
       }
     }
 
-    // Filter by minimum views (now checking against playsCount)
-    if (filters.minViews) {
-      const minViews = parseFormattedNumber(filters.minViews);
-      if (post.playsCount < minViews) {
-        return false;
+    if (platform === 'instagram') {
+      // Instagram-specific filters
+      if (filters.minViews) {
+        const minViews = parseFormattedNumber(filters.minViews);
+        if (post.playsCount < minViews) return false;
+      }
+
+      if (filters.minPlays) {
+        const minPlays = parseFormattedNumber(filters.minPlays);
+        if (post.viewsCount < minPlays) return false;
+      }
+    } else {
+      // TikTok-specific filters
+      if (filters.minViews) {
+        const minViews = parseFormattedNumber(filters.minViews);
+        if (post.views < minViews) return false;
+      }
+
+      if (filters.minShares) {
+        const minShares = parseFormattedNumber(filters.minShares);
+        if (post.shares < minShares) return false;
       }
     }
 
-    // Filter by minimum plays (now checking against viewsCount)
-    if (filters.minPlays) {
-      const minPlays = parseFormattedNumber(filters.minPlays);
-      if (post.viewsCount < minPlays) {
-        return false;
-      }
-    }
-
-    // Filter by minimum likes
+    // Common filters for both platforms
     if (filters.minLikes) {
       const minLikes = parseFormattedNumber(filters.minLikes);
-      if (post.likesCount < minLikes) {
-        return false;
-      }
+      if (post.likesCount < minLikes) return false;
     }
 
-    // Filter by minimum comments
     if (filters.minComments) {
       const minComments = parseFormattedNumber(filters.minComments);
-      if (post.commentsCount < minComments) {
-        return false;
-      }
+      if (post.commentsCount < minComments) return false;
     }
 
-    // Filter by minimum engagement
     if (filters.minEngagement) {
       const minEngagementRate = parseFloat(filters.minEngagement);
       const postEngagement = parseEngagement(post.engagement);
-      if (postEngagement < minEngagementRate) {
-        return false;
-      }
+      if (postEngagement < minEngagementRate) return false;
     }
 
     return true;
