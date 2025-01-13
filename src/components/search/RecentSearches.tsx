@@ -187,73 +187,80 @@ export const RecentSearches = ({ onSelect }: RecentSearchesProps) => {
         )}
       >
         <div className="w-full flex flex-wrap justify-center gap-2.5">
-          {visibleSearches.map((search) => (
-            <div
-              key={search.id}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
-            >
-              {(search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search') ? (
-                <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
-              ) : (
-                <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
-              )}
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => onSelect(search.search_query)}
-                  className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
-                >
-                  {search.search_query}
-                  {search.bulk_search_urls?.length > 0 && (
-                    <HoverCard>
-                      <HoverCardTrigger asChild>
-                        <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
-                          +{search.bulk_search_urls.length - 1}
-                        </span>
-                      </HoverCardTrigger>
-                      <HoverCardContent 
-                        align="start"
-                        className="w-80 p-4"
-                      >
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <h4 className="text-sm font-medium">Bulk Search URLs</h4>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-secondary/80"
-                              onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
-                            >
-                              <Copy className="h-4 w-4" />
-                              <span className="sr-only">Copy URLs</span>
-                            </Button>
-                          </div>
-                          <ul className="list-none space-y-0.5">
-                            {search.bulk_search_urls.map((url: string, index: number) => (
-                              <li 
-                                key={index} 
-                                className="text-xs text-muted-foreground break-all py-0.5 text-left"
-                              >
-                                {url}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
-                  )}
-                </button>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-4 w-4 p-0 hover:bg-transparent"
-                onClick={() => handleRemove(search.id)}
+          {visibleSearches.map((search) => {
+            console.log('Rendering search item:', {
+              type: search.search_type,
+              query: search.search_query
+            });
+            
+            return (
+              <div
+                key={search.id}
+                className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
               >
-                <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-                <span className="sr-only">Remove search</span>
-              </Button>
-            </div>
-          ))}
+                {(search.search_type === 'tiktok_search' || search.search_type === 'bulk_tiktok_search') ? (
+                  <TikTokIcon className="w-3.5 h-3.5 text-black dark:text-white" />
+                ) : (
+                  <Instagram className="w-3.5 h-3.5 text-[#E1306C]" />
+                )}
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => onSelect(search.search_query)}
+                    className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
+                  >
+                    {search.search_query}
+                    {search.bulk_search_urls?.length > 0 && (
+                      <HoverCard>
+                        <HoverCardTrigger asChild>
+                          <span className="text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer ml-1 bg-secondary/50 px-1.5 py-0.5 rounded-full">
+                            +{search.bulk_search_urls.length - 1}
+                          </span>
+                        </HoverCardTrigger>
+                        <HoverCardContent 
+                          align="start"
+                          className="w-80 p-4"
+                        >
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <h4 className="text-sm font-medium">Bulk Search URLs</h4>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0 hover:bg-secondary/80"
+                                onClick={() => handleCopyUrls(search.bulk_search_urls || [])}
+                              >
+                                <Copy className="h-4 w-4" />
+                                <span className="sr-only">Copy URLs</span>
+                              </Button>
+                            </div>
+                            <ul className="list-none space-y-0.5">
+                              {search.bulk_search_urls.map((url: string, index: number) => (
+                                <li 
+                                  key={index} 
+                                  className="text-xs text-muted-foreground break-all py-0.5 text-left"
+                                >
+                                  {url}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </HoverCardContent>
+                      </HoverCard>
+                    )}
+                  </button>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-4 w-4 p-0 hover:bg-transparent"
+                  onClick={() => handleRemove(search.id)}
+                >
+                  <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+                  <span className="sr-only">Remove search</span>
+                </Button>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
