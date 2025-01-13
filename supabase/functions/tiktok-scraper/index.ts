@@ -66,30 +66,30 @@ serve(async (req) => {
     // Transform the data to match our expected format
     const transformedData = data.map((post: any) => {
       // Calculate engagement rate
-      const plays = post.playCount || 0
-      const likes = post.diggCount || 0
-      const comments = post.commentCount || 0
-      const shares = post.shareCount || 0
-      const engagement = plays > 0 ? ((likes + comments + shares) / plays * 100).toFixed(2) : '0'
+      const views = post.views || 0
+      const likes = post.likes || 0
+      const comments = post.comments || 0
+      const shares = post.shares || 0
+      const engagement = views > 0 ? ((likes + comments + shares) / views * 100).toFixed(2) : '0'
 
       // Format date
-      const createDate = post.createTime ? new Date(post.createTime * 1000) : new Date()
-      const formattedDate = createDate.toLocaleDateString()
+      const uploadDate = post.uploadedAt ? new Date(post.uploadedAt * 1000) : new Date()
+      const formattedDate = uploadDate.toLocaleDateString()
 
       return {
-        ownerUsername: post.authorMeta?.name || cleanUsername,
-        caption: post.text || post.desc || '',
+        ownerUsername: post["channel.username"] || cleanUsername,
+        caption: post.title || '',
         date: formattedDate,
-        timestamp: post.createTimeISO || createDate.toISOString(),
-        playsCount: plays,
-        viewsCount: plays, // TikTok uses playCount for views
+        timestamp: post.uploadedAtFormatted || uploadDate.toISOString(),
+        playsCount: views,
+        viewsCount: views,
         likesCount: likes,
         commentsCount: comments,
         sharesCount: shares,
         engagement: engagement,
-        url: post.webVideoUrl || `https://www.tiktok.com/@${cleanUsername}/video/${post.id}`,
-        videoUrl: post.videoUrl || post.downloadAddr || '',
-        thumbnailUrl: post.covers?.[0] || post.dynamicCover || '',
+        url: post.postPage || `https://www.tiktok.com/@${cleanUsername}/video/${post.id}`,
+        videoUrl: post["video.url"] || '',
+        thumbnailUrl: post["video.cover"] || post["video.thumbnail"] || '',
         type: 'video'
       }
     })
