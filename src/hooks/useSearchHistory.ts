@@ -1,19 +1,7 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { InstagramPost } from "@/types/instagram";
-import { transformSearchResults } from "@/utils/transformSearchResults";
-
-interface SearchHistoryResult {
-  id: string;
-  search_query: string;
-  created_at: string;
-  search_results?: Array<{ results: InstagramPost[] }>;
-  bulk_search_urls?: string[];
-}
 
 export const useSearchHistory = (userId: string | undefined) => {
-  const queryClient = useQueryClient();
-
   const { data: searchHistory, isLoading } = useQuery({
     queryKey: ['search-history'],
     queryFn: async () => {
@@ -47,7 +35,7 @@ export const useSearchHistory = (userId: string | undefined) => {
         search_results: item.search_results?.map(sr => ({
           results: transformSearchResults(sr as any).results
         }))
-      })) as SearchHistoryResult[];
+      }));
     },
     enabled: !!userId,
   });

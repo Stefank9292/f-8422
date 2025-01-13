@@ -7,6 +7,7 @@ import { SearchHistoryList } from "@/components/history/SearchHistoryList";
 import { Input } from "@/components/ui/input";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useSearchHistoryActions } from "@/hooks/useSearchHistoryActions";
+import { useSubscriptionCheck } from "@/hooks/useSubscriptionCheck";
 
 const SearchHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,23 +21,9 @@ const SearchHistory = () => {
     },
   });
 
-  // Get subscription status
-  const { data: subscriptionStatus } = useQuery({
-    queryKey: ['subscription-status', session?.access_token],
-    queryFn: async () => {
-      if (!session?.access_token) return null;
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      });
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!session?.access_token,
-  });
-
+  // Use custom hooks
   const { searchHistory, isLoading } = useSearchHistory(session?.user?.id);
+  const { data: subscriptionStatus } = useSubscriptionCheck(session);
   const { isDeleting, isDeletingAll, handleDelete, handleDeleteAll } = 
     useSearchHistoryActions(session?.user?.id);
 

@@ -29,7 +29,6 @@ export const useSubscriptionCheck = (session: Session | null) => {
       }
       
       try {
-        // First check if session is valid
         const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
@@ -85,9 +84,8 @@ export const useSubscriptionCheck = (session: Session | null) => {
       }
     },
     enabled: !!session?.access_token,
-    staleTime: 1000 * 60, // Cache for 1 minute
+    staleTime: 1000 * 60,
     retry: (failureCount, error: any) => {
-      // Don't retry on auth errors
       if (error?.status === 401 || error?.message?.includes('Invalid user session')) {
         return false;
       }
