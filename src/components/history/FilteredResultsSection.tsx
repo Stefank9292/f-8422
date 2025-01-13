@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { SearchFilters } from "../search/SearchFilters";
-import { TableContent } from "../search/TableContent";
 import { TablePagination } from "../search/TablePagination";
 import { FilterState } from "@/utils/filterResults";
 import { InstagramPost } from "@/types/instagram";
 import { cn } from "@/lib/utils";
+import { ResultsTableSection } from "./ResultsTableSection";
+import { useSortResults } from "@/hooks/useSortResults";
 
 interface FilteredResultsSectionProps {
   results: InstagramPost[];
@@ -20,9 +21,6 @@ interface FilteredResultsSectionProps {
   handleDownload: (videoUrl: string) => void;
   formatNumber: (num: number) => string;
   truncateCaption: (caption: string) => string;
-  sortKey: string;
-  sortDirection: "asc" | "desc";
-  handleSort: (key: string) => void;
 }
 
 export function FilteredResultsSection({
@@ -39,39 +37,18 @@ export function FilteredResultsSection({
   handleDownload,
   formatNumber,
   truncateCaption,
-  sortKey,
-  sortDirection,
-  handleSort,
 }: FilteredResultsSectionProps) {
   const [isCollapsed, setIsCollapsed] = useState(() => {
     const saved = localStorage.getItem("filterResultsCollapsed");
     return saved ? JSON.parse(saved) : false;
   });
 
-  const sortedResults = [...unfilteredResults].sort((a, b) => {
-    if (!sortKey) return 0;
-
-    let valueA = a[sortKey as keyof typeof a];
-    let valueB = b[sortKey as keyof typeof b];
-
-    if (sortKey === 'date' || sortKey === 'timestamp') {
-      valueA = new Date(valueA as string).getTime();
-      valueB = new Date(valueB as string).getTime();
-    } else if (sortKey === 'engagement') {
-      valueA = parseFloat((valueA as string).replace('%', ''));
-      valueB = parseFloat((valueB as string).replace('%', ''));
-    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-      // No conversion needed for numbers
-    } else {
-      valueA = String(valueA);
-      valueB = String(valueB);
-    }
-
-    if (sortDirection === 'asc') {
-      return valueA > valueB ? 1 : -1;
-    }
-    return valueA < valueB ? 1 : -1;
-  });
+  const {
+    sortKey,
+    sortDirection,
+    handleSort,
+    sortedResults
+  } = useSortResults(unfilteredResults);
 
   useEffect(() => {
     localStorage.setItem("filterResultsCollapsed", JSON.stringify(isCollapsed));
@@ -104,7 +81,7 @@ export function FilteredResultsSection({
         )}
       >
         <div className="overflow-hidden">
-          <TableContent
+          <ResultsTableSection
             currentPosts={currentPosts}
             handleSort={handleSort}
             handleCopyCaption={handleCopyCaption}
