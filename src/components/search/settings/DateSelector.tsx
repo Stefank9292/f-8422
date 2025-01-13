@@ -1,4 +1,4 @@
-import { Calendar as CalendarIcon, HelpCircle, Lock } from "lucide-react";
+import { Calendar as CalendarIcon, HelpCircle, Lock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -47,32 +47,46 @@ export const DateSelector = ({
           </Tooltip>
         )}
       </div>
-      <Popover>
-        <PopoverTrigger asChild>
+      <div className="relative">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "w-full h-8 justify-start text-[11px] font-normal",
+                !selectedDate && "text-muted-foreground",
+                isFreeUser && "opacity-50 cursor-not-allowed"
+              )}
+              disabled={disabled || isFreeUser}
+            >
+              {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+            </Button>
+          </PopoverTrigger>
+          {!isFreeUser && (
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                disabled={(date) => date > new Date() || date < ninetyDaysAgo}
+                initialFocus
+              />
+            </PopoverContent>
+          )}
+        </Popover>
+        {selectedDate && !isFreeUser && (
           <Button
-            variant="outline"
-            className={cn(
-              "w-full h-8 justify-start text-[11px] font-normal",
-              !selectedDate && "text-muted-foreground",
-              isFreeUser && "opacity-50 cursor-not-allowed"
-            )}
-            disabled={disabled || isFreeUser}
+            variant="ghost"
+            size="icon"
+            className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 hover:bg-muted"
+            onClick={() => setSelectedDate(undefined)}
+            disabled={disabled}
           >
-            {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+            <X className="h-3 w-3" />
+            <span className="sr-only">Clear date</span>
           </Button>
-        </PopoverTrigger>
-        {!isFreeUser && (
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              disabled={(date) => date > new Date() || date < ninetyDaysAgo}
-              initialFocus
-            />
-          </PopoverContent>
         )}
-      </Popover>
+      </div>
     </div>
   );
 };
