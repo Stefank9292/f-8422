@@ -197,7 +197,7 @@ export const useSearchState = () => {
       for (const url of urls) {
         const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
         if (urlResults.length > 0) {
-          await saveSearchHistory(url, urlResults, 'instagram');
+          await saveSearchHistory(url, urlResults, [url]);
         }
       }
       
@@ -211,6 +211,8 @@ export const useSearchState = () => {
       setShouldFetch(false);
     }
   };
+
+  const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return {
     username: currentUsername,
