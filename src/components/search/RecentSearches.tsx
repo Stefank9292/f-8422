@@ -19,6 +19,8 @@ interface RecentSearchesProps {
   onSearch: () => void;
 }
 
+type SearchType = 'instagram_search' | 'tiktok_search' | 'bulk_instagram_search' | 'bulk_tiktok_search';
+
 export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
   const [hiddenSearches, setHiddenSearches] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(() => {
@@ -141,6 +143,15 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
     }
   };
 
+  const getSearchIcon = (searchType: string) => {
+    const isTikTok = searchType.includes('tiktok');
+    return isTikTok ? (
+      <TikTokIcon className="h-3 w-3 text-muted-foreground" />
+    ) : (
+      <Instagram className="h-3 w-3 text-muted-foreground" />
+    );
+  };
+
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
 
   if (!isSteroidsUser) {
@@ -199,11 +210,7 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
                   onClick={() => handleSelect(search.search_query)}
                   className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
                 >
-                  {search.search_type.includes('tiktok') ? (
-                    <TikTokIcon className="h-3 w-3 text-muted-foreground" />
-                  ) : (
-                    <Instagram className="h-3 w-3 text-muted-foreground" />
-                  )}
+                  {getSearchIcon(search.search_type)}
                   {search.search_query}
                   {search.bulk_search_urls?.length > 0 && (
                     <HoverCard>
