@@ -7,13 +7,18 @@ import { useSearchStore } from "../../store/searchStore";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { InstagramPost } from "@/utils/instagram/types/InstagramTypes";
 import { useUsageStats } from "@/hooks/useUsageStats";
+import { usePlatformStore } from "@/store/platformStore";
 
 export const useSearchState = () => {
   const {
-    username,
+    instagramUsername,
+    tiktokUsername,
     numberOfVideos,
     selectedDate,
   } = useSearchStore();
+  
+  const { platform } = usePlatformStore();
+  const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
   
   const [isBulkSearching, setIsBulkSearching] = useState(false);
   const [bulkSearchResults, setBulkSearchResults] = useState<InstagramPost[]>([]);
@@ -38,10 +43,10 @@ export const useSearchState = () => {
   } = useUsageStats(session);
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['instagram-posts', username, numberOfVideos, selectedDate],
+    queryKey: ['instagram-posts', currentUsername, numberOfVideos, selectedDate],
     queryFn: async () => {
       console.log('Starting Instagram search with params:', {
-        username,
+        username: currentUsername,
         numberOfVideos,
         selectedDate,
         requestCount,
@@ -53,8 +58,8 @@ export const useSearchState = () => {
         throw new Error(`You've reached your monthly limit of ${maxRequests} searches on the ${planName} plan. Please upgrade for more searches.`);
       }
 
-      if (!username.trim()) {
-        throw new Error('Please enter a valid Instagram username');
+      if (!currentUsername.trim()) {
+        throw new Error('Please enter a valid username');
       }
 
       // Enforce video limit based on subscription
@@ -70,11 +75,11 @@ export const useSearchState = () => {
       
       try {
         console.log('Fetching Instagram posts...');
-        const results = await fetchInstagramPosts(username, adjustedNumberOfVideos, selectedDate);
+        const results = await fetchInstagramPosts(currentUsername, adjustedNumberOfVideos, selectedDate);
         console.log('Received results:', results);
         
         if (results.length > 0) {
-          await saveSearchHistory(username, results);
+          await saveSearchHistory(currentUsername, results);
         }
         
         setShouldFetch(false);
@@ -84,7 +89,7 @@ export const useSearchState = () => {
         throw error;
       }
     },
-    enabled: shouldFetch && !!username && !isBulkSearching && requestCount < maxRequests,
+    enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests,
     retry: false,
     staleTime: Infinity,
     gcTime: 1000 * 60 * 5,
@@ -95,13 +100,13 @@ export const useSearchState = () => {
         console.error('Search error details:', {
           error: error.message,
           stack: error.stack,
-          username,
+          username: currentUsername,
           numberOfVideos,
           selectedDate
         });
         toast({
           title: "Search Failed",
-          description: error.message || "Failed to fetch Instagram posts",
+          description: error.message || "Failed to fetch posts",
           variant: "destructive",
         });
         setShouldFetch(false);
@@ -114,10 +119,10 @@ export const useSearchState = () => {
       return;
     }
 
-    if (!username) {
+    if (!currentUsername) {
       toast({
         title: "Error",
-        description: "Please enter an Instagram username",
+        description: "Please enter a username",
         variant: "destructive",
       });
       return;
@@ -190,7 +195,7 @@ export const useSearchState = () => {
   const displayPosts = bulkSearchResults.length > 0 ? bulkSearchResults : posts;
 
   return {
-    username,
+    username: currentUsername,
     isLoading,
     isBulkSearching,
     hasReachedLimit,

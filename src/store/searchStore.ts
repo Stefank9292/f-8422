@@ -10,13 +10,15 @@ interface SearchFilters {
 }
 
 interface SearchState {
-  username: string;
+  instagramUsername: string;
+  tiktokUsername: string;
   numberOfVideos: number;
   selectedDate: Date | undefined;
   dateRange: string;
   location: string;
   filters: SearchFilters;
-  setUsername: (username: string) => void;
+  setInstagramUsername: (username: string) => void;
+  setTiktokUsername: (username: string) => void;
   setNumberOfVideos: (num: number) => void;
   setSelectedDate: (date: Date | undefined) => void;
   setDateRange: (range: string) => void;
@@ -26,7 +28,8 @@ interface SearchState {
 }
 
 export const useSearchStore = create<SearchState>((set) => ({
-  username: "",
+  instagramUsername: "",
+  tiktokUsername: "",
   numberOfVideos: 3,
   selectedDate: undefined,
   dateRange: "DEFAULT",
@@ -39,7 +42,8 @@ export const useSearchStore = create<SearchState>((set) => ({
     minEngagement: "",
     postsNewerThan: ""
   },
-  setUsername: (username) => set({ username }),
+  setInstagramUsername: (instagramUsername) => set({ instagramUsername }),
+  setTiktokUsername: (tiktokUsername) => set({ tiktokUsername }),
   setNumberOfVideos: (numberOfVideos) => set({ numberOfVideos }),
   setSelectedDate: (selectedDate) => set({ selectedDate }),
   setDateRange: (dateRange) => set({ dateRange }),

@@ -29,7 +29,6 @@ interface SearchContainerProps {
 }
 
 export const SearchContainer = ({
-  username,
   isLoading,
   isBulkSearching,
   hasReachedLimit,
@@ -44,7 +43,10 @@ export const SearchContainer = ({
   const resultsRef = useRef<HTMLDivElement>(null);
   const { platform } = usePlatformStore();
   const { 
-    setUsername,
+    instagramUsername,
+    tiktokUsername,
+    setInstagramUsername,
+    setTiktokUsername,
     numberOfVideos,
     setNumberOfVideos,
     selectedDate,
@@ -58,6 +60,9 @@ export const SearchContainer = ({
     setLocation,
   } = useSearchStore();
 
+  const currentUsername = platform === 'instagram' ? instagramUsername : tiktokUsername;
+  const setUsername = platform === 'instagram' ? setInstagramUsername : setTiktokUsername;
+
   useEffect(() => {
     if (displayPosts.length > 0 && !isLoading && !isBulkSearching && resultsRef.current) {
       setTimeout(() => {
@@ -70,7 +75,7 @@ export const SearchContainer = ({
   }, [displayPosts, isLoading, isBulkSearching]);
 
   const onSearchClick = () => {
-    if (!username.trim()) {
+    if (!currentUsername.trim()) {
       toast({
         title: "Error",
         description: "Please enter a username",
@@ -97,7 +102,7 @@ export const SearchContainer = ({
   };
 
   const hasNoSearchesLeft = requestCount >= maxRequests;
-  const isSearchDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || hasNoSearchesLeft;
+  const isSearchDisabled = isLoading || isBulkSearching || !currentUsername.trim() || hasReachedLimit || hasNoSearchesLeft;
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -112,19 +117,19 @@ export const SearchContainer = ({
       <div className="w-full max-w-md space-y-4 sm:space-y-6">
         {platform === 'instagram' ? (
           <SearchBar
-            username={username}
+            username={instagramUsername}
             onSearch={onSearchClick}
             onBulkSearch={handleBulkSearch}
             isLoading={isLoading || isBulkSearching}
-            onUsernameChange={setUsername}
+            onUsernameChange={setInstagramUsername}
             hasReachedLimit={hasReachedLimit}
           />
         ) : (
           <TikTokSearchBar
-            username={username}
+            username={tiktokUsername}
             onSearch={onSearchClick}
             isLoading={isLoading}
-            onUsernameChange={setUsername}
+            onUsernameChange={setTiktokUsername}
             hasReachedLimit={hasReachedLimit}
           />
         )}
@@ -134,7 +139,7 @@ export const SearchContainer = ({
           disabled={isSearchDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            username && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            currentUsername && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
           )}
