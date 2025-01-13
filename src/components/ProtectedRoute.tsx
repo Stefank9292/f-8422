@@ -28,18 +28,25 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       if (error && sessionErrors.some(e => error.toString().includes(e))) {
         console.log('Session error detected, signing out...', error);
         try {
-          // Clear query cache first
-          queryClient.clear();
-          // Then attempt to sign out
-          await supabase.auth.signOut();
-          toast({
-            title: "Session Expired",
-            description: "Please sign in again to continue.",
-            variant: "destructive",
-          });
+          // First try to refresh the session
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError || !refreshData.session) {
+            // If refresh fails, clear cache and sign out
+            console.log('Session refresh failed, signing out completely');
+            queryClient.clear();
+            await supabase.auth.signOut();
+            toast({
+              title: "Session Expired",
+              description: "Please sign in again to continue.",
+              variant: "destructive",
+            });
+          } else {
+            console.log('Session refreshed successfully');
+            // Invalidate queries to refetch with new session
+            queryClient.invalidateQueries();
+          }
         } catch (signOutError) {
           console.error('Error during sign out:', signOutError);
-          // If sign out fails, force navigation to auth page
           window.location.href = '/auth';
         }
       }
@@ -55,7 +62,15 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       console.log('Subscription check error:', subscriptionError);
       if (subscriptionError.status === 401 || 
           (subscriptionError.message && subscriptionError.message.includes('session'))) {
-        queryClient.invalidateQueries({ queryKey: ['session'] });
+        // Try to refresh the session first
+        supabase.auth.refreshSession().then(({ data, error: refreshError }) => {
+          if (refreshError || !data.session) {
+            queryClient.invalidateQueries({ queryKey: ['session'] });
+          } else {
+            // Retry subscription check with new session
+            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+          }
+        });
       }
     }
   }, [subscriptionError, queryClient]);
