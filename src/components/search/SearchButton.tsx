@@ -35,7 +35,7 @@ export const SearchButton = ({
         "w-full h-10 text-[11px] font-medium transition-all duration-300",
         {
           'bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] hover:opacity-90': isButtonEnabled && platform === 'instagram',
-          'bg-black hover:bg-black/90 dark:bg-black dark:hover:bg-black/90': isButtonEnabled && platform === 'tiktok',
+          'bg-black hover:bg-black/90': isButtonEnabled && platform === 'tiktok',
           'bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800': !isButtonEnabled
         },
         "text-white dark:text-gray-100 shadow-sm hover:shadow-md",

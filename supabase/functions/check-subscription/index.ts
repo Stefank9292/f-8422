@@ -42,7 +42,7 @@ serve(async (req) => {
 
     console.log('Authenticated user:', user.id);
 
-    // Get subscription status from subscription_logs table
+    // Get subscription status from hooks table
     const { data: subscriptionData, error: subscriptionError } = await supabaseClient
       .from('subscription_logs')
       .select('*')
