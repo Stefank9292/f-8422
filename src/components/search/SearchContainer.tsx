@@ -139,7 +139,7 @@ export const SearchContainer = ({
           disabled={isSearchDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            currentUsername && !hasReachedLimit && !hasNoSearchesLeft 
+            !isSearchDisabled && currentUsername
               ? platform === 'instagram' 
                 ? "instagram-gradient"
                 : "tiktok-gradient"
