@@ -1,4 +1,4 @@
-import { X, History, Lock, ChevronDown, ChevronUp, Copy, TikTok } from "lucide-react";
+import { X, History, Lock, ChevronDown, ChevronUp, Copy } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import {
   HoverCard,
   HoverCardContent,
@@ -202,7 +203,7 @@ export const RecentSearches = ({ onSelect, onSearch }: RecentSearchesProps) => {
                   className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
                 >
                   {search.search_type.includes('tiktok') && (
-                    <TikTok className="h-3 w-3 text-muted-foreground" />
+                    <TikTokIcon className="h-3 w-3 text-muted-foreground" />
                   )}
                   {search.search_query}
                   {search.bulk_search_urls?.length > 0 && (
