@@ -95,7 +95,7 @@ export const useSearchState = () => {
           console.log('Received TikTok results:', results);
           
           if (results.length > 0) {
-            await saveSearchHistory(currentUsername, results, undefined, 'tiktok');
+            await saveSearchHistory(currentUsername, results, 'tiktok');
           }
           
           return results;
@@ -197,7 +197,7 @@ export const useSearchState = () => {
       for (const url of urls) {
         const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
         if (urlResults.length > 0) {
-          await saveSearchHistory(url, urlResults);
+          await saveSearchHistory(url, urlResults, 'instagram');
         }
       }
       
