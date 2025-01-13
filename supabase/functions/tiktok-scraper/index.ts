@@ -28,7 +28,6 @@ serve(async (req) => {
 
     // Prepare request body according to Apify API structure
     const requestBody = {
-      customMapFunction: "(object) => { return {...object} }",
       dateRange: onlyPostsNewerThan ? "CUSTOM" : "DEFAULT",
       location: "US",
       maxItems: maxPosts || 1000,
