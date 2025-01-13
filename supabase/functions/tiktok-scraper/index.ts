@@ -38,7 +38,7 @@ serve(async (req) => {
 
     console.log('Sending request to Apify:', requestBody)
 
-    const response = await fetch('https://api.apify.com/v2/acts/clockworks~tiktok-profile-scraper/run-sync-get-dataset-items', {
+    const response = await fetch('https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
