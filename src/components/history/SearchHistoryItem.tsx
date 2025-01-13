@@ -20,8 +20,6 @@ interface SearchHistoryItemProps {
 export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
-  const [sortKey, setSortKey] = useState<string>("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(25);
   const [filters, setFilters] = useState<FilterState>({
@@ -97,15 +95,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
     }
   };
 
-  const handleSort = (key: string) => {
-    if (sortKey === key) {
-      setSortDirection(prev => prev === "asc" ? "desc" : "asc");
-    } else {
-      setSortKey(key);
-      setSortDirection("desc");
-    }
-  };
-
   const handlePageSizeChange = (value: string) => {
     setPageSize(Number(value));
     setCurrentPage(1);
@@ -144,9 +133,6 @@ export function SearchHistoryItem({ item, onDelete, isDeleting }: SearchHistoryI
           handleDownload={handleDownload}
           formatNumber={(num) => num.toLocaleString()}
           truncateCaption={(caption) => caption.length > 15 ? `${caption.slice(0, 15)}...` : caption}
-          sortKey={sortKey}
-          sortDirection={sortDirection}
-          handleSort={handleSort}
         />
       )}
     </div>
