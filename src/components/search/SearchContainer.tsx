@@ -139,7 +139,11 @@ export const SearchContainer = ({
           disabled={isSearchDisabled}
           className={cn(
             "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            currentUsername && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            currentUsername && !hasReachedLimit && !hasNoSearchesLeft 
+              ? platform === 'instagram' 
+                ? "instagram-gradient"
+                : "tiktok-gradient"
+              : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
           )}

@@ -121,6 +121,10 @@
     @apply bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D];
   }
 
+  .tiktok-gradient {
+    @apply bg-gradient-to-r from-[#00f2ea] via-[#ff0050] to-[#00f2ea];
+  }
+
   .primary-gradient {
     @apply bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] hover:opacity-90;
   }
