@@ -1,7 +1,8 @@
-import { Instagram, TikTok, Loader2, Trash2 } from "lucide-react";
+import { Instagram, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isTikTokUrl } from "@/utils/tiktok/validation";
 import { formatDistanceToNow } from "date-fns";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 interface SearchHistoryItemHeaderProps {
   query: string;
@@ -37,7 +38,7 @@ export function SearchHistoryItemHeader({
           className="flex items-center gap-3 hover:opacity-70 transition-opacity"
         >
           {isTikTok ? (
-            <TikTok className="w-4 h-4 text-[#ff0050]" />
+            <TikTokIcon className="w-4 h-4 text-[#ff0050]" />
           ) : (
             <Instagram className="w-4 h-4 text-[#E1306C]" />
           )}

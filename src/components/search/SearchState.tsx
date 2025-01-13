@@ -175,17 +175,21 @@ export const useSearchState = () => {
 
     setIsBulkSearching(true);
     try {
-      const results = await fetchBulkInstagramPosts(urls, adjustedNumVideos, date);
+      const allResults: InstagramPost[] = [];
       
       for (const url of urls) {
-        const urlResults = results.filter(post => post.ownerUsername === url.replace('@', ''));
-        if (urlResults.length > 0) {
-          await saveSearchHistory(url, urlResults);
+        const results = isTikTokUrl(url) 
+          ? await fetchTikTokPosts(url, adjustedNumVideos, date)
+          : await fetchInstagramPosts(url, adjustedNumVideos, date);
+          
+        if (results.length > 0) {
+          await saveSearchHistory(url, results);
+          allResults.push(...results);
         }
       }
       
-      setBulkSearchResults(results);
-      return results;
+      setBulkSearchResults(allResults);
+      return allResults;
     } catch (error) {
       console.error('Bulk search error:', error);
       throw error;
