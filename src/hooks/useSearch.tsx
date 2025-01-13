@@ -1,14 +1,15 @@
-import { useState } from "react";
-import { useSearchQuery } from "./search/useSearchQuery";
-import { useBulkSearch } from "./search/useBulkSearch";
-import { useSearchValidation } from "./search/useSearchValidation";
-import { useToast } from "./use-toast";
+import { useSearchQuery } from "@/hooks/search/useSearchQuery";
+import { useBulkSearch } from "@/hooks/search/useBulkSearch";
+import { useSearchValidation } from "@/hooks/search/useSearchValidation";
+import { useSubscriptionLimits } from "@/hooks/search/useSubscriptionLimits";
+import { useRequestCount } from "@/hooks/useRequestCount";
+import { Session } from "@supabase/supabase-js";
 
 interface UseSearchProps {
   platform: string;
   currentUsername: string;
   numberOfVideos: number;
-  selectedDate?: Date;
+  selectedDate: Date | undefined;
   dateRange: string;
   location: string;
   requestCount: number;
@@ -31,8 +32,6 @@ export const useSearch = ({
   isSteroidsUser,
   subscriptionStatus
 }: UseSearchProps) => {
-  const { toast } = useToast();
-  
   const {
     posts,
     isLoading,
@@ -53,11 +52,7 @@ export const useSearch = ({
     subscriptionStatus
   });
 
-  const {
-    isBulkSearching,
-    bulkSearchResults,
-    handleBulkSearch
-  } = useBulkSearch({
+  const { isBulkSearching, handleBulkSearch } = useBulkSearch({
     maxVideosPerSearch,
     isProUser,
     isSteroidsUser,
@@ -75,24 +70,15 @@ export const useSearch = ({
   });
 
   const handleSearch = () => {
-    if (!validateSearch()) {
-      return;
+    if (validateSearch()) {
+      setShouldFetch(true);
     }
-    setShouldFetch(true);
   };
 
-  if (error) {
-    toast({
-      title: "Search Failed",
-      description: error.message || "Failed to fetch posts",
-      variant: "destructive",
-    });
-    setShouldFetch(false);
-  }
-
   return {
-    posts: bulkSearchResults.length > 0 ? bulkSearchResults : posts,
+    posts,
     isLoading,
+    error,
     isBulkSearching,
     handleSearch,
     handleBulkSearch,
