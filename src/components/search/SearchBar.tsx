@@ -65,7 +65,17 @@ export const SearchBar = ({
     const cleanInput = input.replace('@', '');
     
     // Check if it's a URL
-    if (input.includes('instagram.com')) {
+    if (input.includes('http') || input.includes('www.')) {
+      // Check if it's an Instagram URL
+      if (!input.includes('instagram.com')) {
+        toast({
+          title: "Invalid URL",
+          description: "Please enter an Instagram URL (e.g., https://instagram.com/username) or just the username",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       const urlPattern = /^(?:https?:\/\/)?(?:www\.)?instagram\.com\/([a-zA-Z0-9._]+)\/?$/;
       const match = input.match(urlPattern);
       if (!match) {
