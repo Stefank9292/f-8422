@@ -2,12 +2,11 @@ import { create } from 'zustand';
 
 interface SearchFilters {
   minViews: string;
-  minPlays: string;
   minLikes: string;
   minComments: string;
   minEngagement: string;
   postsNewerThan: string;
-  minShares: string; // Added this field
+  minShares: string;
 }
 
 interface SearchState {
@@ -37,12 +36,11 @@ export const useSearchStore = create<SearchState>((set) => ({
   location: "US",
   filters: {
     minViews: "",
-    minPlays: "",
     minLikes: "",
     minComments: "",
     minEngagement: "",
     postsNewerThan: "",
-    minShares: "" // Added this field with default empty string
+    minShares: ""
   },
   setInstagramUsername: (instagramUsername) => set({ instagramUsername }),
   setTiktokUsername: (tiktokUsername) => set({ tiktokUsername }),
@@ -54,12 +52,11 @@ export const useSearchStore = create<SearchState>((set) => ({
   resetFilters: () => set({
     filters: {
       minViews: "",
-      minPlays: "",
       minLikes: "",
       minComments: "",
       minEngagement: "",
       postsNewerThan: "",
-      minShares: "" // Added this field
+      minShares: ""
     }
   })
 }));
