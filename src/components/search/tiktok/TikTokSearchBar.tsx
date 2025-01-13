@@ -22,13 +22,6 @@ export const TikTokSearchBar = ({
   const placeholder = usePlaceholderAnimation();
   const { toast } = useToast();
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !isLoading && username.trim() && !hasReachedLimit) {
-      e.preventDefault();
-      onSearch();
-    }
-  };
-
   const validateTikTokUsername = (input: string) => {
     // Skip validation if input is empty
     if (!input.trim()) {
@@ -89,7 +82,6 @@ export const TikTokSearchBar = ({
                  placeholder:text-gray-400 dark:placeholder:text-gray-600"
         value={username}
         onChange={(e) => validateTikTokUsername(e.target.value)}
-        onKeyDown={handleKeyDown}
         disabled={isLoading || hasReachedLimit}
       />
       <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-3.5 h-3.5" />
