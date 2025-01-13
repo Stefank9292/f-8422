@@ -106,18 +106,18 @@ const SubscribePage = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-7xl mx-auto space-y-12 pt-8">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight text-center dark:text-foreground">{title}</h1>
-          <p className="text-[13px] text-muted-foreground text-center">
+    <div className="min-h-screen py-6 md:py-8 px-4 bg-background">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-12">
+        <div className="space-y-2 text-center">
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight dark:text-foreground">{title}</h1>
+          <p className="text-sm text-muted-foreground">
             {subtitle}
           </p>
         </div>
 
-        <div className="space-y-12">
+        <div className="space-y-8 md:space-y-12">
           <div className="flex items-center justify-center gap-4">
-            <span className={`text-[11px] ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+            <span className={`text-sm ${!isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
               Monthly
             </span>
             <Switch
@@ -126,10 +126,10 @@ const SubscribePage = () => {
               className="scale-90"
             />
             <div className="flex items-center gap-2">
-              <span className={`text-[11px] ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
+              <span className={`text-sm ${isAnnual ? "text-foreground" : "text-muted-foreground"}`}>
                 Annual
               </span>
-              <Badge variant="secondary" className="text-[10px] bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+              <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
                 Save 20%
               </Badge>
             </div>

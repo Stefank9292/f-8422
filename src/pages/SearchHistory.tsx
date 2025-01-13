@@ -183,7 +183,7 @@ const SearchHistory = () => {
   }
 
   return (
-    <div className="container max-w-5xl mx-auto py-8 px-4 space-y-6">
+    <div className="container max-w-5xl mx-auto py-6 md:py-8 px-4 space-y-6 md:space-y-8">
       <SearchHistoryHeader 
         onDeleteAll={handleDeleteAll}
         isDeletingAll={isDeletingAll}

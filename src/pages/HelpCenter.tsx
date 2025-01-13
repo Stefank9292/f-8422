@@ -31,11 +31,11 @@ const HelpCenter = () => {
   const showSupport = subscriptionStatus?.subscribed;
 
   return (
-    <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-3xl mx-auto space-y-8 pt-8">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight">Help Center</h1>
-          <p className="text-[13px] text-muted-foreground">
+    <div className="min-h-screen py-6 md:py-8 px-4 bg-background">
+      <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Help Center</h1>
+          <p className="text-sm text-muted-foreground">
             Find guides and tutorials to help you get the most out of VyralSearch
           </p>
         </div>
@@ -55,14 +55,14 @@ const HelpCenter = () => {
 
         <Accordion type="single" collapsible className="w-full space-y-2">
           <AccordionItem value="getting-started" className="border rounded-lg px-4">
-            <AccordionTrigger className="text-[13px] font-medium">
+            <AccordionTrigger className="text-sm font-medium">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-primary" />
                 Getting Started
               </div>
             </AccordionTrigger>
-            <AccordionContent className="text-[11px] text-muted-foreground">
-              <div className="space-y-2">
+            <AccordionContent className="text-sm text-muted-foreground">
+              <div className="space-y-4">
                 <p className="font-medium text-foreground">Welcome to VyralSearch</p>
                 <div className="space-y-2">
                   <p>Get started with our platform in three simple steps:</p>
@@ -119,7 +119,7 @@ const HelpCenter = () => {
           <div className="border rounded-lg p-6 space-y-4">
             <div className="space-y-2">
               <h2 className="text-lg font-semibold">Need More Help?</h2>
-              <p className="text-[13px] text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Our support team is here to help. Get in touch with us directly.
               </p>
             </div>

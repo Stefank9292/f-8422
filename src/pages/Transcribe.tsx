@@ -17,18 +17,18 @@ const Transcribe = () => {
   };
 
   return (
-    <div className="container max-w-4xl py-4 md:py-6 px-4 md:px-4 space-y-4 md:space-y-6 mt-14 md:mt-0">
+    <div className="container max-w-4xl py-6 md:py-8 px-4 space-y-6 md:space-y-8 mt-14 md:mt-0">
       <div className="space-y-2">
-        <h1 className="text-lg md:text-xl font-semibold tracking-tight">Script Generator</h1>
-        <p className="text-xs md:text-sm text-muted-foreground">
+        <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Script Generator</h1>
+        <p className="text-sm text-muted-foreground">
           Transform your videos or text content into engaging social media scripts.
         </p>
       </div>
       
       {isMobile ? (
-        <div className="space-y-6">
+        <div className="space-y-6 md:space-y-8">
           <MobileTabSelect value={activeTab} onValueChange={handleTabChange} />
-          <div className="space-y-6">
+          <div className="space-y-6 md:space-y-8">
             {activeTab === "video" && <VideoTab />}
             {activeTab === "text" && <TextTab />}
             {activeTab === "prompt" && <PromptTab />}
@@ -38,25 +38,25 @@ const Transcribe = () => {
       ) : (
         <Tabs 
           defaultValue="video" 
-          className="space-y-4 md:space-y-6"
+          className="space-y-6 md:space-y-8"
           onValueChange={handleTabChange}
         >
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
-            <TabsTrigger value="video" className="space-x-1 md:space-x-2 px-2 md:px-4">
-              <VideoIcon className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="text-xs md:text-sm">Video to Script</span>
+            <TabsTrigger value="video" className="space-x-2 px-4">
+              <VideoIcon className="h-4 w-4" />
+              <span className="text-sm">Video to Script</span>
             </TabsTrigger>
-            <TabsTrigger value="text" className="space-x-1 md:space-x-2 px-2 md:px-4">
-              <FileTextIcon className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="text-xs md:text-sm">Text to Script</span>
+            <TabsTrigger value="text" className="space-x-2 px-4">
+              <FileTextIcon className="h-4 w-4" />
+              <span className="text-sm">Text to Script</span>
             </TabsTrigger>
-            <TabsTrigger value="prompt" className="space-x-1 md:space-x-2 px-2 md:px-4">
-              <MessageSquareIcon className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="text-xs md:text-sm">Prompt to Script</span>
+            <TabsTrigger value="prompt" className="space-x-2 px-4">
+              <MessageSquareIcon className="h-4 w-4" />
+              <span className="text-sm">Prompt to Script</span>
             </TabsTrigger>
-            <TabsTrigger value="file" className="space-x-1 md:space-x-2 px-2 md:px-4">
-              <FileIcon className="h-3 w-3 md:h-4 md:w-4" />
-              <span className="text-xs md:text-sm">File to Script</span>
+            <TabsTrigger value="file" className="space-x-2 px-4">
+              <FileIcon className="h-4 w-4" />
+              <span className="text-sm">File to Script</span>
             </TabsTrigger>
           </TabsList>
 

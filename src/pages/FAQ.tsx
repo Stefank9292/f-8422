@@ -51,20 +51,20 @@ const faqItems = [
 
 const FAQ = () => {
   return (
-    <div className="min-h-screen p-4 bg-background">
-      <div className="max-w-3xl mx-auto space-y-8 pt-8">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight">Frequently Asked Questions</h1>
-          <p className="text-[13px] text-muted-foreground">
+    <div className="min-h-screen py-6 md:py-8 px-4 bg-background">
+      <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Frequently Asked Questions</h1>
+          <p className="text-sm text-muted-foreground">
             Find answers to common questions about our service
           </p>
         </div>
 
         <Tabs defaultValue="all" className="w-full">
-          <TabsList className="w-full flex flex-wrap justify-start gap-2 bg-transparent h-auto p-0 mb-8">
+          <TabsList className="w-full flex flex-wrap justify-start gap-2 bg-transparent h-auto p-0 mb-6 md:mb-8">
             <TabsTrigger 
               value="all" 
-              className="rounded-full px-4 py-2 text-sm md:px-6 md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
               All Questions
             </TabsTrigger>
@@ -72,7 +72,7 @@ const FAQ = () => {
               <TabsTrigger
                 key={category}
                 value={category}
-                className="rounded-full px-4 py-2 text-sm md:px-6 md:text-base data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
+                className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
               >
                 {category}
               </TabsTrigger>
@@ -90,10 +90,10 @@ const FAQ = () => {
                       value={`item-${index}`} 
                       className="border rounded-lg px-4"
                     >
-                      <AccordionTrigger className="text-[13px] font-medium text-left">
+                      <AccordionTrigger className="text-sm font-medium text-left">
                         {item.question}
                       </AccordionTrigger>
-                      <AccordionContent className="text-[11px] text-muted-foreground text-left">
+                      <AccordionContent className="text-sm text-muted-foreground text-left">
                         {item.answer}
                       </AccordionContent>
                     </AccordionItem>
