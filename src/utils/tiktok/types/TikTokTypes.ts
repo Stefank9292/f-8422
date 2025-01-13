@@ -19,6 +19,8 @@ export interface TikTokPost {
   sharesCount: number;
   ownerUsername: string;
   engagement: number;
+  duration?: string;  // Added to match InstagramPost
+  url?: string;       // Added to match InstagramPost
 }
 
 export interface TikTokApifyRequestBody {

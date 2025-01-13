@@ -4,6 +4,7 @@ import { fetchTikTokPosts } from "@/utils/tiktok/services/apifyService";
 import { saveSearchHistory } from "@/utils/searchHistory";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { transformTikTokPosts } from "@/utils/tiktok/transformers/postTransformer";
 
 interface SearchQueryProps {
   platform: string;
@@ -72,13 +73,14 @@ export const useSearchQuery = ({
           
           return results;
         } else if (platform === 'tiktok') {
-          const results = await fetchTikTokPosts(currentUsername, numberOfVideos, dateRange, location);
+          const tiktokResults = await fetchTikTokPosts(currentUsername, numberOfVideos, dateRange, location);
+          const transformedResults = transformTikTokPosts(tiktokResults);
           
-          if (results.length > 0) {
-            await saveSearchHistory(currentUsername, results);
+          if (transformedResults.length > 0) {
+            await saveSearchHistory(currentUsername, transformedResults);
           }
           
-          return results;
+          return transformedResults;
         }
         return [];
       } catch (error) {
