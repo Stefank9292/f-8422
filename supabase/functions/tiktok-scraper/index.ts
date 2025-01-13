@@ -39,17 +39,13 @@ serve(async (req) => {
 
     // Prepare Actor input
     const input = {
-      startUrls: directUrls.map((url: string) => {
-        // Handle both username and full URL formats
-        if (!url.startsWith('https://')) {
-          const username = url.replace('@', '').trim()
-          return { url: `https://www.tiktok.com/@${username}` }
-        }
-        return { url: url.trim() }
-      }),
+      startUrls: directUrls.map((url: string) => ({ url })),
       maxItems: maxPosts || 3,
       dateRange: onlyPostsNewerThan ? "CUSTOM" : "DEFAULT",
-      location: "US"
+      location: "US",
+      scrapeType: "posts", // Ensure we're scraping posts
+      shouldDownloadVideos: false, // We don't need to download videos
+      shouldDownloadCovers: false, // We don't need to download covers
     }
 
     console.log('Prepared actor input:', {
@@ -71,8 +67,13 @@ serve(async (req) => {
       console.log('Fetching results from dataset:', run.defaultDatasetId)
       const { items } = await client.dataset(run.defaultDatasetId).listItems()
 
-      if (!items || !Array.isArray(items) || items.length === 0) {
+      if (!items || !Array.isArray(items)) {
         console.warn('No data returned from Apify dataset')
+        throw new Error('Invalid data format received from Apify')
+      }
+
+      if (items.length === 0) {
+        console.warn('No items found in dataset')
         throw new Error('No data found for the provided URLs')
       }
 
