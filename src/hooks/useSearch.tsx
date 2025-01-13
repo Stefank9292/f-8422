@@ -39,7 +39,15 @@ export const useSearch = ({
   const { toast } = useToast();
 
   const { data: posts = [], isLoading, error } = useQuery({
-    queryKey: ['social-posts', currentUsername, platform],
+    queryKey: [
+      'social-posts', 
+      currentUsername, 
+      platform,
+      numberOfVideos,
+      selectedDate?.toISOString(),
+      dateRange,
+      location
+    ],
     queryFn: async () => {
       console.log('Starting search with params:', {
         platform,
@@ -101,7 +109,7 @@ export const useSearch = ({
     },
     enabled: shouldFetch && !!currentUsername && !isBulkSearching && requestCount < maxRequests,
     retry: false,
-    staleTime: Infinity,
+    staleTime: 0, // Set to 0 to ensure fresh data on each search
     gcTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
