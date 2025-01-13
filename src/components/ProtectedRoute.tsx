@@ -18,18 +18,30 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleSessionError = async () => {
-      if (error?.toString().includes('refresh_token_not_found') || 
-          error?.toString().includes('Invalid user session')) {
+      const sessionErrors = [
+        'refresh_token_not_found',
+        'Invalid user session',
+        'Session from session_id claim in JWT does not exist',
+        'session_not_found'
+      ];
+
+      if (error && sessionErrors.some(e => error.toString().includes(e))) {
         console.log('Session error detected, signing out...', error);
-        // Clear query cache
-        queryClient.clear();
-        // Sign out
-        await supabase.auth.signOut();
-        toast({
-          title: "Session Expired",
-          description: "Please sign in again to continue.",
-          variant: "destructive",
-        });
+        try {
+          // Clear query cache first
+          queryClient.clear();
+          // Then attempt to sign out
+          await supabase.auth.signOut();
+          toast({
+            title: "Session Expired",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          });
+        } catch (signOutError) {
+          console.error('Error during sign out:', signOutError);
+          // If sign out fails, force navigation to auth page
+          window.location.href = '/auth';
+        }
       }
     };
 
@@ -41,7 +53,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (subscriptionError) {
       console.log('Subscription check error:', subscriptionError);
-      if (subscriptionError.status === 401) {
+      if (subscriptionError.status === 401 || 
+          (subscriptionError.message && subscriptionError.message.includes('session'))) {
         queryClient.invalidateQueries({ queryKey: ['session'] });
       }
     }
@@ -52,35 +65,35 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    // If we have an auth error, redirect to login
-    if (error.toString().includes('refresh_token_not_found') || 
-        error.toString().includes('Invalid user session')) {
+    const sessionErrors = [
+      'refresh_token_not_found',
+      'Invalid user session',
+      'Session from session_id claim in JWT does not exist',
+      'session_not_found'
+    ];
+
+    if (sessionErrors.some(e => error.toString().includes(e))) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
     }
     return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
   }
 
-  // Handle undefined session state
   if (session === undefined) {
     return <UndefinedSessionState onRefresh={() => window.location.reload()} />;
   }
 
-  // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If on subscribe page or auth page, allow access regardless of subscription status
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 
-  // Show loading state for initial subscription check
   if (isLoadingSubscription && !subscriptionStatus) {
     return <LoadingState />;
   }
 
-  // Check if user has an active subscription by checking the priceId
   const hasActiveSubscription = subscriptionStatus?.priceId && [
     "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
     "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
@@ -92,7 +105,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   console.log('Has active subscription:', hasActiveSubscription);
   console.log('Current price ID:', subscriptionStatus?.priceId);
 
-  // If no active subscription and not on subscribe page, redirect to subscribe
   if (!hasActiveSubscription) {
     console.log('No active subscription found, redirecting to subscribe page');
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
