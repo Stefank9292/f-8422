@@ -16,33 +16,8 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
-  // Helper function to safely get username from either structure
-  const getUsername = (post: any): string => {
-    // First try the transformed structure (from edge function)
-    if (post.channel?.username) {
-      return post.channel.username;
-    }
-    
-    // Then try the dot notation structure (direct from API)
-    if (post['channel.username']?.value) {
-      return post['channel.username'].value;
-    }
-    
-    // Log the structure for debugging
-    console.log('Post structure for username:', {
-      channel: post.channel,
-      dotNotation: post['channel.username'],
-      fullPost: post
-    });
-    
-    return 'Unknown';
-  };
-
   return (
     <TableRow className="hover:bg-muted/30 transition-colors duration-200">
-      <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{getUsername(post)}
-      </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
