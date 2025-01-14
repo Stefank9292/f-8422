@@ -2,6 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Copy, ExternalLink, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface TikTokTableRowProps {
   post: any;
@@ -16,7 +17,38 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
+  const { toast } = useToast();
   console.log('Post data:', post);
+
+  const handleDownload = async () => {
+    // If direct video URL is not available, notify user
+    if (!post.video?.url) {
+      toast({
+        title: "Video URL not available",
+        description: "Opening TikTok page instead. You can download the video from there.",
+        variant: "default",
+      });
+      window.open(post.postPage, '_blank');
+      return;
+    }
+
+    try {
+      // Create a temporary anchor element
+      const link = document.createElement('a');
+      link.href = post.video.url;
+      link.download = `tiktok-${post.id}.mp4`; // Set a filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Download failed",
+        description: "Unable to download video. Try opening in TikTok instead.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
@@ -78,7 +110,7 @@ export const TikTokTableRow = ({
           variant="ghost" 
           size="icon"
           className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={() => window.open(post.video?.url || '', '_blank')}
+          onClick={handleDownload}
         >
           <Download className="w-3.5 h-3.5 text-emerald-400" />
         </Button>
