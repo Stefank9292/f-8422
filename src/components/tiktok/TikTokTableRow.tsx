@@ -16,26 +16,24 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
-  // Helper function to safely get username from the API response
+  // Helper function to extract username from TikTok URL
   const getUsername = (post: any): string => {
-    // Debug log to see the entire post object
-    console.log('Post object:', post);
-
-    // Check if we have a nested channel object with username
-    if (post.channel?.username) {
-      console.log('Found username in nested structure:', post.channel.username);
-      return post.channel.username;
+    try {
+      // Extract username from the postPage URL
+      const url = post.postPage;
+      if (!url) return 'Unknown';
+      
+      // URL format: https://www.tiktok.com/@username/video/...
+      const match = url.match(/@([^/]+)/);
+      if (match && match[1]) {
+        return match[1];
+      }
+      
+      return 'Unknown';
+    } catch (error) {
+      console.error('Error extracting username:', error);
+      return 'Unknown';
     }
-    
-    // Check if we have a dot notation structure
-    if (post['channel.username']) {
-      console.log('Found username in dot notation:', post['channel.username']);
-      return post['channel.username'];
-    }
-
-    // If neither structure exists, log the issue and return Unknown
-    console.log('Username structure not found in post:', post);
-    return 'Unknown';
   };
 
   return (
