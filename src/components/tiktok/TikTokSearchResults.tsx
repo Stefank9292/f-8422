@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { FilterInput } from "@/components/search/FilterInput";
-import { Calendar, Hash, Eye, Share2, MessageCircle, Percent } from "lucide-react";
+import { Calendar, Heart, Eye, Share2, MessageSquare, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parse } from "date-fns";
 
@@ -112,10 +112,9 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               onChange={setDate}
               placeholder="DD.MM.YYYY"
               isDatePicker
-              helpText="Show posts after this date"
             />
             <FilterInput
-              icon={Hash}
+              icon={Heart}
               label="Min. Likes"
               value={minLikes}
               onChange={setMinLikes}
@@ -139,7 +138,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               placeholder="Minimum shares..."
             />
             <FilterInput
-              icon={MessageCircle}
+              icon={MessageSquare}
               label="Min. Comments"
               value={minComments}
               onChange={setMinComments}
@@ -147,7 +146,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               placeholder="Minimum comments..."
             />
             <FilterInput
-              icon={Percent}
+              icon={Zap}
               label="Min. Engagement (%)"
               value={minEngagement}
               onChange={setMinEngagement}
