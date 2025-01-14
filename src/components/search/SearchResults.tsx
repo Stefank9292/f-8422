@@ -1,12 +1,11 @@
 import { TableContainer } from "../common/table/TableContainer";
 import { FilterContainer } from "../common/filters/FilterContainer";
-import { TablePagination } from "./TablePagination";
-import { FilterInput } from "./FilterInput";
+import { TableContent } from "./TableContent";
+import { SearchFilters } from "./filters/SearchFilters";
+import { SearchPagination } from "./pagination/SearchPagination";
+import { ExportCSV } from "./ExportCSV";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Calendar, Heart, Eye, Play, MessageSquare, Zap } from "lucide-react";
-import { TableContent } from "./TableContent";
-import { ExportCSV } from "./ExportCSV";
 
 interface SearchResultsProps {
   searchResults?: any[];
@@ -99,53 +98,19 @@ export const SearchResults = ({ searchResults = [] }: SearchResultsProps) => {
         currentPosts={filteredResults}
         exportComponent={<ExportCSV currentPosts={filteredResults} />}
       >
-        <FilterInput
-          icon={Calendar}
-          label="Posts newer than"
-          value={date}
-          onChange={setDate}
-          placeholder="DD.MM.YYYY"
-          isDatePicker
-        />
-        <FilterInput
-          icon={Eye}
-          label="Min. Views"
-          value={minViews}
-          onChange={setMinViews}
-          type="number"
-          placeholder="e.g., 10000"
-        />
-        <FilterInput
-          icon={Play}
-          label="Min. Plays"
-          value={minPlays}
-          onChange={setMinPlays}
-          type="number"
-          placeholder="e.g., 5000"
-        />
-        <FilterInput
-          icon={Heart}
-          label="Min. Likes"
-          value={minLikes}
-          onChange={setMinLikes}
-          type="number"
-          placeholder="e.g., 1000"
-        />
-        <FilterInput
-          icon={MessageSquare}
-          label="Min. Comments"
-          value={minComments}
-          onChange={setMinComments}
-          type="number"
-          placeholder="e.g., 100"
-        />
-        <FilterInput
-          icon={Zap}
-          label="Min. Engagement (%)"
-          value={minEngagement}
-          onChange={setMinEngagement}
-          type="number"
-          placeholder="e.g., 5.5"
+        <SearchFilters
+          date={date}
+          setDate={setDate}
+          minLikes={minLikes}
+          setMinLikes={setMinLikes}
+          minViews={minViews}
+          setMinViews={setMinViews}
+          minPlays={minPlays}
+          setMinPlays={setMinPlays}
+          minComments={minComments}
+          setMinComments={setMinComments}
+          minEngagement={minEngagement}
+          setMinEngagement={setMinEngagement}
         />
       </FilterContainer>
 
@@ -161,16 +126,14 @@ export const SearchResults = ({ searchResults = [] }: SearchResultsProps) => {
             />
           </TableContainer>
         </div>
-        <div className="border-t border-border/50 pt-8 bg-transparent">
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
-            totalResults={filteredResults.length}
-          />
-        </div>
+        <SearchPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={handlePageSizeChange}
+          totalResults={filteredResults.length}
+        />
       </div>
     </div>
   );
