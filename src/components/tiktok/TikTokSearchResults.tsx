@@ -157,12 +157,14 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
         </CollapsibleContent>
       </Collapsible>
 
-      <TikTokTableContent 
-        currentPosts={filteredResults}
-        handleCopyCaption={handleCopyCaption}
-        formatNumber={formatNumber}
-        truncateCaption={truncateCaption}
-      />
+      <div className="rounded-xl overflow-hidden border border-border/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
+        <TikTokTableContent 
+          currentPosts={filteredResults}
+          handleCopyCaption={handleCopyCaption}
+          formatNumber={formatNumber}
+          truncateCaption={truncateCaption}
+        />
+      </div>
     </div>
   );
 };

@@ -36,7 +36,7 @@ export const TikTokTableRow = ({
   };
 
   return (
-    <TableRow className="hover:bg-muted/30 transition-colors">
+    <TableRow className="hover:bg-muted/30 transition-colors duration-200">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
         @{getUsername(post)}
       </TableCell>
@@ -55,36 +55,36 @@ export const TikTokTableRow = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 rounded-md hover:bg-muted"
+            className="h-6 w-6 rounded-md hover:bg-muted transition-colors duration-200"
             onClick={() => onCopyCaption(post.title)}
           >
             <Copy className="h-3.5 w-3.5" />
           </Button>
         </div>
       </TableCell>
-      <TableCell className="text-center py-4 text-xs text-muted-foreground align-middle">
+      <TableCell className="text-center py-4 text-xs text-muted-foreground">
         {new Date(post.uploadedAtFormatted).toLocaleDateString()}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
+      <TableCell className="text-center py-4 text-xs font-medium text-green-500">
         {formatNumber(post.views)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-violet-500 align-middle">
+      <TableCell className="text-center py-4 text-xs font-medium text-violet-500">
         {formatNumber(post.shares)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
+      <TableCell className="text-center py-4 text-xs font-medium text-rose-500">
         {formatNumber(post.likes)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
+      <TableCell className="text-center py-4 text-xs font-medium text-blue-400">
         {formatNumber(post.comments)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
+      <TableCell className="text-center py-4 text-xs font-medium text-orange-500">
         {Math.round((post.likes / post.views) * 100)}%
       </TableCell>
-      <TableCell className="text-center py-4 align-middle">
+      <TableCell className="text-center py-4">
         <Button 
           variant="ghost" 
           size="icon"
-          className="h-6 w-6 rounded-md hover:bg-muted"
+          className="h-6 w-6 rounded-md hover:bg-muted transition-colors duration-200"
           onClick={() => window.open(post.postPage, '_blank')}
         >
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />

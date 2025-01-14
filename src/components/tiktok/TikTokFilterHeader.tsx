@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { ChevronDown, RotateCcw } from "lucide-react";
 import { TikTokExportCSV } from "./TikTokExportCSV";
 
 interface TikTokFilterHeaderProps {
@@ -19,7 +19,7 @@ export const TikTokFilterHeader = ({
   isMobile 
 }: TikTokFilterHeaderProps) => {
   return (
-    <div className="flex items-center justify-between px-4 sm:px-6 py-2 bg-card/50 border border-border/50">
+    <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-card/50 border border-border/50 rounded-t-xl">
       <div className="flex items-center gap-2">
         <p className="text-xs text-muted-foreground">
           Showing <span className="font-medium text-foreground">{filteredResults}</span> of <span className="font-medium text-foreground">{totalResults}</span> results
@@ -27,7 +27,7 @@ export const TikTokFilterHeader = ({
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6"
+          className="h-6 w-6 hover:bg-secondary/50"
           onClick={onReset}
         >
           <RotateCcw className="h-3.5 w-3.5" />
