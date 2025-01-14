@@ -51,17 +51,6 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('likeCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
-          <Tooltip>
-            <TooltipTrigger className="w-full flex items-center justify-center">
-              <Heart className={cn(
-                "h-3.5 w-3.5 text-rose-500",
-                sortKey === 'likeCount' && "text-primary"
-              )} />
-            </TooltipTrigger>
-            <TooltipContent>Likes</TooltipContent>
-          </Tooltip>
-        </TableHead>
         <TableHead onClick={() => onSort('shareCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
@@ -71,6 +60,17 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
               )} />
             </TooltipTrigger>
             <TooltipContent>Shares</TooltipContent>
+          </Tooltip>
+        </TableHead>
+        <TableHead onClick={() => onSort('likeCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+          <Tooltip>
+            <TooltipTrigger className="w-full flex items-center justify-center">
+              <Heart className={cn(
+                "h-3.5 w-3.5 text-rose-500",
+                sortKey === 'likeCount' && "text-primary"
+              )} />
+            </TooltipTrigger>
+            <TooltipContent>Likes</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('commentCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">

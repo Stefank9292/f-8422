@@ -51,11 +51,11 @@ export const TikTokTableRow = ({
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
         {formatNumber(post.views)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
-        {formatNumber(post.likes)}
-      </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-violet-500 align-middle">
         {formatNumber(post.shares)}
+      </TableCell>
+      <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
+        {formatNumber(post.likes)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
         {formatNumber(post.comments)}
