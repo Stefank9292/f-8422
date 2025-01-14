@@ -98,6 +98,12 @@ export const TikTokSearchContainer = () => {
     setShouldSearch(true);
   };
 
+  const handleUsernameChange = (value: string) => {
+    setUsername(value);
+    // Reset shouldSearch when username changes but don't trigger search
+    setShouldSearch(false);
+  };
+
   // Show error state if search fails
   useEffect(() => {
     if (searchError) {
@@ -120,7 +126,7 @@ export const TikTokSearchContainer = () => {
       <div className="w-full max-w-lg space-y-6 animate-in fade-in duration-500 delay-150">
         <TikTokSearchBar
           username={username}
-          onUsernameChange={setUsername}
+          onUsernameChange={handleUsernameChange}
           isLoading={isLoading}
           onSearch={handleSearch}
         />
@@ -137,7 +143,7 @@ export const TikTokSearchContainer = () => {
           disabled={isLoading}
         />
 
-        <TikTokRecentSearches onSelect={setUsername} />
+        <TikTokRecentSearches onSelect={handleUsernameChange} />
       </div>
 
       <div className="w-full animate-in fade-in duration-500 delay-300">
