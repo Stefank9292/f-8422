@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     const response = await fetch(
-      'https://api.apify.com/v2/acts/clockworks~tiktok-scraper/run-sync-get-dataset-items?token=' + APIFY_API_KEY,
+      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=' + APIFY_API_KEY,
       {
         method: 'POST',
         headers: {
