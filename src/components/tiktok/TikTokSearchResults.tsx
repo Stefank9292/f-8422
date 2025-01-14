@@ -36,7 +36,8 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
     });
   };
 
-  const formatNumber = (num: number) => {
+  const formatNumber = (num: number | undefined | null): string => {
+    if (num === undefined || num === null) return '0';
     return num.toLocaleString('de-DE').replace(/,/g, '.');
   };
 
@@ -57,10 +58,10 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
   const filterResults = (results: any[]) => {
     return results.filter(post => {
-      const views = post.playCount || 0;
-      const likes = post.likeCount || 0;
-      const comments = post.commentCount || 0;
-      const engagement = ((likes + comments) / views) * 100 || 0;
+      const views = post.playCount || post.views || 0;
+      const likes = post.likeCount || post.likes || 0;
+      const comments = post.commentCount || post.comments || 0;
+      const engagement = ((likes + comments) / (views || 1)) * 100 || 0;
 
       return (
         (!filters.minViews || views >= parseInt(filters.minViews)) &&
