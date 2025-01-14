@@ -99,8 +99,8 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   }
 
   return (
-    <div className="w-full space-y-6">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <div className="w-full space-y-8">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="animate-fade-in">
         <TikTokFilterHeader 
           totalResults={searchResults.length}
           filteredResults={filteredResults.length}
@@ -109,7 +109,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
           isMobile={isMobile}
         />
         
-        <CollapsibleContent className="space-y-4 px-4 sm:px-6 py-4 bg-card/50 border-x border-b border-border/50">
+        <CollapsibleContent className="space-y-6 px-4 sm:px-6 py-6 bg-card/50 border-x border-b border-border/50 rounded-b-xl">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <FilterInput
               icon={Calendar}
@@ -163,14 +163,16 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
         </CollapsibleContent>
       </Collapsible>
 
-      <div>
-        <TikTokTableContent 
-          currentPosts={currentPosts}
-          handleCopyCaption={handleCopyCaption}
-          formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
-          truncateCaption={(caption) => caption}
-        />
-        <div className="mt-8 border-t border-border/50">
+      <div className="space-y-8 animate-fade-in">
+        <div className="rounded-xl overflow-hidden">
+          <TikTokTableContent 
+            currentPosts={currentPosts}
+            handleCopyCaption={handleCopyCaption}
+            formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
+            truncateCaption={(caption) => caption}
+          />
+        </div>
+        <div className="border-t border-border/50 pt-8">
           <TablePagination
             currentPage={currentPage}
             totalPages={totalPages}
