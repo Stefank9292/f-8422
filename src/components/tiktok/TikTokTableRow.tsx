@@ -18,27 +18,26 @@ export const TikTokTableRow = ({
   truncateCaption 
 }: TikTokTableRowProps) => {
   const { toast } = useToast();
-  console.log('Post data:', post);
 
   const handleDownload = async () => {
-    // Check if video URL exists in the flattened structure
+    // Get video URL from the nested or flattened structure
     const videoUrl = post['video.url'] || post.video?.url;
     
     if (!videoUrl) {
       toast({
         title: "Video URL not available",
-        description: "Opening TikTok page instead. You can download the video from there.",
-        variant: "default",
+        description: "Unable to download video. Opening TikTok page instead.",
+        variant: "destructive",
       });
       window.open(post.postPage, '_blank');
       return;
     }
 
     try {
-      // Create a temporary anchor element
+      // Create a temporary anchor element for download
       const link = document.createElement('a');
       link.href = videoUrl;
-      link.download = `tiktok-${post.id}.mp4`; // Set a filename
+      link.download = `tiktok-${post.id}.mp4`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -55,6 +54,7 @@ export const TikTokTableRow = ({
         description: "Unable to download video. Try opening in TikTok instead.",
         variant: "destructive",
       });
+      window.open(post.postPage, '_blank');
     }
   };
 
