@@ -54,6 +54,7 @@ export const useBulkSearch = (
   return {
     isBulkSearching,
     bulkSearchResults,
+    setBulkSearchResults,
     handleBulkSearch
   };
 };

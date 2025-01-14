@@ -33,7 +33,12 @@ export const useSearchState = () => {
 
   const { validateSearch } = useSearchValidation(requestCount, maxRequests, subscriptionStatus);
 
-  const { isBulkSearching, bulkSearchResults, handleBulkSearch } = useBulkSearch(
+  const { 
+    isBulkSearching, 
+    bulkSearchResults, 
+    setBulkSearchResults, 
+    handleBulkSearch 
+  } = useBulkSearch(
     requestCount,
     maxRequests,
     subscriptionStatus,
