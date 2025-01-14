@@ -180,7 +180,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
               key={search.id}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
-              <TikTokIcon className="w-3.5 h-3.5 text-[#FF0050]" />
+              <TikTokIcon className="w-3.5 h-3.5 text-gray-800 dark:text-gray-200" />
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onSelect(search.search_query)}
