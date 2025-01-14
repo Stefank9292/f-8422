@@ -34,13 +34,25 @@ export const TikTokTableRow = ({
     }
 
     try {
-      // Create a temporary anchor element for download
-      const link = document.createElement('a');
-      link.href = videoUrl;
-      link.download = `tiktok-${post.id}.mp4`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Fetch the video data as a blob
+      const response = await fetch(videoUrl);
+      const blob = await response.blob();
+      
+      // Create a temporary URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a temporary anchor element
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tiktok-${post.id}.mp4`;
+      
+      // Append to body, click, and cleanup
+      document.body.appendChild(a);
+      a.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
       
       toast({
         title: "Download started",
