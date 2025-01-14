@@ -21,9 +21,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       if (error?.toString().includes('refresh_token_not_found') || 
           error?.toString().includes('Invalid user session')) {
         console.log('Session error detected, signing out...', error);
-        // Clear query cache
         queryClient.clear();
-        // Sign out
         await supabase.auth.signOut();
         toast({
           title: "Session Expired",
@@ -52,7 +50,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    // If we have an auth error, redirect to login
     if (error.toString().includes('refresh_token_not_found') || 
         error.toString().includes('Invalid user session')) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
@@ -60,12 +57,10 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
   }
 
-  // Handle undefined session state
   if (session === undefined) {
     return <UndefinedSessionState onRefresh={() => window.location.reload()} />;
   }
 
-  // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
@@ -88,13 +83,35 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
+  // Check if the route requires Creator Pro subscription
+  const isCreatorProRoute = ['/tiktok', '/history', '/transcribe'].includes(location.pathname);
+  const hasCreatorProAccess = subscriptionStatus?.priceId && [
+    "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+    "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+    "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+    "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+  ].includes(subscriptionStatus.priceId);
+
   console.log('Subscription status:', subscriptionStatus);
   console.log('Has active subscription:', hasActiveSubscription);
   console.log('Current price ID:', subscriptionStatus?.priceId);
+  console.log('Is Creator Pro route:', isCreatorProRoute);
+  console.log('Has Creator Pro access:', hasCreatorProAccess);
 
   // If no active subscription and not on subscribe page, redirect to subscribe
   if (!hasActiveSubscription) {
     console.log('No active subscription found, redirecting to subscribe page');
+    return <Navigate to="/subscribe" state={{ from: location }} replace />;
+  }
+
+  // If trying to access a Creator Pro route without proper subscription, redirect to subscribe
+  if (isCreatorProRoute && !hasCreatorProAccess) {
+    console.log('Attempting to access Creator Pro feature without proper subscription');
+    toast({
+      title: "Creator Pro Required",
+      description: "This feature requires a Creator Pro subscription or higher.",
+      variant: "destructive",
+    });
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }
 
