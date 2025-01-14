@@ -133,7 +133,7 @@ export const TikTokSearchSettings = ({
               disabled={disabled}
               className="w-full [&>.relative>.absolute]:bg-[#000000e6] [&>.relative]:bg-gray-200 dark:[&>.relative]:bg-gray-700
                        [&>button]:border-[#000000e6] [&>button]:bg-white dark:[&>button]:bg-gray-900
-                       [&>button:focus-visible]:ring-[#000000e6]"
+                       [&>button:focus-visible]:ring-[#000000e6] [&>button]:border-2"
             />
           </div>
 
