@@ -44,7 +44,6 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
-  // Set up real-time subscription for tiktok_search_history changes
   useEffect(() => {
     if (!isSteroidsUser || !session?.user?.id) return;
 
@@ -106,7 +105,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
         .select('id, search_query')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(5); // Ensure we only get the 5 most recent searches
 
       if (error) {
         console.error('Error fetching recent TikTok searches:', error);
@@ -137,7 +136,10 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     }
   };
 
-  const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
+  // Only show the 5 most recent visible searches
+  const visibleSearches = recentSearches
+    .filter(search => !hiddenSearches.includes(search.id))
+    .slice(0, 5);
 
   if (!isSteroidsUser) {
     return (
