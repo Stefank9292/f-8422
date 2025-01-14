@@ -73,27 +73,29 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
 
   const extractUsername = (query: string): string => {
     // Handle full TikTok URLs
-    if (query.includes('tiktok.com/@')) {
-      const username = query.split('tiktok.com/@')[1]?.split('/')[0];
-      return username ? `@${username}` : query;
+    if (query.includes('tiktok.com/')) {
+      const username = query.split('tiktok.com/')[1]?.split('/')[0];
+      // Remove @ if present in the URL
+      return `@${username?.replace('@', '')}`;
     }
-    // Handle @username format
-    if (query.startsWith('@')) {
-      return query;
-    }
-    // Handle plain username
-    return `@${query}`;
+    // Handle @username format or plain username
+    return query.startsWith('@') ? query : `@${query}`;
   };
 
   const formatTikTokUrl = (query: string): string => {
-    // If it's already a TikTok URL, return it as is
-    if (query.startsWith('https://www.tiktok.com/@')) {
-      return query;
+    // Extract clean username regardless of input format
+    let username = query;
+    
+    // If it's a full URL, extract username part
+    if (query.includes('tiktok.com/')) {
+      username = query.split('tiktok.com/')[1]?.split('/')[0] || '';
     }
     
-    // Remove @ if it exists, then add it back in the URL format
-    const cleanUsername = query.replace(/^@/, '').split('/')[0];
-    return `https://www.tiktok.com/@${cleanUsername}`;
+    // Remove @ if present, we'll add it back in the correct position
+    username = username.replace('@', '');
+    
+    // Return properly formatted URL
+    return `https://www.tiktok.com/@${username}`;
   };
 
   const { data: recentSearches = [] } = useQuery({
