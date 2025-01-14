@@ -1,13 +1,14 @@
-import { TikTokTableContent } from "./TikTokTableContent";
-import { TikTokFilterHeader } from "./TikTokFilterHeader";
+import { TableContainer } from "../common/table/TableContainer";
+import { FilterContainer } from "../common/filters/FilterContainer";
 import { TablePagination } from "../search/TablePagination";
+import { FilterInput } from "@/components/search/FilterInput";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
-import { FilterInput } from "@/components/search/FilterInput";
 import { Calendar, Heart, Eye, Share2, MessageSquare, Zap } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { parse } from "date-fns";
+import { TikTokTableContent } from "./TikTokTableContent";
+import { TikTokExportCSV } from "./TikTokExportCSV";
 
 interface TikTokSearchResultsProps {
   searchResults?: any[];
@@ -26,7 +27,6 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   const [minShares, setMinShares] = useState("");
   const [minComments, setMinComments] = useState("");
   const [minEngagement, setMinEngagement] = useState("");
-  const [isOpen, setIsOpen] = useState(!isMobile);
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -100,77 +100,73 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
   return (
     <div className="w-full space-y-8">
-      <Collapsible open={isOpen} onOpenChange={setIsOpen} className="animate-fade-in">
-        <TikTokFilterHeader 
-          totalResults={searchResults.length}
-          filteredResults={filteredResults.length}
-          onReset={handleReset}
-          currentPosts={filteredResults}
-          isMobile={isMobile}
+      <FilterContainer
+        totalResults={searchResults.length}
+        filteredResults={filteredResults.length}
+        onReset={handleReset}
+        currentPosts={filteredResults}
+        exportComponent={<TikTokExportCSV currentPosts={filteredResults} />}
+      >
+        <FilterInput
+          icon={Calendar}
+          label="Posts newer than"
+          value={date}
+          onChange={setDate}
+          placeholder="DD.MM.YYYY"
+          isDatePicker
         />
-        
-        <CollapsibleContent className="space-y-6 px-4 sm:px-6 py-6 bg-card/50 border-x border-b border-border/50 rounded-b-xl">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <FilterInput
-              icon={Calendar}
-              label="Posts newer than"
-              value={date}
-              onChange={setDate}
-              placeholder="DD.MM.YYYY"
-              isDatePicker
-            />
-            <FilterInput
-              icon={Eye}
-              label="Min. Views"
-              value={minViews}
-              onChange={setMinViews}
-              type="number"
-              placeholder="e.g., 10000"
-            />
-            <FilterInput
-              icon={Share2}
-              label="Min. Shares"
-              value={minShares}
-              onChange={setMinShares}
-              type="number"
-              placeholder="e.g., 500"
-            />
-            <FilterInput
-              icon={Heart}
-              label="Min. Likes"
-              value={minLikes}
-              onChange={setMinLikes}
-              type="number"
-              placeholder="e.g., 1000"
-            />
-            <FilterInput
-              icon={MessageSquare}
-              label="Min. Comments"
-              value={minComments}
-              onChange={setMinComments}
-              type="number"
-              placeholder="e.g., 100"
-            />
-            <FilterInput
-              icon={Zap}
-              label="Min. Engagement (%)"
-              value={minEngagement}
-              onChange={setMinEngagement}
-              type="number"
-              placeholder="e.g., 5.5"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+        <FilterInput
+          icon={Eye}
+          label="Min. Views"
+          value={minViews}
+          onChange={setMinViews}
+          type="number"
+          placeholder="e.g., 10000"
+        />
+        <FilterInput
+          icon={Share2}
+          label="Min. Shares"
+          value={minShares}
+          onChange={setMinShares}
+          type="number"
+          placeholder="e.g., 500"
+        />
+        <FilterInput
+          icon={Heart}
+          label="Min. Likes"
+          value={minLikes}
+          onChange={setMinLikes}
+          type="number"
+          placeholder="e.g., 1000"
+        />
+        <FilterInput
+          icon={MessageSquare}
+          label="Min. Comments"
+          value={minComments}
+          onChange={setMinComments}
+          type="number"
+          placeholder="e.g., 100"
+        />
+        <FilterInput
+          icon={Zap}
+          label="Min. Engagement (%)"
+          value={minEngagement}
+          onChange={setMinEngagement}
+          type="number"
+          placeholder="e.g., 5.5"
+        />
+      </FilterContainer>
 
       <div className="space-y-8 animate-fade-in">
         <div className="rounded-xl overflow-hidden">
-          <TikTokTableContent 
-            currentPosts={currentPosts}
-            handleCopyCaption={handleCopyCaption}
-            formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
-            truncateCaption={(caption) => caption}
-          />
+          <TableContainer>
+            <TikTokTableContent 
+              currentPosts={currentPosts}
+              handleCopyCaption={handleCopyCaption}
+              formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
+              truncateCaption={(caption) => caption}
+            />
+          </TableContainer>
         </div>
         <div className="border-t border-border/50 pt-8 bg-transparent">
           <TablePagination
