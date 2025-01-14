@@ -1,9 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Copy, ExternalLink, Download } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Copy, ExternalLink } from "lucide-react";
 
 interface TikTokTableRowProps {
   post: any;
@@ -18,8 +16,6 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
-  const { toast } = useToast();
-
   // Helper function to safely get username from nested structure
   const getUsername = (post: any) => {
     // Try different possible paths for username
@@ -37,59 +33,6 @@ export const TikTokTableRow = ({
     });
     
     return username || 'Unknown';
-  };
-
-  const handleDownload = async () => {
-    const videoUrl = post.video?.url || post['video.url'];
-    
-    if (!videoUrl) {
-      toast({
-        title: "Video URL not available",
-        description: "Unable to download video. Opening TikTok page instead.",
-        variant: "destructive",
-      });
-      window.open(post.postPage, '_blank');
-      return;
-    }
-
-    try {
-      console.log('Attempting to download video:', videoUrl);
-      
-      const { data, error } = await supabase.functions.invoke('tiktok-video-download', {
-        body: { videoUrl }
-      });
-
-      if (error) {
-        console.error('Edge function error:', error);
-        throw new Error(error.message);
-      }
-
-      const blob = new Blob([data], { type: 'video/mp4' });
-      const url = window.URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `tiktok-${post.id || 'video'}.mp4`;
-      
-      document.body.appendChild(a);
-      a.click();
-      
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast({
-        title: "Download started",
-        description: "Your video download has started.",
-      });
-    } catch (error) {
-      console.error('Download error:', error);
-      toast({
-        title: "Download failed",
-        description: "Unable to download video. Try opening in TikTok instead.",
-        variant: "destructive",
-      });
-      window.open(post.postPage, '_blank');
-    }
   };
 
   return (
@@ -145,16 +88,6 @@ export const TikTokTableRow = ({
           onClick={() => window.open(post.postPage, '_blank')}
         >
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
-        </Button>
-      </TableCell>
-      <TableCell className="text-center py-4 align-middle">
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={handleDownload}
-        >
-          <Download className="w-3.5 h-3.5 text-emerald-400" />
         </Button>
       </TableCell>
     </TableRow>
