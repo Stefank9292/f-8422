@@ -21,8 +21,10 @@ export const TikTokTableRow = ({
   console.log('Post data:', post);
 
   const handleDownload = async () => {
-    // If direct video URL is not available, notify user
-    if (!post.video?.url) {
+    // Check if video URL exists in the flattened structure
+    const videoUrl = post['video.url'] || post.video?.url;
+    
+    if (!videoUrl) {
       toast({
         title: "Video URL not available",
         description: "Opening TikTok page instead. You can download the video from there.",
@@ -35,11 +37,17 @@ export const TikTokTableRow = ({
     try {
       // Create a temporary anchor element
       const link = document.createElement('a');
-      link.href = post.video.url;
+      link.href = videoUrl;
       link.download = `tiktok-${post.id}.mp4`; // Set a filename
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      
+      toast({
+        title: "Download started",
+        description: "Your video download has started.",
+        variant: "default",
+      });
     } catch (error) {
       console.error('Download error:', error);
       toast({
@@ -53,14 +61,14 @@ export const TikTokTableRow = ({
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post.channel?.username || 'Unknown'}
+        @{post['channel.username'] || post.channel?.username || 'Unknown'}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {post.title?.slice(0, 15)}...
+                {truncateCaption(post.title)}
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
