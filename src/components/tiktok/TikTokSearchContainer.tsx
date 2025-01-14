@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 export const TikTokSearchContainer = () => {
+  console.log('TikTokSearchContainer: Component mounting');
+  
   const [username, setUsername] = useState("");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
@@ -22,6 +24,7 @@ export const TikTokSearchContainer = () => {
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
+      console.log('TikTokSearchContainer: Fetching session');
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
@@ -30,9 +33,11 @@ export const TikTokSearchContainer = () => {
 
   // Load saved search parameters from localStorage on mount only
   useEffect(() => {
+    console.log('TikTokSearchContainer: Loading saved search parameters');
     const savedSearch = localStorage.getItem('tiktok-search');
     if (savedSearch) {
       const { username: savedUsername, numberOfVideos: savedNumber, dateRange: savedRange, location: savedLocation } = JSON.parse(savedSearch);
+      console.log('TikTokSearchContainer: Found saved search:', { savedUsername, savedNumber, savedRange, savedLocation });
       if (!username) { // Only set if username is empty to prevent overwriting active search
         setUsername(savedUsername || "");
         setNumberOfVideos(savedNumber || 5);
@@ -52,11 +57,19 @@ export const TikTokSearchContainer = () => {
     queryFn: async () => {
       if (!username.trim()) return [];
       
-      console.log('Searching with params:', { username, numberOfVideos, dateRange, location });
+      console.log('TikTokSearchContainer: Executing search with params:', { 
+        username, 
+        numberOfVideos, 
+        dateRange, 
+        location,
+        shouldSearch 
+      });
+
       const results = await fetchTikTokPosts(username, numberOfVideos, dateRange, location);
 
       // Save search to history if user is logged in
       if (session?.user?.id) {
+        console.log('TikTokSearchContainer: Saving search to history');
         const { error } = await supabase
           .from('tiktok_search_history')
           .insert({
@@ -91,6 +104,7 @@ export const TikTokSearchContainer = () => {
   });
 
   const handleSearch = async () => {
+    console.log('TikTokSearchContainer: Search triggered by user');
     if (!username.trim()) {
       toast({
         title: "Error",
@@ -106,6 +120,7 @@ export const TikTokSearchContainer = () => {
   // Show error state if search fails
   useEffect(() => {
     if (searchError) {
+      console.error('TikTokSearchContainer: Search error:', searchError);
       toast({
         title: "Error",
         description: searchError instanceof Error ? searchError.message : "Failed to fetch TikTok data",
@@ -114,6 +129,13 @@ export const TikTokSearchContainer = () => {
       setShouldSearch(false);
     }
   }, [searchError, toast]);
+
+  // Cleanup logging
+  useEffect(() => {
+    return () => {
+      console.log('TikTokSearchContainer: Component unmounting');
+    };
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-start min-h-[calc(100vh-theme(spacing.20))] md:min-h-[calc(100vh-theme(spacing.32))] 
