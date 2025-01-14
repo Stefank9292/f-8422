@@ -10,6 +10,12 @@ export const NAV_ITEMS: NavItem[] = [
     badge: "LIVE"
   },
   {
+    title: "TikTok Search",
+    url: "/tiktok",
+    icon: TikTokIcon,
+    badge: "BETA"
+  },
+  {
     title: "Search History",
     url: "/history",
     icon: History
@@ -19,12 +25,6 @@ export const NAV_ITEMS: NavItem[] = [
     url: "/transcribe",
     icon: FileText,
     badge: "NEW"
-  },
-  {
-    title: "TikTok Search",
-    url: "/tiktok",
-    icon: TikTokIcon,
-    badge: "BETA"
   },
   {
     title: "Twitter Search",
