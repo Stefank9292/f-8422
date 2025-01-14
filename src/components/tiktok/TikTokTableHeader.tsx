@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, PenLine, Clock, Eye, Play, Heart, MessageSquare, Zap, Link } from "lucide-react";
+import { User, PenLine, Clock, Eye, Share2, Heart, MessageSquare, Zap, Link, Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TableHeaderProps {
@@ -13,10 +13,13 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
   return (
     <TableHeader>
       <TableRow className="hover:bg-transparent border-b border-border/50">
-        <TableHead className="h-12">
+        <TableHead onClick={() => onSort('channel.name')} className="group cursor-pointer hover:bg-muted/50 h-12">
           <Tooltip>
-            <TooltipTrigger>
-              <User className="h-3.5 w-3.5 text-muted-foreground" />
+            <TooltipTrigger className="w-full flex items-center justify-center">
+              <User className={cn(
+                "h-3.5 w-3.5 text-muted-foreground",
+                sortKey === 'channel.name' && "text-primary"
+              )} />
             </TooltipTrigger>
             <TooltipContent>Username</TooltipContent>
           </Tooltip>
@@ -29,56 +32,56 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
             <TooltipContent>Caption</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('date')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('uploadedAtFormatted')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Clock className={cn(
                 "h-3.5 w-3.5 text-muted-foreground",
-                sortKey === 'date' && "text-primary"
+                sortKey === 'uploadedAtFormatted' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Date</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('viewCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('views')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Eye className={cn(
                 "h-3.5 w-3.5 text-green-500",
-                sortKey === 'viewCount' && "text-primary"
+                sortKey === 'views' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('playCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('shares')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
-              <Play className={cn(
-                "h-3.5 w-3.5 text-primary",
-                sortKey === 'playCount' && "text-primary"
+              <Share2 className={cn(
+                "h-3.5 w-3.5 text-blue-500",
+                sortKey === 'shares' && "text-primary"
               )} />
             </TooltipTrigger>
-            <TooltipContent>Plays</TooltipContent>
+            <TooltipContent>Shares</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('likeCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('likes')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Heart className={cn(
                 "h-3.5 w-3.5 text-rose-500",
-                sortKey === 'likeCount' && "text-primary"
+                sortKey === 'likes' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Likes</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('commentCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('comments')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <MessageSquare className={cn(
                 "h-3.5 w-3.5 text-blue-400",
-                sortKey === 'commentCount' && "text-primary"
+                sortKey === 'comments' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Comments</TooltipContent>
@@ -98,9 +101,17 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
         <TableHead className="text-center h-12">
           <Tooltip>
             <TooltipTrigger>
-              <Link className="h-3.5 w-3.5 mx-auto text-rose-400" />
+              <Link className="h-3.5 w-3.5 text-rose-400" />
             </TooltipTrigger>
             <TooltipContent>Open URL</TooltipContent>
+          </Tooltip>
+        </TableHead>
+        <TableHead className="text-center h-12">
+          <Tooltip>
+            <TooltipTrigger>
+              <Download className="h-3.5 w-3.5 text-emerald-500" />
+            </TooltipTrigger>
+            <TooltipContent>Download Video</TooltipContent>
           </Tooltip>
         </TableHead>
       </TableRow>
