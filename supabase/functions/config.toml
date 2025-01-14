@@ -1,3 +1,37 @@
-project_id = "uubpxlhfkxqjrsgnwlzh"
-[functions.tiktok-apify-scraper]
-verify_jwt = false
+# project_id = "your-project-id"
+
+[functions.instagram-scraper]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
+
+[functions.tiktok-scraper]
+verify_jwt = true
+
+[functions.generate-script]
+verify_jwt = true
+
+[functions.generate-variation]
+verify_jwt = true
+
+[functions.generate-prompt-script]
+verify_jwt = true
+
+[functions.transcribe]
+verify_jwt = true
+
+[functions.transcribe-file]
+verify_jwt = true
+
+[functions.create-checkout-session]
+verify_jwt = true
+
+[functions.cancel-subscription]
+verify_jwt = true
+
+[functions.resume-subscription]
+verify_jwt = true
+
+[functions.update-subscription]
+verify_jwt = true

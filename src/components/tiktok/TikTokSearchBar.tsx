@@ -7,14 +7,12 @@ interface TikTokSearchBarProps {
   username: string;
   onUsernameChange: (value: string) => void;
   isLoading?: boolean;
-  onSearch: () => void;
 }
 
 export const TikTokSearchBar = ({ 
   username, 
   onUsernameChange,
-  isLoading = false,
-  onSearch
+  isLoading = false
 }: TikTokSearchBarProps) => {
   return (
     <div className="flex flex-col space-y-3 w-full">
@@ -28,17 +26,11 @@ export const TikTokSearchBar = ({
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
           disabled={isLoading}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !isLoading && username.trim()) {
-              onSearch();
-            }
-          }}
         />
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
       </div>
       
       <Button
-        onClick={onSearch}
         disabled={isLoading || !username.trim()}
         className="w-full h-10 bg-black hover:bg-black/90 rounded-xl"
       >
