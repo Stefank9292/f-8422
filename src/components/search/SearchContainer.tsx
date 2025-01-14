@@ -2,7 +2,6 @@ import { SearchHeader } from "./SearchHeader";
 import { SearchBar } from "./SearchBar";
 import { SearchSettings } from "./SearchSettings";
 import { SearchResults } from "./SearchResults";
-import { SearchFilters } from "./SearchFilters";
 import { RecentSearches } from "./RecentSearches";
 import { AnnouncementBar } from "./AnnouncementBar";
 import { Button } from "@/components/ui/button";
@@ -45,9 +44,6 @@ export const SearchContainer = ({
     setNumberOfVideos,
     selectedDate,
     setSelectedDate,
-    filters,
-    setFilters,
-    resetFilters
   } = useSearchStore();
 
   useEffect(() => {
@@ -159,22 +155,8 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div className="w-full animate-in fade-in duration-500 delay-300">
-          <div className="rounded-xl overflow-hidden">
-            <SearchFilters
-              filters={filters}
-              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-              onReset={resetFilters}
-              totalResults={displayPosts.length}
-              filteredResults={displayPosts.length}
-              currentPosts={displayPosts}
-            />
-          </div>
-          <div className="mt-8">
-            <div className="sm:material-card overflow-hidden">
-              <SearchResults searchResults={displayPosts} />
-            </div>
-          </div>
+        <div ref={resultsRef} className="w-full animate-in fade-in duration-500 delay-300">
+          <SearchResults searchResults={displayPosts} />
         </div>
       )}
     </div>
