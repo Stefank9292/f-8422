@@ -12,17 +12,21 @@ export interface TikTokPost {
   uploadedAt: number;
   uploadedAtFormatted: string;
   postPage: string;
-  "channel.name": string;
-  "channel.username": string;
-  "channel.id": string;
-  "channel.url": string;
-  "channel.avatar": string;
-  "channel.verified": boolean;
-  "channel.followers": number;
-  "channel.following": number;
-  "channel.videos": number;
-  "video.url": string;
-  "video.cover": string;
+  channel: {
+    name: string;
+    username: string;
+    id: string;
+    url: string;
+    avatar: string;
+    verified: boolean;
+    followers: number;
+    following: number;
+    videos: number;
+  };
+  video: {
+    url: string;
+    cover: string;
+  };
   engagement: string;
 }
 
@@ -74,28 +78,22 @@ export async function fetchTikTokPosts(
     }
 
     return data.map(post => ({
-      id: post.id,
-      title: post.title || '',
-      views: post.views || 0,
-      likes: post.likes || 0,
-      comments: post.comments || 0,
-      shares: post.shares || 0,
-      bookmarks: post.bookmarks || 0,
-      uploadedAt: post.uploadedAt,
-      uploadedAtFormatted: post.uploadedAtFormatted,
-      postPage: post.postPage,
-      "channel.name": post["channel.name"],
-      "channel.username": post["channel.username"],
-      "channel.id": post["channel.id"],
-      "channel.url": post["channel.url"],
-      "channel.avatar": post["channel.avatar"],
-      "channel.verified": post["channel.verified"],
-      "channel.followers": post["channel.followers"],
-      "channel.following": post["channel.following"],
-      "channel.videos": post["channel.videos"],
-      "video.url": post["video.url"],
-      "video.cover": post["video.cover"],
-      engagement: `${((post.likes + post.comments + post.shares) / (post.views || 1) * 100).toFixed(2)}`
+      ...post,
+      channel: {
+        name: post["channel.name"]?.value || '',
+        username: post["channel.username"]?.value || '',
+        id: post["channel.id"]?.value || '',
+        url: post["channel.url"]?.value || '',
+        avatar: post["channel.avatar"]?.value || '',
+        verified: post["channel.verified"]?.value || false,
+        followers: post["channel.followers"]?.value || 0,
+        following: post["channel.following"]?.value || 0,
+        videos: post["channel.videos"]?.value || 0
+      },
+      video: {
+        url: post["video.url"]?.value || '',
+        cover: post["video.cover"]?.value || ''
+      }
     }));
   } catch (error) {
     console.error('Error fetching TikTok posts:', error);

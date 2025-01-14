@@ -78,7 +78,7 @@ export const TikTokTableRow = ({
           variant="ghost" 
           size="icon"
           className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={() => window.open(post["video.url"], '_blank')}
+          onClick={() => window.open(post.video?.url || '', '_blank')}
         >
           <Download className="w-3.5 h-3.5 text-emerald-400" />
         </Button>
