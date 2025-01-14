@@ -131,33 +131,6 @@ export const TikTokSearchSettings = ({
 
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-medium">Location</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="text-[10px]">Select content location</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <Select
-              value={location}
-              onValueChange={setLocation}
-              disabled={disabled}
-            >
-              <SelectTrigger className="w-full h-8 text-[11px]">
-                <SelectValue placeholder="Select location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="US">United States</SelectItem>
-                <SelectItem value="DE">Germany</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
               <span className="text-[11px] font-medium">Date Range</span>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -185,6 +158,33 @@ export const TikTokSearchSettings = ({
                 <SelectItem value="THIS_WEEK">This Week</SelectItem>
                 <SelectItem value="THIS_MONTH">This Month</SelectItem>
                 <SelectItem value="LAST_THREE_MONTHS">Last 3 Months</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-medium">Location</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">Select content location</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Select
+              value={location}
+              onValueChange={setLocation}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-full h-8 text-[11px]">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="US">United States</SelectItem>
+                <SelectItem value="DE">Germany</SelectItem>
               </SelectContent>
             </Select>
           </div>
