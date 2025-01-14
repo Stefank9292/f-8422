@@ -20,8 +20,26 @@ export const TikTokTableRow = ({
 }: TikTokTableRowProps) => {
   const { toast } = useToast();
 
+  // Helper function to safely get username from nested structure
+  const getUsername = (post: any) => {
+    // Try different possible paths for username
+    const username = post.channel?.username || 
+                    post['channel.username'] || 
+                    post.channel?.name ||
+                    post['channel.name'];
+                    
+    console.log('Username data:', { 
+      channelUsername: post.channel?.username,
+      channelDotUsername: post['channel.username'],
+      channelName: post.channel?.name,
+      channelDotName: post['channel.name'],
+      finalUsername: username
+    });
+    
+    return username || 'Unknown';
+  };
+
   const handleDownload = async () => {
-    // Get video URL from the nested structure
     const videoUrl = post.video?.url || post['video.url'];
     
     if (!videoUrl) {
@@ -37,7 +55,6 @@ export const TikTokTableRow = ({
     try {
       console.log('Attempting to download video:', videoUrl);
       
-      // Call our Edge Function to download the video
       const { data, error } = await supabase.functions.invoke('tiktok-video-download', {
         body: { videoUrl }
       });
@@ -47,20 +64,16 @@ export const TikTokTableRow = ({
         throw new Error(error.message);
       }
 
-      // Create a blob from the response
       const blob = new Blob([data], { type: 'video/mp4' });
       const url = window.URL.createObjectURL(blob);
       
-      // Create a temporary anchor element
       const a = document.createElement('a');
       a.href = url;
       a.download = `tiktok-${post.id || 'video'}.mp4`;
       
-      // Append to body, click, and cleanup
       document.body.appendChild(a);
       a.click();
       
-      // Cleanup
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
@@ -82,7 +95,7 @@ export const TikTokTableRow = ({
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post['channel.username'] || post.channel?.username || 'Unknown'}
+        @{getUsername(post)}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
