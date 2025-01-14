@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { ApifyClient } from 'https://esm.sh/apify-client@2.9.3'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,24 +28,32 @@ serve(async (req) => {
     console.log(`Number of videos requested: ${numberOfVideos}`)
     console.log(`Selected date filter: ${selectedDate}`)
 
-    const client = new ApifyClient({
-      token: apifyKey,
-    })
+    // Prepare the request payload
+    const payload = {
+      customMapFunction: "(object) => { return {...object} }",
+      dateRange: "LAST_SIX_MONTHS",
+      location: "DE",
+      maxItems: numberOfVideos,
+      startUrls: [`https://www.tiktok.com/@${username}`]
+    }
 
-    // Run the TikTok scraper actor
-    const run = await client.actor("clockworks/tiktok-profile-scraper").call({
-      profileName: username,
-      maxPosts: numberOfVideos,
-      shouldDownloadCovers: false,
-      shouldDownloadSlideshowImages: false,
-      shouldDownloadVideos: false,
-    })
+    // Make the request to Apify API
+    const response = await fetch(
+      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=' + apifyKey,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      }
+    )
 
-    console.log('Scraper run started, waiting for results...')
+    if (!response.ok) {
+      throw new Error(`Apify API error: ${response.statusText}`)
+    }
 
-    // Wait for the actor to finish and fetch the results
-    const { items: posts } = await client.dataset(run.defaultDatasetId).listItems()
-
+    const posts = await response.json()
     console.log(`Retrieved ${posts.length} posts`)
 
     // Process and transform the results
