@@ -1,5 +1,5 @@
-import { ApifyClient } from 'apify-client';
-import { createClient } from '@supabase/supabase-js';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { ApifyClient } from "apify-client";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +12,7 @@ interface RequestBody {
   dateFrom?: string;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
