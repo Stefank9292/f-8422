@@ -73,6 +73,7 @@ export const TikTokSearchSettings = ({
   };
 
   const handleSliderPointerUp = () => {
+    // Only update parent state when the user finishes dragging
     setNumberOfVideos(localNumberOfVideos);
   };
 
