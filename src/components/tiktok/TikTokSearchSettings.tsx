@@ -68,13 +68,16 @@ export const TikTokSearchSettings = ({
     }
   }, [subscriptionStatus?.priceId]);
 
+  // Update local state without triggering parent update
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);
   };
 
+  // Only update parent state when the user finishes dragging
   const handleSliderPointerUp = () => {
-    // Only update parent state when the user finishes dragging
-    setNumberOfVideos(localNumberOfVideos);
+    if (localNumberOfVideos !== numberOfVideos) {
+      setNumberOfVideos(localNumberOfVideos);
+    }
   };
 
   return (
