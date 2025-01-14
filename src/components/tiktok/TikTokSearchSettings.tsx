@@ -77,6 +77,16 @@ export const TikTokSearchSettings = ({
     setNumberOfVideos(localNumberOfVideos);
   };
 
+  const getDateButtonText = () => {
+    if (!selectedDate) return "Select date";
+    try {
+      return format(selectedDate, "dd.MM.yyyy");
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return "Select date";
+    }
+  };
+
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <button
@@ -152,7 +162,7 @@ export const TikTokSearchSettings = ({
                   )}
                   disabled={disabled || isFreeUser}
                 >
-                  {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+                  {getDateButtonText()}
                 </Button>
               </PopoverTrigger>
               {!isFreeUser && (
