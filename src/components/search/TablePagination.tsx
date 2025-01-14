@@ -38,24 +38,24 @@ export const TablePagination = ({
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4 
-                  bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/80 dark:border-gray-700/80 
-                  backdrop-blur-sm">
-      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/80 dark:border-gray-700/80 
+                    backdrop-blur-sm">
+      <div className="flex items-center gap-3 text-sm text-muted-foreground">
         <span>Show</span>
         <Select
           value={pageSize.toString()}
           onValueChange={onPageSizeChange}
         >
-          <SelectTrigger className="w-[100px] h-8 text-xs">
+          <SelectTrigger className="w-[120px] h-9 text-sm bg-background/50 hover:bg-background/80 transition-colors">
             <SelectValue placeholder="25" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="25" className="text-xs">25 rows</SelectItem>
-            <SelectItem value="50" className="text-xs">50 rows</SelectItem>
-            <SelectItem value="100" className="text-xs">100 rows</SelectItem>
+            <SelectItem value="25" className="text-sm">25 rows</SelectItem>
+            <SelectItem value="50" className="text-sm">50 rows</SelectItem>
+            <SelectItem value="100" className="text-sm">100 rows</SelectItem>
           </SelectContent>
         </Select>
-        <span>of {totalResults} results</span>
+        <span>of {totalResults.toLocaleString()} results</span>
       </div>
 
       <Pagination>
@@ -64,8 +64,8 @@ export const TablePagination = ({
             <PaginationPrevious 
               onClick={() => onPageChange(currentPage - 1)}
               className={cn(
-                "h-8 min-w-8 px-2 text-xs transition-colors hover:bg-accent",
-                "border border-gray-200/80 dark:border-gray-700/80",
+                "h-9 min-w-9 px-3 text-sm font-medium transition-colors",
+                "bg-background/50 hover:bg-background/80 border-border/50",
                 currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
               )}
             />
@@ -77,10 +77,10 @@ export const TablePagination = ({
                 onClick={() => onPageChange(page)}
                 isActive={currentPage === page}
                 className={cn(
-                  "h-8 min-w-8 px-3 text-xs transition-colors border border-gray-200/80 dark:border-gray-700/80",
+                  "h-9 min-w-9 px-3 text-sm font-medium transition-colors border border-border/50",
                   currentPage === page 
                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                    : "hover:bg-accent"
+                    : "bg-background/50 hover:bg-background/80"
                 )}
               >
                 {page}
@@ -92,8 +92,8 @@ export const TablePagination = ({
             <PaginationNext 
               onClick={() => onPageChange(currentPage + 1)}
               className={cn(
-                "h-8 min-w-8 px-2 text-xs transition-colors hover:bg-accent",
-                "border border-gray-200/80 dark:border-gray-700/80",
+                "h-9 min-w-9 px-3 text-sm font-medium transition-colors",
+                "bg-background/50 hover:bg-background/80 border-border/50",
                 currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
               )}
             />
