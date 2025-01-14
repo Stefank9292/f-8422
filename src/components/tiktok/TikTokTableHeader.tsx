@@ -25,17 +25,6 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
             <TooltipContent>Username</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('channel.username.value')} className="group cursor-pointer hover:bg-muted/50 h-12">
-          <Tooltip>
-            <TooltipTrigger className="w-full flex items-center justify-center">
-              <User className={cn(
-                "h-3.5 w-3.5 text-muted-foreground",
-                sortKey === 'channel.username.value' && "text-primary"
-              )} />
-            </TooltipTrigger>
-            <TooltipContent>Channel Username</TooltipContent>
-          </Tooltip>
-        </TableHead>
         <TableHead className="h-12">
           <Tooltip>
             <TooltipTrigger>

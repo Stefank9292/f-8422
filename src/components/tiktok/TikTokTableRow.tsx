@@ -38,22 +38,10 @@ export const TikTokTableRow = ({
     return 'Unknown';
   };
 
-  // Helper function to get channel username value
-  const getChannelUsername = (post: any): string => {
-    if (post['channel.username']?.value) {
-      console.log('Found channel username value:', post['channel.username'].value);
-      return post['channel.username'].value;
-    }
-    return 'Unknown';
-  };
-
   return (
     <TableRow className="hover:bg-muted/30 transition-colors duration-200">
       <TableCell className="py-4 text-xs text-muted-foreground">
         @{getUsername(post)}
-      </TableCell>
-      <TableCell className="py-4 text-xs text-muted-foreground">
-        @{getChannelUsername(post)}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
