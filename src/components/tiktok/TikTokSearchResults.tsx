@@ -164,7 +164,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
       </Collapsible>
 
       <div className="space-y-8 animate-fade-in">
-        <div className="rounded-xl overflow-hidden">
+        <div className="rounded-xl overflow-hidden shadow-lg">
           <TikTokTableContent 
             currentPosts={currentPosts}
             handleCopyCaption={handleCopyCaption}
@@ -172,15 +172,18 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
             truncateCaption={(caption) => caption}
           />
         </div>
-        <div className="border-t border-border/50 pt-8">
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
-            totalResults={filteredResults.length}
-          />
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/5 pointer-events-none" />
+          <div className="relative pt-8">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+              pageSize={pageSize}
+              onPageSizeChange={handlePageSizeChange}
+              totalResults={filteredResults.length}
+            />
+          </div>
         </div>
       </div>
     </div>
