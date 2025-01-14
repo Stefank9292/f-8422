@@ -2,7 +2,6 @@ import { TikTokTableContent } from "./TikTokTableContent";
 import { TikTokFilterHeader } from "./TikTokFilterHeader";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { FilterInput } from "../search/FilterInput";
 import { Eye, Heart, MessageCircle, Zap } from "lucide-react";
 
@@ -38,7 +37,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
   const formatNumber = (num: number | undefined | null): string => {
     if (num === undefined || num === null) return '0';
-    return num.toLocaleString('de-DE').replace(/,/g, '.');
+    return num.toLocaleString('en-US');
   };
 
   const truncateCaption = (caption: string) => caption;
@@ -58,10 +57,10 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
   const filterResults = (results: any[]) => {
     return results.filter(post => {
-      const views = post.playCount || post.views || 0;
-      const likes = post.likeCount || post.likes || 0;
-      const comments = post.commentCount || post.comments || 0;
-      const engagement = ((likes + comments) / (views || 1)) * 100 || 0;
+      const views = Number(post.views) || 0;
+      const likes = Number(post.likes) || 0;
+      const comments = Number(post.comments) || 0;
+      const engagement = views > 0 ? ((likes + comments) / views * 100) : 0;
 
       return (
         (!filters.minViews || views >= parseInt(filters.minViews)) &&
