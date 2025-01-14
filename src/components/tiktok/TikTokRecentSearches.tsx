@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 interface TikTokRecentSearchesProps {
   onSelect: (username: string) => void;
@@ -40,7 +41,6 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     enabled: !!session?.access_token,
   });
 
-  // Check if user has Creator on Steroids plan
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
@@ -71,6 +71,15 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     localStorage.setItem('tiktokRecentSearchesCollapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
+  const extractUsername = (query: string): string => {
+    if (query.includes('tiktok.com/@')) {
+      return query.split('tiktok.com/@')[1]?.split('/')[0] || query;
+    } else if (query.startsWith('@')) {
+      return query.substring(1);
+    }
+    return query;
+  };
+
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-tiktok-searches'],
     queryFn: async () => {
@@ -91,7 +100,10 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
         throw error;
       }
 
-      return data || [];
+      return data.map(item => ({
+        ...item,
+        search_query: extractUsername(item.search_query)
+      })) || [];
     },
     enabled: isSteroidsUser,
   });
@@ -168,6 +180,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
               key={search.id}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm"
             >
+              <TikTokIcon className="w-3.5 h-3.5 text-[#FF0050]" />
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => onSelect(search.search_query)}
