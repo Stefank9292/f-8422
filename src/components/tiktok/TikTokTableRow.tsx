@@ -42,7 +42,7 @@ export const TikTokTableRow = ({
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors duration-200">
-      <TableCell className="py-4 text-xs text-muted-foreground">
+      <TableCell className="py-4 text-xs font-medium text-muted-foreground">
         @{getUsername(post)}
       </TableCell>
       <TableCell className="max-w-xs py-4">
@@ -56,7 +56,7 @@ export const TikTokTableRow = ({
             <TooltipContent 
               side="right" 
               align="start"
-              className="max-w-sm z-[100] bg-popover shadow-lg"
+              className="max-w-sm z-[100] bg-popover/95 backdrop-blur-sm shadow-lg"
               sideOffset={5}
             >
               <p className="break-words text-xs">{post.title}</p>
@@ -75,19 +75,19 @@ export const TikTokTableRow = ({
       <TableCell className="text-center py-4 text-xs text-muted-foreground">
         {new Date(post.uploadedAtFormatted).toLocaleDateString()}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-green-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-green-500/90">
         {formatNumber(post.views)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-violet-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-violet-500/90">
         {formatNumber(post.shares)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-rose-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-rose-500/90">
         {formatNumber(post.likes)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-blue-400">
+      <TableCell className="text-center py-4 text-xs font-medium text-blue-400/90">
         {formatNumber(post.comments)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-orange-500">
+      <TableCell className="text-center py-4 text-xs font-medium text-orange-500/90">
         {Math.round((post.likes / post.views) * 100)}%
       </TableCell>
       <TableCell className="text-center py-4">
@@ -97,7 +97,7 @@ export const TikTokTableRow = ({
           className="h-6 w-6 rounded-md hover:bg-muted transition-colors duration-200"
           onClick={() => window.open(post.postPage, '_blank')}
         >
-          <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
+          <ExternalLink className="w-3.5 h-3.5 text-rose-400/90" />
         </Button>
       </TableCell>
     </TableRow>

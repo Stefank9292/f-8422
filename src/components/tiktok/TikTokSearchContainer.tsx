@@ -77,12 +77,12 @@ export const TikTokSearchContainer = () => {
 
   return (
     <div className="flex flex-col items-center justify-start min-h-[calc(100vh-theme(spacing.20))] md:min-h-[calc(100vh-theme(spacing.32))] 
-                    px-4 sm:px-6 py-8 sm:py-12 space-y-8 sm:space-y-10 animate-in fade-in duration-500">
-      <div className="space-y-6 sm:space-y-8 w-full max-w-md">
+                    px-4 sm:px-6 py-8 sm:py-12 space-y-8 sm:space-y-10 animate-in fade-in duration-500 w-full">
+      <div className="space-y-6 sm:space-y-8 w-full max-w-lg">
         <TikTokSearchHeader />
       </div>
 
-      <div className="w-full max-w-md space-y-6">
+      <div className="w-full max-w-lg space-y-6 animate-in fade-in duration-500 delay-150">
         <TikTokSearchBar
           username={username}
           onUsernameChange={setUsername}
@@ -105,7 +105,9 @@ export const TikTokSearchContainer = () => {
         <TikTokRecentSearches onSelect={setUsername} />
       </div>
 
-      <TikTokSearchResults searchResults={searchResults} />
+      <div className="w-full animate-in fade-in duration-500 delay-300">
+        <TikTokSearchResults searchResults={searchResults} />
+      </div>
     </div>
   );
 };

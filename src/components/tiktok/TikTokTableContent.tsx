@@ -79,8 +79,8 @@ export const TikTokTableContent = ({
 
   return (
     <TooltipProvider>
-      <div className="rounded-xl overflow-hidden border border-gray-200/80 dark:border-gray-700/80 
-                    bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
+      <div className="rounded-xl overflow-hidden border border-border/50 bg-white/90 dark:bg-gray-800/90 
+                    backdrop-blur-sm shadow-lg transition-all duration-300">
         <Table>
           <TikTokTableHeader 
             onSort={handleSort}

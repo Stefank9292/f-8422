@@ -19,7 +19,8 @@ export const TikTokFilterHeader = ({
   isMobile 
 }: TikTokFilterHeaderProps) => {
   return (
-    <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-card/50 border border-border/50 rounded-t-xl">
+    <div className="flex items-center justify-between px-4 sm:px-6 py-3 bg-card/50 backdrop-blur-sm 
+                    border border-border/50 rounded-t-xl shadow-sm">
       <div className="flex items-center gap-2">
         <p className="text-xs text-muted-foreground">
           Showing <span className="font-medium text-foreground">{filteredResults}</span> of <span className="font-medium text-foreground">{totalResults}</span> results
@@ -27,7 +28,7 @@ export const TikTokFilterHeader = ({
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 hover:bg-secondary/50"
+          className="h-6 w-6 hover:bg-secondary/50 transition-colors duration-200"
           onClick={onReset}
         >
           <RotateCcw className="h-3.5 w-3.5" />
@@ -39,7 +40,8 @@ export const TikTokFilterHeader = ({
           <Button
             variant="ghost"
             size="sm"
-            className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50 border border-border/50"
+            className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50 transition-colors duration-200
+                       border border-border/50 rounded-lg"
           >
             {isMobile ? (
               <>
