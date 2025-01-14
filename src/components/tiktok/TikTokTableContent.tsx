@@ -33,22 +33,34 @@ export const TikTokTableContent = ({
     }
   };
 
+  const calculateEngagement = (post: any) => {
+    return (post.likes / post.views) * 100;
+  };
+
   const sortedPosts = [...currentPosts].sort((a, b) => {
     if (!sortKey) return 0;
 
-    let valueA = a[sortKey];
-    let valueB = b[sortKey];
+    let valueA, valueB;
 
-    if (sortKey === 'uploadedAtFormatted') {
-      valueA = new Date(valueA).getTime();
-      valueB = new Date(valueB).getTime();
-    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-      // No conversion needed for numbers
+    if (sortKey === 'engagement') {
+      valueA = calculateEngagement(a);
+      valueB = calculateEngagement(b);
+    } else if (sortKey === 'uploadedAtFormatted') {
+      valueA = new Date(a[sortKey]).getTime();
+      valueB = new Date(b[sortKey]).getTime();
     } else {
-      valueA = String(valueA);
-      valueB = String(valueB);
+      valueA = a[sortKey];
+      valueB = b[sortKey];
     }
 
+    if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+    }
+
+    // Handle string comparisons
+    valueA = String(valueA).toLowerCase();
+    valueB = String(valueB).toLowerCase();
+    
     if (sortDirection === 'asc') {
       return valueA > valueB ? 1 : -1;
     }
