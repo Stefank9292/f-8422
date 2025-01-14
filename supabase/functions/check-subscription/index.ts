@@ -35,14 +35,37 @@ serve(async (req) => {
       authHeader.replace('Bearer ', '')
     );
 
-    if (authError || !user) {
+    if (authError) {
       console.error('Auth error:', authError);
-      throw new Error('Unauthorized');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', message: authError.message }),
+        { 
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
+    if (!user) {
+      console.error('No user found');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized', message: 'No user found' }),
+        { 
+          status: 401,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
     }
 
     console.log('Authenticated user:', user.id);
 
-    // Get subscription status from hooks table
+    // Get subscription status from subscription_logs table
     const { data: subscriptionData, error: subscriptionError } = await supabaseClient
       .from('subscription_logs')
       .select('*')
@@ -85,12 +108,17 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in check-subscription function:', error);
     
+    // Determine if error is auth-related
+    const isAuthError = error.message?.includes('JWT') || 
+                       error.message?.includes('auth') ||
+                       error.message?.includes('token');
+    
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : 'An unexpected error occurred'
       }),
       { 
-        status: error instanceof Error && error.message === 'Unauthorized' ? 401 : 500,
+        status: isAuthError ? 401 : 500,
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
