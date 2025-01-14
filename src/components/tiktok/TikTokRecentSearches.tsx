@@ -72,12 +72,17 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
   }, [isCollapsed]);
 
   const extractUsername = (query: string): string => {
+    // Handle full TikTok URLs
     if (query.includes('tiktok.com/@')) {
-      return query.split('tiktok.com/@')[1]?.split('/')[0] || query;
-    } else if (query.startsWith('@')) {
-      return query.substring(1);
+      const username = query.split('tiktok.com/@')[1]?.split('/')[0];
+      return username ? `@${username}` : query;
     }
-    return query;
+    // Handle @username format
+    if (query.startsWith('@')) {
+      return query;
+    }
+    // Handle plain username
+    return `@${query}`;
   };
 
   const { data: recentSearches = [] } = useQuery({
@@ -100,10 +105,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
         throw error;
       }
 
-      return data.map(item => ({
-        ...item,
-        search_query: extractUsername(item.search_query)
-      })) || [];
+      return data || [];
     },
     enabled: isSteroidsUser,
   });
@@ -186,7 +188,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
                   onClick={() => onSelect(search.search_query)}
                   className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
                 >
-                  {search.search_query}
+                  {extractUsername(search.search_query)}
                 </button>
               </div>
               <Button
