@@ -85,6 +85,12 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     return `@${query}`;
   };
 
+  const formatTikTokUrl = (username: string): string => {
+    // Remove @ if it exists, then add it back in the URL
+    const cleanUsername = username.replace(/^@/, '');
+    return `https://www.tiktok.com/@${cleanUsername}`;
+  };
+
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-tiktok-searches'],
     queryFn: async () => {
@@ -185,7 +191,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
               <TikTokIcon className="w-3.5 h-3.5 text-gray-800 dark:text-gray-200" />
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => onSelect(search.search_query)}
+                  onClick={() => onSelect(formatTikTokUrl(search.search_query))}
                   className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
                 >
                   {extractUsername(search.search_query)}
