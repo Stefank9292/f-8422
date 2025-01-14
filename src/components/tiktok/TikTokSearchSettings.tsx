@@ -131,7 +131,9 @@ export const TikTokSearchSettings = ({
               max={maxVideos}
               step={1}
               disabled={disabled}
-              className="w-full"
+              className="w-full [&>.relative>.absolute]:bg-[#000000e6] [&>.relative]:bg-gray-200 dark:[&>.relative]:bg-gray-700
+                       [&>button]:border-[#000000e6] [&>button]:bg-white dark:[&>button]:bg-gray-900
+                       [&>button:focus-visible]:ring-[#000000e6]"
             />
           </div>
 
