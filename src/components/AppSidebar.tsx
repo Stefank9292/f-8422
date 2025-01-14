@@ -117,14 +117,14 @@ export function AppSidebar() {
                 {subscriptionStatus?.subscribed && (
                   <>
                     <SidebarMenuItem>
+                      <RequestUsageCounter />
+                    </SidebarMenuItem>
+
+                    <SidebarMenuItem>
                       <SidebarSettings 
                         currentPath={location.pathname}
                         subscriptionStatus={subscriptionStatus}
                       />
-                    </SidebarMenuItem>
-
-                    <SidebarMenuItem>
-                      <RequestUsageCounter />
                     </SidebarMenuItem>
                   </>
                 )}
