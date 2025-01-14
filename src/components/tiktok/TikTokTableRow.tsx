@@ -16,32 +16,22 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
-  // Helper function to safely get username from nested structure
-  const getUsername = (post: any) => {
-    // First try the direct channel object structure
-    if (post.channel?.username?.value) {
-      return post.channel.username.value;
+  // Helper function to safely get username from either structure
+  const getUsername = (post: any): string => {
+    // First try the transformed structure (from edge function)
+    if (post.channel?.username) {
+      return post.channel.username;
     }
     
-    // Then try the dot notation structure
+    // Then try the dot notation structure (direct from API)
     if (post['channel.username']?.value) {
       return post['channel.username'].value;
     }
     
-    // Fallback to name if username is not available
-    if (post.channel?.name?.value) {
-      return post.channel.name.value;
-    }
-    
-    if (post['channel.name']?.value) {
-      return post['channel.name'].value;
-    }
-
-    // Log the post structure for debugging
-    console.log('Post structure:', {
-      channelDirect: post.channel,
-      channelUsername: post['channel.username'],
-      channelName: post['channel.name'],
+    // Log the structure for debugging
+    console.log('Post structure for username:', {
+      channel: post.channel,
+      dotNotation: post['channel.username'],
       fullPost: post
     });
     
