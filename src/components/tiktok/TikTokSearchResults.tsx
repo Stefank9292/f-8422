@@ -114,14 +114,6 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               isDatePicker
             />
             <FilterInput
-              icon={Heart}
-              label="Min. Likes"
-              value={minLikes}
-              onChange={setMinLikes}
-              type="number"
-              placeholder="Minimum likes..."
-            />
-            <FilterInput
               icon={Eye}
               label="Min. Views"
               value={minViews}
@@ -136,6 +128,14 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               onChange={setMinShares}
               type="number"
               placeholder="Minimum shares..."
+            />
+            <FilterInput
+              icon={Heart}
+              label="Min. Likes"
+              value={minLikes}
+              onChange={setMinLikes}
+              type="number"
+              placeholder="Minimum likes..."
             />
             <FilterInput
               icon={MessageSquare}
