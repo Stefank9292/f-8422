@@ -53,14 +53,16 @@ export const TikTokSearchContainer = () => {
         <TikTokSearchHeader />
       </div>
 
-      <div className="w-full max-w-md space-y-4 sm:space-y-6">
+      <div className="w-full max-w-md space-y-4">
         <TikTokSearchBar
           username={username}
           onUsernameChange={setUsername}
           isLoading={isLoading}
           onSearch={handleSearch}
         />
+        
         <TikTokRecentSearches onSelect={setUsername} />
+
         <TikTokSearchSettings 
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
