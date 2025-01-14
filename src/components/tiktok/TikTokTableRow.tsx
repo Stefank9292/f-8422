@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Copy, ExternalLink } from "lucide-react";
+import { Copy, ExternalLink, Download } from "lucide-react";
 
 interface TikTokTableRowProps {
   post: any;
@@ -71,6 +71,16 @@ export const TikTokTableRow = ({
           onClick={() => window.open(post.postPage, '_blank')}
         >
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
+        </Button>
+      </TableCell>
+      <TableCell className="text-center py-4 align-middle">
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="h-6 w-6 rounded-md hover:bg-muted"
+          onClick={() => window.open(post["video.url"], '_blank')}
+        >
+          <Download className="w-3.5 h-3.5 text-emerald-400" />
         </Button>
       </TableCell>
     </TableRow>

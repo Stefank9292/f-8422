@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2 } from "lucide-react";
+import { User, PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TableHeaderProps {
@@ -101,6 +101,14 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
               <Link className="h-3.5 w-3.5 mx-auto text-rose-400" />
             </TooltipTrigger>
             <TooltipContent>Open URL</TooltipContent>
+          </Tooltip>
+        </TableHead>
+        <TableHead className="text-center h-12">
+          <Tooltip>
+            <TooltipTrigger>
+              <Video className="h-3.5 w-3.5 mx-auto text-emerald-400" />
+            </TooltipTrigger>
+            <TooltipContent>Download Video</TooltipContent>
           </Tooltip>
         </TableHead>
       </TableRow>
