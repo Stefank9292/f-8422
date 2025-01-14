@@ -71,16 +71,16 @@ serve(async (req) => {
 
     // Process and transform the results
     const processedResults = posts.map(post => ({
-      authorUsername: post.authorMeta?.name || username,
-      description: post.text || '',
-      createTime: new Date(post.createTime).toLocaleDateString(),
-      playCount: post.playCount || 0,
-      viewCount: post.playCount || 0, // TikTok uses playCount as views
-      likeCount: post.diggCount || 0,
-      commentCount: post.commentCount || 0,
+      "channel.username": post.authorMeta?.name || username,
+      title: post.text || '',
+      uploadedAtFormatted: new Date(post.createTime).toLocaleDateString(),
+      views: post.playCount || 0,
+      shares: post.shareCount || 0,
+      likes: post.diggCount || 0,
+      comments: post.commentCount || 0,
       engagement: ((post.diggCount + post.commentCount) / (post.playCount || 1) * 100).toFixed(2),
-      webVideoUrl: post.webVideoUrl || '',
-      timestamp: post.createTime,
+      postPage: post.webVideoUrl || '',
+      "video.url": post.videoUrl || post.downloadAddr || '',
     }))
 
     console.log(`Returning ${processedResults.length} processed results`)
