@@ -62,7 +62,6 @@ export const TikTokSearchSettings = ({
 
   const maxVideos = getMaxVideos();
 
-  // Update local number of videos when subscription changes
   useEffect(() => {
     if (localNumberOfVideos > maxVideos) {
       setLocalNumberOfVideos(maxVideos);
@@ -74,7 +73,6 @@ export const TikTokSearchSettings = ({
     setLocalNumberOfVideos(value[0]);
   };
 
-  // Only update parent state when slider interaction ends
   const handleSliderPointerUp = () => {
     setNumberOfVideos(localNumberOfVideos);
   };
@@ -90,8 +88,6 @@ export const TikTokSearchSettings = ({
     { value: "US", label: "United States" },
     { value: "DE", label: "Germany" },
   ];
-
-  // ... keep existing code (JSX for the settings UI)
 
   return (
     <div className="w-full flex flex-col items-center justify-center">
@@ -114,7 +110,14 @@ export const TikTokSearchSettings = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-medium">Number of Videos</span>
-                <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-[10px]">Maximum number of videos to fetch</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                 {localNumberOfVideos}
@@ -128,7 +131,9 @@ export const TikTokSearchSettings = ({
               max={maxVideos}
               step={1}
               disabled={disabled}
-              className="w-full"
+              className="w-full [&>.relative>.absolute]:bg-[#000000e6] [&>.relative]:bg-gray-200 dark:[&>.relative]:bg-gray-700
+                       [&>button]:border-[#000000e6] [&>button]:bg-white dark:[&>button]:bg-gray-900
+                       [&>button:focus-visible]:ring-[#000000e6] [&>button]:border-2"
             />
           </div>
 
