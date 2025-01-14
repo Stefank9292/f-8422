@@ -18,15 +18,22 @@ export const RecentSearchItem = ({
   // Extract username from TikTok URL or use the query as is
   const formatUsername = (query: string): string => {
     try {
+      let username = query;
+      
       // Handle full TikTok URLs
       if (query.includes('tiktok.com/')) {
         const match = query.match(/@([^/?]+)/);
-        return match ? match[1] : query;
+        username = match ? match[1] : query;
+      } else {
+        // Handle @username format or raw username
+        username = query.startsWith('@') ? query.substring(1) : query;
       }
-      // Handle @username format
-      return query.startsWith('@') ? query.substring(1) : query;
+
+      // Ensure username starts with @
+      return username.startsWith('@') ? username : `@${username}`;
     } catch {
-      return query;
+      // Fallback to original query with @ if something goes wrong
+      return query.startsWith('@') ? query : `@${query}`;
     }
   };
 
