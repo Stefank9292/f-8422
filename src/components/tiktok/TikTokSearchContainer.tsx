@@ -11,7 +11,8 @@ export const TikTokSearchContainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [selectedDate, setSelectedDate] = useState<string>("THIS_MONTH");
+  const [location, setLocation] = useState<string>("US");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -29,7 +30,8 @@ export const TikTokSearchContainer = () => {
         body: {
           username: username.trim(),
           numberOfVideos,
-          selectedDate: selectedDate?.toISOString(),
+          selectedDate,
+          location
         }
       });
 
@@ -78,6 +80,8 @@ export const TikTokSearchContainer = () => {
           setNumberOfVideos={setNumberOfVideos}
           selectedDate={selectedDate}
           setSelectedDate={setSelectedDate}
+          location={location}
+          setLocation={setLocation}
           disabled={isLoading}
         />
       </div>

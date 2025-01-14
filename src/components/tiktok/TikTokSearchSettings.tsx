@@ -1,22 +1,28 @@
 import { useState, useEffect } from "react";
-import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Settings2, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Slider } from "@/components/ui/slider";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TikTokSearchSettingsProps {
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
   numberOfVideos: number;
   setNumberOfVideos: (num: number) => void;
-  selectedDate: Date | undefined;
-  setSelectedDate: (date: Date | undefined) => void;
+  selectedDate: string;
+  setSelectedDate: (date: string) => void;
+  location: string;
+  setLocation: (location: string) => void;
   disabled?: boolean;
 }
 
@@ -27,11 +33,11 @@ export const TikTokSearchSettings = ({
   setNumberOfVideos,
   selectedDate,
   setSelectedDate,
+  location,
+  setLocation,
   disabled = false,
 }: TikTokSearchSettingsProps) => {
   const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
-  const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
   const { data: subscriptionStatus } = useQuery({
     queryKey: ['subscription-status'],
@@ -98,7 +104,14 @@ export const TikTokSearchSettings = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-medium">Number of Videos</span>
-                <HelpCircle className="w-3.5 h-3.5 text-gray-400" />
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-[10px]">Maximum number of videos to fetch</p>
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
                 {localNumberOfVideos}
@@ -118,57 +131,62 @@ export const TikTokSearchSettings = ({
 
           <div className="space-y-2">
             <div className="flex items-center gap-1.5">
-              <CalendarIcon className="w-3.5 h-3.5 text-gray-500" />
-              <span className="text-[11px] font-medium">Posts newer than</span>
-              {isFreeUser && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Lock className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[10px]">Upgrade to filter by date</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-              {!isFreeUser && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[10px]">Limited to posts from the last 90 days</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
+              <span className="text-[11px] font-medium">Location</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">Select content location</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full h-8 justify-start text-[11px] font-normal",
-                    !selectedDate && "text-muted-foreground",
-                    isFreeUser && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={disabled || isFreeUser}
-                >
-                  {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              {!isFreeUser && (
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) =>
-                      date > new Date() || date < ninetyDaysAgo
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              )}
-            </Popover>
+            <Select
+              value={location}
+              onValueChange={setLocation}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-full h-8 text-[11px]">
+                <SelectValue placeholder="Select location" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="US">United States</SelectItem>
+                <SelectItem value="DE">Germany</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[11px] font-medium">Date Range</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-[10px]">Filter posts by date range</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <Select
+              value={selectedDate}
+              onValueChange={setSelectedDate}
+              disabled={disabled || isFreeUser}
+            >
+              <SelectTrigger 
+                className={cn(
+                  "w-full h-8 text-[11px]",
+                  isFreeUser && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <SelectValue placeholder="Select date range" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="THIS_WEEK">This Week</SelectItem>
+                <SelectItem value="THIS_MONTH">This Month</SelectItem>
+                <SelectItem value="LAST_THREE_MONTHS">Last 3 Months</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}
