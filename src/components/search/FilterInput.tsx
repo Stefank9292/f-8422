@@ -28,7 +28,6 @@ export const FilterInput = ({
   placeholder,
   type = "text",
   isDatePicker,
-  helpText
 }: FilterInputProps) => {
   const [date, setDate] = useState<Date | undefined>();
 
@@ -116,11 +115,6 @@ export const FilterInput = ({
       <Label className="text-xs font-medium flex items-center gap-1.5">
         <Icon className="h-3.5 w-3.5" />
         <span>{label}</span>
-        {helpText && (
-          <span className="text-[10px] text-muted-foreground ml-1">
-            ({helpText})
-          </span>
-        )}
       </Label>
       <Input
         type={type}

@@ -7,22 +7,15 @@ interface TikTokSearchBarProps {
   username: string;
   onUsernameChange: (value: string) => void;
   isLoading?: boolean;
-  onSearch: () => void;
 }
 
 export const TikTokSearchBar = ({ 
   username, 
   onUsernameChange,
-  isLoading = false,
-  onSearch
+  isLoading = false
 }: TikTokSearchBarProps) => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSearch();
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col space-y-3 w-full">
+    <div className="flex flex-col space-y-3 w-full">
       <div className="relative w-full">
         <Input
           type="text"
@@ -38,7 +31,6 @@ export const TikTokSearchBar = ({
       </div>
       
       <Button
-        type="submit"
         disabled={isLoading || !username.trim()}
         className="w-full h-10 bg-black hover:bg-black/90 rounded-xl"
       >
@@ -54,6 +46,6 @@ export const TikTokSearchBar = ({
           </>
         )}
       </Button>
-    </form>
+    </div>
   );
 };
