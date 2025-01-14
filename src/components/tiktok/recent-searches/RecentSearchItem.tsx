@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 interface RecentSearchItemProps {
   id: string;
@@ -15,42 +14,23 @@ export const RecentSearchItem = ({
   onSelect, 
   onRemove 
 }: RecentSearchItemProps) => {
-  const extractUsername = (query: string): string => {
-    if (query.includes('tiktok.com/')) {
-      const username = query.split('tiktok.com/')[1]?.split('/')[0];
-      return `@${username?.replace('@', '')}`;
-    }
-    return query.startsWith('@') ? query : `@${query}`;
-  };
-
-  const formatTikTokUrl = (query: string): string => {
-    let username = query;
-    if (query.includes('tiktok.com/')) {
-      username = query.split('tiktok.com/')[1]?.split('/')[0] || '';
-    }
-    username = username.replace('@', '');
-    return `https://www.tiktok.com/@${username}`;
-  };
-
   return (
-    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm">
-      <TikTokIcon className="w-3.5 h-3.5 text-gray-800 dark:text-gray-200" />
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => onSelect(formatTikTokUrl(searchQuery))}
-          className="text-[11px] font-medium text-gray-800 dark:text-gray-200"
-        >
-          {extractUsername(searchQuery)}
-        </button>
-      </div>
+    <div className="relative group">
+      <button
+        onClick={() => onSelect(searchQuery)}
+        className="text-[11px] text-muted-foreground hover:text-primary font-medium 
+                   bg-muted/50 hover:bg-muted px-3 py-1.5 rounded-lg transition-colors"
+      >
+        @{searchQuery}
+      </button>
       <Button
         variant="ghost"
         size="icon"
-        className="h-4 w-4 p-0 hover:bg-transparent"
+        className="absolute -right-1 -top-1 h-4 w-4 rounded-full opacity-0 group-hover:opacity-100 
+                   transition-opacity bg-muted hover:bg-destructive/90 hover:text-destructive-foreground"
         onClick={() => onRemove(id)}
       >
-        <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
-        <span className="sr-only">Remove search</span>
+        <X className="h-2.5 w-2.5" />
       </Button>
     </div>
   );
