@@ -170,14 +170,16 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
           formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
           truncateCaption={(caption) => caption}
         />
-        <TablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          pageSize={pageSize}
-          onPageSizeChange={handlePageSizeChange}
-          totalResults={filteredResults.length}
-        />
+        <div className="mt-8 border-t border-border/50">
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+            totalResults={filteredResults.length}
+          />
+        </div>
       </div>
     </div>
   );
