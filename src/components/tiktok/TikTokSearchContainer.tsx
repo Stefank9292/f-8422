@@ -11,38 +11,34 @@ import { useQuery } from "@tanstack/react-query";
 
 export const TikTokSearchContainer = () => {
   const [username, setUsername] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
   const [dateRange, setDateRange] = useState<DateRangeOption>("DEFAULT");
   const [location, setLocation] = useState<LocationOption>("US");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
   const { toast } = useToast();
 
-  // Get current user session
+  // Get current user session with proper caching
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
       const { data } = await supabase.auth.getSession();
       return data.session;
     },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  const handleSearch = async () => {
-    if (!username.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a TikTok username or URL",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
+  // TikTok search query with persistence
+  const { 
+    data: searchResults = [], 
+    isLoading,
+    refetch: performSearch
+  } = useQuery({
+    queryKey: ['tiktok-search', username, numberOfVideos, dateRange, location],
+    queryFn: async () => {
+      if (!username.trim()) return [];
+      
       console.log('Searching with params:', { username, numberOfVideos, dateRange, location });
       const results = await fetchTikTokPosts(username, numberOfVideos, dateRange, location);
-      setSearchResults(results);
 
       // Save search to history if user is logged in
       if (session?.user?.id) {
@@ -60,18 +56,43 @@ export const TikTokSearchContainer = () => {
         }
       }
 
-      toast({
-        description: `Found ${results.length} videos for @${username.replace('@', '')}`,
-      });
-    } catch (error) {
-      console.error('Search error:', error);
+      return results;
+    },
+    enabled: false, // Don't run automatically
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    retry: 2,
+    meta: {
+      onError: (error: Error) => {
+        console.error('Search error:', error);
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
+          variant: "destructive",
+        });
+      }
+    }
+  });
+
+  const handleSearch = async () => {
+    if (!username.trim()) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
+        description: "Please enter a TikTok username or URL",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const results = await performSearch();
+      if (results.data && results.data.length > 0) {
+        toast({
+          description: `Found ${results.data.length} videos for @${username.replace('@', '')}`,
+        });
+      }
+    } catch (error) {
+      // Error handling is done in the query's meta.onError
     }
   };
 
