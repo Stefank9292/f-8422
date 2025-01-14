@@ -33,11 +33,20 @@ export async function fetchTikTokPosts(
   try {
     console.log('Fetching TikTok posts for:', username);
     
+    // Clean up the username and ensure it's in the correct format
+    const cleanUsername = username.replace('@', '').trim();
+    const url = `https://www.tiktok.com/@${cleanUsername}`;
+
     const { data, error } = await supabase.functions.invoke('tiktok-apify-scraper', {
       body: {
-        username,
+        username: cleanUsername,
+        startUrls: [url],
         numberOfVideos,
-        postsNewerThan: postsNewerThan?.toISOString()
+        postsNewerThan: postsNewerThan?.toISOString(),
+        customMapFunction: "(object) => { return {...object} }",
+        dateRange: "THIS_WEEK",
+        location: "US",
+        maxItems: numberOfVideos
       }
     });
 

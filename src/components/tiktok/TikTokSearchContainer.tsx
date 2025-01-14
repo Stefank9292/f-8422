@@ -3,6 +3,8 @@ import { TikTokSearchBar } from "./TikTokSearchBar";
 import { TikTokSearchSettings } from "./TikTokSearchSettings";
 import { TikTokSearchResults } from "./TikTokSearchResults";
 import { useState } from "react";
+import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
+import { useToast } from "@/hooks/use-toast";
 
 export const TikTokSearchContainer = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +12,37 @@ export const TikTokSearchContainer = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const { toast } = useToast();
+
+  const handleSearch = async () => {
+    if (!username.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a TikTok username or URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const results = await fetchTikTokPosts(username, numberOfVideos, selectedDate);
+      setSearchResults(results);
+      toast({
+        description: `Found ${results.length} videos for @${username.replace('@', '')}`,
+      });
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -22,6 +55,7 @@ export const TikTokSearchContainer = () => {
           username={username}
           onUsernameChange={setUsername}
           isLoading={isLoading}
+          onSearch={handleSearch}
         />
         <TikTokSearchSettings 
           isSettingsOpen={isSettingsOpen}
@@ -34,7 +68,7 @@ export const TikTokSearchContainer = () => {
         />
       </div>
 
-      <TikTokSearchResults />
+      <TikTokSearchResults searchResults={searchResults} />
     </div>
   );
 };
