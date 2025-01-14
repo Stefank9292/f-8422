@@ -36,6 +36,10 @@ export const TikTokTableRow = ({
     }
   };
 
+  const truncatedCaption = post.title.length > 15 
+    ? `${post.title.substring(0, 15)}...` 
+    : post.title;
+
   return (
     <TableRow className="hover:bg-muted/30 transition-colors duration-200">
       <TableCell className="py-4 text-xs text-muted-foreground">
@@ -46,7 +50,7 @@ export const TikTokTableRow = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {truncateCaption(post.title)}
+                {truncatedCaption}
               </span>
             </TooltipTrigger>
             <TooltipContent 
