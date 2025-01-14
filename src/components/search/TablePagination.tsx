@@ -39,7 +39,7 @@ export const TablePagination = ({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-5 py-4 
                   bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200/80 dark:border-gray-700/80 
-                  backdrop-blur-sm shadow-lg">
+                  backdrop-blur-sm">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <span>Show</span>
         <Select
