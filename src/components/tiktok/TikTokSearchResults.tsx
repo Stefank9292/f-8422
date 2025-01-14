@@ -1,5 +1,6 @@
 import { TikTokTableContent } from "./TikTokTableContent";
 import { TikTokFilterHeader } from "./TikTokFilterHeader";
+import { TablePagination } from "../search/TablePagination";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
@@ -14,8 +15,8 @@ interface TikTokSearchResultsProps {
 
 export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsProps) => {
   const { toast } = useToast();
-  const [currentPage] = useState(1);
-  const [pageSize] = useState(25);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const isMobile = useIsMobile();
   
   // Filter states
@@ -33,12 +34,6 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
       description: "Caption copied to clipboard",
     });
   };
-
-  const formatNumber = (num: number) => {
-    return num.toLocaleString('de-DE').replace(/,/g, '.');
-  };
-
-  const truncateCaption = (caption: string) => caption;
 
   // Filter logic
   const filteredResults = searchResults.filter(post => {
@@ -78,6 +73,17 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
     return dateMatch && likesMatch && viewsMatch && 
            sharesMatch && commentsMatch && engagementMatch;
   });
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredResults.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentPosts = filteredResults.slice(startIndex, endIndex);
+
+  const handlePageSizeChange = (value: string) => {
+    setPageSize(Number(value));
+    setCurrentPage(1);
+  };
 
   const handleReset = () => {
     setDate("");
@@ -159,10 +165,18 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
       <div className="rounded-xl overflow-hidden border border-border/50 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg">
         <TikTokTableContent 
-          currentPosts={filteredResults}
+          currentPosts={currentPosts}
           handleCopyCaption={handleCopyCaption}
-          formatNumber={formatNumber}
-          truncateCaption={truncateCaption}
+          formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
+          truncateCaption={(caption) => caption}
+        />
+        <TablePagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          pageSize={pageSize}
+          onPageSizeChange={handlePageSizeChange}
+          totalResults={filteredResults.length}
         />
       </div>
     </div>
