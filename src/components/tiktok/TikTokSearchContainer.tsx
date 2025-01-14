@@ -4,7 +4,7 @@ import { TikTokSearchSettings, DateRangeOption, LocationOption } from "./TikTokS
 import { TikTokSearchResults } from "./TikTokSearchResults";
 import { TikTokRecentSearches } from "./TikTokRecentSearches";
 import { useState, useEffect } from "react";
-import { fetchTikTokPosts, TikTokPost } from "@/utils/tiktok/services/tiktokService";
+import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -28,17 +28,19 @@ export const TikTokSearchContainer = () => {
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  // Persist search parameters in localStorage
+  // Load saved search parameters from localStorage on mount only
   useEffect(() => {
     const savedSearch = localStorage.getItem('tiktok-search');
     if (savedSearch) {
       const { username: savedUsername, numberOfVideos: savedNumber, dateRange: savedRange, location: savedLocation } = JSON.parse(savedSearch);
-      setUsername(savedUsername || "");
-      setNumberOfVideos(savedNumber || 5);
-      setDateRange(savedRange || "DEFAULT");
-      setLocation(savedLocation || "US");
+      if (!username) { // Only set if username is empty to prevent overwriting active search
+        setUsername(savedUsername || "");
+        setNumberOfVideos(savedNumber || 5);
+        setDateRange(savedRange || "DEFAULT");
+        setLocation(savedLocation || "US");
+      }
     }
-  }, []);
+  }, []); // Empty dependency array ensures this only runs once on mount
 
   // TikTok search query with persistence
   const { 
@@ -80,9 +82,12 @@ export const TikTokSearchContainer = () => {
       return results;
     },
     enabled: shouldSearch && Boolean(username.trim()),
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
-    retry: 2
+    staleTime: Infinity, // Keep data fresh indefinitely until explicitly invalidated
+    gcTime: 1000 * 60 * 60, // Keep in cache for 1 hour
+    retry: 2,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false
   });
 
   const handleSearch = async () => {
