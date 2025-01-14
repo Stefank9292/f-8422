@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2 } from "lucide-react";
+import { PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SortDirection } from "./TikTokTableContent";
 
@@ -14,6 +14,17 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
   return (
     <TableHeader>
       <TableRow className="hover:bg-transparent border-b border-border/50">
+        <TableHead onClick={() => onSort('channel.username')} className="group cursor-pointer hover:bg-muted/50 h-12">
+          <Tooltip>
+            <TooltipTrigger className="w-full flex items-center justify-center">
+              <User className={cn(
+                "h-3.5 w-3.5 text-muted-foreground",
+                sortKey === 'channel.username' && "text-primary"
+              )} />
+            </TooltipTrigger>
+            <TooltipContent>Username</TooltipContent>
+          </Tooltip>
+        </TableHead>
         <TableHead className="h-12">
           <Tooltip>
             <TooltipTrigger>
