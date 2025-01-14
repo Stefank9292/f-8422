@@ -18,6 +18,26 @@ interface ExportCSVProps {
 }
 
 export const TikTokExportCSV = ({ currentPosts }: ExportCSVProps) => {
+  // Helper function to extract username from TikTok URL
+  const getUsername = (post: Post): string => {
+    try {
+      const url = post.postPage;
+      if (!url) return 'Unknown';
+      
+      const match = url.match(/@([^/]+)/);
+      return match && match[1] ? match[1] : 'Unknown';
+    } catch (error) {
+      console.error('Error extracting username:', error);
+      return 'Unknown';
+    }
+  };
+
+  // Helper function to calculate engagement
+  const calculateEngagement = (post: Post): string => {
+    const engagement = (post.likes / post.views) * 100;
+    return `${Math.round(engagement)}%`;
+  };
+
   const handleExportCSV = () => {
     const headers = [
       'Username',
@@ -32,14 +52,14 @@ export const TikTokExportCSV = ({ currentPosts }: ExportCSVProps) => {
     ].join(',');
 
     const rows = currentPosts.map(post => [
-      `@${post.ownerUsername}`,
+      `@${getUsername(post)}`,
       `"${post.title.replace(/"/g, '""')}"`,
       post.uploadedAtFormatted,
       post.views,
       post.shares,
       post.likes,
       post.comments,
-      post.engagement,
+      calculateEngagement(post),
       post.postPage
     ].join(','));
 
