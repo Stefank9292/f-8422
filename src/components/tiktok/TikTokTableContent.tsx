@@ -1,6 +1,7 @@
 import { Table, TableBody } from "@/components/ui/table";
 import { TikTokTableHeader } from "./TikTokTableHeader";
 import { TikTokTableRow } from "./TikTokTableRow";
+import { TikTokMobilePostRow } from "./TikTokMobilePostRow";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
@@ -70,9 +71,15 @@ export const TikTokTableContent = ({
   if (isMobile) {
     return (
       <div className="space-y-3">
-        <p className="text-sm text-muted-foreground text-center">
-          Mobile view coming soon
-        </p>
+        {sortedPosts.map((post, index) => (
+          <TikTokMobilePostRow
+            key={index}
+            post={post}
+            onCopyCaption={handleCopyCaption}
+            formatNumber={formatNumber}
+            truncateCaption={truncateCaption}
+          />
+        ))}
       </div>
     );
   }
