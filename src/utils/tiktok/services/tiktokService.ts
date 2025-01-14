@@ -2,17 +2,26 @@ import { supabase } from "@/integrations/supabase/client";
 
 export interface TikTokPost {
   id: string;
-  description: string;
-  createTime: string;
-  authorUsername: string;
-  videoUrl: string;
-  webVideoUrl: string;
-  covers: string[];
-  playCount: number;
-  viewCount: number;
-  likeCount: number;
-  commentCount: number;
-  shareCount: number;
+  title: string;
+  views: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  bookmarks: number;
+  uploadedAt: number;
+  uploadedAtFormatted: string;
+  postPage: string;
+  "channel.name": string;
+  "channel.username": string;
+  "channel.id": string;
+  "channel.url": string;
+  "channel.avatar": string;
+  "channel.verified": boolean;
+  "channel.followers": number;
+  "channel.following": number;
+  "channel.videos": number;
+  "video.url": string;
+  "video.cover": string;
   engagement: string;
 }
 
@@ -24,7 +33,7 @@ export async function fetchTikTokPosts(
   try {
     console.log('Fetching TikTok posts for:', username);
     
-    const { data, error } = await supabase.functions.invoke('tiktok-scraper', {
+    const { data, error } = await supabase.functions.invoke('tiktok-apify-scraper', {
       body: {
         username,
         numberOfVideos,
@@ -44,18 +53,27 @@ export async function fetchTikTokPosts(
 
     return data.map(post => ({
       id: post.id,
-      description: post.description || '',
-      createTime: new Date(post.createTime).toLocaleDateString(),
-      authorUsername: post.authorUsername,
-      videoUrl: post.videoUrl,
-      webVideoUrl: post.webVideoUrl,
-      covers: post.covers,
-      playCount: post.playCount || 0,
-      viewCount: post.viewCount || 0,
-      likeCount: post.likeCount || 0,
-      commentCount: post.commentCount || 0,
-      shareCount: post.shareCount || 0,
-      engagement: `${((post.likeCount + post.commentCount + post.shareCount) / (post.playCount || 1) * 100).toFixed(2)}`
+      title: post.title || '',
+      views: post.views || 0,
+      likes: post.likes || 0,
+      comments: post.comments || 0,
+      shares: post.shares || 0,
+      bookmarks: post.bookmarks || 0,
+      uploadedAt: post.uploadedAt,
+      uploadedAtFormatted: post.uploadedAtFormatted,
+      postPage: post.postPage,
+      "channel.name": post["channel.name"],
+      "channel.username": post["channel.username"],
+      "channel.id": post["channel.id"],
+      "channel.url": post["channel.url"],
+      "channel.avatar": post["channel.avatar"],
+      "channel.verified": post["channel.verified"],
+      "channel.followers": post["channel.followers"],
+      "channel.following": post["channel.following"],
+      "channel.videos": post["channel.videos"],
+      "video.url": post["video.url"],
+      "video.cover": post["video.cover"],
+      engagement: `${((post.likes + post.comments + post.shares) / (post.views || 1) * 100).toFixed(2)}`
     }));
   } catch (error) {
     console.error('Error fetching TikTok posts:', error);
