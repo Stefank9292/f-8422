@@ -1,4 +1,4 @@
-import { Instagram, History, FileText, Facebook, Twitter, Youtube } from "lucide-react";
+import { Instagram, History, FileText, Twitter, Youtube } from "lucide-react";
 import { TikTokIcon } from "@/components/icons/TikTokIcon";
 import { NavItem } from "@/types/navigation";
 
@@ -25,12 +25,6 @@ export const NAV_ITEMS: NavItem[] = [
     url: "/tiktok",
     icon: TikTokIcon,
     badge: "BETA"
-  },
-  {
-    title: "Facebook Search",
-    url: "#",
-    icon: Facebook,
-    className: "opacity-60 cursor-not-allowed"
   },
   {
     title: "Twitter Search",
