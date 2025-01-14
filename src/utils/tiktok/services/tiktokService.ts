@@ -52,24 +52,20 @@ export async function fetchTikTokPosts(
 ): Promise<TikTokPost[]> {
   try {
     const cleanUsername = formatTikTokUsername(username);
-    const url = `https://www.tiktok.com/@${cleanUsername}`;
-    
     console.log('Fetching TikTok posts for:', { username: cleanUsername, numberOfVideos, dateRange, location });
 
     const { data, error } = await supabase.functions.invoke('tiktok-apify-scraper', {
       body: {
         username: cleanUsername,
-        startUrls: [url],
-        maxItems: numberOfVideos,
+        numberOfVideos,
         dateRange,
-        location,
-        customMapFunction: "(object) => { return {...object} }"
+        location
       }
     });
 
     if (error) {
       console.error('Error from Edge Function:', error);
-      throw new Error(error.message);
+      throw error;
     }
 
     if (!data || !Array.isArray(data)) {

@@ -8,7 +8,8 @@ const corsHeaders = {
 interface TikTokRequestBody {
   username: string;
   numberOfVideos?: number;
-  postsNewerThan?: string;
+  dateRange?: string;
+  location?: string;
 }
 
 serve(async (req) => {
@@ -23,14 +24,14 @@ serve(async (req) => {
       throw new Error('APIFY_API_KEY is not set');
     }
 
-    const { username, numberOfVideos = 3, postsNewerThan } = await req.json() as TikTokRequestBody;
+    const { username, numberOfVideos = 3, dateRange = "DEFAULT", location = "US" } = await req.json() as TikTokRequestBody;
 
-    console.log('TikTok scraper request:', { username, numberOfVideos, postsNewerThan });
+    console.log('TikTok scraper request:', { username, numberOfVideos, dateRange, location });
 
     const requestBody = {
       "customMapFunction": "(object) => { return {...object} }",
-      "dateRange": "THIS_WEEK",
-      "location": "US",
+      "dateRange": dateRange,
+      "location": location,
       "maxItems": numberOfVideos,
       "startUrls": [
         `https://www.tiktok.com/@${username.replace('@', '')}`

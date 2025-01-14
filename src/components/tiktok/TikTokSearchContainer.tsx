@@ -28,6 +28,7 @@ export const TikTokSearchContainer = () => {
 
     setIsLoading(true);
     try {
+      console.log('Searching with params:', { username, numberOfVideos, dateRange, location });
       const results = await fetchTikTokPosts(username, numberOfVideos, dateRange, location);
       setSearchResults(results);
       toast({
