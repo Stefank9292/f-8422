@@ -76,8 +76,7 @@ export const useRecentSearches = (userId: string | undefined, isSteroidsUser: bo
   };
 
   const visibleSearches = recentSearches
-    .filter(search => !hiddenSearches.includes(search.id))
-    .slice(0, 5);
+    .filter(search => !hiddenSearches.includes(search.id));
 
   return {
     isCollapsed,
