@@ -44,9 +44,12 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
+  // Set up real-time subscription for tiktok_search_history changes
   useEffect(() => {
-    if (!isSteroidsUser) return;
+    if (!isSteroidsUser || !session?.user?.id) return;
 
+    console.log('Setting up real-time subscription for TikTok search history');
+    
     const channel = supabase
       .channel('tiktok-search-history-changes')
       .on(
@@ -54,58 +57,50 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
         {
           event: '*',
           schema: 'public',
-          table: 'tiktok_search_history'
+          table: 'tiktok_search_history',
+          filter: `user_id=eq.${session.user.id}`
         },
-        () => {
+        (payload) => {
+          console.log('Received real-time update for TikTok search:', payload);
           queryClient.invalidateQueries({ queryKey: ['recent-tiktok-searches'] });
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Cleaning up real-time subscription');
       supabase.removeChannel(channel);
     };
-  }, [queryClient, isSteroidsUser]);
+  }, [queryClient, isSteroidsUser, session?.user?.id]);
 
   useEffect(() => {
     localStorage.setItem('tiktokRecentSearchesCollapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
   const extractUsername = (query: string): string => {
-    // Handle full TikTok URLs
     if (query.includes('tiktok.com/')) {
       const username = query.split('tiktok.com/')[1]?.split('/')[0];
-      // Remove @ if present in the URL
       return `@${username?.replace('@', '')}`;
     }
-    // Handle @username format or plain username
     return query.startsWith('@') ? query : `@${query}`;
   };
 
   const formatTikTokUrl = (query: string): string => {
-    // Extract clean username regardless of input format
     let username = query;
     
-    // If it's a full URL, extract username part
     if (query.includes('tiktok.com/')) {
       username = query.split('tiktok.com/')[1]?.split('/')[0] || '';
     }
     
-    // Remove @ if present, we'll add it back in the correct position
     username = username.replace('@', '');
-    
-    // Return properly formatted URL
     return `https://www.tiktok.com/@${username}`;
   };
 
   const { data: recentSearches = [] } = useQuery({
     queryKey: ['recent-tiktok-searches'],
     queryFn: async () => {
-      if (!isSteroidsUser) return [];
+      if (!isSteroidsUser || !session?.user?.id) return [];
       
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user?.id) return [];
-
       const { data, error } = await supabase
         .from('tiktok_search_history')
         .select('id, search_query')
@@ -120,7 +115,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
 
       return data || [];
     },
-    enabled: isSteroidsUser,
+    enabled: isSteroidsUser && !!session?.user?.id,
   });
 
   const handleRemove = async (id: string) => {
