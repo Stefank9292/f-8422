@@ -44,10 +44,10 @@ export const TikTokSearchBar = ({
       <Button
         onClick={onSearch}
         disabled={isLoading || !username.trim()}
-        className="w-full h-11 !bg-[#000000e6] hover:!bg-black/90 rounded-xl shadow-sm 
+        className="w-full h-11 bg-[#000000e6] hover:bg-black/90 rounded-xl shadow-sm 
                    hover:shadow-md transition-all duration-300 ease-spring text-white
-                   disabled:!bg-black/50 disabled:hover:!bg-black/50"
-        variant="default"
+                   disabled:bg-black/50 disabled:hover:bg-black/50"
+        variant="secondary"
       >
         {isLoading ? (
           <>
