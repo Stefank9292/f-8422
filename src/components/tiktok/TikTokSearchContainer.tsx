@@ -1,6 +1,6 @@
 import { TikTokSearchHeader } from "./TikTokSearchHeader";
 import { TikTokSearchBar } from "./TikTokSearchBar";
-import { TikTokSearchSettings } from "./TikTokSearchSettings";
+import { TikTokSearchSettings, DateRangeOption, LocationOption } from "./TikTokSearchSettings";
 import { TikTokSearchResults } from "./TikTokSearchResults";
 import { useState } from "react";
 import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
@@ -11,7 +11,8 @@ export const TikTokSearchContainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [dateRange, setDateRange] = useState<DateRangeOption>("DEFAULT");
+  const [location, setLocation] = useState<LocationOption>("US");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const { toast } = useToast();
 
@@ -27,7 +28,7 @@ export const TikTokSearchContainer = () => {
 
     setIsLoading(true);
     try {
-      const results = await fetchTikTokPosts(username, numberOfVideos, selectedDate);
+      const results = await fetchTikTokPosts(username, numberOfVideos, dateRange, location);
       setSearchResults(results);
       toast({
         description: `Found ${results.length} videos for @${username.replace('@', '')}`,
@@ -62,8 +63,10 @@ export const TikTokSearchContainer = () => {
           setIsSettingsOpen={setIsSettingsOpen}
           numberOfVideos={numberOfVideos}
           setNumberOfVideos={setNumberOfVideos}
-          selectedDate={selectedDate}
-          setSelectedDate={setSelectedDate}
+          dateRange={dateRange}
+          setDateRange={setDateRange}
+          location={location}
+          setLocation={setLocation}
           disabled={isLoading}
         />
       </div>

@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { DateRangeOption, LocationOption } from "@/components/tiktok/TikTokSearchSettings";
 
 export interface TikTokPost {
   id: string;
@@ -28,10 +29,11 @@ export interface TikTokPost {
 export async function fetchTikTokPosts(
   username: string,
   numberOfVideos: number = 3,
-  postsNewerThan?: Date
+  dateRange: DateRangeOption = "DEFAULT",
+  location: LocationOption = "US"
 ): Promise<TikTokPost[]> {
   try {
-    console.log('Fetching TikTok posts for:', username);
+    console.log('Fetching TikTok posts for:', { username, numberOfVideos, dateRange, location });
     
     // Clean up the username and ensure it's in the correct format
     const cleanUsername = username.replace('@', '').trim();
@@ -41,12 +43,10 @@ export async function fetchTikTokPosts(
       body: {
         username: cleanUsername,
         startUrls: [url],
-        numberOfVideos,
-        postsNewerThan: postsNewerThan?.toISOString(),
-        customMapFunction: "(object) => { return {...object} }",
-        dateRange: "THIS_WEEK",
-        location: "US",
-        maxItems: numberOfVideos
+        maxItems: numberOfVideos,
+        dateRange,
+        location,
+        customMapFunction: "(object) => { return {...object} }"
       }
     });
 
