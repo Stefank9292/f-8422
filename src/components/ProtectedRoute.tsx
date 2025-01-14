@@ -21,9 +21,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       if (error?.toString().includes('refresh_token_not_found') || 
           error?.toString().includes('Invalid user session')) {
         console.log('Session error detected, signing out...', error);
-        // Clear query cache
         queryClient.clear();
-        // Sign out
         await supabase.auth.signOut();
         toast({
           title: "Session Expired",
@@ -52,7 +50,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    // If we have an auth error, redirect to login
     if (error.toString().includes('refresh_token_not_found') || 
         error.toString().includes('Invalid user session')) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
@@ -60,22 +57,18 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
   }
 
-  // Handle undefined session state
   if (session === undefined) {
     return <UndefinedSessionState onRefresh={() => window.location.reload()} />;
   }
 
-  // If no session, redirect to auth
   if (!session) {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // If on subscribe page or auth page, allow access regardless of subscription status
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 
-  // Show loading state for initial subscription check
   if (isLoadingSubscription && !subscriptionStatus) {
     return <LoadingState />;
   }
@@ -88,13 +81,17 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
-  console.log('Subscription status:', subscriptionStatus);
-  console.log('Has active subscription:', hasActiveSubscription);
-  console.log('Current price ID:', subscriptionStatus?.priceId);
+  // Check if the current route requires Creator Pro or higher subscription
+  const isRestrictedRoute = ['/tiktok', '/transcribe', '/history'].includes(location.pathname);
 
-  // If no active subscription and not on subscribe page, redirect to subscribe
-  if (!hasActiveSubscription) {
-    console.log('No active subscription found, redirecting to subscribe page');
+  // If on a restricted route and no active subscription, redirect to subscribe
+  if (isRestrictedRoute && !hasActiveSubscription) {
+    console.log('No active subscription found for restricted route, redirecting to subscribe page');
+    toast({
+      title: "Subscription Required",
+      description: "This feature requires a Creator Pro subscription or higher.",
+      variant: "destructive",
+    });
     return <Navigate to="/subscribe" state={{ from: location }} replace />;
   }
 

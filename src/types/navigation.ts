@@ -6,4 +6,5 @@ export interface NavItem {
   icon: LucideIcon;
   badge?: string;
   className?: string;
+  showWhen?: (status: any) => boolean;
 }
