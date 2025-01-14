@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState } from "react";
 
+export type SortDirection = "asc" | "desc";
+
 interface TikTokTableContentProps {
   currentPosts: any[];
   handleCopyCaption: (caption: string) => void;
@@ -20,7 +22,7 @@ export const TikTokTableContent = ({
 }: TikTokTableContentProps) => {
   const isMobile = useIsMobile();
   const [sortKey, setSortKey] = useState<string>("");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -30,6 +32,28 @@ export const TikTokTableContent = ({
       setSortDirection("desc");
     }
   };
+
+  const sortedPosts = [...currentPosts].sort((a, b) => {
+    if (!sortKey) return 0;
+
+    let valueA = a[sortKey];
+    let valueB = b[sortKey];
+
+    if (sortKey === 'uploadedAtFormatted') {
+      valueA = new Date(valueA).getTime();
+      valueB = new Date(valueB).getTime();
+    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+      // No conversion needed for numbers
+    } else {
+      valueA = String(valueA);
+      valueB = String(valueB);
+    }
+
+    if (sortDirection === 'asc') {
+      return valueA > valueB ? 1 : -1;
+    }
+    return valueA < valueB ? 1 : -1;
+  });
 
   if (isMobile) {
     return (
@@ -52,7 +76,7 @@ export const TikTokTableContent = ({
             sortDirection={sortDirection}
           />
           <TableBody>
-            {currentPosts.map((post, index) => (
+            {sortedPosts.map((post, index) => (
               <TikTokTableRow
                 key={index}
                 post={post}

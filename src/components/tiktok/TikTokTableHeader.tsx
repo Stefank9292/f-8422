@@ -2,11 +2,12 @@ import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { User, PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SortDirection } from "./TikTokTableContent";
 
 interface TableHeaderProps {
   onSort: (key: string) => void;
   sortKey?: string;
-  sortDirection?: "asc" | "desc";
+  sortDirection?: SortDirection;
 }
 
 export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeaderProps) => {
@@ -29,56 +30,56 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
             <TooltipContent>Caption</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('date')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('uploadedAtFormatted')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Clock className={cn(
                 "h-3.5 w-3.5 text-muted-foreground",
-                sortKey === 'date' && "text-primary"
+                sortKey === 'uploadedAtFormatted' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Date</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('viewCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('views')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Eye className={cn(
                 "h-3.5 w-3.5 text-green-500",
-                sortKey === 'viewCount' && "text-primary"
+                sortKey === 'views' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('shareCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('shares')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Share2 className={cn(
                 "h-3.5 w-3.5 text-violet-500",
-                sortKey === 'shareCount' && "text-primary"
+                sortKey === 'shares' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Shares</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('likeCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('likes')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <Heart className={cn(
                 "h-3.5 w-3.5 text-rose-500",
-                sortKey === 'likeCount' && "text-primary"
+                sortKey === 'likes' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Likes</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('commentCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+        <TableHead onClick={() => onSort('comments')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
               <MessageSquare className={cn(
                 "h-3.5 w-3.5 text-blue-400",
-                sortKey === 'commentCount' && "text-primary"
+                sortKey === 'comments' && "text-primary"
               )} />
             </TooltipTrigger>
             <TooltipContent>Comments</TooltipContent>
