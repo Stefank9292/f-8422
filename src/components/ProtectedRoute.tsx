@@ -65,10 +65,12 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
+  // If on subscribe page or auth page, allow access regardless of subscription status
   if (location.pathname === '/subscribe' || location.pathname === '/auth') {
     return <>{children}</>;
   }
 
+  // Show loading state for initial subscription check
   if (isLoadingSubscription && !subscriptionStatus) {
     return <LoadingState />;
   }
@@ -81,14 +83,32 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
-  // Check if the current route requires Creator Pro or higher subscription
-  const isRestrictedRoute = ['/tiktok', '/transcribe', '/history'].includes(location.pathname);
+  // Check if the route requires Creator Pro subscription
+  const isCreatorProRoute = ['/tiktok', '/history', '/transcribe'].includes(location.pathname);
+  const hasCreatorProAccess = subscriptionStatus?.priceId && [
+    "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+    "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+    "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+    "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+  ].includes(subscriptionStatus.priceId);
 
-  // If on a restricted route and no active subscription, redirect to subscribe
-  if (isRestrictedRoute && !hasActiveSubscription) {
-    console.log('No active subscription found for restricted route, redirecting to subscribe page');
+  console.log('Subscription status:', subscriptionStatus);
+  console.log('Has active subscription:', hasActiveSubscription);
+  console.log('Current price ID:', subscriptionStatus?.priceId);
+  console.log('Is Creator Pro route:', isCreatorProRoute);
+  console.log('Has Creator Pro access:', hasCreatorProAccess);
+
+  // If no active subscription and not on subscribe page, redirect to subscribe
+  if (!hasActiveSubscription) {
+    console.log('No active subscription found, redirecting to subscribe page');
+    return <Navigate to="/subscribe" state={{ from: location }} replace />;
+  }
+
+  // If trying to access a Creator Pro route without proper subscription, redirect to subscribe
+  if (isCreatorProRoute && !hasCreatorProAccess) {
+    console.log('Attempting to access Creator Pro feature without proper subscription');
     toast({
-      title: "Subscription Required",
+      title: "Creator Pro Required",
       description: "This feature requires a Creator Pro subscription or higher.",
       variant: "destructive",
     });

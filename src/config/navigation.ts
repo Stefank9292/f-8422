@@ -14,41 +14,29 @@ export const NAV_ITEMS: NavItem[] = [
     url: "/tiktok",
     icon: TikTokIcon,
     badge: "BETA",
-    showWhen: (subscriptionStatus) => {
-      return subscriptionStatus?.priceId && [
-        "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
-        "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
-        "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-        "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
-      ].includes(subscriptionStatus.priceId);
-    }
+    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
+                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
+                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
   },
   {
     title: "Search History",
     url: "/history",
     icon: History,
-    showWhen: (subscriptionStatus) => {
-      return subscriptionStatus?.priceId && [
-        "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
-        "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
-        "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-        "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
-      ].includes(subscriptionStatus.priceId);
-    }
+    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
+                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
+                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
   },
   {
     title: "Script Generator",
     url: "/transcribe",
     icon: FileText,
     badge: "NEW",
-    showWhen: (subscriptionStatus) => {
-      return subscriptionStatus?.priceId && [
-        "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
-        "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
-        "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-        "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
-      ].includes(subscriptionStatus.priceId);
-    }
+    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
+                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
+                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
+                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
   },
   {
     title: "Twitter Search",
