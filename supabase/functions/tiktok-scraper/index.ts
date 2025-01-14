@@ -51,18 +51,15 @@ serve(async (req) => {
 
     console.log('Sending payload to Apify:', payload)
 
-    // Make the request to Apify API with the correct endpoint and token
-    const response = await fetch(
-      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apifyKey}`
-        },
-        body: JSON.stringify(payload)
-      }
-    )
+    // Make the request to Apify API with token as query parameter
+    const apiUrl = `https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=${apifyKey}`
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
 
     if (!response.ok) {
       console.error('Apify API response status:', response.status)
