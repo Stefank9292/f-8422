@@ -155,10 +155,9 @@ export const TikTokSearchSettings = ({
                 <SelectValue placeholder="Select date range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">Default</SelectItem>
+                <SelectItem value="DEFAULT">Default</SelectItem>
                 <SelectItem value="THIS_WEEK">This Week</SelectItem>
                 <SelectItem value="THIS_MONTH">This Month</SelectItem>
-                <SelectItem value="LAST_THREE_MONTHS">Last 3 Months</SelectItem>
               </SelectContent>
             </Select>
           </div>

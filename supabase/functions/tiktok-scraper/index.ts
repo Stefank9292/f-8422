@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { username, numberOfVideos = 5, selectedDate } = await req.json()
+    const { username, numberOfVideos = 5, selectedDate, location } = await req.json()
     const apifyKey = Deno.env.get('TIKTOK_APIFY_API_KEY')
 
     if (!apifyKey) {
@@ -27,15 +27,28 @@ serve(async (req) => {
     console.log(`Starting TikTok scrape for user: ${username}`)
     console.log(`Number of videos requested: ${numberOfVideos}`)
     console.log(`Selected date filter: ${selectedDate}`)
+    console.log(`Selected location: ${location}`)
+
+    // Map the date range values
+    let dateRange = "LAST_SIX_MONTHS"; // default value
+    if (selectedDate === "THIS_WEEK") {
+      dateRange = "THIS_WEEK";
+    } else if (selectedDate === "THIS_MONTH") {
+      dateRange = "THIS_MONTH";
+    }
 
     // Prepare the request payload
     const payload = {
       customMapFunction: "(object) => { return {...object} }",
-      dateRange: "LAST_SIX_MONTHS",
-      location: "DE",
+      dateRange: dateRange,
+      location: location || "US", // Default to US if not specified
       maxItems: numberOfVideos,
-      startUrls: [`https://www.tiktok.com/@${username}`]
+      startUrls: [
+        username.startsWith('https://') ? username : `https://www.tiktok.com/@${username}`
+      ]
     }
+
+    console.log('Sending payload to Apify:', payload)
 
     // Make the request to Apify API
     const response = await fetch(
@@ -70,17 +83,12 @@ serve(async (req) => {
       timestamp: post.createTime,
     }))
 
-    // Filter by date if specified
-    const filteredResults = selectedDate 
-      ? processedResults.filter(post => new Date(post.timestamp) >= new Date(selectedDate))
-      : processedResults
-
-    console.log(`Returning ${filteredResults.length} filtered results`)
+    console.log(`Returning ${processedResults.length} processed results`)
 
     return new Response(
       JSON.stringify({
         status: 'success',
-        data: filteredResults,
+        data: processedResults,
       }),
       { 
         headers: { 
