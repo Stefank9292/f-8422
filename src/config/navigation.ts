@@ -13,30 +13,18 @@ export const NAV_ITEMS: NavItem[] = [
     title: "TikTok Search",
     url: "/tiktok",
     icon: TikTokIcon,
-    badge: "BETA",
-    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
-                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
-                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
+    badge: "BETA"
   },
   {
     title: "Search History",
     url: "/history",
-    icon: History,
-    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
-                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
-                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
+    icon: History
   },
   {
     title: "Script Generator",
     url: "/transcribe",
     icon: FileText,
-    badge: "NEW",
-    showWhen: (status) => status?.priceId === "price_1QfKMGGX13ZRG2XiFyskXyJo" || 
-                         status?.priceId === "price_1QfKMYGX13ZRG2XioPYKCe7h" ||
-                         status?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" ||
-                         status?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
+    badge: "NEW"
   },
   {
     title: "Twitter Search",
