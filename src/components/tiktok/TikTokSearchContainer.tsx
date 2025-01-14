@@ -3,6 +3,8 @@ import { TikTokSearchBar } from "./TikTokSearchBar";
 import { TikTokSearchSettings } from "./TikTokSearchSettings";
 import { TikTokSearchResults } from "./TikTokSearchResults";
 import { useState } from "react";
+import { searchTikTokProfile } from "@/utils/tiktok/services/tiktokService";
+import { useToast } from "@/hooks/use-toast";
 
 export const TikTokSearchContainer = () => {
   const [username, setUsername] = useState("");
@@ -10,6 +12,27 @@ export const TikTokSearchContainer = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [numberOfVideos, setNumberOfVideos] = useState(5);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [searchResults, setSearchResults] = useState([]);
+  const { toast } = useToast();
+
+  const handleSearch = async () => {
+    if (!username.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const results = await searchTikTokProfile(username, numberOfVideos, selectedDate);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch TikTok data. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
@@ -22,6 +45,7 @@ export const TikTokSearchContainer = () => {
           username={username}
           onUsernameChange={setUsername}
           isLoading={isLoading}
+          onSearch={handleSearch}
         />
         <TikTokSearchSettings 
           isSettingsOpen={isSettingsOpen}
@@ -34,7 +58,7 @@ export const TikTokSearchContainer = () => {
         />
       </div>
 
-      <TikTokSearchResults />
+      <TikTokSearchResults searchResults={searchResults} />
     </div>
   );
 };

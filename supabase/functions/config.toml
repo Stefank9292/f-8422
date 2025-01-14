@@ -8,3 +8,7 @@ maxDuration = 300
 slug = "transcribe"
 max_jobs = 10
 version = "v0"
+
+[[functions]]
+name = "tiktok-apify-scraper"
+verify_jwt = true
