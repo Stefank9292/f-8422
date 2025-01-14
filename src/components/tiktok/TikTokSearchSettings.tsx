@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Settings2, HelpCircle } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export type DateRangeOption = "DEFAULT" | "THIS_WEEK" | "THIS_MONTH";
+export type DateRangeOption = "DEFAULT" | "THIS_WEEK" | "THIS_MONTH" | "LAST_THREE_MONTHS";
 export type LocationOption = "US" | "DE";
 
 interface TikTokSearchSettingsProps {
@@ -82,6 +81,7 @@ export const TikTokSearchSettings = ({
     { value: "DEFAULT", label: "Default" },
     { value: "THIS_WEEK", label: "This Week" },
     { value: "THIS_MONTH", label: "This Month" },
+    { value: "LAST_THREE_MONTHS", label: "Last Three Months" },
   ];
 
   const locationOptions = [
