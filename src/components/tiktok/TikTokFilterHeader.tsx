@@ -1,62 +1,59 @@
-import { Filter, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useState } from "react";
+import { CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { TikTokExportCSV } from "./TikTokExportCSV";
 
 interface TikTokFilterHeaderProps {
   totalResults: number;
   filteredResults: number;
   onReset: () => void;
   currentPosts: any[];
-  isMobile?: boolean;
+  isMobile: boolean;
 }
 
 export const TikTokFilterHeader = ({ 
   totalResults, 
   filteredResults, 
-  onReset, 
+  onReset,
+  currentPosts,
   isMobile 
 }: TikTokFilterHeaderProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 sm:px-6 pt-6 pb-3 bg-card/50 sm:border-x sm:border-t sm:border-border/50">
-      {isMobile ? (
+    <div className="flex items-center justify-between px-4 sm:px-6 py-2 bg-card/50 border border-border/50">
+      <div className="flex items-center gap-2">
+        <p className="text-xs text-muted-foreground">
+          Showing <span className="font-medium text-foreground">{filteredResults}</span> of <span className="font-medium text-foreground">{totalResults}</span> results
+        </p>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-6 w-6"
+          onClick={onReset}
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+      <div className="flex items-center gap-2">
+        <TikTokExportCSV currentPosts={currentPosts} />
         <CollapsibleTrigger asChild>
-          <Button 
-            variant="outline" 
-            className="w-full flex items-center justify-between p-4"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50 border border-border/50"
           >
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <span className="text-sm font-medium">Filter Results</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
-                Showing {filteredResults} of {totalResults}
-              </span>
-              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''}`} />
-            </div>
+            {isMobile ? (
+              <>
+                Filters
+                <ChevronDown className="h-3 w-3 ml-1" />
+              </>
+            ) : (
+              <>
+                Advanced Filters
+                <ChevronDown className="h-3 w-3 ml-1" />
+              </>
+            )}
           </Button>
         </CollapsibleTrigger>
-      ) : (
-        <div className="flex items-center gap-1.5">
-          <Filter className="w-3.5 h-3.5 text-primary/70" />
-          <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
-          <span className="text-[10px] text-muted-foreground/70">
-            Showing {filteredResults} of {totalResults} results
-          </span>
-        </div>
-      )}
-      <div className="flex items-center gap-2 w-full sm:w-auto">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onReset} 
-          className="h-6 px-2 text-[10px] font-medium hover:bg-secondary/50 border border-border/50 w-full sm:w-auto"
-        >
-          Reset
-        </Button>
       </div>
     </div>
   );
