@@ -15,41 +15,59 @@ export const RecentSearchItem = ({
   onSelect, 
   onRemove 
 }: RecentSearchItemProps) => {
-  // Extract username from TikTok URL or use the query as is
-  const formatUsername = (query: string): string => {
+  // Extract username for display and format URL for search
+  const formatForDisplay = (query: string): string => {
     try {
-      let username = query;
-      
       // Handle full TikTok URLs
       if (query.includes('tiktok.com/')) {
         const match = query.match(/@([^/?]+)/);
-        username = match ? match[1] : query;
-      } else {
-        // Handle @username format or raw username
-        username = query.startsWith('@') ? query.substring(1) : query;
+        if (match) return `@${match[1]}`;
       }
-
-      // Ensure username starts with @
+      
+      // Handle raw username or @username
+      const username = query.replace('https://www.tiktok.com/', '');
       return username.startsWith('@') ? username : `@${username}`;
     } catch {
-      // Fallback to original query with @ if something goes wrong
       return query.startsWith('@') ? query : `@${query}`;
     }
   };
 
-  const displayUsername = formatUsername(searchQuery);
+  const formatForSearch = (query: string): string => {
+    try {
+      // If it's already a full URL, return it
+      if (query.includes('tiktok.com/')) {
+        // Ensure the @ symbol is present in the URL
+        if (query.includes('tiktok.com/@')) return query;
+        return query.replace('tiktok.com/', 'tiktok.com/@');
+      }
+
+      // Handle @username or raw username
+      const username = query.startsWith('@') ? query : `@${query}`;
+      return `https://www.tiktok.com/${username}`;
+    } catch {
+      // Fallback to constructing a proper URL
+      const username = query.startsWith('@') ? query : `@${query}`;
+      return `https://www.tiktok.com/${username}`;
+    }
+  };
+
+  const displayUsername = formatForDisplay(searchQuery);
+  
+  const handleSelect = () => {
+    const formattedUrl = formatForSearch(searchQuery);
+    console.log('Formatted URL for search:', formattedUrl);
+    onSelect(formattedUrl);
+  };
 
   return (
     <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm">
       <TikTokIcon className="w-3.5 h-3.5" />
-      <div className="flex items-center gap-1">
-        <button
-          onClick={() => onSelect(searchQuery)}
-          className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
-        >
-          {displayUsername}
-        </button>
-      </div>
+      <button
+        onClick={handleSelect}
+        className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
+      >
+        {displayUsername}
+      </button>
       <Button
         variant="ghost"
         size="icon"
