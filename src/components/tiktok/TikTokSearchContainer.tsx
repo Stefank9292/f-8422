@@ -28,6 +28,13 @@ export const TikTokSearchContainer = () => {
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
+  // Reset shouldSearch when search parameters change
+  useEffect(() => {
+    if (shouldSearch) {
+      setShouldSearch(false);
+    }
+  }, [numberOfVideos, dateRange, location]);
+
   // Persist search parameters in localStorage
   useEffect(() => {
     const savedSearch = localStorage.getItem('tiktok-search');
@@ -100,7 +107,6 @@ export const TikTokSearchContainer = () => {
 
   const handleUsernameChange = (value: string) => {
     setUsername(value);
-    // Reset shouldSearch when username changes but don't trigger search
     setShouldSearch(false);
   };
 
