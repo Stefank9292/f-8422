@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { FilterInput } from "@/components/search/FilterInput";
 import { Calendar, Hash, Eye, Share2, MessageCircle, Percent } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { parse } from "date-fns";
 
 interface TikTokSearchResultsProps {
   searchResults?: any[];
@@ -24,7 +25,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   const [minShares, setMinShares] = useState("");
   const [minComments, setMinComments] = useState("");
   const [minEngagement, setMinEngagement] = useState("");
-  const [isOpen, setIsOpen] = useState(!isMobile); // Open by default on desktop
+  const [isOpen, setIsOpen] = useState(!isMobile);
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
@@ -42,7 +43,16 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   // Filter logic
   const filteredResults = searchResults.filter(post => {
     const dateMatch = date
-      ? post.uploadedAtFormatted?.includes(date)
+      ? (() => {
+          try {
+            const selectedDate = parse(date, "dd.MM.yyyy", new Date());
+            const postDate = new Date(post.uploadedAtFormatted);
+            return postDate > selectedDate;
+          } catch (error) {
+            console.error('Error parsing date:', error);
+            return true;
+          }
+        })()
       : true;
 
     const likesMatch = minLikes
@@ -97,11 +107,12 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <FilterInput
               icon={Calendar}
-              label="Upload Date"
+              label="Posts newer than"
               value={date}
               onChange={setDate}
               placeholder="DD.MM.YYYY"
               isDatePicker
+              helpText="Show posts after this date"
             />
             <FilterInput
               icon={Hash}
