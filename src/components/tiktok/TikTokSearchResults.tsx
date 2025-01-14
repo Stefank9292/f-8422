@@ -172,7 +172,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
             truncateCaption={(caption) => caption}
           />
         </div>
-        <div className="border-t border-border/50 pt-8">
+        <div className="border-t border-border/50 pt-8 bg-transparent">
           <TablePagination
             currentPage={currentPage}
             totalPages={totalPages}
