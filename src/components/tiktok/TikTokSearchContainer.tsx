@@ -4,10 +4,10 @@ import { TikTokSearchSettings, DateRangeOption, LocationOption } from "./TikTokS
 import { TikTokSearchResults } from "./TikTokSearchResults";
 import { TikTokRecentSearches } from "./TikTokRecentSearches";
 import { useState } from "react";
-import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
+import { fetchTikTokPosts, TikTokPost } from "@/utils/tiktok/services/tiktokService";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, UseQueryOptions } from "@tanstack/react-query";
 
 export const TikTokSearchContainer = () => {
   const [username, setUsername] = useState("");
@@ -32,7 +32,7 @@ export const TikTokSearchContainer = () => {
     data: searchResults = [], 
     isLoading,
     refetch: performSearch
-  } = useQuery({
+  } = useQuery<TikTokPost[], Error>({
     queryKey: ['tiktok-search', username, numberOfVideos, dateRange, location],
     queryFn: async () => {
       if (!username.trim()) return [];
@@ -58,19 +58,12 @@ export const TikTokSearchContainer = () => {
 
       return results;
     },
-    enabled: false, // Don't run automatically
+    enabled: false,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     retry: 2,
-    onError: (error: Error) => {
-      console.error('Search error:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
-        variant: "destructive",
-      });
-    }
-  });
+    throwOnError: true
+  } as UseQueryOptions<TikTokPost[], Error>);
 
   const handleSearch = async () => {
     if (!username.trim()) {
@@ -90,7 +83,12 @@ export const TikTokSearchContainer = () => {
         });
       }
     } catch (error) {
-      // Error handling is done in the query's onError
+      console.error('Search error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
+        variant: "destructive",
+      });
     }
   };
 
