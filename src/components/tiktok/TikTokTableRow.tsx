@@ -17,9 +17,9 @@ export const TikTokTableRow = ({
   truncateCaption 
 }: TikTokTableRowProps) => {
   // Calculate engagement rate
-  const views = post.views || 0;
-  const likes = post.likes || 0;
-  const comments = post.comments || 0;
+  const views = Number(post.views) || 0;
+  const likes = Number(post.likes) || 0;
+  const comments = Number(post.comments) || 0;
   const engagement = views > 0 ? ((likes + comments) / views * 100).toFixed(2) : '0';
 
   return (
