@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Copy, ExternalLink, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface TikTokTableRowProps {
   post: any;
@@ -34,11 +35,17 @@ export const TikTokTableRow = ({
     }
 
     try {
-      // Fetch the video data as a blob
-      const response = await fetch(videoUrl);
-      const blob = await response.blob();
-      
-      // Create a temporary URL for the blob
+      // Call our Edge Function to download the video
+      const { data, error } = await supabase.functions.invoke('tiktok-video-download', {
+        body: { videoUrl }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Create a blob from the response
+      const blob = new Blob([data], { type: 'video/mp4' });
       const url = window.URL.createObjectURL(blob);
       
       // Create a temporary anchor element
