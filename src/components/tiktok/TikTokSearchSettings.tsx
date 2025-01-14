@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Settings2, HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Settings2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { VideoCountSlider } from "./search-settings/VideoCountSlider";
+import { DateRangeSelect } from "./search-settings/DateRangeSelect";
+import { LocationSelect } from "./search-settings/LocationSelect";
 
 export type DateRangeOption = "DEFAULT" | "THIS_WEEK" | "THIS_MONTH" | "LAST_THREE_MONTHS";
 export type LocationOption = "US" | "DE";
@@ -77,18 +76,6 @@ export const TikTokSearchSettings = ({
     setNumberOfVideos(localNumberOfVideos);
   };
 
-  const dateRangeOptions = [
-    { value: "DEFAULT", label: "Default" },
-    { value: "THIS_WEEK", label: "This Week" },
-    { value: "THIS_MONTH", label: "This Month" },
-    { value: "LAST_THREE_MONTHS", label: "Last Three Months" },
-  ];
-
-  const locationOptions = [
-    { value: "US", label: "United States" },
-    { value: "DE", label: "Germany" },
-  ];
-
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <button
@@ -106,105 +93,25 @@ export const TikTokSearchSettings = ({
         <div className="mt-3 p-4 space-y-5 bg-white/90 dark:bg-gray-800/90 rounded-xl 
                       border border-gray-200/80 dark:border-gray-700/80 animate-in fade-in duration-200
                       w-full max-w-md mx-auto backdrop-blur-sm shadow-lg">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-medium">Number of Videos</span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[10px]">Maximum number of videos to fetch</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <span className="text-[11px] font-medium bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
-                {localNumberOfVideos}
-              </span>
-            </div>
-            <Slider
-              value={[localNumberOfVideos]}
-              onValueChange={handleSliderChange}
-              onPointerUp={handleSliderPointerUp}
-              min={1}
-              max={maxVideos}
-              step={1}
-              disabled={disabled}
-              className="w-full [&>.relative>.absolute]:bg-[#000000e6] [&>.relative]:bg-gray-200 dark:[&>.relative]:bg-gray-700
-                       [&>button]:border-[#000000e6] [&>button]:bg-white dark:[&>button]:bg-gray-900
-                       [&>button:focus-visible]:ring-[#000000e6] [&>button]:border-2"
-            />
-          </div>
+          <VideoCountSlider
+            localNumberOfVideos={localNumberOfVideos}
+            maxVideos={maxVideos}
+            onSliderChange={handleSliderChange}
+            onSliderPointerUp={handleSliderPointerUp}
+            disabled={disabled}
+          />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-medium">Date Range</span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[10px]">Filter posts by date range</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <Select
-                value={dateRange}
-                onValueChange={(value: DateRangeOption) => setDateRange(value)}
-                disabled={disabled}
-              >
-                <SelectTrigger className="w-full h-8 text-[11px]">
-                  <SelectValue placeholder="Select date range" />
-                </SelectTrigger>
-                <SelectContent>
-                  {dateRangeOptions.map((option) => (
-                    <SelectItem
-                      key={option.value}
-                      value={option.value}
-                      className="text-[11px]"
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-medium">Location</span>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-[10px]">Select content location</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-              <Select
-                value={location}
-                onValueChange={(value: LocationOption) => setLocation(value)}
-                disabled={disabled}
-              >
-                <SelectTrigger className="w-full h-8 text-[11px]">
-                  <SelectValue placeholder="Select location" />
-                </SelectTrigger>
-                <SelectContent>
-                  {locationOptions.map((option) => (
-                    <SelectItem
-                      key={option.value}
-                      value={option.value}
-                      className="text-[11px]"
-                    >
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <DateRangeSelect
+              dateRange={dateRange}
+              onDateRangeChange={setDateRange}
+              disabled={disabled}
+            />
+            <LocationSelect
+              location={location}
+              onLocationChange={setLocation}
+              disabled={disabled}
+            />
           </div>
         </div>
       )}
