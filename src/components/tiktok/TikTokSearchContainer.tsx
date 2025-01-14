@@ -60,17 +60,15 @@ export const TikTokSearchContainer = () => {
     },
     enabled: false, // Don't run automatically
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes (renamed from cacheTime)
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     retry: 2,
-    meta: {
-      onError: (error: Error) => {
-        console.error('Search error:', error);
-        toast({
-          title: "Error",
-          description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
-          variant: "destructive",
-        });
-      }
+    onError: (error: Error) => {
+      console.error('Search error:', error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
+        variant: "destructive",
+      });
     }
   });
 
@@ -92,7 +90,7 @@ export const TikTokSearchContainer = () => {
         });
       }
     } catch (error) {
-      // Error handling is done in the query's meta.onError
+      // Error handling is done in the query's onError
     }
   };
 
