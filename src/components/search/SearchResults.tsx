@@ -32,6 +32,10 @@ export const SearchResults = ({ searchResults = [] }: SearchResultsProps) => {
     });
   };
 
+  const handleDownload = (videoUrl: string) => {
+    window.open(videoUrl, '_blank');
+  };
+
   // Filter logic
   const filteredResults = searchResults.filter(post => {
     const dateMatch = date
@@ -151,6 +155,7 @@ export const SearchResults = ({ searchResults = [] }: SearchResultsProps) => {
             <TableContent 
               currentPosts={currentPosts}
               handleCopyCaption={handleCopyCaption}
+              handleDownload={handleDownload}
               formatNumber={(num) => num.toLocaleString('de-DE').replace(/,/g, '.')}
               truncateCaption={(caption) => caption}
             />
