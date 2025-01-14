@@ -16,7 +16,7 @@ export const TikTokTableRow = ({
   formatNumber,
   truncateCaption 
 }: TikTokTableRowProps) => {
-  console.log('Post data:', post); // Add this to debug the data structure
+  console.log('Post data:', post);
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
@@ -51,11 +51,11 @@ export const TikTokTableRow = ({
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
         {formatNumber(post.views)}
       </TableCell>
-      <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
-        {formatNumber(post.views)}
-      </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
         {formatNumber(post.likes)}
+      </TableCell>
+      <TableCell className="text-center py-4 text-xs font-medium text-violet-500 align-middle">
+        {formatNumber(post.shares)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
         {formatNumber(post.comments)}

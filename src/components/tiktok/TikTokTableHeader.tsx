@@ -1,6 +1,6 @@
 import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { User, PenLine, Clock, Eye, Play, Heart, MessageSquare, Zap, Link } from "lucide-react";
+import { User, PenLine, Clock, Eye, Heart, MessageSquare, Zap, Link, Share2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface TableHeaderProps {
@@ -51,17 +51,6 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
             <TooltipContent>Views</TooltipContent>
           </Tooltip>
         </TableHead>
-        <TableHead onClick={() => onSort('playCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
-          <Tooltip>
-            <TooltipTrigger className="w-full flex items-center justify-center">
-              <Play className={cn(
-                "h-3.5 w-3.5 text-primary",
-                sortKey === 'playCount' && "text-primary"
-              )} />
-            </TooltipTrigger>
-            <TooltipContent>Plays</TooltipContent>
-          </Tooltip>
-        </TableHead>
         <TableHead onClick={() => onSort('likeCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
           <Tooltip>
             <TooltipTrigger className="w-full flex items-center justify-center">
@@ -71,6 +60,17 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
               )} />
             </TooltipTrigger>
             <TooltipContent>Likes</TooltipContent>
+          </Tooltip>
+        </TableHead>
+        <TableHead onClick={() => onSort('shareCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
+          <Tooltip>
+            <TooltipTrigger className="w-full flex items-center justify-center">
+              <Share2 className={cn(
+                "h-3.5 w-3.5 text-violet-500",
+                sortKey === 'shareCount' && "text-primary"
+              )} />
+            </TooltipTrigger>
+            <TooltipContent>Shares</TooltipContent>
           </Tooltip>
         </TableHead>
         <TableHead onClick={() => onSort('commentCount')} className="group cursor-pointer hover:bg-muted/50 text-center h-12">
