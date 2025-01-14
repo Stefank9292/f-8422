@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock } from "lucide-react";
+import { Calendar as CalendarIcon, Settings2, HelpCircle, Lock, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { format } from "date-fns";
@@ -78,6 +78,10 @@ export const SearchSettings = ({
     setNumberOfVideos(localNumberOfVideos);
   };
 
+  const handleResetDate = () => {
+    setSelectedDate(undefined);
+  };
+
   return (
     <div className="w-full flex flex-col items-center justify-center">
       <button
@@ -142,34 +146,47 @@ export const SearchSettings = ({
                 </Tooltip>
               )}
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
+            <div className="relative">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-8 justify-start text-[11px] font-normal",
+                      !selectedDate && "text-muted-foreground",
+                      isFreeUser && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={disabled || isFreeUser}
+                  >
+                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                {!isFreeUser && (
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={setSelectedDate}
+                      disabled={(date) =>
+                        date > new Date() || date < ninetyDaysAgo
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                )}
+              </Popover>
+              {selectedDate && !isFreeUser && (
                 <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full h-8 justify-start text-[11px] font-normal",
-                    !selectedDate && "text-muted-foreground",
-                    isFreeUser && "opacity-50 cursor-not-allowed"
-                  )}
-                  disabled={disabled || isFreeUser}
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 h-5 w-5 border border-border/50"
+                  onClick={handleResetDate}
                 >
-                  {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+                  <X className="h-3 w-3" />
+                  <span className="sr-only">Reset date</span>
                 </Button>
-              </PopoverTrigger>
-              {!isFreeUser && (
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    disabled={(date) =>
-                      date > new Date() || date < ninetyDaysAgo
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
               )}
-            </Popover>
+            </div>
           </div>
         </div>
       )}
