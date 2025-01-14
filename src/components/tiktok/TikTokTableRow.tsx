@@ -17,52 +17,52 @@ export const TikTokTableRow = ({
   truncateCaption 
 }: TikTokTableRowProps) => {
   // Calculate engagement rate
-  const views = Number(post.playCount) || 0;
-  const likes = Number(post.diggCount) || 0;
-  const comments = Number(post.commentCount) || 0;
+  const views = Number(post.views) || 0;
+  const likes = Number(post.likes) || 0;
+  const comments = Number(post.comments) || 0;
   const engagement = views > 0 ? ((likes + comments) / views * 100).toFixed(2) : '0';
 
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post.authorMeta?.name || ''}
+        @{post["channel.username"]}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {post.text || ''}
+                {post.title}
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
-              <p className="break-words text-xs">{post.text || ''}</p>
+              <p className="break-words text-xs">{post.title}</p>
             </TooltipContent>
           </Tooltip>
           <Button
             variant="ghost"
             size="icon"
             className="h-6 w-6 rounded-md hover:bg-muted"
-            onClick={() => onCopyCaption(post.text || '')}
+            onClick={() => onCopyCaption(post.title)}
           >
             <Copy className="h-3.5 w-3.5" />
           </Button>
         </div>
       </TableCell>
       <TableCell className="text-center py-4 text-xs text-muted-foreground align-middle">
-        {new Date(post.createTime).toLocaleDateString()}
+        {new Date(post.uploadedAtFormatted).toLocaleDateString()}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
-        {formatNumber(views)}
+        {formatNumber(post.views)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-500 align-middle">
-        {formatNumber(post.shareCount || 0)}
+        {formatNumber(post.shares)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
-        {formatNumber(likes)}
+        {formatNumber(post.likes)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
-        {formatNumber(comments)}
+        {formatNumber(post.comments)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
         {engagement}%
@@ -72,7 +72,7 @@ export const TikTokTableRow = ({
           variant="ghost" 
           size="icon"
           className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={() => window.open(post.webVideoUrl, '_blank')}
+          onClick={() => window.open(post.postPage, '_blank')}
         >
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
         </Button>
@@ -82,7 +82,7 @@ export const TikTokTableRow = ({
           variant="ghost" 
           size="icon"
           className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={() => window.open(post.video?.downloadAddr || post.webVideoUrl, '_blank')}
+          onClick={() => window.open(post["video.url"], '_blank')}
         >
           <Download className="w-3.5 h-3.5 text-emerald-500" />
         </Button>
