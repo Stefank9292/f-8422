@@ -60,7 +60,7 @@ export const TikTokSearchContainer = () => {
     },
     enabled: false, // Don't run automatically
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
-    cacheTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
+    gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes (renamed from cacheTime)
     retry: 2,
     meta: {
       onError: (error: Error) => {
