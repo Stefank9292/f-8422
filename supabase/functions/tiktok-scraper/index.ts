@@ -28,6 +28,7 @@ serve(async (req) => {
     console.log(`Number of videos requested: ${numberOfVideos}`)
     console.log(`Selected date filter: ${selectedDate}`)
     console.log(`Selected location: ${location}`)
+    console.log('Using Apify API key:', apifyKey.substring(0, 5) + '...')
 
     // Map the date range values
     let dateRange = "LAST_SIX_MONTHS"; // default value
@@ -50,19 +51,24 @@ serve(async (req) => {
 
     console.log('Sending payload to Apify:', payload)
 
-    // Make the request to Apify API
+    // Make the request to Apify API with the correct endpoint and token
     const response = await fetch(
-      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=' + apifyKey,
+      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items',
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apifyKey}`
         },
         body: JSON.stringify(payload)
       }
     )
 
     if (!response.ok) {
+      console.error('Apify API response status:', response.status)
+      console.error('Apify API response status text:', response.statusText)
+      const errorText = await response.text()
+      console.error('Apify API error response:', errorText)
       throw new Error(`Apify API error: ${response.statusText}`)
     }
 
