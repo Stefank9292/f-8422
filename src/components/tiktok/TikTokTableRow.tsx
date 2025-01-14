@@ -19,54 +19,54 @@ export const TikTokTableRow = ({
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post.authorUsername}
+        @{post["channel.username"]}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="truncate cursor-help text-xs text-muted-foreground">
-                {post.description.slice(0, 15)}...
+                {post.title?.slice(0, 15)}...
               </span>
             </TooltipTrigger>
             <TooltipContent className="max-w-sm">
-              <p className="break-words text-xs">{post.description}</p>
+              <p className="break-words text-xs">{post.title}</p>
             </TooltipContent>
           </Tooltip>
           <Button
             variant="ghost"
             size="icon"
             className="h-6 w-6 rounded-md hover:bg-muted"
-            onClick={() => onCopyCaption(post.description)}
+            onClick={() => onCopyCaption(post.title)}
           >
             <Copy className="h-3.5 w-3.5" />
           </Button>
         </div>
       </TableCell>
       <TableCell className="text-center py-4 text-xs text-muted-foreground align-middle">
-        {post.createTime}
+        {new Date(post.uploadedAtFormatted).toLocaleDateString()}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-green-500 align-middle">
-        {formatNumber(post.playCount)}
+        {formatNumber(post.views)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-primary align-middle">
-        {formatNumber(post.viewCount)}
+        {formatNumber(post.views)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-rose-500 align-middle">
-        {formatNumber(post.likeCount)}
+        {formatNumber(post.likes)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-blue-400 align-middle">
-        {formatNumber(post.commentCount)}
+        {formatNumber(post.comments)}
       </TableCell>
       <TableCell className="text-center py-4 text-xs font-medium text-orange-500 align-middle">
-        {post.engagement}%
+        {Math.round((post.likes / post.views) * 100)}%
       </TableCell>
       <TableCell className="text-center py-4 align-middle">
         <Button 
           variant="ghost" 
           size="icon"
           className="h-6 w-6 rounded-md hover:bg-muted"
-          onClick={() => window.open(post.webVideoUrl, '_blank')}
+          onClick={() => window.open(post.postPage, '_blank')}
         >
           <ExternalLink className="w-3.5 h-3.5 text-rose-400" />
         </Button>
