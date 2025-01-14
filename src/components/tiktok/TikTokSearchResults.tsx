@@ -119,7 +119,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               value={minViews}
               onChange={setMinViews}
               type="number"
-              placeholder="Minimum views..."
+              placeholder="e.g., 10000"
             />
             <FilterInput
               icon={Share2}
@@ -127,7 +127,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               value={minShares}
               onChange={setMinShares}
               type="number"
-              placeholder="Minimum shares..."
+              placeholder="e.g., 500"
             />
             <FilterInput
               icon={Heart}
@@ -135,7 +135,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               value={minLikes}
               onChange={setMinLikes}
               type="number"
-              placeholder="Minimum likes..."
+              placeholder="e.g., 1000"
             />
             <FilterInput
               icon={MessageSquare}
@@ -143,7 +143,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               value={minComments}
               onChange={setMinComments}
               type="number"
-              placeholder="Minimum comments..."
+              placeholder="e.g., 100"
             />
             <FilterInput
               icon={Zap}
@@ -151,7 +151,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
               value={minEngagement}
               onChange={setMinEngagement}
               type="number"
-              placeholder="Minimum engagement..."
+              placeholder="e.g., 5.5"
             />
           </div>
         </CollapsibleContent>
