@@ -87,8 +87,7 @@ export const TikTokSearchContainer = () => {
     retry: 2,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    suspense: false // Disable suspense mode to prevent auto-fetching
+    refetchOnReconnect: false
   });
 
   const handleSearch = async () => {
