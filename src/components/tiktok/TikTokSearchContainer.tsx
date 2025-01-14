@@ -6,6 +6,8 @@ import { TikTokRecentSearches } from "./TikTokRecentSearches";
 import { useState } from "react";
 import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 export const TikTokSearchContainer = () => {
   const [username, setUsername] = useState("");
@@ -16,6 +18,15 @@ export const TikTokSearchContainer = () => {
   const [location, setLocation] = useState<LocationOption>("US");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const { toast } = useToast();
+
+  // Get current user session
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
 
   const handleSearch = async () => {
     if (!username.trim()) {
@@ -32,6 +43,23 @@ export const TikTokSearchContainer = () => {
       console.log('Searching with params:', { username, numberOfVideos, dateRange, location });
       const results = await fetchTikTokPosts(username, numberOfVideos, dateRange, location);
       setSearchResults(results);
+
+      // Save search to history if user is logged in
+      if (session?.user?.id) {
+        const { error } = await supabase
+          .from('tiktok_search_history')
+          .insert({
+            user_id: session.user.id,
+            search_query: username.replace('@', ''),
+            search_type: 'user_search',
+            location
+          });
+
+        if (error) {
+          console.error('Error saving search history:', error);
+        }
+      }
+
       toast({
         description: `Found ${results.length} videos for @${username.replace('@', '')}`,
       });

@@ -40,6 +40,7 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     enabled: !!session?.access_token,
   });
 
+  // Check if user has Creator on Steroids plan
   const isSteroidsUser = subscriptionStatus?.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || 
                         subscriptionStatus?.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk";
 
@@ -95,8 +96,23 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     enabled: isSteroidsUser,
   });
 
-  const handleRemove = (id: string) => {
-    setHiddenSearches(prev => [...prev, id]);
+  const handleRemove = async (id: string) => {
+    if (!session?.user?.id) return;
+
+    try {
+      const { error } = await supabase
+        .from('tiktok_search_history')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', session.user.id);
+
+      if (error) throw error;
+      
+      setHiddenSearches(prev => [...prev, id]);
+      queryClient.invalidateQueries({ queryKey: ['recent-tiktok-searches'] });
+    } catch (error) {
+      console.error('Error removing search:', error);
+    }
   };
 
   const visibleSearches = recentSearches.filter(search => !hiddenSearches.includes(search.id));
