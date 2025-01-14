@@ -30,6 +30,7 @@ export const SearchSettings = ({
   disabled = false,
 }: SearchSettingsProps) => {
   const [localNumberOfVideos, setLocalNumberOfVideos] = useState(numberOfVideos);
+  const [localSelectedDate, setLocalSelectedDate] = useState<Date | undefined>(selectedDate);
   const ninetyDaysAgo = new Date();
   ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -70,6 +71,11 @@ export const SearchSettings = ({
     }
   }, [subscriptionStatus?.priceId]);
 
+  // Update local date when prop changes
+  useEffect(() => {
+    setLocalSelectedDate(selectedDate);
+  }, [selectedDate]);
+
   const handleSliderChange = (value: number[]) => {
     setLocalNumberOfVideos(value[0]);
   };
@@ -78,7 +84,13 @@ export const SearchSettings = ({
     setNumberOfVideos(localNumberOfVideos);
   };
 
+  const handleDateSelect = (date: Date | undefined) => {
+    setLocalSelectedDate(date);
+    setSelectedDate(date);
+  };
+
   const handleResetDate = () => {
+    setLocalSelectedDate(undefined);
     setSelectedDate(undefined);
   };
 
@@ -153,20 +165,20 @@ export const SearchSettings = ({
                     variant="outline"
                     className={cn(
                       "w-full h-8 justify-start text-[11px] font-normal",
-                      !selectedDate && "text-muted-foreground",
+                      !localSelectedDate && "text-muted-foreground",
                       isFreeUser && "opacity-50 cursor-not-allowed"
                     )}
                     disabled={disabled || isFreeUser}
                   >
-                    {selectedDate ? format(selectedDate, "dd.MM.yyyy") : "Select date"}
+                    {localSelectedDate ? format(localSelectedDate, "dd.MM.yyyy") : "Select date"}
                   </Button>
                 </PopoverTrigger>
                 {!isFreeUser && (
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={selectedDate}
-                      onSelect={setSelectedDate}
+                      selected={localSelectedDate}
+                      onSelect={handleDateSelect}
                       disabled={(date) =>
                         date > new Date() || date < ninetyDaysAgo
                       }
@@ -175,7 +187,7 @@ export const SearchSettings = ({
                   </PopoverContent>
                 )}
               </Popover>
-              {selectedDate && !isFreeUser && (
+              {localSelectedDate && !isFreeUser && (
                 <Button
                   variant="ghost"
                   size="icon"
