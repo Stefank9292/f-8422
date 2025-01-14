@@ -27,7 +27,7 @@ export const TikTokTableHeader = ({ onSort, sortKey, sortDirection }: TableHeade
         </TableHead>
         <TableHead className="h-12">
           <Tooltip>
-            <TooltipTrigger>
+            <TooltipTrigger className="w-full flex items-center justify-center">
               <PenLine className="h-3.5 w-3.5 text-muted-foreground" />
             </TooltipTrigger>
             <TooltipContent>Caption</TooltipContent>
