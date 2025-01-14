@@ -15,6 +15,7 @@ export const TikTokSearchContainer = () => {
   const [numberOfVideos, setNumberOfVideos] = useState(5);
   const [dateRange, setDateRange] = useState<DateRangeOption>("DEFAULT");
   const [location, setLocation] = useState<LocationOption>("US");
+  const [shouldSearch, setShouldSearch] = useState(false);
   const { toast } = useToast();
 
   // Get current user session
@@ -45,7 +46,7 @@ export const TikTokSearchContainer = () => {
     isLoading,
     error: searchError
   } = useQuery({
-    queryKey: ['tiktok-search', username, numberOfVideos, dateRange, location],
+    queryKey: ['tiktok-search', username, numberOfVideos, dateRange, location, shouldSearch],
     queryFn: async () => {
       if (!username.trim()) return [];
       
@@ -78,7 +79,7 @@ export const TikTokSearchContainer = () => {
 
       return results;
     },
-    enabled: Boolean(username.trim()),
+    enabled: shouldSearch && Boolean(username.trim()),
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
     gcTime: 1000 * 60 * 30, // Keep in cache for 30 minutes
     retry: 2
@@ -94,22 +95,7 @@ export const TikTokSearchContainer = () => {
       return;
     }
 
-    try {
-      // Trigger a refetch of the query
-      const results = await searchResults;
-      if (results && results.length > 0) {
-        toast({
-          description: `Found ${results.length} videos for @${username.replace('@', '')}`,
-        });
-      }
-    } catch (error) {
-      console.error('Search error:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to fetch TikTok data",
-        variant: "destructive",
-      });
-    }
+    setShouldSearch(true);
   };
 
   // Show error state if search fails
@@ -120,6 +106,7 @@ export const TikTokSearchContainer = () => {
         description: searchError instanceof Error ? searchError.message : "Failed to fetch TikTok data",
         variant: "destructive",
       });
+      setShouldSearch(false);
     }
   }, [searchError, toast]);
 
