@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TikTokIcon } from "@/components/icons/TikTokIcon";
 
 interface RecentSearchItemProps {
   id: string;
@@ -32,22 +33,24 @@ export const RecentSearchItem = ({
   const displayUsername = formatUsername(searchQuery);
 
   return (
-    <div className="relative group">
-      <button
-        onClick={() => onSelect(searchQuery)}
-        className="text-[11px] text-muted-foreground hover:text-primary font-medium 
-                   bg-muted/50 hover:bg-muted px-3 py-1.5 rounded-lg transition-colors"
-      >
-        @{displayUsername}
-      </button>
+    <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white dark:bg-gray-800 shadow-sm">
+      <TikTokIcon className="w-3.5 h-3.5" />
+      <div className="flex items-center gap-1">
+        <button
+          onClick={() => onSelect(searchQuery)}
+          className="text-[11px] font-medium text-gray-800 dark:text-gray-200 flex items-center gap-1"
+        >
+          {displayUsername}
+        </button>
+      </div>
       <Button
         variant="ghost"
         size="icon"
-        className="absolute -right-1 -top-1 h-4 w-4 rounded-full opacity-0 group-hover:opacity-100 
-                   transition-opacity bg-muted hover:bg-destructive/90 hover:text-destructive-foreground"
+        className="h-4 w-4 p-0 hover:bg-transparent"
         onClick={() => onRemove(id)}
       >
-        <X className="h-2.5 w-2.5" />
+        <X className="h-3 w-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300" />
+        <span className="sr-only">Remove search</span>
       </Button>
     </div>
   );
