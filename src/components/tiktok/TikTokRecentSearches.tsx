@@ -85,9 +85,14 @@ export const TikTokRecentSearches = ({ onSelect }: TikTokRecentSearchesProps) =>
     return `@${query}`;
   };
 
-  const formatTikTokUrl = (username: string): string => {
-    // Remove @ if it exists, then add it back in the URL
-    const cleanUsername = username.replace(/^@/, '');
+  const formatTikTokUrl = (query: string): string => {
+    // If it's already a TikTok URL, return it as is
+    if (query.startsWith('https://www.tiktok.com/@')) {
+      return query;
+    }
+    
+    // Remove @ if it exists, then add it back in the URL format
+    const cleanUsername = query.replace(/^@/, '').split('/')[0];
     return `https://www.tiktok.com/@${cleanUsername}`;
   };
 
