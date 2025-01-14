@@ -12,6 +12,18 @@ interface TikTokRequestBody {
   location?: string;
 }
 
+interface TikTokChannel {
+  name: string;
+  username: string;
+  id: string;
+  url: string;
+  avatar: string;
+  verified: boolean;
+  followers: number;
+  following: number;
+  videos: number;
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -53,11 +65,45 @@ serve(async (req) => {
       throw new Error(`Apify API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log('TikTok scraper response:', data);
+    const rawData = await response.json();
+    console.log('Raw TikTok API response:', rawData);
+
+    // Transform the data to handle dot notation and prevent circular references
+    const transformedData = rawData.map((item: any) => {
+      // Extract channel information from dot notation fields
+      const channel: TikTokChannel = {
+        name: item['channel.name']?.value || '',
+        username: item['channel.username']?.value || '',
+        id: item['channel.id']?.value || '',
+        url: item['channel.url']?.value || '',
+        avatar: item['channel.avatar']?.value || '',
+        verified: item['channel.verified']?.value || false,
+        followers: item['channel.followers']?.value || 0,
+        following: item['channel.following']?.value || 0,
+        videos: item['channel.videos']?.value || 0
+      };
+
+      // Return transformed post with proper structure
+      return {
+        ...item,
+        channel,
+        // Remove dot notation fields to prevent duplication
+        'channel.name': undefined,
+        'channel.username': undefined,
+        'channel.id': undefined,
+        'channel.url': undefined,
+        'channel.avatar': undefined,
+        'channel.verified': undefined,
+        'channel.followers': undefined,
+        'channel.following': undefined,
+        'channel.videos': undefined
+      };
+    });
+
+    console.log('Transformed TikTok data:', transformedData);
 
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(transformedData),
       { 
         headers: { 
           ...corsHeaders,
