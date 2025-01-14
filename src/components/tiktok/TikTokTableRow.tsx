@@ -49,7 +49,12 @@ export const TikTokTableRow = ({
                 {truncateCaption(post.title)}
               </span>
             </TooltipTrigger>
-            <TooltipContent className="max-w-sm">
+            <TooltipContent 
+              side="right" 
+              align="start"
+              className="max-w-sm z-[100] bg-popover shadow-lg"
+              sideOffset={5}
+            >
               <p className="break-words text-xs">{post.title}</p>
             </TooltipContent>
           </Tooltip>
