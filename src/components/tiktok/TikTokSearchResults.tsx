@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { FilterInput } from "@/components/search/FilterInput";
-import { Calendar, User, Hash, Eye, Share2, MessageCircle, Percent } from "lucide-react";
+import { Calendar, Hash, Eye, Share2, MessageCircle, Percent } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TikTokSearchResultsProps {
@@ -18,7 +18,6 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   const isMobile = useIsMobile();
   
   // Filter states
-  const [username, setUsername] = useState("");
   const [date, setDate] = useState("");
   const [minLikes, setMinLikes] = useState("");
   const [minViews, setMinViews] = useState("");
@@ -42,11 +41,6 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
 
   // Filter logic
   const filteredResults = searchResults.filter(post => {
-    const usernameMatch = username 
-      ? post.channel?.username?.toLowerCase().includes(username.toLowerCase()) ||
-        post["channel.username"]?.toLowerCase().includes(username.toLowerCase())
-      : true;
-
     const dateMatch = date
       ? post.uploadedAtFormatted?.includes(date)
       : true;
@@ -71,12 +65,11 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
       ? (parseFloat(post.engagement) >= parseFloat(minEngagement))
       : true;
 
-    return usernameMatch && dateMatch && likesMatch && viewsMatch && 
+    return dateMatch && likesMatch && viewsMatch && 
            sharesMatch && commentsMatch && engagementMatch;
   });
 
   const handleReset = () => {
-    setUsername("");
     setDate("");
     setMinLikes("");
     setMinViews("");
@@ -101,14 +94,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
         />
         
         <CollapsibleContent className="space-y-4 px-4 sm:px-6 py-4 bg-card/50 border-x border-b border-border/50">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <FilterInput
-              icon={User}
-              label="Username"
-              value={username}
-              onChange={setUsername}
-              placeholder="Filter by username..."
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <FilterInput
               icon={Calendar}
               label="Upload Date"
