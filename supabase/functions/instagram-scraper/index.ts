@@ -27,9 +27,9 @@ serve(async (req) => {
 
     const { directUrls, ...otherParams } = await req.json()
     
-    // Set timeout to 20 minutes for bulk requests with more than 10 URLs
-    const timeout = directUrls.length > 10 ? 1200000 : 120000; // 1200000ms = 20 minutes, 120000ms = 2 minutes
-    console.log(`Setting timeout to ${timeout}ms for ${directUrls.length} URLs`);
+    // Set timeout to 20 minutes for all requests to handle potential long-running scrapes
+    const timeout = 1200000; // 1200000ms = 20 minutes
+    console.log(`Setting timeout to ${timeout}ms for request`);
 
     const response = await fetch('https://api.apify.com/v2/acts/apify~instagram-scraper/run-sync-get-dataset-items', {
       method: 'POST',
@@ -84,7 +84,7 @@ serve(async (req) => {
     if (error.name === 'TimeoutError' || error.message.includes('timeout')) {
       return new Response(
         JSON.stringify({ 
-          error: 'Request timed out. This may happen with large bulk requests. Please try with fewer URLs.',
+          error: 'Request timed out. The Instagram API is taking longer than expected to respond. Please try again.',
           timestamp: new Date().toISOString(),
           requestId: crypto.randomUUID()
         }),
