@@ -89,8 +89,6 @@ export const TikTokSearchContainer = () => {
           onSearch={handleSearch}
         />
         
-        <TikTokRecentSearches onSelect={setUsername} />
-
         <TikTokSearchSettings 
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
@@ -102,6 +100,8 @@ export const TikTokSearchContainer = () => {
           setLocation={setLocation}
           disabled={isLoading}
         />
+
+        <TikTokRecentSearches onSelect={setUsername} />
       </div>
 
       <TikTokSearchResults searchResults={searchResults} />
