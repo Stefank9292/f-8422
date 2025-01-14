@@ -21,8 +21,8 @@ export const TikTokTableRow = ({
   const { toast } = useToast();
 
   const handleDownload = async () => {
-    // Get video URL from the nested or flattened structure
-    const videoUrl = post['video.url'] || post.video?.url;
+    // Get video URL from the nested structure
+    const videoUrl = post.video?.url || post['video.url'];
     
     if (!videoUrl) {
       toast({
@@ -35,12 +35,15 @@ export const TikTokTableRow = ({
     }
 
     try {
+      console.log('Attempting to download video:', videoUrl);
+      
       // Call our Edge Function to download the video
       const { data, error } = await supabase.functions.invoke('tiktok-video-download', {
         body: { videoUrl }
       });
 
       if (error) {
+        console.error('Edge function error:', error);
         throw new Error(error.message);
       }
 
@@ -51,7 +54,7 @@ export const TikTokTableRow = ({
       // Create a temporary anchor element
       const a = document.createElement('a');
       a.href = url;
-      a.download = `tiktok-${post.id}.mp4`;
+      a.download = `tiktok-${post.id || 'video'}.mp4`;
       
       // Append to body, click, and cleanup
       document.body.appendChild(a);
@@ -64,7 +67,6 @@ export const TikTokTableRow = ({
       toast({
         title: "Download started",
         description: "Your video download has started.",
-        variant: "default",
       });
     } catch (error) {
       console.error('Download error:', error);

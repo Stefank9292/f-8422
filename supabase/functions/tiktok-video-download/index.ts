@@ -6,14 +6,17 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
     const { videoUrl } = await req.json()
+    console.log('Attempting to download video from:', videoUrl);
     
     if (!videoUrl) {
+      console.error('No video URL provided');
       return new Response(
         JSON.stringify({ error: 'Video URL is required' }),
         { 
@@ -27,11 +30,13 @@ serve(async (req) => {
     const response = await fetch(videoUrl)
     
     if (!response.ok) {
+      console.error('Failed to fetch video:', response.statusText);
       throw new Error(`Failed to fetch video: ${response.statusText}`)
     }
 
     // Get the video data
     const videoData = await response.arrayBuffer()
+    console.log('Successfully fetched video data, size:', videoData.byteLength);
 
     // Return the video data with appropriate headers
     return new Response(videoData, {
@@ -42,6 +47,7 @@ serve(async (req) => {
       },
     })
   } catch (error) {
+    console.error('Download error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
