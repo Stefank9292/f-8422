@@ -28,7 +28,6 @@ serve(async (req) => {
     console.log(`Number of videos requested: ${numberOfVideos}`)
     console.log(`Selected date filter: ${selectedDate}`)
     console.log(`Selected location: ${location}`)
-    console.log('Using Apify API key:', apifyKey.substring(0, 5) + '...')
 
     // Map the date range values
     let dateRange = "LAST_SIX_MONTHS"; // default value
@@ -51,21 +50,19 @@ serve(async (req) => {
 
     console.log('Sending payload to Apify:', payload)
 
-    // Make the request to Apify API with token as query parameter
-    const apiUrl = `https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=${apifyKey}`
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
+    // Make the request to Apify API
+    const response = await fetch(
+      'https://api.apify.com/v2/acts/apidojo~tiktok-scraper/run-sync-get-dataset-items?token=' + apifyKey,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      }
+    )
 
     if (!response.ok) {
-      console.error('Apify API response status:', response.status)
-      console.error('Apify API response status text:', response.statusText)
-      const errorText = await response.text()
-      console.error('Apify API error response:', errorText)
       throw new Error(`Apify API error: ${response.statusText}`)
     }
 
@@ -74,16 +71,16 @@ serve(async (req) => {
 
     // Process and transform the results
     const processedResults = posts.map(post => ({
-      "channel.username": post.authorMeta?.name || username,
-      title: post.text || '',
-      uploadedAtFormatted: new Date(post.createTime).toLocaleDateString(),
-      views: post.playCount || 0,
-      shares: post.shareCount || 0,
-      likes: post.diggCount || 0,
-      comments: post.commentCount || 0,
+      authorUsername: post.authorMeta?.name || username,
+      description: post.text || '',
+      createTime: new Date(post.createTime).toLocaleDateString(),
+      playCount: post.playCount || 0,
+      viewCount: post.playCount || 0, // TikTok uses playCount as views
+      likeCount: post.diggCount || 0,
+      commentCount: post.commentCount || 0,
       engagement: ((post.diggCount + post.commentCount) / (post.playCount || 1) * 100).toFixed(2),
-      postPage: post.webVideoUrl || '',
-      "video.url": post.videoUrl || post.downloadAddr || '',
+      webVideoUrl: post.webVideoUrl || '',
+      timestamp: post.createTime,
     }))
 
     console.log(`Returning ${processedResults.length} processed results`)
