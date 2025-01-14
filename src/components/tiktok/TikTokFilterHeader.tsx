@@ -43,7 +43,7 @@ export const TikTokFilterHeader = ({
         <div className="flex items-center gap-1.5">
           <Filter className="w-3.5 h-3.5 text-primary/70" />
           <h2 className="text-xs font-medium text-muted-foreground">Filter Results</h2>
-          <span className="text-[10px] text-muted-foreground/70 hidden sm:inline">
+          <span className="text-[10px] text-muted-foreground/70">
             Showing {filteredResults} of {totalResults} results
           </span>
         </div>

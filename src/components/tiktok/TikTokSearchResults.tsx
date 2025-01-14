@@ -21,7 +21,7 @@ export const TikTokSearchResults = ({ searchResults = [] }: TikTokSearchResultsP
   const [username, setUsername] = useState("");
   const [date, setDate] = useState("");
   const [minLikes, setMinLikes] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(!isMobile); // Open by default on desktop
 
   const handleCopyCaption = (caption: string) => {
     navigator.clipboard.writeText(caption);
