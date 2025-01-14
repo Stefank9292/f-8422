@@ -2,6 +2,7 @@ import { TikTokSearchHeader } from "./TikTokSearchHeader";
 import { TikTokSearchBar } from "./TikTokSearchBar";
 import { TikTokSearchSettings, DateRangeOption, LocationOption } from "./TikTokSearchSettings";
 import { TikTokSearchResults } from "./TikTokSearchResults";
+import { TikTokRecentSearches } from "./TikTokRecentSearches";
 import { useState } from "react";
 import { fetchTikTokPosts } from "@/utils/tiktok/services/tiktokService";
 import { useToast } from "@/hooks/use-toast";
@@ -59,6 +60,7 @@ export const TikTokSearchContainer = () => {
           isLoading={isLoading}
           onSearch={handleSearch}
         />
+        <TikTokRecentSearches onSelect={setUsername} />
         <TikTokSearchSettings 
           isSettingsOpen={isSettingsOpen}
           setIsSettingsOpen={setIsSettingsOpen}
