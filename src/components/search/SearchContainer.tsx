@@ -92,13 +92,14 @@ export const SearchContainer = ({
   const isSearchDisabled = isLoading || isBulkSearching || !username.trim() || hasReachedLimit || hasNoSearchesLeft;
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen px-4 sm:px-6 py-8 sm:py-12 space-y-6 sm:space-y-8 animate-in fade-in duration-300">
+    <div className="flex flex-col items-center justify-start min-h-[calc(100vh-theme(spacing.20))] md:min-h-[calc(100vh-theme(spacing.32))] 
+                    px-4 sm:px-6 py-8 sm:py-12 space-y-8 sm:space-y-10 animate-in fade-in duration-500 w-full">
       <AnnouncementBar />
-      <div className="space-y-4 sm:space-y-6 w-full max-w-md">
+      <div className="space-y-6 sm:space-y-8 w-full max-w-lg">
         <SearchHeader />
       </div>
 
-      <div className="w-full max-w-md space-y-4 sm:space-y-6">
+      <div className="w-full max-w-lg space-y-6 animate-in fade-in duration-500 delay-150">
         <SearchBar
           username={username}
           onSearch={onSearchClick}
@@ -112,8 +113,10 @@ export const SearchContainer = ({
           onClick={onSearchClick}
           disabled={isSearchDisabled}
           className={cn(
-            "w-full h-10 text-[11px] font-medium transition-all duration-300",
-            username && !hasReachedLimit && !hasNoSearchesLeft ? "instagram-gradient" : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
+            "w-full h-11 text-[13px] font-medium transition-all duration-300 ease-spring",
+            username && !hasReachedLimit && !hasNoSearchesLeft 
+              ? "instagram-gradient" 
+              : "bg-gradient-to-r from-gray-300 to-gray-400 dark:from-gray-700 dark:to-gray-800",
             "text-white dark:text-gray-100 shadow-sm hover:shadow-md",
             (hasReachedLimit || hasNoSearchesLeft) && "opacity-50 cursor-not-allowed"
           )}
@@ -156,20 +159,18 @@ export const SearchContainer = ({
       </div>
 
       {displayPosts.length > 0 && (
-        <div ref={resultsRef} className="space-y-4">
-          <div className="w-full max-w-[90rem]">
-            <div className="rounded-xl sm:border sm:border-border/50 overflow-hidden">
-              <SearchFilters
-                filters={filters}
-                onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
-                onReset={resetFilters}
-                totalResults={displayPosts.length}
-                filteredResults={displayPosts.length}
-                currentPosts={displayPosts}
-              />
-            </div>
+        <div className="w-full animate-in fade-in duration-500 delay-300">
+          <div className="rounded-xl overflow-hidden">
+            <SearchFilters
+              filters={filters}
+              onFilterChange={(key, value) => setFilters({ ...filters, [key]: value })}
+              onReset={resetFilters}
+              totalResults={displayPosts.length}
+              filteredResults={displayPosts.length}
+              currentPosts={displayPosts}
+            />
           </div>
-          <div className="w-full max-w-[90rem]">
+          <div className="mt-8">
             <div className="sm:material-card overflow-hidden">
               <SearchResults searchResults={displayPosts} />
             </div>

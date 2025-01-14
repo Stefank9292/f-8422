@@ -71,8 +71,8 @@ export const SearchBar = ({
         <Input
           type="text"
           placeholder={placeholder}
-          className="pl-12 pr-32 h-12 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
-                   focus:border-[#D946EF] shadow-sm hover:shadow-md transition-all duration-200
+          className="pl-12 h-12 text-[13px] rounded-xl border border-gray-200/80 dark:border-gray-800/80 
+                   focus:border-[#D946EF] shadow-sm hover:shadow-md transition-all duration-300 ease-spring
                    placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
           value={username}
           onChange={(e) => onUsernameChange(e.target.value)}
