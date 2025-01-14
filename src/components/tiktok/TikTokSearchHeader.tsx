@@ -1,15 +1,12 @@
-import { Video } from "lucide-react";
+import { BrandTiktok } from "lucide-react";
 
 export const TikTokSearchHeader = () => {
   return (
-    <div className="space-y-2 text-center">
-      <div className="flex items-center justify-center gap-2">
-        <Video className="w-5 h-5" />
-        <h1 className="text-xl font-semibold">TikTok Search</h1>
+    <div className="flex items-center justify-center">
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-black/5 dark:bg-white/5 backdrop-blur-sm border border-black/5 dark:border-white/5">
+        <BrandTiktok className="w-4 h-4" />
+        <span className="text-sm font-medium">TikTok Search</span>
       </div>
-      <p className="text-sm text-muted-foreground">
-        Search and analyze TikTok profiles and their content
-      </p>
     </div>
   );
 };
