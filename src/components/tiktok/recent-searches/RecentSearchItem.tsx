@@ -14,6 +14,23 @@ export const RecentSearchItem = ({
   onSelect, 
   onRemove 
 }: RecentSearchItemProps) => {
+  // Extract username from TikTok URL or use the query as is
+  const formatUsername = (query: string): string => {
+    try {
+      // Handle full TikTok URLs
+      if (query.includes('tiktok.com/')) {
+        const match = query.match(/@([^/?]+)/);
+        return match ? match[1] : query;
+      }
+      // Handle @username format
+      return query.startsWith('@') ? query.substring(1) : query;
+    } catch {
+      return query;
+    }
+  };
+
+  const displayUsername = formatUsername(searchQuery);
+
   return (
     <div className="relative group">
       <button
@@ -21,7 +38,7 @@ export const RecentSearchItem = ({
         className="text-[11px] text-muted-foreground hover:text-primary font-medium 
                    bg-muted/50 hover:bg-muted px-3 py-1.5 rounded-lg transition-colors"
       >
-        @{searchQuery}
+        @{displayUsername}
       </button>
       <Button
         variant="ghost"
