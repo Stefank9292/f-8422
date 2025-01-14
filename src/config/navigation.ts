@@ -4,7 +4,7 @@ import { NavItem } from "@/types/navigation";
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    title: "Instagram Video Search",
+    title: "Instagram Search",
     url: "/",
     icon: Instagram,
     badge: "LIVE"
