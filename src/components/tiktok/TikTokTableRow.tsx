@@ -19,7 +19,7 @@ export const TikTokTableRow = ({
   return (
     <TableRow className="hover:bg-muted/30 transition-colors">
       <TableCell className="py-4 text-xs text-muted-foreground font-medium">
-        @{post["channel.username"]}
+        @{post.authorMeta?.name || 'Unknown'}
       </TableCell>
       <TableCell className="max-w-xs py-4">
         <div className="flex items-center gap-2">
