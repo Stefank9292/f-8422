@@ -31,10 +31,12 @@ export const TikTokSearchContainer = () => {
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   });
 
-  // Load saved search parameters from localStorage on mount only
+  // Load saved search parameters and results from localStorage on mount only
   useEffect(() => {
     console.log('TikTokSearchContainer: Loading saved search parameters');
     const savedSearch = localStorage.getItem('tiktok-search');
+    const savedResults = localStorage.getItem('tiktok-results');
+    
     if (savedSearch) {
       const { username: savedUsername, numberOfVideos: savedNumber, dateRange: savedRange, location: savedLocation } = JSON.parse(savedSearch);
       console.log('TikTokSearchContainer: Found saved search:', { savedUsername, savedNumber, savedRange, savedLocation });
@@ -84,13 +86,15 @@ export const TikTokSearchContainer = () => {
         }
       }
 
-      // Save successful search parameters
+      // Save successful search parameters and results
       localStorage.setItem('tiktok-search', JSON.stringify({
         username,
         numberOfVideos,
         dateRange,
         location
       }));
+      
+      localStorage.setItem('tiktok-results', JSON.stringify(results));
 
       return results;
     },
@@ -130,6 +134,22 @@ export const TikTokSearchContainer = () => {
     }
   }, [searchError, toast]);
 
+  // Load saved results on mount
+  const [persistedResults, setPersistedResults] = useState<any[]>([]);
+  useEffect(() => {
+    const savedResults = localStorage.getItem('tiktok-results');
+    if (savedResults) {
+      setPersistedResults(JSON.parse(savedResults));
+    }
+  }, []);
+
+  // Update persisted results when new search results come in
+  useEffect(() => {
+    if (searchResults.length > 0) {
+      setPersistedResults(searchResults);
+    }
+  }, [searchResults]);
+
   // Cleanup logging
   useEffect(() => {
     return () => {
@@ -168,7 +188,7 @@ export const TikTokSearchContainer = () => {
       </div>
 
       <div className="w-full animate-in fade-in duration-500 delay-300">
-        <TikTokSearchResults searchResults={searchResults} />
+        <TikTokSearchResults searchResults={persistedResults.length > 0 ? persistedResults : searchResults} />
       </div>
     </div>
   );
