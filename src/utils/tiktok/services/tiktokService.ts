@@ -26,6 +26,20 @@ export interface TikTokPost {
   engagement: string;
 }
 
+const formatTikTokUsername = (input: string): string => {
+  // Remove any trailing slashes
+  input = input.replace(/\/$/, '');
+  
+  // If it's already a full URL, extract just the username
+  if (input.includes('tiktok.com/')) {
+    const match = input.match(/@([^/?]+)/);
+    return match ? match[1] : input.split('@').pop()!;
+  }
+  
+  // If it's just a username, remove @ if present
+  return input.replace('@', '');
+};
+
 export async function fetchTikTokPosts(
   username: string,
   numberOfVideos: number = 3,
@@ -33,11 +47,10 @@ export async function fetchTikTokPosts(
   location: LocationOption = "US"
 ): Promise<TikTokPost[]> {
   try {
-    console.log('Fetching TikTok posts for:', { username, numberOfVideos, dateRange, location });
-    
-    // Clean up the username and ensure it's in the correct format
-    const cleanUsername = username.replace('@', '').trim();
+    const cleanUsername = formatTikTokUsername(username);
     const url = `https://www.tiktok.com/@${cleanUsername}`;
+    
+    console.log('Fetching TikTok posts for:', { username: cleanUsername, numberOfVideos, dateRange, location });
 
     const { data, error } = await supabase.functions.invoke('tiktok-apify-scraper', {
       body: {
