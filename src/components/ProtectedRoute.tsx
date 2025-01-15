@@ -85,6 +85,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <LoadingState />;
   }
 
+  console.log('Subscription status:', subscriptionStatus);
+  console.log('Current price ID:', subscriptionStatus?.priceId);
+
   // Check if user has an active subscription by checking the priceId
   const hasActiveSubscription = subscriptionStatus?.priceId && [
     "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
@@ -93,9 +96,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
   ].includes(subscriptionStatus.priceId);
 
-  console.log('Subscription status:', subscriptionStatus);
   console.log('Has active subscription:', hasActiveSubscription);
-  console.log('Current price ID:', subscriptionStatus?.priceId);
 
   // If no active subscription and not on subscribe page, redirect to subscribe
   if (!hasActiveSubscription) {
