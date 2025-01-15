@@ -58,20 +58,31 @@ serve(async (req) => {
 
     if (hasActiveSubscription) {
       const latestSubscription = subscriptionLogs[0];
+      const details = latestSubscription.details || {};
+      
+      // Extract priceId from details, ensuring it's properly typed
+      const priceId = typeof details === 'string' ? 
+        JSON.parse(details).priceId : 
+        details.priceId;
+
       subscriptionDetails = {
         subscribed: true,
-        priceId: latestSubscription.details?.priceId || null,
-        canceled: latestSubscription.details?.canceled || false
+        priceId: priceId || null,
+        canceled: latestSubscription.details?.canceled || false,
+        cancel_at: latestSubscription.details?.cancel_at || null
       };
+
+      console.log('Returning subscription details:', subscriptionDetails);
     } else {
       subscriptionDetails = {
         subscribed: false,
         priceId: null,
-        canceled: false
+        canceled: false,
+        cancel_at: null
       };
-    }
 
-    console.log('Returning subscription details:', subscriptionDetails);
+      console.log('No active subscription found, returning:', subscriptionDetails);
+    }
 
     return new Response(
       JSON.stringify(subscriptionDetails),
