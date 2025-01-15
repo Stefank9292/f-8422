@@ -39,10 +39,7 @@ export const RequestUsageCounter = () => {
     enabled: !!session?.access_token,
   });
 
-  if (!subscriptionStatus?.subscribed) {
-    return null;
-  }
-
+  // Removed the condition that was hiding the component for non-subscribed users
   return (
     <div className="px-2 py-2">
       <UserProfileInfo
