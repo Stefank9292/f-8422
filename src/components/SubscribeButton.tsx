@@ -88,6 +88,7 @@ export const SubscribeButton = ({ planId, planName, isPopular, isAnnual }: Subsc
     return (
       <CancelSubscriptionButton 
         isCanceled={subscriptionStatus?.canceled}
+        cancelAt={subscriptionStatus?.cancel_at}
         className="w-full"
       >
         Cancel Subscription

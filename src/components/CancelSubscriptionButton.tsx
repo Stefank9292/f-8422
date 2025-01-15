@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,11 +19,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 export const CancelSubscriptionButton = ({ 
   isCanceled = false, 
   children,
-  className 
+  className,
+  cancelAt
 }: { 
   isCanceled?: boolean;
   children?: React.ReactNode;
   className?: string;
+  cancelAt?: number;
 }) => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -65,14 +68,15 @@ export const CancelSubscriptionButton = ({
     }
   };
 
-  if (isCanceled) {
+  if (isCanceled && cancelAt) {
+    const cancelDate = new Date(cancelAt * 1000);
     return (
       <Button 
         variant="outline" 
         disabled 
         className={`text-[11px] h-8 px-4 ${className}`}
       >
-        {children || "Canceled"}
+        {`Cancels ${format(cancelDate, 'MMM d')}`}
       </Button>
     );
   }
