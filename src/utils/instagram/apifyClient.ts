@@ -20,12 +20,17 @@ async function trackInstagramRequest(userId: string) {
 }
 
 function normalizeInstagramUrl(input: string): string {
-  // Check if the input is already a full URL
-  if (input.startsWith('https://www.instagram.com/')) {
-    return input;
+  // Remove any trailing slashes
+  const cleanInput = input.trim().replace(/\/$/, '');
+  
+  // If it's a full URL, extract the username
+  if (cleanInput.startsWith('https://www.instagram.com/')) {
+    const username = cleanInput.replace('https://www.instagram.com/', '');
+    return `https://www.instagram.com/${username}`;
   }
+  
   // Remove @ if present and construct the URL
-  const username = input.replace('@', '');
+  const username = cleanInput.replace('@', '');
   return `https://www.instagram.com/${username}`;
 }
 
