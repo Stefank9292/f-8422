@@ -16,6 +16,23 @@ interface SearchBarProps {
   hasReachedLimit?: boolean;
 }
 
+const normalizeInstagramUsername = (input: string): string => {
+  // Remove any trailing slashes and trim whitespace
+  const cleanInput = input.trim().replace(/\/$/, '');
+  
+  // If it's a full URL, extract just the username
+  if (cleanInput.startsWith('https://www.instagram.com/')) {
+    return cleanInput.replace('https://www.instagram.com/', '').split('/')[0];
+  }
+  
+  // If it starts with @, remove it
+  if (cleanInput.startsWith('@')) {
+    return cleanInput.slice(1);
+  }
+  
+  return cleanInput;
+};
+
 export const SearchBar = ({ 
   username, 
   onUsernameChange, 
@@ -58,6 +75,11 @@ export const SearchBar = ({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const normalizedUsername = normalizeInstagramUsername(e.target.value);
+    onUsernameChange(normalizedUsername);
+  };
+
   const isBulkSearchEnabled = subscriptionStatus?.priceId && (
     subscriptionStatus.priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || // Creator on Steroids Monthly
     subscriptionStatus.priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk" || // Creator on Steroids Annual
@@ -75,7 +97,7 @@ export const SearchBar = ({
                    focus:border-[#D946EF] shadow-sm hover:shadow-md transition-all duration-300 ease-spring
                    placeholder:text-gray-400 dark:placeholder:text-gray-600 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm"
           value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           disabled={isLoading || hasReachedLimit}
         />
