@@ -22,36 +22,27 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           error?.toString().includes('Invalid user session')) {
         console.log('Session error detected, cleaning up...', error);
         
-        // Clear all storage except specific items we want to keep
-        const keysToKeep = ['supabase.auth.token'];
-        const itemsToKeep = {};
-        
-        keysToKeep.forEach(key => {
-          const value = localStorage.getItem(key);
-          if (value) {
-            itemsToKeep[key] = value;
-          }
-        });
-        
-        // Clear query cache
-        queryClient.clear();
-        
-        // Clear localStorage
-        localStorage.clear();
-        
-        // Restore kept items
-        Object.entries(itemsToKeep).forEach(([key, value]) => {
-          localStorage.setItem(key, value);
-        });
-        
-        // Sign out from Supabase
-        await supabase.auth.signOut();
-        
-        toast({
-          title: "Session Expired",
-          description: "Please sign in again to continue.",
-          variant: "destructive",
-        });
+        try {
+          // Clear query cache first
+          queryClient.clear();
+          
+          // Sign out from Supabase
+          await supabase.auth.signOut();
+          
+          // Clear localStorage after signout
+          localStorage.clear();
+          
+          toast({
+            title: "Session Expired",
+            description: "Please sign in again to continue.",
+            variant: "destructive",
+          });
+        } catch (cleanupError) {
+          console.error('Error during session cleanup:', cleanupError);
+          // Force clear everything as fallback
+          localStorage.clear();
+          queryClient.clear();
+        }
       }
     };
 
