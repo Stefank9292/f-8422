@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,64 +13,80 @@ serve(async (req) => {
   }
 
   try {
-    // Get the authorization header
+    // Get auth header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      throw new Error('No auth header');
     }
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase credentials');
+    }
 
-    // Get user from the JWT token
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Get user from auth header
+    const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''));
     if (userError || !user) {
+      console.error('User error:', userError);
       throw new Error('Invalid user session');
     }
 
-    console.log('Checking subscription for user:', user.email);
+    console.log('Checking subscription for user:', user.id);
 
-    // Get the latest active subscription log for the user
-    const { data: subscriptionLogs, error: subError } = await supabaseClient
+    // Get latest subscription log
+    const { data: subscriptionLogs, error: subscriptionError } = await supabase
       .from('subscription_logs')
       .select('*')
       .eq('user_id', user.id)
-      .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(1);
 
-    if (subError) {
-      console.error('Error fetching subscription:', subError);
-      throw subError;
+    if (subscriptionError) {
+      console.error('Subscription query error:', subscriptionError);
+      throw subscriptionError;
     }
 
     console.log('Found subscription logs:', subscriptionLogs);
 
-    // Check if user has an active subscription
-    const hasActiveSubscription = subscriptionLogs && subscriptionLogs.length > 0;
     let subscriptionDetails;
+    const hasActiveSubscription = subscriptionLogs && subscriptionLogs.length > 0;
 
     if (hasActiveSubscription) {
       const latestSubscription = subscriptionLogs[0];
-      const details = latestSubscription.details || {};
-      
-      // Extract priceId from details, ensuring it's properly typed
-      const priceId = typeof details === 'string' ? 
-        JSON.parse(details).priceId : 
-        details.priceId;
+      let details;
 
-      subscriptionDetails = {
-        subscribed: true,
-        priceId: priceId || null,
-        canceled: latestSubscription.details?.canceled || false,
-        cancel_at: latestSubscription.details?.cancel_at || null
-      };
+      try {
+        // Handle both string and object formats of details
+        if (typeof latestSubscription.details === 'string') {
+          details = JSON.parse(latestSubscription.details);
+        } else {
+          details = latestSubscription.details || {};
+        }
+
+        console.log('Parsed subscription details:', details);
+
+        subscriptionDetails = {
+          subscribed: true,
+          priceId: details.priceId || null,
+          canceled: details.canceled || false,
+          cancel_at: details.cancel_at || null,
+          maxRequests: details.maxRequests || 5
+        };
+      } catch (parseError) {
+        console.error('Error parsing subscription details:', parseError);
+        // Fallback to default values if parsing fails
+        subscriptionDetails = {
+          subscribed: true,
+          priceId: null,
+          canceled: false,
+          cancel_at: null,
+          maxRequests: 5
+        };
+      }
 
       console.log('Returning subscription details:', subscriptionDetails);
     } else {
@@ -78,7 +94,8 @@ serve(async (req) => {
         subscribed: false,
         priceId: null,
         canceled: false,
-        cancel_at: null
+        cancel_at: null,
+        maxRequests: 5
       };
 
       console.log('No active subscription found, returning:', subscriptionDetails);
@@ -86,20 +103,28 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify(subscriptionDetails),
-      { 
-        headers: { 
+      {
+        headers: {
           ...corsHeaders,
           'Content-Type': 'application/json'
         }
       }
     );
+
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in check-subscription function:', error);
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500
+      JSON.stringify({
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }),
+      {
+        status: error.message.includes('Invalid user session') ? 401 : 500,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
       }
     );
   }
