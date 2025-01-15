@@ -12,9 +12,6 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
 
-  const isCreatorPro = subscriptionStatus?.priceId === "price_1QdtwnGX13ZRG2XihcM36r3W";
-  const isFreeUser = !subscriptionStatus?.subscribed;
-
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
@@ -34,13 +31,10 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
 
   const secondaryMenuItems = [
     {
-      title: isCreatorPro || isFreeUser ? "Upgrade to Creator on Steroids" : "Manage Subscription",
-      icon: isCreatorPro || isFreeUser ? Zap : CreditCard,
+      title: "Manage Subscription",
+      icon: CreditCard,
       url: "/subscribe",
       showWhen: () => true,
-      className: (isCreatorPro || isFreeUser) ? 
-        "group relative" 
-        : undefined
     },
     {
       title: "Help Center",
@@ -55,12 +49,9 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
     {
       title: "Dark Mode",
       icon: isDark ? Sun : Moon,
-      onClick: isFreeUser ? undefined : () => {
+      onClick: () => {
         document.documentElement.classList.toggle('dark');
       },
-      className: `group ${isFreeUser ? 'opacity-50 cursor-not-allowed' : ''}`,
-      lockIcon: isFreeUser,
-      tooltipText: isFreeUser ? "Upgrade to customize theme" : undefined
     },
   ];
 
@@ -74,48 +65,24 @@ export function SidebarSettings({ currentPath, subscriptionStatus }: SidebarSett
           }
 
           const IconComponent = item.icon;
-          const isUpgradeButton = item.title.includes("Upgrade to Creator on Steroids");
           
-          const button = (
+          return (
             <button
               key={item.title}
               onClick={item.onClick || (item.url ? () => navigate(item.url) : undefined)}
               className={`w-full px-3 py-2 rounded-lg flex items-center gap-3 text-[11px] ${
-                item.className || 
-                (item.url && currentPath === item.url 
+                item.url && currentPath === item.url 
                   ? 'bg-sidebar-accent text-sidebar-accent-foreground' 
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent/10')
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent/10'
               } transition-all duration-200`}
             >
               <IconComponent 
                 className={`h-4 w-4 transition-transform duration-200 ease-spring
                   ${item.icon === Sun || item.icon === Moon ? 'group-hover:rotate-45' : 'group-hover:scale-110'}`}
               />
-              {isUpgradeButton ? (
-                <span className="bg-gradient-to-r from-[#D946EF] via-[#FF3D77] to-[#FF8A3D] text-transparent bg-clip-text font-medium">
-                  {item.title}
-                </span>
-              ) : (
-                <span className="font-medium">{item.title}</span>
-              )}
-              {item.lockIcon && <Lock className="h-3.5 w-3.5 ml-auto text-muted-foreground" />}
+              <span className="font-medium">{item.title}</span>
             </button>
           );
-
-          if (item.tooltipText) {
-            return (
-              <Tooltip key={item.title}>
-                <TooltipTrigger asChild>
-                  {button}
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  <p className="text-[10px]">{item.tooltipText}</p>
-                </TooltipContent>
-              </Tooltip>
-            );
-          }
-
-          return button;
         })}
       </div>
     </div>

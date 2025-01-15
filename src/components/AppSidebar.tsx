@@ -116,23 +116,18 @@ export function AppSidebar() {
 
             <div className="mt-auto space-y-2">
               <SidebarMenu>
-                {/* Only show subscription-dependent items if there's a subscription */}
-                {subscriptionStatus?.subscribed && (
-                  <>
-                    <SidebarMenuItem>
-                      <RequestUsageCounter />
-                    </SidebarMenuItem>
+                {/* Show all items regardless of subscription */}
+                <SidebarMenuItem>
+                  <RequestUsageCounter />
+                </SidebarMenuItem>
 
-                    <SidebarMenuItem>
-                      <SidebarSettings 
-                        currentPath={location.pathname}
-                        subscriptionStatus={subscriptionStatus}
-                      />
-                    </SidebarMenuItem>
-                  </>
-                )}
+                <SidebarMenuItem>
+                  <SidebarSettings 
+                    currentPath={location.pathname}
+                    subscriptionStatus={subscriptionStatus}
+                  />
+                </SidebarMenuItem>
 
-                {/* Always show sign out button if there's a session */}
                 <SidebarMenuItem>
                   <div className="px-3 py-2">
                     <button
