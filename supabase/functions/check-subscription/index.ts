@@ -1,26 +1,21 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { 
-      status: 204,
-      headers: corsHeaders 
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get user ID from auth context
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      console.error('No authorization header found');
       throw new Error('No authorization header');
     }
 
@@ -30,71 +25,18 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify the JWT token
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(
+    // Get user from the JWT token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
-    if (authError) {
-      console.error('Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', message: authError.message }),
-        { 
-          status: 401,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
+    if (userError || !user) {
+      throw new Error('Invalid user session');
     }
 
-    if (!user) {
-      console.error('No user found');
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized', message: 'No user found' }),
-        { 
-          status: 401,
-          headers: {
-            ...corsHeaders,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
-    }
+    console.log('Checking subscription for user:', user.email);
 
-    console.log('Checking subscription for user:', user.id);
-
-    // Get subscription status from subscription_logs table
-    const { data: subscriptionData, error: subscriptionError } = await supabaseClient
-      .from('subscription_logs')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('status', 'active')  // Only get active subscriptions
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single(); // Get single record to avoid array
-
-    if (subscriptionError && subscriptionError.code !== 'PGRST116') { // Ignore "no rows returned" error
-      console.error('Error fetching subscription:', subscriptionError);
-      throw subscriptionError;
-    }
-
-    console.log('Raw subscription data:', subscriptionData);
-
-    // Check if we have an active subscription
-    const isSubscribed = subscriptionData?.status === 'active';
-    const priceId = subscriptionData?.details?.price_id || null;
-    const canceled = subscriptionData?.status === 'canceled';
-
-    console.log('Subscription check result:', {
-      subscribed: isSubscribed,
-      priceId,
-      canceled,
-      details: subscriptionData?.details
-    });
-
-    // Check if the price ID is one of the valid ones
+    // Updated valid price IDs
     const validPriceIds = [
       "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
       "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
@@ -102,48 +44,55 @@ serve(async (req) => {
       "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
     ];
 
-    const hasValidPriceId = priceId && validPriceIds.includes(priceId);
+    // Get the latest subscription log for the user
+    const { data: subscriptionLogs, error: subError } = await supabaseClient
+      .from('subscription_logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(1);
 
-    const response = {
-      subscribed: isSubscribed && hasValidPriceId,
-      priceId,
-      canceled,
-      maxClicks: (isSubscribed && hasValidPriceId) ? 
-        (priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") ? Infinity : 25 
-        : 3
+    if (subError) {
+      console.error('Error fetching subscription:', subError);
+      throw subError;
+    }
+
+    console.log('Found subscription logs:', subscriptionLogs);
+
+    const hasActiveSubscription = subscriptionLogs && 
+                                subscriptionLogs.length > 0 && 
+                                subscriptionLogs[0].details?.price_id && 
+                                validPriceIds.includes(subscriptionLogs[0].details.price_id);
+
+    const subscriptionDetails = hasActiveSubscription ? {
+      subscribed: true,
+      priceId: subscriptionLogs[0].details.price_id,
+      canceled: subscriptionLogs[0].details.canceled || false
+    } : {
+      subscribed: false,
+      priceId: null,
+      canceled: false
     };
 
-    console.log('Sending response:', response);
+    console.log('Returning subscription details:', subscriptionDetails);
 
     return new Response(
-      JSON.stringify(response),
+      JSON.stringify(subscriptionDetails),
       { 
-        status: 200,
-        headers: {
+        headers: { 
           ...corsHeaders,
           'Content-Type': 'application/json'
         }
       }
     );
-
   } catch (error) {
-    console.error('Error in check-subscription function:', error);
-    
-    // Determine if error is auth-related
-    const isAuthError = error.message?.includes('JWT') || 
-                       error.message?.includes('auth') ||
-                       error.message?.includes('token');
-    
+    console.error('Error:', error);
     return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : 'An unexpected error occurred'
-      }),
+      JSON.stringify({ error: error.message }),
       { 
-        status: isAuthError ? 401 : 500,
-        headers: {
-          ...corsHeaders,
-          'Content-Type': 'application/json'
-        }
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500
       }
     );
   }
