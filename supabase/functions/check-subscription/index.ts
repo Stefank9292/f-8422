@@ -81,21 +81,38 @@ serve(async (req) => {
 
     const subscription = subscriptionData?.[0];
     const isSubscribed = subscription?.status === 'active';
-    const priceId = subscription?.details?.price_id;
+    const priceId = subscription?.details?.price_id || null;
     const canceled = subscription?.status === 'canceled';
 
+    console.log('Raw subscription data:', subscription);
     console.log('Subscription status:', {
       subscribed: isSubscribed,
       priceId,
-      canceled
+      canceled,
+      details: subscription?.details
+    });
+
+    // Check if the price ID is one of the valid ones
+    const validPriceIds = [
+      "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+      "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
+      "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+      "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
+    ];
+
+    const hasValidPriceId = priceId && validPriceIds.includes(priceId);
+    console.log('Price ID validation:', {
+      priceId,
+      isValid: hasValidPriceId,
+      validPriceIds
     });
 
     return new Response(
       JSON.stringify({
-        subscribed: isSubscribed,
+        subscribed: isSubscribed && hasValidPriceId,
         priceId,
         canceled,
-        maxClicks: isSubscribed ? 25 : 3
+        maxClicks: (isSubscribed && hasValidPriceId) ? 25 : 3
       }),
       { 
         status: 200,
