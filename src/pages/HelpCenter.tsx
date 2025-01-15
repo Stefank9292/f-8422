@@ -1,185 +1,107 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlayCircle, Book, MessageCircle, Mail, ExternalLink } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-const videoTutorials = [
+const faqItems = [
   {
-    title: "Getting Started with VyralSearch",
-    description: "Learn the basics of using our platform and discover viral content",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    duration: "5:30"
+    category: "general",
+    question: "Do you need access to my Account?",
+    answer: "No, all features are available without the need of logging in your Instagram account."
   },
   {
-    title: "Advanced Search Techniques",
-    description: "Master the art of content discovery and trend analysis",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    duration: "8:45"
+    category: "billing",
+    question: "What is your cancellation policy?",
+    answer: "Our goal is to make you happy. You can cancel at any time and won't be billed for subsequent months. No hard feelings."
   },
   {
-    title: "Using Bulk Search",
-    description: "Learn how to efficiently search multiple accounts at once",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    duration: "6:15"
-  }
-];
-
-const guides = [
-  {
-    title: "Quick Start Guide",
-    description: "Get up and running in minutes with our platform",
-    icon: Book,
-    link: "/docs/quickstart"
+    category: "billing",
+    question: "What are my payment options?",
+    answer: "We accept all major credit cards."
   },
   {
-    title: "Video Tutorials",
-    description: "Learn through our comprehensive video guides",
-    icon: PlayCircle,
-    link: "#video-tutorials"
+    category: "billing",
+    question: "What currency are your prices in?",
+    answer: "Our prices are in USD."
   },
   {
-    title: "Community Forum",
-    description: "Connect with other users and share insights",
-    icon: MessageCircle,
-    link: "https://community.vyralsearch.com"
+    category: "billing",
+    question: "Can I change my plan?",
+    answer: "You can change your plan at any time!"
+  },
+  {
+    category: "features",
+    question: "Do you have a referral plan?",
+    answer: "We currently do not have a referral program, but plan to add one in the near future."
+  },
+  {
+    category: "technical",
+    question: "Can I use VyralSearch on my phone?",
+    answer: "Yes! Our platform supports all common devices with a web browser."
+  },
+  {
+    category: "technical",
+    question: "My search came up with no results. What happened?",
+    answer: "Although our software is incredibly awesome, it has its limits. We aren't able to search private accounts, so please make sure you are only searching public profiles."
+  },
+  {
+    category: "features",
+    question: "Do I need to give credit to the owner of content I'm reposting?",
+    answer: "Some accounts get away with doing this. We highly advise against it. Our platform will provide you with all the users tagged in the content. Sometimes there will be multiple users on that list. You can feel free to only tag the original poster in those cases."
   }
 ];
 
 const HelpCenter = () => {
   return (
-    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-12">
-      <div className="container max-w-6xl mx-auto px-4 space-y-12">
-        {/* Header Section */}
+    <div className="min-h-screen bg-background pt-20 md:pt-24 pb-6 md:pb-8">
+      <div className="container max-w-4xl mx-auto px-4 space-y-6 md:space-y-8">
         <div className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Help Center</h1>
-          <p className="text-muted-foreground text-lg">
-            Find everything you need to get started and make the most of VyralSearch
+          <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Help Center</h1>
+          <p className="text-sm text-muted-foreground">
+            Get help with using our platform
           </p>
         </div>
 
-        {/* Quick Access Guide Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {guides.map((guide, index) => (
-            <Card 
-              key={index} 
-              className="hover:shadow-lg transition-shadow duration-200 cursor-pointer group"
-              onClick={() => window.location.href = guide.link}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="w-full flex flex-wrap justify-start gap-2 bg-transparent h-auto p-0 mb-6 md:mb-8">
+            <TabsTrigger 
+              value="all" 
+              className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
             >
-              <CardHeader className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <guide.icon className="w-8 h-8 text-primary" />
-                  {guide.link.startsWith('http') && (
-                    <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  )}
-                </div>
-                <div>
-                  <CardTitle className="text-xl">{guide.title}</CardTitle>
-                  <CardDescription className="text-sm mt-1">{guide.description}</CardDescription>
-                </div>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-
-        {/* Video Tutorials Section */}
-        <div id="video-tutorials" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold tracking-tight">Video Tutorials</h2>
-            <Button variant="outline" className="hidden md:flex items-center gap-2">
-              <PlayCircle className="w-4 h-4" />
-              View All
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videoTutorials.map((tutorial, index) => (
-              <Card key={index} className="overflow-hidden">
-                <div className="aspect-video bg-muted">
-                  <iframe
-                    className="w-full h-full"
-                    src={tutorial.videoUrl}
-                    title={tutorial.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-                <CardContent className="p-4 space-y-2">
-                  <h3 className="font-semibold text-lg leading-tight">{tutorial.title}</h3>
-                  <p className="text-sm text-muted-foreground">{tutorial.description}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <PlayCircle className="w-4 h-4" />
-                    {tutorial.duration}
-                  </div>
-                </CardContent>
-              </Card>
+              All Questions
+            </TabsTrigger>
+            {["general", "billing", "features", "technical"].map((category) => (
+              <TabsTrigger
+                key={category}
+                value={category}
+                className="rounded-full px-4 py-2 text-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground capitalize"
+              >
+                {category}
+              </TabsTrigger>
             ))}
-          </div>
-          <Button variant="outline" className="w-full md:hidden">
-            <PlayCircle className="w-4 h-4 mr-2" />
-            View All Tutorials
-          </Button>
-        </div>
+          </TabsList>
 
-        {/* Common Questions Section */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold tracking-tight">Common Questions</h2>
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            <AccordionItem value="item-1" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-base font-medium">
-                How do I get started with VyralSearch?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                Getting started is easy! Simply sign up for an account, choose your subscription plan,
-                and you can immediately begin searching for viral content. Our Quick Start Guide
-                will walk you through the basics.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-2" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-base font-medium">
-                What features are included in my subscription?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                Each subscription plan includes different features. Check our pricing page for a detailed
-                comparison of what's included in each plan. You can upgrade or downgrade your plan
-                at any time.
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="item-3" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-base font-medium">
-                How does bulk search work?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                Bulk search allows you to search multiple accounts simultaneously. Simply paste your
-                list of accounts or URLs, set your filters, and let VyralSearch do the work. Watch
-                our video tutorial on bulk search for a detailed walkthrough.
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        </div>
-
-        {/* Contact Support Section */}
-        <Card className="bg-primary/5 border-primary/10">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6 justify-between">
-              <div className="flex items-start gap-4">
-                <Mail className="w-8 h-8 text-primary mt-1" />
-                <div className="space-y-1">
-                  <CardTitle className="text-xl">Need More Help?</CardTitle>
-                  <CardDescription>
-                    Our support team is here to help you succeed
-                  </CardDescription>
-                </div>
-              </div>
-              <div className="flex gap-4 w-full md:w-auto">
-                <Button className="flex-1 md:flex-none">
-                  Contact Support
-                </Button>
-                <Button variant="outline" className="flex-1 md:flex-none">
-                  View Documentation
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          {["all", "general", "billing", "features", "technical"].map((tab) => (
+            <TabsContent key={tab} value={tab} className="mt-0">
+              <Accordion type="single" collapsible className="w-full space-y-2">
+                {faqItems
+                  .filter((item) => tab === "all" || item.category === tab)
+                  .map((item, index) => (
+                    <AccordionItem 
+                      key={index} 
+                      value={`item-${index}`} 
+                      className="border rounded-lg px-4"
+                    >
+                      <AccordionTrigger className="text-sm font-medium text-left">
+                        {item.question}
+                      </AccordionTrigger>
+                      <AccordionContent className="text-sm text-muted-foreground text-left">
+                        {item.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+              </Accordion>
+            </TabsContent>
+          ))}
+        </Tabs>
       </div>
     </div>
   );
