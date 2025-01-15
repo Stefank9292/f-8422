@@ -8,14 +8,11 @@ const corsHeaders = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    console.log('Starting checkout session creation...');
-
     // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
@@ -108,7 +105,7 @@ serve(async (req) => {
 
     console.log('Creating checkout session with return URL:', baseUrl);
     
-    // Create checkout session without proration settings
+    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       line_items: [{ price: priceId, quantity: 1 }],
