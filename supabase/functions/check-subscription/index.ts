@@ -37,11 +37,12 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.id);
 
-    // Get latest subscription log
+    // Get latest active subscription log
     const { data: subscriptionLogs, error: subscriptionError } = await supabase
       .from('subscription_logs')
       .select('*')
       .eq('user_id', user.id)
+      .eq('status', 'active')  // Only get active subscriptions
       .order('created_at', { ascending: false })
       .limit(1);
 
@@ -69,13 +70,41 @@ serve(async (req) => {
 
         console.log('Parsed subscription details:', details);
 
+        // Map price IDs to subscription tiers
+        const priceId = details.price_id || details.priceId;
+        let maxRequests;
+
+        // Updated price ID mapping
+        switch (priceId) {
+          // Creator on Steroids Monthly
+          case 'price_1Qdt4NGX13ZRG2XiMWXryAm9':
+            maxRequests = Infinity;
+            break;
+          // Creator on Steroids Annual
+          case 'price_1Qdt5HGX13ZRG2XiUW80k3Fk':
+            maxRequests = Infinity;
+            break;
+          // Creator Pro Monthly
+          case 'price_1QfKMGGX13ZRG2XiFyskXyJo':
+            maxRequests = 25;
+            break;
+          // Creator Pro Annual
+          case 'price_1QfKMYGX13ZRG2XioPYKCe7h':
+            maxRequests = 25;
+            break;
+          default:
+            maxRequests = 3; // Free tier
+        }
+
         subscriptionDetails = {
           subscribed: true,
-          priceId: details.priceId || null,
+          priceId: priceId || null,
           canceled: details.canceled || false,
           cancel_at: details.cancel_at || null,
-          maxRequests: details.maxRequests || 5
+          maxRequests
         };
+
+        console.log('Subscription details being returned:', subscriptionDetails);
       } catch (parseError) {
         console.error('Error parsing subscription details:', parseError);
         // Fallback to default values if parsing fails
@@ -84,18 +113,16 @@ serve(async (req) => {
           priceId: null,
           canceled: false,
           cancel_at: null,
-          maxRequests: 5
+          maxRequests: 3
         };
       }
-
-      console.log('Returning subscription details:', subscriptionDetails);
     } else {
       subscriptionDetails = {
         subscribed: false,
         priceId: null,
         canceled: false,
         cancel_at: null,
-        maxRequests: 5
+        maxRequests: 3
       };
 
       console.log('No active subscription found, returning:', subscriptionDetails);
