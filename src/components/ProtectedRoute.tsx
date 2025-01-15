@@ -20,11 +20,33 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const handleSessionError = async () => {
       if (error?.toString().includes('refresh_token_not_found') || 
           error?.toString().includes('Invalid user session')) {
-        console.log('Session error detected, signing out...', error);
+        console.log('Session error detected, cleaning up...', error);
+        
+        // Clear all storage except specific items we want to keep
+        const keysToKeep = ['supabase.auth.token'];
+        const itemsToKeep = {};
+        
+        keysToKeep.forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value) {
+            itemsToKeep[key] = value;
+          }
+        });
+        
         // Clear query cache
         queryClient.clear();
-        // Sign out
+        
+        // Clear localStorage
+        localStorage.clear();
+        
+        // Restore kept items
+        Object.entries(itemsToKeep).forEach(([key, value]) => {
+          localStorage.setItem(key, value);
+        });
+        
+        // Sign out from Supabase
         await supabase.auth.signOut();
+        
         toast({
           title: "Session Expired",
           description: "Please sign in again to continue.",
