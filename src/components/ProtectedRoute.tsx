@@ -18,9 +18,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleSessionError = async () => {
-      if (error?.toString().includes('refresh_token_not_found') || 
-          error?.toString().includes('Invalid user session')) {
-        console.log('Session error detected, cleaning up...', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      if (errorMessage.includes('refresh_token_not_found') || 
+          errorMessage.includes('Invalid user session')) {
+        console.log('Session error detected, cleaning up...', errorMessage);
         
         try {
           // Clear query cache first
@@ -52,9 +54,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, [error, toast, queryClient]);
 
   useEffect(() => {
-    if (subscriptionError && 'message' in subscriptionError) {
-      console.log('Subscription check error:', subscriptionError);
-      if ('status' in subscriptionError && (subscriptionError as any).status === 401) {
+    if (subscriptionError) {
+      console.error('Subscription check error:', subscriptionError);
+      if (subscriptionError instanceof Error && 'status' in subscriptionError && (subscriptionError as any).status === 401) {
         queryClient.invalidateQueries({ queryKey: ['session'] });
       }
     }
@@ -70,12 +72,13 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     // If we have an auth error, redirect to login
-    if (error.toString().includes('refresh_token_not_found') || 
-        error.toString().includes('Invalid user session')) {
+    if (errorMessage.includes('refresh_token_not_found') || 
+        errorMessage.includes('Invalid user session')) {
       return <Navigate to="/auth" state={{ from: location }} replace />;
     }
-    return <ErrorState error={error.toString()} onRetry={() => window.location.reload()} />;
+    return <ErrorState error={errorMessage} onRetry={() => window.location.reload()} />;
   }
 
   // Handle undefined session state
