@@ -36,15 +36,7 @@ serve(async (req) => {
 
     console.log('Checking subscription for user:', user.email);
 
-    // Updated valid price IDs
-    const validPriceIds = [
-      "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
-      "price_1QfKMYGX13ZRG2XioPYKCe7h", // Creator Pro Annual
-      "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
-      "price_1Qdt5HGX13ZRG2XiUW80k3Fk"  // Creator on Steroids Annual
-    ];
-
-    // Get the latest subscription log for the user
+    // Get the latest active subscription log for the user
     const { data: subscriptionLogs, error: subError } = await supabaseClient
       .from('subscription_logs')
       .select('*')
@@ -60,20 +52,24 @@ serve(async (req) => {
 
     console.log('Found subscription logs:', subscriptionLogs);
 
-    const hasActiveSubscription = subscriptionLogs && 
-                                subscriptionLogs.length > 0 && 
-                                subscriptionLogs[0].details?.price_id && 
-                                validPriceIds.includes(subscriptionLogs[0].details.price_id);
+    // Check if user has an active subscription
+    const hasActiveSubscription = subscriptionLogs && subscriptionLogs.length > 0;
+    let subscriptionDetails;
 
-    const subscriptionDetails = hasActiveSubscription ? {
-      subscribed: true,
-      priceId: subscriptionLogs[0].details.price_id,
-      canceled: subscriptionLogs[0].details.canceled || false
-    } : {
-      subscribed: false,
-      priceId: null,
-      canceled: false
-    };
+    if (hasActiveSubscription) {
+      const latestSubscription = subscriptionLogs[0];
+      subscriptionDetails = {
+        subscribed: true,
+        priceId: latestSubscription.details?.priceId || null,
+        canceled: latestSubscription.details?.canceled || false
+      };
+    } else {
+      subscriptionDetails = {
+        subscribed: false,
+        priceId: null,
+        canceled: false
+      };
+    }
 
     console.log('Returning subscription details:', subscriptionDetails);
 
