@@ -72,23 +72,26 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .eq('status', 'active')  // Only get active subscriptions
       .order('created_at', { ascending: false })
-      .limit(1);
+      .limit(1)
+      .single(); // Get single record to avoid array
 
-    if (subscriptionError) {
+    if (subscriptionError && subscriptionError.code !== 'PGRST116') { // Ignore "no rows returned" error
       console.error('Error fetching subscription:', subscriptionError);
       throw subscriptionError;
     }
 
-    const subscription = subscriptionData?.[0];
-    const isSubscribed = subscription?.status === 'active';
-    const priceId = subscription?.details?.price_id || null;
-    const canceled = subscription?.status === 'canceled';
+    console.log('Raw subscription data:', subscriptionData);
+
+    // Check if we have an active subscription
+    const isSubscribed = subscriptionData?.status === 'active';
+    const priceId = subscriptionData?.details?.price_id || null;
+    const canceled = subscriptionData?.status === 'canceled';
 
     console.log('Subscription check result:', {
       subscribed: isSubscribed,
       priceId,
       canceled,
-      details: subscription?.details
+      details: subscriptionData?.details
     });
 
     // Check if the price ID is one of the valid ones
@@ -101,13 +104,19 @@ serve(async (req) => {
 
     const hasValidPriceId = priceId && validPriceIds.includes(priceId);
 
+    const response = {
+      subscribed: isSubscribed && hasValidPriceId,
+      priceId,
+      canceled,
+      maxClicks: (isSubscribed && hasValidPriceId) ? 
+        (priceId === "price_1Qdt4NGX13ZRG2XiMWXryAm9" || priceId === "price_1Qdt5HGX13ZRG2XiUW80k3Fk") ? Infinity : 25 
+        : 3
+    };
+
+    console.log('Sending response:', response);
+
     return new Response(
-      JSON.stringify({
-        subscribed: isSubscribed && hasValidPriceId,
-        priceId,
-        canceled,
-        maxClicks: (isSubscribed && hasValidPriceId) ? 25 : 3
-      }),
+      JSON.stringify(response),
       { 
         status: 200,
         headers: {
