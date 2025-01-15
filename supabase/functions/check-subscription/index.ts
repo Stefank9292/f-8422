@@ -63,7 +63,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Authenticated user:', user.id);
+    console.log('Checking subscription for user:', user.id);
 
     // Get subscription status from subscription_logs table
     const { data: subscriptionData, error: subscriptionError } = await supabaseClient
@@ -84,8 +84,7 @@ serve(async (req) => {
     const priceId = subscription?.details?.price_id || null;
     const canceled = subscription?.status === 'canceled';
 
-    console.log('Raw subscription data:', subscription);
-    console.log('Subscription status:', {
+    console.log('Subscription check result:', {
       subscribed: isSubscribed,
       priceId,
       canceled,
@@ -101,11 +100,6 @@ serve(async (req) => {
     ];
 
     const hasValidPriceId = priceId && validPriceIds.includes(priceId);
-    console.log('Price ID validation:', {
-      priceId,
-      isValid: hasValidPriceId,
-      validPriceIds
-    });
 
     return new Response(
       JSON.stringify({
