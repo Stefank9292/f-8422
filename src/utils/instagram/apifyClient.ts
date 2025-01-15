@@ -23,13 +23,17 @@ function normalizeInstagramUrl(input: string): string {
   // Remove any trailing slashes and trim whitespace
   const cleanInput = input.trim().replace(/\/$/, '');
   
-  // If it's a full URL, extract just the username
+  // If it's already a full URL, extract just the username
   if (cleanInput.startsWith('https://www.instagram.com/')) {
     return cleanInput.replace('https://www.instagram.com/', '').split('/')[0];
   }
   
-  // Remove @ if present
-  return cleanInput.replace('@', '');
+  // If it starts with @, remove it
+  if (cleanInput.startsWith('@')) {
+    return cleanInput.slice(1);
+  }
+  
+  return cleanInput;
 }
 
 export async function fetchInstagramPosts(
@@ -106,7 +110,10 @@ export async function fetchBulkInstagramPosts(
 
     await trackInstagramRequest(session.user.id);
 
-    const normalizedUrls = urls.map(url => normalizeInstagramUrl(url.trim()));
+    const normalizedUrls = urls.map(url => {
+      const username = normalizeInstagramUrl(url.trim());
+      return `https://www.instagram.com/${username}`;
+    });
     console.log('Normalized URLs:', normalizedUrls);
 
     const requestBody: ApifyRequestBody = {
