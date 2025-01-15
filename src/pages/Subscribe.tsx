@@ -68,12 +68,12 @@ const SubscribePage = () => {
 
   const priceIds = {
     premium: {
-      monthly: "price_1QfKMGGX13ZRG2XiFyskXyJo",
-      annual: "price_1QfKMYGX13ZRG2XioPYKCe7h"
+      monthly: "price_1QfKMGGX13ZRG2XiFyskXyJo", // Creator Pro Monthly
+      annual: "price_1QfKMYGX13ZRG2XioPYKCe7h"   // Creator Pro Annual
     },
     ultra: {
-      monthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9",
-      annual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk"
+      monthly: "price_1Qdt4NGX13ZRG2XiMWXryAm9", // Creator on Steroids Monthly
+      annual: "price_1Qdt5HGX13ZRG2XiUW80k3Fk"   // Creator on Steroids Annual
     }
   };
 
