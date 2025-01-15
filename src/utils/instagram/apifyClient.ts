@@ -19,6 +19,16 @@ async function trackInstagramRequest(userId: string) {
     });
 }
 
+function normalizeInstagramUrl(input: string): string {
+  // Check if the input is already a full URL
+  if (input.startsWith('https://www.instagram.com/')) {
+    return input;
+  }
+  // Remove @ if present and construct the URL
+  const username = input.replace('@', '');
+  return `https://www.instagram.com/${username}`;
+}
+
 export async function fetchInstagramPosts(
   username: string, 
   numberOfVideos: number = 3,
@@ -39,9 +49,12 @@ export async function fetchInstagramPosts(
 
     await trackInstagramRequest(session.user.id);
 
+    const normalizedUrl = normalizeInstagramUrl(username.trim());
+    console.log('Normalized URL:', normalizedUrl);
+
     const requestBody: ApifyRequestBody = {
       addParentData: false,
-      directUrls: [`https://www.instagram.com/${username.replace('@', '')}`],
+      directUrls: [normalizedUrl],
       enhanceUserSearchWithFacebookPage: false,
       isUserReelFeedURL: false,
       isUserTaggedFeedURL: false,
@@ -89,17 +102,12 @@ export async function fetchBulkInstagramPosts(
 
     await trackInstagramRequest(session.user.id);
 
-    const cleanUrls = urls.map(url => {
-      let cleanUrl = url.trim();
-      if (!cleanUrl.startsWith('https://')) {
-        cleanUrl = `https://www.instagram.com/${cleanUrl.replace('@', '')}`;
-      }
-      return cleanUrl;
-    });
+    const normalizedUrls = urls.map(url => normalizeInstagramUrl(url.trim()));
+    console.log('Normalized URLs:', normalizedUrls);
 
     const requestBody: ApifyRequestBody = {
       addParentData: false,
-      directUrls: cleanUrls,
+      directUrls: normalizedUrls,
       enhanceUserSearchWithFacebookPage: false,
       isUserReelFeedURL: false,
       isUserTaggedFeedURL: false,
