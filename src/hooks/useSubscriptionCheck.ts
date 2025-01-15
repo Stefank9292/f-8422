@@ -86,7 +86,7 @@ export const useSubscriptionCheck = (session: Session | null) => {
     },
     enabled: !!session?.access_token,
     staleTime: 0, // Always fetch fresh data
-    cacheTime: 0, // Don't cache the data
+    gcTime: 0, // Don't cache the data
     retry: (failureCount, error: any) => {
       // Don't retry on auth errors
       if (error?.status === 401 || error?.message?.includes('Invalid user session')) {

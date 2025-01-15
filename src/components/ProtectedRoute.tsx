@@ -39,9 +39,9 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, [error, toast, queryClient]);
 
   useEffect(() => {
-    if (subscriptionError) {
+    if (subscriptionError && 'message' in subscriptionError) {
       console.log('Subscription check error:', subscriptionError);
-      if (subscriptionError.status === 401) {
+      if ('status' in subscriptionError && (subscriptionError as any).status === 401) {
         queryClient.invalidateQueries({ queryKey: ['session'] });
       }
     }
