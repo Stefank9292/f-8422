@@ -18,7 +18,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const handleSessionError = async () => {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = typeof error === 'object' && error !== null ? (error as Error).message : String(error);
       
       if (errorMessage.includes('refresh_token_not_found') || 
           errorMessage.includes('Invalid user session')) {
@@ -56,7 +56,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (subscriptionError) {
       console.error('Subscription check error:', subscriptionError);
-      if (subscriptionError instanceof Error && 'status' in subscriptionError && (subscriptionError as any).status === 401) {
+      if (typeof subscriptionError === 'object' && subscriptionError !== null && 'status' in subscriptionError && (subscriptionError as any).status === 401) {
         queryClient.invalidateQueries({ queryKey: ['session'] });
       }
     }
@@ -72,7 +72,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = typeof error === 'object' && error !== null ? (error as Error).message : String(error);
     // If we have an auth error, redirect to login
     if (errorMessage.includes('refresh_token_not_found') || 
         errorMessage.includes('Invalid user session')) {
