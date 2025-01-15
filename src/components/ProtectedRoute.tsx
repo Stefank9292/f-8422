@@ -47,6 +47,11 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     }
   }, [subscriptionError, queryClient]);
 
+  // Invalidate subscription status on route change
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+  }, [location.pathname, queryClient]);
+
   if (isLoading) {
     return <LoadingState />;
   }

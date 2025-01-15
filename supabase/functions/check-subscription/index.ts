@@ -70,6 +70,7 @@ serve(async (req) => {
       .from('subscription_logs')
       .select('*')
       .eq('user_id', user.id)
+      .eq('status', 'active')  // Only get active subscriptions
       .order('created_at', { ascending: false })
       .limit(1);
 
