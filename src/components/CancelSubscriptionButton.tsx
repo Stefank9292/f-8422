@@ -31,6 +31,8 @@ export const CancelSubscriptionButton = ({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  console.log('CancelSubscriptionButton props:', { isCanceled, cancelAt });
+
   const { data: session } = useQuery({
     queryKey: ['session'],
     queryFn: async () => {
@@ -69,6 +71,7 @@ export const CancelSubscriptionButton = ({
   };
 
   if (isCanceled && cancelAt) {
+    console.log('Rendering canceled button with date:', new Date(cancelAt * 1000));
     const cancelDate = new Date(cancelAt * 1000);
     return (
       <Button 
