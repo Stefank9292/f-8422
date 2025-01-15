@@ -53,18 +53,21 @@ export function AppSidebar() {
       // First close the sidebar on mobile
       setOpen(false);
       
-      // Then invalidate all queries to clear the cache
+      // Clear all queries from the cache
       queryClient.clear();
       
-      // Then sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-
       // Clear local storage except for specific items
       const authData = window.localStorage.getItem('supabase.auth.token');
       window.localStorage.clear();
       if (authData) {
         window.localStorage.setItem('supabase.auth.token', authData);
+      }
+
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Sign out error:', error);
+        throw error;
       }
 
       // Show success message
