@@ -67,7 +67,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
   }, [location.pathname, queryClient]);
 
-  if (isLoading) {
+  if (isLoading || isLoadingSubscription) {
     return <LoadingState />;
   }
 
@@ -91,6 +91,8 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Simply return children without any subscription checks
+  // Log subscription status for debugging
+  console.log('Current subscription status:', subscriptionStatus);
+
   return <>{children}</>;
-};
+});

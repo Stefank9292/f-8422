@@ -5,7 +5,6 @@ import Stripe from "https://esm.sh/stripe@12.0.0?target=deno";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Content-Type': 'application/json'
 };
 
@@ -59,7 +58,8 @@ serve(async (req) => {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxRequests: 3
+          maxRequests: 3,
+          subscriptionTier: 'free'
         }),
         { headers: corsHeaders }
       );
@@ -82,7 +82,8 @@ serve(async (req) => {
           subscribed: false,
           priceId: null,
           canceled: false,
-          maxRequests: 3
+          maxRequests: 3,
+          subscriptionTier: 'free'
         }),
         { headers: corsHeaders }
       );
