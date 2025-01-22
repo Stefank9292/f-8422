@@ -110,12 +110,12 @@ serve(async (req) => {
           maxRequests
         };
 
-        console.log('Subscription details being returned:', subscriptionDetails);
+        console.log('Returning subscription details:', subscriptionDetails);
       } catch (parseError) {
         console.error('Error parsing subscription details:', parseError);
-        // Fallback to default values if parsing fails
+        // Fallback to default free tier values if parsing fails
         subscriptionDetails = {
-          subscribed: true,
+          subscribed: false,
           priceId: null,
           canceled: false,
           cancel_at: null,
@@ -123,6 +123,7 @@ serve(async (req) => {
         };
       }
     } else {
+      // No active subscription, return free tier values
       subscriptionDetails = {
         subscribed: false,
         priceId: null,
@@ -131,7 +132,7 @@ serve(async (req) => {
         maxRequests: 3
       };
 
-      console.log('No active subscription found, returning:', subscriptionDetails);
+      console.log('No active subscription found, returning free tier details');
     }
 
     return new Response(
