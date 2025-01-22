@@ -77,28 +77,29 @@ serve(async (req) => {
 
         // Map price IDs to subscription tiers
         const priceId = details.price_id || details.priceId;
-        let maxRequests;
 
-        // Updated price ID mapping
-        switch (priceId) {
-          // Creator on Steroids Monthly
-          case 'price_1Qdt4NGX13ZRG2XiMWXryAm9':
-            maxRequests = Infinity;
-            break;
-          // Creator on Steroids Annual
-          case 'price_1Qdt5HGX13ZRG2XiUW80k3Fk':
-            maxRequests = Infinity;
-            break;
-          // Creator Pro Monthly
-          case 'price_1QfKMGGX13ZRG2XiFyskXyJo':
-            maxRequests = 25;
-            break;
-          // Creator Pro Annual
-          case 'price_1QfKMYGX13ZRG2XioPYKCe7h':
-            maxRequests = 25;
-            break;
-          default:
-            maxRequests = 3; // Free tier
+        // Creator on Steroids Plans
+        const creatorOnSteroidsPlans = [
+          'price_1Qdt4NGX13ZRG2XiMWXryAm9', // Monthly
+          'price_1Qdt5HGX13ZRG2XiUW80k3Fk'  // Annual
+        ];
+
+        // Creator Pro Plans
+        const creatorProPlans = [
+          'price_1QfKMGGX13ZRG2XiFyskXyJo', // Monthly
+          'price_1QfKMYGX13ZRG2XioPYKCe7h'  // Annual
+        ];
+
+        let maxRequests;
+        if (creatorOnSteroidsPlans.includes(priceId)) {
+          maxRequests = Infinity;
+          console.log('User has Creator on Steroids plan with unlimited requests');
+        } else if (creatorProPlans.includes(priceId)) {
+          maxRequests = 25;
+          console.log('User has Creator Pro plan with 25 requests');
+        } else {
+          maxRequests = 3;
+          console.log('User has Free plan with 3 requests');
         }
 
         subscriptionDetails = {
