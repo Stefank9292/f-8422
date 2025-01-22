@@ -51,7 +51,7 @@ serve(async (req) => {
       throw new Error('No price ID provided')
     }
 
-    console.log('Creating checkout session for:', { email: user.email });
+    console.log('Creating checkout session for:', { email: user.email, priceId });
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
@@ -86,10 +86,13 @@ serve(async (req) => {
         const currentSubscription = subscriptions.data[0]
         const currentPriceId = currentSubscription.items.data[0].price.id
 
-        // If trying to subscribe to the same plan, return error
+        // If trying to subscribe to the same plan, return error with a clear message
         if (currentPriceId === priceId) {
           return new Response(
-            JSON.stringify({ error: "You are already subscribed to this plan" }),
+            JSON.stringify({ 
+              error: "You are already subscribed to this plan",
+              code: "already_subscribed"
+            }),
             { 
               headers: { ...corsHeaders, 'Content-Type': 'application/json' },
               status: 400,
