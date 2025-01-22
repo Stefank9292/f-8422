@@ -95,4 +95,4 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   console.log('Current subscription status:', subscriptionStatus);
 
   return <>{children}</>;
-});
+};
